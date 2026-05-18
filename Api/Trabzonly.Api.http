@@ -1,0 +1,6 @@
+@Trabzonly.Api_HostAddress = http://localhost:5173
+
+GET {{Trabzonly.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
