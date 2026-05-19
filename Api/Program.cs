@@ -3,6 +3,9 @@ using System.Text.Json.Serialization;
 using Api.Core.Middlewares;
 using Api.Core.Security;
 using Api.Data;
+using Api.Features.Authentication;
+using Api.Features.Roles;
+using Api.Features.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -24,6 +27,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 builder.Services.AddDataDependencies(builder.Configuration);
+builder.Services.AddUserDependencies();
+builder.Services.AddRoleDependencies();
+builder.Services.AddAuthenticationDependencies();
 
 builder.Services.Configure<TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
 

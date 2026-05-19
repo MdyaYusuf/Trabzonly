@@ -19,4 +19,11 @@ public static class HashingHelper
 
     return Convert.ToBase64String(computedHash) == passwordHash;
   }
+
+  public static string HashRefreshToken(string token)
+  {
+    using var sha256 = SHA256.Create();
+    var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(token));
+    return Convert.ToBase64String(hashBytes);
+  }
 }
