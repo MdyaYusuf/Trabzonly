@@ -1,6 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Api.Core.Entities;
+using Api.Features.Blogs;
+using Api.Features.Comments;
 using Api.Features.Roles;
+using Api.Features.Quizzes;
 
 namespace Api.Features.Users;
 
@@ -28,4 +31,7 @@ public class User : Entity<Guid>
   // Navigation properties
   public int RoleId { get; set; }
   public virtual Role Role { get; set; } = default!;
+  public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
+  public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+  public virtual ICollection<UserQuizResult> QuizResults { get; set; } = new List<UserQuizResult>();
 }
