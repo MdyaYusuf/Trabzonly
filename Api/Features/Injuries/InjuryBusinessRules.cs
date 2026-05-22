@@ -23,6 +23,8 @@ public class InjuryBusinessRules(IInjuryRepository _injuryRepository)
   public void AdminRoleRequired(string userRole)
   {
     if (userRole != "Admin")
+    {
       throw new ForbiddenException("Sakatlık işlemleri için yetkiniz bulunmamaktadır.");
+    }
   }
 }
