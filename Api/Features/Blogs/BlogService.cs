@@ -25,7 +25,7 @@ public class BlogService(
   {
     List<Blog> blogs = await _blogRepository.GetAllAsync(
       filter,
-      include: include ?? (query => query.Include(b => b.User)),
+      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
       orderBy,
       enableTracking,
       withDeleted,
@@ -50,7 +50,7 @@ public class BlogService(
   {
     Blog? blog = await _blogRepository.GetAsync(
       predicate,
-      include: include ?? (query => query.Include(b => b.User)),
+      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
       enableTracking,
       cancellationToken);
 
@@ -84,7 +84,7 @@ public class BlogService(
   {
     Blog blog = await _businessRules.GetBlogIfExistAsync(
       id,
-      include: include ?? (query => query.Include(b => b.User)),
+      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
       enableTracking,
       cancellationToken);
 

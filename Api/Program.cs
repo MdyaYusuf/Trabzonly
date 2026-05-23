@@ -17,6 +17,7 @@ using Api.Features.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Api.Features.Categories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,7 @@ builder.Services.AddPlayerDependencies();
 builder.Services.AddInjuryDependencies();
 builder.Services.AddQuizDependencies();
 builder.Services.AddBlogDependencies();
+builder.Services.AddCategoryDependencies();
 builder.Services.AddCommentDependencies();
 builder.Services.AddPositionDependencies();
 builder.Services.AddSeasonDependencies();

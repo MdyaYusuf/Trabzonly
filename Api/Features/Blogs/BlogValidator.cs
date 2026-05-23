@@ -15,6 +15,9 @@ public class CreateBlogRequestValidator : AbstractValidator<CreateBlogRequest>
 
     RuleFor(b => b.Content)
       .NotEmpty().WithMessage("İçerik boş olamaz.");
+
+    RuleFor(b => b.CategoryId)
+      .GreaterThan(0).WithMessage("Kategori seçimi zorunludur.");
   }
 }
 
@@ -34,5 +37,8 @@ public class UpdateBlogRequestValidator : AbstractValidator<UpdateBlogRequest>
 
     RuleFor(b => b.Content)
       .NotEmpty().WithMessage("İçerik boş olamaz.");
+
+    RuleFor(b => b.CategoryId)
+      .GreaterThan(0).WithMessage("Kategori seçimi zorunludur.");
   }
 }

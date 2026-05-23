@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Api.Features.Categories;
 
 namespace Api.Features.Blogs;
 
@@ -40,6 +41,11 @@ public class BlogConfiguration : IEntityTypeConfiguration<Blog>
     builder.HasOne(b => b.User)
       .WithMany(u => u.Blogs)
       .HasForeignKey(b => b.UserId)
+      .OnDelete(DeleteBehavior.Restrict);
+
+    builder.HasOne(b => b.Category)
+      .WithMany(c => c.Blogs)
+      .HasForeignKey(b => b.CategoryId)
       .OnDelete(DeleteBehavior.Restrict);
   }
 }
