@@ -19,6 +19,20 @@ public interface IPlayerStatsService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopScorersAsync(
+    int count,
+    Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopAssistersAsync(
+    int count,
+    Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<PlayerStatsResponseDto>> AddAsync(
     CreatePlayerStatsRequest request,
     string userRole,

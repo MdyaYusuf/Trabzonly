@@ -27,6 +27,26 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [HttpGet("most-taken/{count:int}")]
+  public async Task<IActionResult> GetMostTakenQuizzes(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _quizService.GetMostTakenQuizzesAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("recent/{count:int}")]
+  public async Task<IActionResult> GetRecentQuizzes(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _quizService.GetRecentQuizzesAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [Authorize(Roles = "Admin")]
   [HttpPost]
   public async Task<IActionResult> Add(

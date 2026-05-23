@@ -66,6 +66,56 @@ public class QuizService(
     };
   }
 
+  public async Task<ReturnModel<List<QuizResponseDto>>> GetMostTakenQuizzesAsync(
+    int count,
+    Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Quiz> quizzes = await _quizRepository.GetMostTakenQuizzesAsync(
+      count,
+      include: include ?? (query => query.Include(q => q.Questions).ThenInclude(q => q.Answers)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<QuizResponseDto> response = _mapper.EntityToResponseDtoList(quizzes);
+
+    return new ReturnModel<List<QuizResponseDto>>()
+    {
+      Success = true,
+      Message = "En çok çözülen quizler başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<QuizResponseDto>>> GetRecentQuizzesAsync(
+    int count,
+    Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Quiz> quizzes = await _quizRepository.GetRecentQuizzesAsync(
+      count,
+      include: include ?? (query => query.Include(q => q.Questions).ThenInclude(q => q.Answers)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<QuizResponseDto> response = _mapper.EntityToResponseDtoList(quizzes);
+
+    return new ReturnModel<List<QuizResponseDto>>()
+    {
+      Success = true,
+      Message = "En son eklenen quizler başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<QuizResponseDto>> AddAsync(
     CreateQuizRequest request,
     string userRole,

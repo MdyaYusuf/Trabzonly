@@ -11,13 +11,53 @@ public class EfUserRepository : EfBaseRepository<BaseDbContext, User, Guid>, IUs
 
   }
 
-  public async Task<User?> GetUserByEmailAsync(string email)
+  public async Task<bool> IsEmailUniqueAsync(
+    string email,
+    CancellationToken cancellationToken = default)
   {
-    return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    return !await Query(enableTracking: false, withDeleted: true)
+      .AnyAsync(u => u.Email == email, cancellationToken);
   }
 
-  public async Task<bool> IsEmailUniqueAsync(string email)
+  public async Task<List<User>> GetTopContributorsAsync(
+    int count,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
   {
-    return !await _context.Users.AnyAsync(u => u.Email == email);
+    IQueryable<User> query = Query(enableTracking, withDeleted);
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    return await query
+      .Where(u => u.IsActive)
+      .OrderByDescending(u => u.Blogs.Count + u.Comments.Count)
+      .Take(count)
+      .ToListAsync(cancellationToken);
+  }
+
+  public async Task<List<User>> GetNewestMembersAsync(
+    int count,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<User> query = Query(enableTracking, withDeleted);
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    return await query
+      .Where(u => u.IsActive)
+      .OrderByDescending(u => u.CreatedDate)
+      .Take(count)
+      .ToListAsync(cancellationToken);
   }
 }

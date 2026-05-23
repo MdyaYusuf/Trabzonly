@@ -27,6 +27,26 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
+  [HttpGet("top-valued/{count:int}")]
+  public async Task<IActionResult> GetTopValuedPlayers(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _playerService.GetTopValuedPlayersAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("most-commented/{count:int}")]
+  public async Task<IActionResult> GetMostCommentedPlayers(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _playerService.GetMostCommentedPlayersAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [Authorize(Roles = "Admin")]
   [HttpPost]
   public async Task<IActionResult> Add(

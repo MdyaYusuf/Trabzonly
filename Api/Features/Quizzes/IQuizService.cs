@@ -19,6 +19,20 @@ public interface IQuizService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<QuizResponseDto>>> GetMostTakenQuizzesAsync(
+    int count,
+    Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<List<QuizResponseDto>>> GetRecentQuizzesAsync(
+    int count,
+    Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<QuizResponseDto>> AddAsync(
     CreateQuizRequest request,
     string userRole,

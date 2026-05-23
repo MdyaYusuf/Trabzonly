@@ -27,6 +27,26 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
     return CreateActionResult(result);
   }
 
+  [HttpGet("top-scorers/{count:int}")]
+  public async Task<IActionResult> GetTopScorers(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _playerStatsService.GetTopScorersAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("top-assisters/{count:int}")]
+  public async Task<IActionResult> GetTopAssisters(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _playerStatsService.GetTopAssistersAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [Authorize(Roles = "Admin")]
   [HttpPost]
   public async Task<IActionResult> Add(

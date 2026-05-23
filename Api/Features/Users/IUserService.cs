@@ -31,6 +31,24 @@ public interface IUserService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<UserPreviewDto>>> GetTopContributorsAsync(
+    int count,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<List<UserPreviewDto>>> GetNewestMembersAsync(
+    int count,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<bool>> CheckEmailUniqueAsync(
+    string email,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
     Guid currentUserId,

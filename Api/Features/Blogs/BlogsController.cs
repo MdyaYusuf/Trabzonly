@@ -27,6 +27,26 @@ public class BlogsController(IBlogService _blogService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [HttpGet("top-commented/{count:int}")]
+  public async Task<IActionResult> GetTopCommentedBlogs(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _blogService.GetTopCommentedBlogsAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("recent/{count:int}")]
+  public async Task<IActionResult> GetRecentBlogs(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _blogService.GetRecentBlogsAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [Authorize]
   [HttpPost]
   public async Task<IActionResult> Add(

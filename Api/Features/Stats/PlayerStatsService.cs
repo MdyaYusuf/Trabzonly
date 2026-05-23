@@ -64,6 +64,56 @@ public class PlayerStatsService(
     };
   }
 
+  public async Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopScorersAsync(
+    int count,
+    Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<PlayerStats> stats = await _playerStatsRepository.GetTopScorersAsync(
+      count,
+      include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<PlayerStatsResponseDto> response = _mapper.EntityToResponseDtoList(stats);
+
+    return new ReturnModel<List<PlayerStatsResponseDto>>()
+    {
+      Success = true,
+      Message = "En çok gol atan oyuncular başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopAssistersAsync(
+    int count,
+    Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<PlayerStats> stats = await _playerStatsRepository.GetTopAssistersAsync(
+      count,
+      include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<PlayerStatsResponseDto> response = _mapper.EntityToResponseDtoList(stats);
+
+    return new ReturnModel<List<PlayerStatsResponseDto>>()
+    {
+      Success = true,
+      Message = "En çok asist yapan oyuncular başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<PlayerStatsResponseDto>> AddAsync(
     CreatePlayerStatsRequest request,
     string userRole,

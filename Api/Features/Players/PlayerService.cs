@@ -65,6 +65,56 @@ public class PlayerService(
     };
   }
 
+  public async Task<ReturnModel<List<PlayerResponseDto>>> GetTopValuedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Player> players = await _playerRepository.GetTopValuedPlayersAsync(
+      count,
+      include: include ?? (query => query.Include(p => p.Position)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<PlayerResponseDto> response = _mapper.EntityToResponseDtoList(players);
+
+    return new ReturnModel<List<PlayerResponseDto>>()
+    {
+      Success = true,
+      Message = "En değerli oyuncular başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<PlayerResponseDto>>> GetMostCommentedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Player> players = await _playerRepository.GetMostCommentedPlayersAsync(
+      count,
+      include: include ?? (query => query.Include(p => p.Position)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<PlayerResponseDto> response = _mapper.EntityToResponseDtoList(players);
+
+    return new ReturnModel<List<PlayerResponseDto>>()
+    {
+      Success = true,
+      Message = "En çok konuşulan oyuncular başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<PlayerResponseDto>> AddAsync(
     CreatePlayerRequest request,
     string userRole,

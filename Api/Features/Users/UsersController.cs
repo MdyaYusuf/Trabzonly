@@ -33,6 +33,48 @@ public class UsersController(IUserService _userService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [HttpGet("by-email/{email}")]
+  public async Task<IActionResult> GetByEmail(string email, CancellationToken cancellationToken)
+  {
+    var result = await _userService.GetAsync(
+      predicate: u => u.Email == email,
+      currentUserId: GetUserId(),
+      userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [AllowAnonymous]
+  [HttpGet("top-contributors/{count:int}")]
+  public async Task<IActionResult> GetTopContributors(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _userService.GetTopContributorsAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [AllowAnonymous]
+  [HttpGet("newest-members/{count:int}")]
+  public async Task<IActionResult> GetNewestMembers(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _userService.GetNewestMembersAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [AllowAnonymous]
+  [HttpGet("check-email")]
+  public async Task<IActionResult> CheckEmailUnique([FromQuery] string email, CancellationToken cancellationToken)
+  {
+    var result = await _userService.CheckEmailUniqueAsync(email, cancellationToken);
+    return CreateActionResult(result);
+  }
+
   [HttpPut("profile")]
   public async Task<IActionResult> Update([FromForm] UpdateUserRequest request, CancellationToken cancellationToken)
   {

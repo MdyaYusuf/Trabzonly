@@ -108,6 +108,71 @@ public class UserService(
     };
   }
 
+  public async Task<ReturnModel<List<UserPreviewDto>>> GetTopContributorsAsync(
+    int count,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<User> users = await _userRepository.GetTopContributorsAsync(
+      count,
+      include: include ?? (query => query.Include(u => u.Role)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<UserPreviewDto> response = _mapper.EntityToPreviewDtoList(users);
+
+    return new ReturnModel<List<UserPreviewDto>>()
+    {
+      Success = true,
+      Message = "En çok katkıda bulunan kullanıcılar başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<UserPreviewDto>>> GetNewestMembersAsync(
+    int count,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<User> users = await _userRepository.GetNewestMembersAsync(
+      count,
+      include: include ?? (query => query.Include(u => u.Role)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<UserPreviewDto> response = _mapper.EntityToPreviewDtoList(users);
+
+    return new ReturnModel<List<UserPreviewDto>>()
+    {
+      Success = true,
+      Message = "En yeni üyeler başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<bool>> CheckEmailUniqueAsync(
+    string email,
+    CancellationToken cancellationToken = default)
+  {
+    bool isUnique = await _userRepository.IsEmailUniqueAsync(email, cancellationToken);
+
+    return new ReturnModel<bool>()
+    {
+      Success = true,
+      Message = isUnique ? "E-posta adresi kullanılabilir." : "E-posta adresi zaten kullanımda.",
+      Data = isUnique,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<NoData>> UpdateAsync(
     UpdateUserRequest request,
     Guid currentUserId,

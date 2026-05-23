@@ -25,6 +25,20 @@ public interface IBlogService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<BlogResponseDto>>> GetTopCommentedBlogsAsync(
+    int count,
+    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<List<BlogResponseDto>>> GetRecentBlogsAsync(
+    int count,
+    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<BlogResponseDto>> AddAsync(
     CreateBlogRequest request,
     Guid currentUserId,

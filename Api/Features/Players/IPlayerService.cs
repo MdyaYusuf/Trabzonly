@@ -19,6 +19,20 @@ public interface IPlayerService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<PlayerResponseDto>>> GetTopValuedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<List<PlayerResponseDto>>> GetMostCommentedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<PlayerResponseDto>> AddAsync(
     CreatePlayerRequest request,
     string userRole,

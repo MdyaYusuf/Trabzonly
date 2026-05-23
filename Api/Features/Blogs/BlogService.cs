@@ -99,6 +99,56 @@ public class BlogService(
     };
   }
 
+  public async Task<ReturnModel<List<BlogResponseDto>>> GetTopCommentedBlogsAsync(
+    int count,
+    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Blog> blogs = await _blogRepository.GetTopCommentedBlogsAsync(
+      count,
+      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<BlogResponseDto> response = _mapper.EntityToResponseDtoList(blogs);
+
+    return new ReturnModel<List<BlogResponseDto>>()
+    {
+      Success = true,
+      Message = "En çok yorum alan bloglar başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<BlogResponseDto>>> GetRecentBlogsAsync(
+    int count,
+    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Blog> blogs = await _blogRepository.GetRecentBlogsAsync(
+      count,
+      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<BlogResponseDto> response = _mapper.EntityToResponseDtoList(blogs);
+
+    return new ReturnModel<List<BlogResponseDto>>()
+    {
+      Success = true,
+      Message = "En son eklenen bloglar başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<BlogResponseDto>> AddAsync(
     CreateBlogRequest request,
     Guid currentUserId,
