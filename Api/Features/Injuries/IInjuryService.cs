@@ -19,7 +19,7 @@ public interface IInjuryService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<InjuryResponseDto>> AddAsync(
+  Task<ReturnModel<CreatedInjuryResponseDto>> AddAsync(
     CreateInjuryRequest request,
     string userRole,
     CancellationToken cancellationToken = default);

@@ -21,6 +21,21 @@ public sealed record PlayerResponseDto(
   Guid PositionId,
   string PositionName);
 
+public sealed record CreatedPlayerResponseDto(
+  Guid Id,
+  string Name,
+  string? ImageUrl);
+
+public sealed record PlayerPreviewDto(
+  Guid Id,
+  string Name,
+  string Nationality,
+  int Age,
+  decimal? MarketValue,
+  string CurrentTeam,
+  string? ImageUrl,
+  string PositionName);
+
 // Requests
 public sealed record CreatePlayerRequest(
   string Name,

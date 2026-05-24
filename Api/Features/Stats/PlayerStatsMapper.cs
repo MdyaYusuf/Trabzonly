@@ -10,5 +10,6 @@ public partial class PlayerStatsMapper
   [MapProperty("Player.Name", "PlayerName")]
   [MapProperty("Season.Name", "SeasonName")]
   public partial PlayerStatsResponseDto EntityToResponseDto(PlayerStats entity);
+  public partial CreatedPlayerStatsResponseDto EntityToCreatedResponseDto(PlayerStats entity);
   public partial List<PlayerStatsResponseDto> EntityToResponseDtoList(List<PlayerStats> entities);
 }

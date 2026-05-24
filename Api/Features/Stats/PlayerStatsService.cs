@@ -114,7 +114,7 @@ public class PlayerStatsService(
     };
   }
 
-  public async Task<ReturnModel<PlayerStatsResponseDto>> AddAsync(
+  public async Task<ReturnModel<CreatedPlayerStatsResponseDto>> AddAsync(
     CreatePlayerStatsRequest request,
     string userRole,
     CancellationToken cancellationToken = default)
@@ -135,9 +135,9 @@ public class PlayerStatsService(
     await _playerStatsRepository.AddAsync(stats, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    PlayerStatsResponseDto response = _mapper.EntityToResponseDto(stats);
+    CreatedPlayerStatsResponseDto response = _mapper.EntityToCreatedResponseDto(stats);
 
-    return new ReturnModel<PlayerStatsResponseDto>()
+    return new ReturnModel<CreatedPlayerStatsResponseDto>()
     {
       Success = true,
       Message = "İstatistik başarılı bir şekilde eklendi.",

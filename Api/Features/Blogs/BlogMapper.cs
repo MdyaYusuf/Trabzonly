@@ -10,5 +10,11 @@ public partial class BlogMapper
   [MapProperty("User.Username", "AuthorUsername")]
   [MapProperty("Category.Name", "CategoryName")]
   public partial BlogResponseDto EntityToResponseDto(Blog entity);
+  public partial CreatedBlogResponseDto EntityToCreatedResponseDto(Blog entity);
   public partial List<BlogResponseDto> EntityToResponseDtoList(List<Blog> entities);
+
+  [MapProperty("User.Username", "AuthorUsername")]
+  [MapProperty("Category.Name", "CategoryName")]
+  public partial BlogPreviewDto EntityToPreviewDto(Blog entity);
+  public partial List<BlogPreviewDto> EntityToPreviewDtoList(List<Blog> entities);
 }

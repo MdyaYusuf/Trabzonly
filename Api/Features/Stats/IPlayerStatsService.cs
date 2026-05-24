@@ -33,7 +33,7 @@ public interface IPlayerStatsService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<PlayerStatsResponseDto>> AddAsync(
+  Task<ReturnModel<CreatedPlayerStatsResponseDto>> AddAsync(
     CreatePlayerStatsRequest request,
     string userRole,
     CancellationToken cancellationToken = default);

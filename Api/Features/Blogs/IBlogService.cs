@@ -39,7 +39,7 @@ public interface IBlogService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<BlogResponseDto>> AddAsync(
+  Task<ReturnModel<CreatedBlogResponseDto>> AddAsync(
     CreateBlogRequest request,
     Guid currentUserId,
     CancellationToken cancellationToken = default);

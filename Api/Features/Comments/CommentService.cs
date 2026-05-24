@@ -64,7 +64,7 @@ public class CommentService(
     };
   }
 
-  public async Task<ReturnModel<CommentResponseDto>> AddAsync(
+  public async Task<ReturnModel<CreatedCommentResponseDto>> AddAsync(
     CreateCommentRequest request,
     Guid currentUserId,
     CancellationToken cancellationToken = default)
@@ -83,9 +83,9 @@ public class CommentService(
     await _commentRepository.AddAsync(comment, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    CommentResponseDto response = _mapper.EntityToResponseDto(comment);
+    CreatedCommentResponseDto response = _mapper.EntityToCreatedResponseDto(comment);
 
-    return new ReturnModel<CommentResponseDto>()
+    return new ReturnModel<CreatedCommentResponseDto>()
     {
       Success = true,
       Message = "Yorum başarılı bir şekilde eklendi.",

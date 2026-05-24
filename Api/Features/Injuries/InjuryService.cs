@@ -64,7 +64,7 @@ public class InjuryService(
     };
   }
 
-  public async Task<ReturnModel<InjuryResponseDto>> AddAsync(
+  public async Task<ReturnModel<CreatedInjuryResponseDto>> AddAsync(
     CreateInjuryRequest request,
     string userRole,
     CancellationToken cancellationToken = default)
@@ -83,9 +83,9 @@ public class InjuryService(
     await _injuryRepository.AddAsync(injury, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    InjuryResponseDto response = _mapper.EntityToResponseDto(injury);
+    CreatedInjuryResponseDto response = _mapper.EntityToCreatedResponseDto(injury);
 
-    return new ReturnModel<InjuryResponseDto>()
+    return new ReturnModel<CreatedInjuryResponseDto>()
     {
       Success = true,
       Message = "Sakatlık başarılı bir şekilde eklendi.",

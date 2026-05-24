@@ -12,6 +12,11 @@ public sealed record InjuryResponseDto(
   string? SeasonName,
   DateTime CreatedDate);
 
+public sealed record CreatedInjuryResponseDto(
+  Guid Id,
+  string Name,
+  Guid PlayerId);
+
 // Requests
 public sealed record CreateInjuryRequest(
   string Name,

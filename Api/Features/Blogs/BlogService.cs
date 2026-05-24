@@ -149,7 +149,7 @@ public class BlogService(
     };
   }
 
-  public async Task<ReturnModel<BlogResponseDto>> AddAsync(
+  public async Task<ReturnModel<CreatedBlogResponseDto>> AddAsync(
     CreateBlogRequest request,
     Guid currentUserId,
     CancellationToken cancellationToken = default)
@@ -176,9 +176,9 @@ public class BlogService(
     await _blogRepository.AddAsync(blog, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    BlogResponseDto response = _mapper.EntityToResponseDto(blog);
+    CreatedBlogResponseDto response = _mapper.EntityToCreatedResponseDto(blog);
 
-    return new ReturnModel<BlogResponseDto>()
+    return new ReturnModel<CreatedBlogResponseDto>()
     {
       Success = true,
       Message = "Blog başarılı bir şekilde eklendi.",

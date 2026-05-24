@@ -12,6 +12,11 @@ public sealed record CommentResponseDto(
   Guid? ParentCommentId,
   DateTime CreatedDate);
 
+public sealed record CreatedCommentResponseDto(
+  Guid Id,
+  string Content,
+  bool IsApproved);
+
 // Requests
 public sealed record CreateCommentRequest(
   string Content,

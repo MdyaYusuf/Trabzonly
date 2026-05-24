@@ -115,7 +115,7 @@ public class PlayerService(
     };
   }
 
-  public async Task<ReturnModel<PlayerResponseDto>> AddAsync(
+  public async Task<ReturnModel<CreatedPlayerResponseDto>> AddAsync(
     CreatePlayerRequest request,
     string userRole,
     CancellationToken cancellationToken = default)
@@ -139,9 +139,9 @@ public class PlayerService(
     await _playerRepository.AddAsync(player, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    PlayerResponseDto response = _mapper.EntityToResponseDto(player);
+    CreatedPlayerResponseDto response = _mapper.EntityToCreatedResponseDto(player);
 
-    return new ReturnModel<PlayerResponseDto>()
+    return new ReturnModel<CreatedPlayerResponseDto>()
     {
       Success = true,
       Message = "Oyuncu başarılı bir şekilde eklendi.",

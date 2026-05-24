@@ -19,6 +19,12 @@ public sealed record PlayerStatsResponseDto(
   string SeasonName,
   DateTime CreatedDate);
 
+public sealed record CreatedPlayerStatsResponseDto(
+  Guid Id,
+  string Team,
+  Guid PlayerId,
+  Guid SeasonId);
+
 // Requests
 public sealed record CreatePlayerStatsRequest(
   string Team,

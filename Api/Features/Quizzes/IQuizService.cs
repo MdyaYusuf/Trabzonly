@@ -33,7 +33,7 @@ public interface IQuizService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<QuizResponseDto>> AddAsync(
+  Task<ReturnModel<CreatedQuizResponseDto>> AddAsync(
     CreateQuizRequest request,
     string userRole,
     CancellationToken cancellationToken = default);

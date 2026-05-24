@@ -116,7 +116,7 @@ public class QuizService(
     };
   }
 
-  public async Task<ReturnModel<QuizResponseDto>> AddAsync(
+  public async Task<ReturnModel<CreatedQuizResponseDto>> AddAsync(
     CreateQuizRequest request,
     string userRole,
     CancellationToken cancellationToken = default)
@@ -135,9 +135,9 @@ public class QuizService(
     await _quizRepository.AddAsync(quiz, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    QuizResponseDto response = _mapper.EntityToResponseDto(quiz);
+    CreatedQuizResponseDto response = _mapper.EntityToCreatedResponseDto(quiz);
 
-    return new ReturnModel<QuizResponseDto>()
+    return new ReturnModel<CreatedQuizResponseDto>()
     {
       Success = true,
       Message = "Quiz başarılı bir şekilde eklendi.",

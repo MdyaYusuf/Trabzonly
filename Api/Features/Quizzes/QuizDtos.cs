@@ -27,6 +27,16 @@ public sealed record UserQuizResultResponseDto(
   TimeSpan CompletionTime,
   DateTime CompletedAt);
 
+public sealed record CreatedQuizResponseDto(
+  Guid Id,
+  string Title);
+
+public sealed record QuizPreviewDto(
+  Guid Id,
+  string Title,
+  string? Description,
+  bool IsActive);
+
 // Requests
 public sealed record CreateQuizRequest(string Title, string? Description, List<CreateQuestionRequest> Questions);
 

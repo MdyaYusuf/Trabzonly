@@ -10,5 +10,6 @@ public partial class InjuryMapper
   [MapProperty("Player.Name", "PlayerName")]
   [MapProperty("Season.Name", "SeasonName")]
   public partial InjuryResponseDto EntityToResponseDto(Injury entity);
+  public partial CreatedInjuryResponseDto EntityToCreatedResponseDto(Injury entity);
   public partial List<InjuryResponseDto> EntityToResponseDtoList(List<Injury> entities);
 }
