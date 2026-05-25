@@ -22,6 +22,7 @@ public interface ICommentService
   Task<ReturnModel<CreatedCommentResponseDto>> AddAsync(
     CreateCommentRequest request,
     Guid currentUserId,
+    string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> UpdateAsync(

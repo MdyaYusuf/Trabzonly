@@ -24,9 +24,9 @@ public class PositionBusinessRules(IPositionRepository _positionRepository)
     string abbreviation,
     CancellationToken cancellationToken)
   {
-    var existingPosition = await _positionRepository.GetAsync(p => p.Abbreviation == abbreviation, enableTracking: false, cancellationToken: cancellationToken);
+    bool exists = await _positionRepository.AnyAsync(p => p.Abbreviation == abbreviation, cancellationToken);
 
-    if (existingPosition != null)
+    if (exists)
     {
       throw new BusinessException("Bu kısaltmaya sahip bir pozisyon zaten mevcut.");
     }
@@ -37,9 +37,9 @@ public class PositionBusinessRules(IPositionRepository _positionRepository)
     string abbreviation,
     CancellationToken cancellationToken)
   {
-    var existingPosition = await _positionRepository.GetAsync(p => p.Id != id && p.Abbreviation == abbreviation, enableTracking: false, cancellationToken: cancellationToken);
+    bool exists = await _positionRepository.AnyAsync(p => p.Id != id && p.Abbreviation == abbreviation, cancellationToken);
 
-    if (existingPosition != null)
+    if (exists)
     {
       throw new BusinessException("Bu kısaltmaya sahip bir pozisyon zaten mevcut.");
     }
@@ -51,6 +51,31 @@ public class PositionBusinessRules(IPositionRepository _positionRepository)
     if (userRole != "Admin")
     {
       throw new ForbiddenException("Bu işlem için yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public async Task PositionNameCannotBeDuplicatedWhenInserted(
+    string name,
+    CancellationToken cancellationToken)
+  {
+    bool exists = await _positionRepository.AnyAsync(p => p.Name == name, cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu ada sahip bir pozisyon zaten mevcut.");
+    }
+  }
+
+  public async Task PositionNameCannotBeDuplicatedWhenUpdated(
+    Guid id,
+    string name,
+    CancellationToken cancellationToken)
+  {
+    bool exists = await _positionRepository.AnyAsync(p => p.Id != id && p.Name == name, cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu ada sahip bir pozisyon zaten mevcut.");
     }
   }
 }

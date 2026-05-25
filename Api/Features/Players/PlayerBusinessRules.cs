@@ -27,4 +27,30 @@ public class PlayerBusinessRules(IPlayerRepository _playerRepository)
       throw new ForbiddenException("Bu işlem için yetkiniz bulunmamaktadır.");
     }
   }
+
+  public async Task PlayerCannotBeDuplicatedAsync(
+    string name,
+    DateTime dateOfBirth,
+    CancellationToken cancellationToken = default)
+  {
+    bool exists = await _playerRepository.AnyAsync(
+      p => p.Name == name && p.DateOfBirth == dateOfBirth, cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu isim ve doğum tarihine sahip bir oyuncu zaten sistemde kayıtlı.");
+    }
+  }
+
+  public async Task PlayerCannotBeDuplicatedWhenUpdatedAsync(
+    Guid id, string name, DateTime dateOfBirth, CancellationToken cancellationToken = default)
+  {
+    bool exists = await _playerRepository.AnyAsync(
+      p => p.Id != id && p.Name == name && p.DateOfBirth == dateOfBirth, cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu isim ve doğum tarihine sahip başka bir oyuncu sistemde zaten kayıtlı.");
+    }
+  }
 }

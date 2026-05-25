@@ -128,6 +128,13 @@ public class PlayerStatsService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    _businessRules.PlayerStatsMustBeLogicallyValid(
+      request.Appearances,
+      request.MinutesPlayed,
+      request.Goals,
+      request.Assists,
+      request.CleanSheets,
+      request.RedCards);
     await _businessRules.PlayerStatsCannotBeDuplicatedWhenInserted(request.PlayerId, request.SeasonId, request.Team, cancellationToken);
 
     PlayerStats stats = _mapper.CreateToEntity(request);
@@ -160,6 +167,13 @@ public class PlayerStatsService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    _businessRules.PlayerStatsMustBeLogicallyValid(
+      request.Appearances,
+      request.MinutesPlayed,
+      request.Goals,
+      request.Assists,
+      request.CleanSheets,
+      request.RedCards);
     await _businessRules.PlayerStatsCannotBeDuplicatedWhenUpdated(request.Id, request.PlayerId, request.SeasonId, request.Team, cancellationToken);
 
     PlayerStats stats = await _businessRules.GetPlayerStatsIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);

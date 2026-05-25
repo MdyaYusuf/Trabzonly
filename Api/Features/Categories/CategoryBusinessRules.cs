@@ -18,4 +18,26 @@ public class CategoryBusinessRules(ICategoryRepository _categoryRepository)
 
     return category;
   }
+
+  public async Task CategoryNameMustBeUniqueAsync(
+    string name,
+    CancellationToken cancellationToken = default)
+  {
+    bool exists = await _categoryRepository.AnyAsync(c => c.Name == name, cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu ada sahip bir kategori zaten mevcut. Lütfen farklı bir kategori adı seçiniz.");
+    }
+  }
+
+  public async Task CategoryNameCannotBeDuplicatedWhenUpdated(int id, string name, CancellationToken cancellationToken = default)
+  {
+    bool exists = await _categoryRepository.AnyAsync(c => c.Id != id && c.Name == name, cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu ada sahip bir kategori zaten mevcut. Lütfen farklı bir kategori adı seçiniz.");
+    }
+  }
 }

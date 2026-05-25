@@ -1,6 +1,7 @@
 using Api.Core.Exceptions;
 using Api.Core.Security;
 using Api.Features.Roles;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Users;
 
@@ -75,6 +76,32 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
     if (!exists)
     {
       throw new NotFoundException("Belirtilen rol sistemde kayıtlı değil.");
+    }
+  }
+
+  public void UsernameCannotBeRestrictedWord(string username)
+  {
+    var restrictedWords = new[] { "admin", "administrator", "system", "root", "support", "moderator", "trabzonly" };
+
+    if (restrictedWords.Contains(username.ToLowerInvariant()))
+    {
+      throw new BusinessException("Seçtiğiniz kullanıcı adı sistem tarafından rezerve edilmiştir. Lütfen farklı bir kullanıcı adı belirleyiniz.");
+    }
+  }
+
+  public async Task CannotDeleteLastAdminAsync(User user, CancellationToken cancellationToken = default)
+  {
+    var isAdmin = await _roleRepository.AnyAsync(r => r.Id == user.RoleId && r.Name == "Admin", cancellationToken);
+
+    if (isAdmin)
+    {
+      var adminCount = await _userRepository.Query(enableTracking: false)
+        .CountAsync(u => u.RoleId == user.RoleId, cancellationToken);
+
+      if (adminCount <= 1)
+      {
+        throw new BusinessException("Sistemdeki son yönetici (Admin) hesabı silinemez.");
+      }
     }
   }
 }

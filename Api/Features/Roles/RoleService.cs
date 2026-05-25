@@ -140,10 +140,8 @@ public class RoleService(
 
     Role role = await _businessRules.GetRoleIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
-    if (role.Name != request.Name)
-    {
-      await _businessRules.NameMustBeUniqueAsync(request.Name, cancellationToken);
-    }
+    _businessRules.CoreRolesCannotBeModifiedOrDeleted(role);
+    await _businessRules.RoleNameCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Name, cancellationToken);
 
     _mapper.UpdateEntityFromRequest(request, role);
 
@@ -166,6 +164,7 @@ public class RoleService(
     Role role = await _businessRules.GetRoleIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
     _businessRules.AdminRoleRequired(userRole);
+    _businessRules.CoreRolesCannotBeModifiedOrDeleted(role);
 
     _roleRepository.Delete(role);
     await _unitOfWork.SaveChangesAsync(cancellationToken);

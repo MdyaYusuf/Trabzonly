@@ -42,6 +42,7 @@ public interface IBlogService
   Task<ReturnModel<CreatedBlogResponseDto>> AddAsync(
     CreateBlogRequest request,
     Guid currentUserId,
+    string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> UpdateAsync(

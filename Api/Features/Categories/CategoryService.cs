@@ -71,6 +71,8 @@ public class CategoryService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    await _businessRules.CategoryNameMustBeUniqueAsync(request.Name, cancellationToken);
+
     Category category = _mapper.CreateToEntity(request);
 
     await _categoryRepository.AddAsync(category, cancellationToken);
@@ -97,6 +99,8 @@ public class CategoryService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    await _businessRules.CategoryNameCannotBeDuplicatedWhenUpdated(request.Id, request.Name, cancellationToken);
 
     Category category = await _businessRules.GetCategoryIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 

@@ -56,6 +56,7 @@ public class BlogsController(IBlogService _blogService) : CustomBaseController
     var result = await _blogService.AddAsync(
       request: request,
       currentUserId: GetUserId(),
+      userRole: GetUserRole(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

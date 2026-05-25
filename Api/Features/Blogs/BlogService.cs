@@ -152,6 +152,7 @@ public class BlogService(
   public async Task<ReturnModel<CreatedBlogResponseDto>> AddAsync(
     CreateBlogRequest request,
     Guid currentUserId,
+    string userRole,
     CancellationToken cancellationToken = default)
   {
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
@@ -160,6 +161,10 @@ public class BlogService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    await _businessRules.UserCannotExceedDailyBlogLimitAsync(currentUserId, userRole, cancellationToken);
+    await _businessRules.UserMustWaitBetweenBlogPostsAsync(currentUserId, userRole, cancellationToken);
+    await _businessRules.BlogTitleMustBeUniqueAsync(request.Title, cancellationToken);
 
     Blog blog = _mapper.CreateToEntity(request);
     blog.UserId = currentUserId;
@@ -199,6 +204,8 @@ public class BlogService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    await _businessRules.BlogTitleCannotBeDuplicatedWhenUpdated(request.Id, request.Title, cancellationToken);
 
     Blog blog = await _businessRules.GetBlogIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 

@@ -1,4 +1,5 @@
 using Api.Core.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Comments;
 
@@ -25,6 +26,58 @@ public class CommentBusinessRules(ICommentRepository _commentRepository)
     if (commentUserId != currentUserId && userRole != "Admin")
     {
       throw new ForbiddenException("Bu işlem için yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public async Task UserCannotExceedDailyCommentLimitAsync(
+    Guid userId,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    if (userRole == "Admin") return;
+
+    var today = DateTime.Today;
+    var count = await _commentRepository
+      .Query(enableTracking: false, withDeleted: false)
+      .CountAsync(c => c.UserId == userId && c.CreatedDate >= today, cancellationToken);
+
+    if (count >= 50)
+    {
+      throw new BusinessException("Günlük yorum ekleme sınırına ulaştınız (Maksimum 50). Lütfen yarın tekrar deneyin.");
+    }
+  }
+
+  public async Task UserMustWaitBetweenCommentsAsync(
+    Guid userId,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    if (userRole == "Admin") return;
+
+    var oneMinuteAgo = DateTime.Now.AddMinutes(-1);
+    bool postedRecently = await _commentRepository.AnyAsync(
+      c => c.UserId == userId && c.CreatedDate >= oneMinuteAgo,
+      cancellationToken);
+
+    if (postedRecently)
+    {
+      throw new BusinessException("Çok sık yorum yapıyorsunuz. Lütfen yeni bir yorum eklemeden önce 1 dakika bekleyin.");
+    }
+  }
+
+  public async Task CommentContentCannotBeDuplicatedByUserAsync(
+    Guid userId,
+    string content,
+    CancellationToken cancellationToken = default)
+  {
+    var oneHourAgo = DateTime.Now.AddHours(-1);
+    bool isDuplicate = await _commentRepository.AnyAsync(
+      c => c.UserId == userId && c.Content == content && c.CreatedDate >= oneHourAgo,
+      cancellationToken);
+
+    if (isDuplicate)
+    {
+      throw new BusinessException("Aynı yorumu kısa süre içinde tekrar gönderemezsiniz.");
     }
   }
 }

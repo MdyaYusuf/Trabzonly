@@ -77,6 +77,7 @@ public class PositionService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    await _businessRules.PositionNameCannotBeDuplicatedWhenInserted(request.Name, cancellationToken);
     await _businessRules.PositionAbbreviationCannotBeDuplicatedWhenInserted(request.Abbreviation, cancellationToken);
 
     Position position = _mapper.CreateToEntity(request);
@@ -108,6 +109,7 @@ public class PositionService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    await _businessRules.PositionNameCannotBeDuplicatedWhenUpdated(request.Id, request.Name, cancellationToken);
     await _businessRules.PositionAbbreviationCannotBeDuplicatedWhenUpdated(request.Id, request.Abbreviation, cancellationToken);
 
     Position position = await _businessRules.GetPositionIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);

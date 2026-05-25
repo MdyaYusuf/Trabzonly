@@ -67,6 +67,7 @@ public class CommentService(
   public async Task<ReturnModel<CreatedCommentResponseDto>> AddAsync(
     CreateCommentRequest request,
     Guid currentUserId,
+    string userRole,
     CancellationToken cancellationToken = default)
   {
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
@@ -75,6 +76,10 @@ public class CommentService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    await _businessRules.UserCannotExceedDailyCommentLimitAsync(currentUserId, userRole, cancellationToken);
+    await _businessRules.UserMustWaitBetweenCommentsAsync(currentUserId, userRole, cancellationToken);
+    await _businessRules.CommentContentCannotBeDuplicatedByUserAsync(currentUserId, request.Content, cancellationToken);
 
     Comment comment = _mapper.CreateToEntity(request);
     comment.UserId = currentUserId;

@@ -36,6 +36,7 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
     var result = await _commentService.AddAsync(
       request: request,
       currentUserId: GetUserId(),
+      userRole: GetUserRole(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

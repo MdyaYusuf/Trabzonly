@@ -73,6 +73,9 @@ public class SeasonService(
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
     if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
+    await _businessRules.SeasonNameCannotBeDuplicatedAsync(request.Name, cancellationToken);
+    await _businessRules.SeasonDatesCannotOverlapAsync(request.StartDate, request.EndDate, null, cancellationToken);
+
     Season season = _mapper.CreateToEntity(request);
 
     await _seasonRepository.AddAsync(season, cancellationToken);
@@ -102,6 +105,9 @@ public class SeasonService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    await _businessRules.SeasonNameCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Name, cancellationToken);
+    await _businessRules.SeasonDatesCannotOverlapAsync(request.StartDate, request.EndDate, request.Id, cancellationToken);
 
     Season season = await _businessRules.GetSeasonIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 

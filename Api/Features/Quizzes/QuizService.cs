@@ -130,6 +130,9 @@ public class QuizService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    await _businessRules.QuizTitleCannotBeDuplicatedAsync(request.Title, cancellationToken);
+    _businessRules.QuestionsMustHaveExactlyOneCorrectAnswer(request.Questions);
+
     Quiz quiz = _mapper.CreateToEntity(request);
 
     await _quizRepository.AddAsync(quiz, cancellationToken);
@@ -159,6 +162,8 @@ public class QuizService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    await _businessRules.QuizTitleCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Title, cancellationToken);
 
     Quiz quiz = await _businessRules.GetQuizIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
@@ -211,6 +216,8 @@ public class QuizService(
       include: query => query.Include(q => q.Questions).ThenInclude(q => q.Answers.Where(a => a.IsCorrect)),
       enableTracking: false,
       cancellationToken: cancellationToken);
+
+    _businessRules.QuizMustBeActive(quiz);
 
     int totalScore = 0;
 

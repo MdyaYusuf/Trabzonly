@@ -129,6 +129,8 @@ public class PlayerService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    await _businessRules.PlayerCannotBeDuplicatedAsync(request.Name, request.DateOfBirth, cancellationToken);
+
     Player player = _mapper.CreateToEntity(request);
 
     if (request.ImageFile != null)
@@ -163,6 +165,8 @@ public class PlayerService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    await _businessRules.PlayerCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Name, request.DateOfBirth, cancellationToken);
 
     Player player = await _businessRules.GetPlayerIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 

@@ -188,6 +188,7 @@ public class UserService(
 
     User user = await _businessRules.GetUserIfExistAsync(currentUserId, enableTracking: true, cancellationToken: cancellationToken);
 
+    _businessRules.UsernameCannotBeRestrictedWord(request.Username);
     await _businessRules.UsernameMustBeUniqueAsync(request.Username, user.Id, cancellationToken);
     await _businessRules.EmailMustBeUniqueAsync(request.Email, user.Id, cancellationToken);
 
@@ -251,6 +252,8 @@ public class UserService(
     _businessRules.UserMustBeOwnerOrAdmin(id, currentUserId, userRole);
 
     User user = await _businessRules.GetUserIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
+
+    await _businessRules.CannotDeleteLastAdminAsync(user, cancellationToken);
 
     _userRepository.Delete(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);

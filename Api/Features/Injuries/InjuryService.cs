@@ -78,6 +78,15 @@ public class InjuryService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    _businessRules.InjuryMustBeLogicallyValid(request.DaysInjured, request.GamesMissed);
+    await _businessRules.InjuryCannotBeDuplicatedAsync(
+      request.PlayerId,
+      request.SeasonId,
+      request.Name,
+      request.DaysInjured,
+      request.GamesMissed,
+      cancellationToken);
+
     Injury injury = _mapper.CreateToEntity(request);
 
     await _injuryRepository.AddAsync(injury, cancellationToken);
@@ -107,6 +116,16 @@ public class InjuryService(
     {
       throw new ValidationException(validationResult.Errors);
     }
+
+    _businessRules.InjuryMustBeLogicallyValid(request.DaysInjured, request.GamesMissed);
+    await _businessRules.InjuryCannotBeDuplicatedWhenUpdatedAsync(
+      request.Id,
+      request.PlayerId,
+      request.SeasonId,
+      request.Name,
+      request.DaysInjured,
+      request.GamesMissed,
+      cancellationToken);
 
     Injury injury = await _businessRules.GetInjuryIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
