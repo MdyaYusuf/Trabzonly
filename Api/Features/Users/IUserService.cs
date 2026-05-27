@@ -5,12 +5,14 @@ namespace Api.Features.Users;
 
 public interface IUserService
 {
-  Task<ReturnModel<List<UserResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<UserResponseDto>>> GetAllAsync(
     Guid currentUserId,
     string userRole,
     Expression<Func<User, bool>>? filter = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
@@ -38,8 +40,10 @@ public interface IUserService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<UserPreviewDto>>> GetNewestMembersAsync(
+  Task<ReturnModel<CursorPagedResponse<UserPreviewDto>>> GetNewestMembersAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

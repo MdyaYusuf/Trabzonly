@@ -1,4 +1,5 @@
 using Api.Core.Controllers;
+using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +11,13 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
 {
   [HttpGet]
   public async Task<IActionResult> GetAll(
-    CancellationToken cancellationToken)
+    [FromQuery] PaginationRequest pagination,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _playerStatsService.GetAllAsync(cancellationToken: cancellationToken);
+    var result = await _playerStatsService.GetAllAsync(
+      pageNumber: pagination.PageNumber,
+      pageSize: pagination.PageSize,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -30,9 +35,15 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
   [HttpGet("top-scorers/{count:int}")]
   public async Task<IActionResult> GetTopScorers(
     int count,
-    CancellationToken cancellationToken)
+    [FromQuery] int? lastValue = null,
+    [FromQuery] Guid? lastId = null,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _playerStatsService.GetTopScorersAsync(count: count, cancellationToken: cancellationToken);
+    var result = await _playerStatsService.GetTopScorersAsync(
+      count: count,
+      lastValueCursor: lastValue,
+      lastIdCursor: lastId,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -40,9 +51,15 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
   [HttpGet("top-assisters/{count:int}")]
   public async Task<IActionResult> GetTopAssisters(
     int count,
-    CancellationToken cancellationToken)
+    [FromQuery] int? lastValue = null,
+    [FromQuery] Guid? lastId = null,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _playerStatsService.GetTopAssistersAsync(count: count, cancellationToken: cancellationToken);
+    var result = await _playerStatsService.GetTopAssistersAsync(
+      count: count,
+      lastValueCursor: lastValue,
+      lastIdCursor: lastId,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }

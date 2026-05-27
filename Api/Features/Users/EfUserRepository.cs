@@ -42,6 +42,8 @@ public class EfUserRepository : EfBaseRepository<BaseDbContext, User, Guid>, IUs
 
   public async Task<List<User>> GetNewestMembersAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -54,9 +56,15 @@ public class EfUserRepository : EfBaseRepository<BaseDbContext, User, Guid>, IUs
       query = include(query);
     }
 
+    if (lastDateCursor.HasValue && lastIdCursor.HasValue)
+    {
+      query = query.Where(u => u.CreatedDate < lastDateCursor ||
+                              (u.CreatedDate == lastDateCursor && u.Id.CompareTo(lastIdCursor.Value) < 0));
+    }
+
     return await query
       .Where(u => u.IsActive)
-      .OrderByDescending(u => u.CreatedDate)
+      .OrderByDescending(u => u.CreatedDate).ThenByDescending(u => u.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
   }

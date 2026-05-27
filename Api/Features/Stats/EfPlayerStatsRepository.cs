@@ -13,6 +13,8 @@ public class EfPlayerStatsRepository : EfBaseRepository<BaseDbContext, PlayerSta
 
   public async Task<List<PlayerStats>> GetTopScorersAsync(
     int count,
+    int? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -25,14 +27,22 @@ public class EfPlayerStatsRepository : EfBaseRepository<BaseDbContext, PlayerSta
       query = include(query);
     }
 
+    if (lastValueCursor.HasValue && lastIdCursor.HasValue)
+    {
+      query = query.Where(s => s.Goals < lastValueCursor ||
+                              (s.Goals == lastValueCursor && s.Id.CompareTo(lastIdCursor.Value) < 0));
+    }
+
     return await query
-      .OrderByDescending(s => s.Goals)
+      .OrderByDescending(s => s.Goals).ThenByDescending(s => s.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
   }
 
   public async Task<List<PlayerStats>> GetTopAssistersAsync(
     int count,
+    int? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -45,8 +55,14 @@ public class EfPlayerStatsRepository : EfBaseRepository<BaseDbContext, PlayerSta
       query = include(query);
     }
 
+    if (lastValueCursor.HasValue && lastIdCursor.HasValue)
+    {
+      query = query.Where(s => s.Assists < lastValueCursor ||
+                              (s.Assists == lastValueCursor && s.Id.CompareTo(lastIdCursor.Value) < 0));
+    }
+
     return await query
-      .OrderByDescending(s => s.Assists)
+      .OrderByDescending(s => s.Assists).ThenByDescending(s => s.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
   }

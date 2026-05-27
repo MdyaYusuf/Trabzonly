@@ -13,6 +13,8 @@ public interface IBlogRepository : IRepository<Blog, Guid>
 
   Task<List<Blog>> GetRecentBlogsAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

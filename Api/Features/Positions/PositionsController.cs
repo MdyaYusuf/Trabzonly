@@ -1,4 +1,5 @@
 using Api.Core.Controllers;
+using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +11,13 @@ public class PositionsController(IPositionService _positionService) : CustomBase
 {
   [HttpGet]
   public async Task<IActionResult> GetAll(
-    CancellationToken cancellationToken)
+    [FromQuery] PaginationRequest pagination,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _positionService.GetAllAsync(cancellationToken: cancellationToken);
+    var result = await _positionService.GetAllAsync(
+      pageNumber: pagination.PageNumber,
+      pageSize: pagination.PageSize,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }

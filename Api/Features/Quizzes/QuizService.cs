@@ -91,27 +91,43 @@ public class QuizService(
     };
   }
 
-  public async Task<ReturnModel<List<QuizResponseDto>>> GetRecentQuizzesAsync(
+  public async Task<ReturnModel<CursorPagedResponse<QuizResponseDto>>> GetRecentQuizzesAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
+    // Request count + 1 to check if there is a next page
     List<Quiz> quizzes = await _quizRepository.GetRecentQuizzesAsync(
-      count,
+      count + 1,
+      lastDateCursor,
+      lastIdCursor,
       include: include ?? (query => query.Include(q => q.Questions).ThenInclude(q => q.Answers)),
       enableTracking,
       withDeleted,
       cancellationToken);
 
-    List<QuizResponseDto> response = _mapper.EntityToResponseDtoList(quizzes);
+    bool hasNextPage = quizzes.Count > count;
+    var itemsToReturn = hasNextPage ? quizzes.Take(count).ToList() : quizzes;
 
-    return new ReturnModel<List<QuizResponseDto>>()
+    List<QuizResponseDto> response = _mapper.EntityToResponseDtoList(itemsToReturn);
+
+    var pagedResponse = new CursorPagedResponse<QuizResponseDto>
+    {
+      Items = response,
+      NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      HasNextPage = hasNextPage
+    };
+
+    return new ReturnModel<CursorPagedResponse<QuizResponseDto>>()
     {
       Success = true,
       Message = "En son eklenen quizler başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

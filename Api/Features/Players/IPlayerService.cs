@@ -5,10 +5,12 @@ namespace Api.Features.Players;
 
 public interface IPlayerService
 {
-  Task<ReturnModel<List<PlayerResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<PlayerResponseDto>>> GetAllAsync(
     Expression<Func<Player, bool>>? filter = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     Func<IQueryable<Player>, IOrderedQueryable<Player>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
@@ -19,8 +21,10 @@ public interface IPlayerService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<PlayerResponseDto>>> GetTopValuedPlayersAsync(
+  Task<ReturnModel<CursorPagedResponse<PlayerResponseDto>>> GetTopValuedPlayersAsync(
     int count,
+    decimal? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

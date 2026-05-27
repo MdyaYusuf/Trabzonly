@@ -13,14 +13,18 @@ public class CategoryService(
   IValidator<CreateCategoryRequest> _createValidator,
   IValidator<UpdateCategoryRequest> _updateValidator) : ICategoryService
 {
-  public async Task<ReturnModel<List<CategoryResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<CategoryResponseDto>>> GetAllAsync(
     Expression<Func<Category, bool>>? filter = null,
     Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Category> categories = await _categoryRepository.GetAllAsync(
+    var (categories, totalCount) = await _categoryRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include: null,
       orderBy,
@@ -28,13 +32,14 @@ public class CategoryService(
       withDeleted,
       cancellationToken);
 
-    List<CategoryResponseDto> response = _mapper.EntityToResponseDtoList(categories);
+    List<CategoryResponseDto> responseDtos = _mapper.EntityToResponseDtoList(categories);
+    var pagedResponse = new PagedResponse<CategoryResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<CategoryResponseDto>>()
+    return new ReturnModel<PagedResponse<CategoryResponseDto>>()
     {
       Success = true,
       Message = "Kategori listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

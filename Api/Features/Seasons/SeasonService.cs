@@ -13,15 +13,19 @@ public class SeasonService(
   IValidator<CreateSeasonRequest> _createValidator,
   IValidator<UpdateSeasonRequest> _updateValidator) : ISeasonService
 {
-  public async Task<ReturnModel<List<SeasonResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<SeasonResponseDto>>> GetAllAsync(
     Expression<Func<Season, bool>>? filter = null,
     Func<IQueryable<Season>, IQueryable<Season>>? include = null,
     Func<IQueryable<Season>, IOrderedQueryable<Season>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Season> seasons = await _seasonRepository.GetAllAsync(
+    var (seasons, totalCount) = await _seasonRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include,
       orderBy,
@@ -29,13 +33,14 @@ public class SeasonService(
       withDeleted,
       cancellationToken);
 
-    List<SeasonResponseDto> response = _mapper.EntityToResponseDtoList(seasons);
+    List<SeasonResponseDto> responseDtos = _mapper.EntityToResponseDtoList(seasons);
+    var pagedResponse = new PagedResponse<SeasonResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<SeasonResponseDto>>()
+    return new ReturnModel<PagedResponse<SeasonResponseDto>>()
     {
       Success = true,
       Message = "Sezon listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

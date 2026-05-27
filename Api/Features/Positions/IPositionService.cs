@@ -5,10 +5,12 @@ namespace Api.Features.Positions;
 
 public interface IPositionService
 {
-  Task<ReturnModel<List<PositionResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<PositionResponseDto>>> GetAllAsync(
     Expression<Func<Position, bool>>? filter = null,
     Func<IQueryable<Position>, IQueryable<Position>>? include = null,
     Func<IQueryable<Position>, IOrderedQueryable<Position>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);

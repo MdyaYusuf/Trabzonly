@@ -5,10 +5,12 @@ namespace Api.Features.Stats;
 
 public interface IPlayerStatsService
 {
-  Task<ReturnModel<List<PlayerStatsResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<PlayerStatsResponseDto>>> GetAllAsync(
     Expression<Func<PlayerStats, bool>>? filter = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     Func<IQueryable<PlayerStats>, IOrderedQueryable<PlayerStats>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
@@ -19,15 +21,19 @@ public interface IPlayerStatsService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopScorersAsync(
+  Task<ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>> GetTopScorersAsync(
     int count,
+    int? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopAssistersAsync(
+  Task<ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>> GetTopAssistersAsync(
     int count,
+    int? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

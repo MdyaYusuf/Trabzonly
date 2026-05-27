@@ -17,6 +17,8 @@ public interface IUserRepository : IRepository<User, Guid>
 
   Task<List<User>> GetNewestMembersAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

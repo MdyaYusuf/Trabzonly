@@ -40,9 +40,15 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   [HttpGet("recent/{count:int}")]
   public async Task<IActionResult> GetRecentQuizzes(
     int count,
-    CancellationToken cancellationToken)
+    [FromQuery] DateTime? lastDate = null,
+    [FromQuery] Guid? lastId = null,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _quizService.GetRecentQuizzesAsync(count: count, cancellationToken: cancellationToken);
+    var result = await _quizService.GetRecentQuizzesAsync(
+      count: count,
+      lastDateCursor: lastDate,
+      lastIdCursor: lastId,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }

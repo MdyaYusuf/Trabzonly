@@ -15,15 +15,19 @@ public class PlayerService(
   IValidator<CreatePlayerRequest> _createValidator,
   IValidator<UpdatePlayerRequest> _updateValidator) : IPlayerService
 {
-  public async Task<ReturnModel<List<PlayerResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<PlayerResponseDto>>> GetAllAsync(
     Expression<Func<Player, bool>>? filter = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     Func<IQueryable<Player>, IOrderedQueryable<Player>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Player> players = await _playerRepository.GetAllAsync(
+    var (players, totalCount) = await _playerRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include: include ?? (query => query.Include(p => p.Position)),
       orderBy: orderBy ?? (query => query.OrderBy(p => p.Name)),
@@ -31,13 +35,14 @@ public class PlayerService(
       withDeleted,
       cancellationToken);
 
-    List<PlayerResponseDto> response = _mapper.EntityToResponseDtoList(players);
+    List<PlayerResponseDto> responseDtos = _mapper.EntityToResponseDtoList(players);
+    var pagedResponse = new PagedResponse<PlayerResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<PlayerResponseDto>>()
+    return new ReturnModel<PagedResponse<PlayerResponseDto>>()
     {
       Success = true,
       Message = "Oyuncu listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }
@@ -65,27 +70,42 @@ public class PlayerService(
     };
   }
 
-  public async Task<ReturnModel<List<PlayerResponseDto>>> GetTopValuedPlayersAsync(
+  public async Task<ReturnModel<CursorPagedResponse<PlayerResponseDto>>> GetTopValuedPlayersAsync(
     int count,
+    decimal? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
     List<Player> players = await _playerRepository.GetTopValuedPlayersAsync(
-      count,
+      count + 1,
+      lastValueCursor,
+      lastIdCursor,
       include: include ?? (query => query.Include(p => p.Position)),
       enableTracking,
       withDeleted,
       cancellationToken);
 
-    List<PlayerResponseDto> response = _mapper.EntityToResponseDtoList(players);
+    bool hasNextPage = players.Count > count;
+    var itemsToReturn = hasNextPage ? players.Take(count).ToList() : players;
 
-    return new ReturnModel<List<PlayerResponseDto>>()
+    List<PlayerResponseDto> response = _mapper.EntityToResponseDtoList(itemsToReturn);
+
+    var pagedResponse = new CursorPagedResponse<PlayerResponseDto>
+    {
+      Items = response,
+      NextCursorValue = itemsToReturn.LastOrDefault()?.MarketValue,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      HasNextPage = hasNextPage
+    };
+
+    return new ReturnModel<CursorPagedResponse<PlayerResponseDto>>()
     {
       Success = true,
       Message = "En değerli oyuncular başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

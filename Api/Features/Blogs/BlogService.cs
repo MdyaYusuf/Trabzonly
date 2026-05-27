@@ -15,15 +15,19 @@ public class BlogService(
   IValidator<CreateBlogRequest> _createValidator,
   IValidator<UpdateBlogRequest> _updateValidator) : IBlogService
 {
-  public async Task<ReturnModel<List<BlogResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<BlogResponseDto>>> GetAllAsync(
     Expression<Func<Blog, bool>>? filter = null,
     Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
     Func<IQueryable<Blog>, IOrderedQueryable<Blog>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Blog> blogs = await _blogRepository.GetAllAsync(
+    var (blogs, totalCount) = await _blogRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
       orderBy,
@@ -31,13 +35,14 @@ public class BlogService(
       withDeleted,
       cancellationToken);
 
-    List<BlogResponseDto> response = _mapper.EntityToResponseDtoList(blogs);
+    List<BlogResponseDto> responseDtos = _mapper.EntityToResponseDtoList(blogs);
+    var pagedResponse = new PagedResponse<BlogResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<BlogResponseDto>>()
+    return new ReturnModel<PagedResponse<BlogResponseDto>>()
     {
       Success = true,
       Message = "Blog listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }
@@ -124,27 +129,42 @@ public class BlogService(
     };
   }
 
-  public async Task<ReturnModel<List<BlogResponseDto>>> GetRecentBlogsAsync(
+  public async Task<ReturnModel<CursorPagedResponse<BlogResponseDto>>> GetRecentBlogsAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
     List<Blog> blogs = await _blogRepository.GetRecentBlogsAsync(
-      count,
+      count + 1,
+      lastDateCursor,
+      lastIdCursor,
       include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
       enableTracking,
       withDeleted,
       cancellationToken);
 
-    List<BlogResponseDto> response = _mapper.EntityToResponseDtoList(blogs);
+    bool hasNextPage = blogs.Count > count;
+    var itemsToReturn = hasNextPage ? blogs.Take(count).ToList() : blogs;
 
-    return new ReturnModel<List<BlogResponseDto>>()
+    List<BlogResponseDto> response = _mapper.EntityToResponseDtoList(itemsToReturn);
+
+    var pagedResponse = new CursorPagedResponse<BlogResponseDto>
+    {
+      Items = response,
+      NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      HasNextPage = hasNextPage
+    };
+
+    return new ReturnModel<CursorPagedResponse<BlogResponseDto>>()
     {
       Success = true,
       Message = "En son eklenen bloglar başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

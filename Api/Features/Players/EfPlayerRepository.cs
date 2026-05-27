@@ -13,6 +13,8 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>,
 
   public async Task<List<Player>> GetTopValuedPlayersAsync(
     int count,
+    decimal? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -25,9 +27,15 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>,
       query = include(query);
     }
 
+    if (lastValueCursor.HasValue && lastIdCursor.HasValue)
+    {
+      query = query.Where(p => p.MarketValue < lastValueCursor ||
+                              (p.MarketValue == lastValueCursor && p.Id.CompareTo(lastIdCursor.Value) < 0));
+    }
+
     return await query
       .Where(p => p.IsActive && p.MarketValue.HasValue)
-      .OrderByDescending(p => p.MarketValue)
+      .OrderByDescending(p => p.MarketValue).ThenByDescending(p => p.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
   }

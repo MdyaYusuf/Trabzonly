@@ -1,4 +1,5 @@
 using Api.Core.Controllers;
+using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,14 @@ namespace Api.Features.Roles;
 public class RolesController(IRoleService _roleService) : CustomBaseController
 {
   [HttpGet]
-  public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+  public async Task<IActionResult> GetAll(
+    [FromQuery] PaginationRequest pagination,
+    CancellationToken cancellationToken = default)
   {
     var result = await _roleService.GetAllAsync(
       userRole: GetUserRole(),
+      pageNumber: pagination.PageNumber,
+      pageSize: pagination.PageSize,
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

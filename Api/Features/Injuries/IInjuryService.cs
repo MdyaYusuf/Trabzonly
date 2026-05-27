@@ -5,10 +5,12 @@ namespace Api.Features.Injuries;
 
 public interface IInjuryService
 {
-  Task<ReturnModel<List<InjuryResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<InjuryResponseDto>>> GetAllAsync(
     Expression<Func<Injury, bool>>? filter = null,
     Func<IQueryable<Injury>, IQueryable<Injury>>? include = null,
     Func<IQueryable<Injury>, IOrderedQueryable<Injury>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);

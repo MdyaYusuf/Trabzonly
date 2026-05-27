@@ -15,6 +15,16 @@ where TId : notnull
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<(List<TEntity> Items, int TotalCount)> GetPagedListAsync(
+    int pageNumber,
+    int pageSize,
+    Expression<Func<TEntity, bool>>? filter = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
   Task<TEntity?> GetAsync(
     Expression<Func<TEntity, bool>> predicate,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,

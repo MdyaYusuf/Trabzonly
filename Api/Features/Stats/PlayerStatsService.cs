@@ -14,15 +14,19 @@ public class PlayerStatsService(
   IValidator<CreatePlayerStatsRequest> _createValidator,
   IValidator<UpdatePlayerStatsRequest> _updateValidator) : IPlayerStatsService
 {
-  public async Task<ReturnModel<List<PlayerStatsResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<PlayerStatsResponseDto>>> GetAllAsync(
     Expression<Func<PlayerStats, bool>>? filter = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     Func<IQueryable<PlayerStats>, IOrderedQueryable<PlayerStats>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<PlayerStats> stats = await _playerStatsRepository.GetAllAsync(
+    var (stats, totalCount) = await _playerStatsRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
       orderBy: orderBy ?? (query => query.OrderByDescending(s => s.CreatedDate)),
@@ -30,13 +34,14 @@ public class PlayerStatsService(
       withDeleted,
       cancellationToken);
 
-    List<PlayerStatsResponseDto> response = _mapper.EntityToResponseDtoList(stats);
+    List<PlayerStatsResponseDto> responseDtos = _mapper.EntityToResponseDtoList(stats);
+    var pagedResponse = new PagedResponse<PlayerStatsResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<PlayerStatsResponseDto>>()
+    return new ReturnModel<PagedResponse<PlayerStatsResponseDto>>()
     {
       Success = true,
       Message = "İstatistik listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }
@@ -64,52 +69,82 @@ public class PlayerStatsService(
     };
   }
 
-  public async Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopScorersAsync(
+  public async Task<ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>> GetTopScorersAsync(
     int count,
+    int? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
     List<PlayerStats> stats = await _playerStatsRepository.GetTopScorersAsync(
-      count,
+      count + 1,
+      lastValueCursor,
+      lastIdCursor,
       include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
       enableTracking,
       withDeleted,
       cancellationToken);
 
-    List<PlayerStatsResponseDto> response = _mapper.EntityToResponseDtoList(stats);
+    bool hasNextPage = stats.Count > count;
+    var itemsToReturn = hasNextPage ? stats.Take(count).ToList() : stats;
 
-    return new ReturnModel<List<PlayerStatsResponseDto>>()
+    List<PlayerStatsResponseDto> response = _mapper.EntityToResponseDtoList(itemsToReturn);
+
+    var pagedResponse = new CursorPagedResponse<PlayerStatsResponseDto>
+    {
+      Items = response,
+      NextCursorValue = itemsToReturn.LastOrDefault()?.Goals,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      HasNextPage = hasNextPage
+    };
+
+    return new ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>()
     {
       Success = true,
       Message = "En çok gol atan oyuncular başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }
 
-  public async Task<ReturnModel<List<PlayerStatsResponseDto>>> GetTopAssistersAsync(
+  public async Task<ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>> GetTopAssistersAsync(
     int count,
+    int? lastValueCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
     List<PlayerStats> stats = await _playerStatsRepository.GetTopAssistersAsync(
-      count,
+      count + 1,
+      lastValueCursor,
+      lastIdCursor,
       include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
       enableTracking,
       withDeleted,
       cancellationToken);
 
-    List<PlayerStatsResponseDto> response = _mapper.EntityToResponseDtoList(stats);
+    bool hasNextPage = stats.Count > count;
+    var itemsToReturn = hasNextPage ? stats.Take(count).ToList() : stats;
 
-    return new ReturnModel<List<PlayerStatsResponseDto>>()
+    List<PlayerStatsResponseDto> response = _mapper.EntityToResponseDtoList(itemsToReturn);
+
+    var pagedResponse = new CursorPagedResponse<PlayerStatsResponseDto>
+    {
+      Items = response,
+      NextCursorValue = itemsToReturn.LastOrDefault()?.Assists,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      HasNextPage = hasNextPage
+    };
+
+    return new ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>()
     {
       Success = true,
       Message = "En çok asist yapan oyuncular başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

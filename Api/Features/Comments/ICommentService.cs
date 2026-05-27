@@ -5,10 +5,22 @@ namespace Api.Features.Comments;
 
 public interface ICommentService
 {
-  Task<ReturnModel<List<CommentResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<CommentResponseDto>>> GetAllAsync(
     Expression<Func<Comment, bool>>? filter = null,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
     Func<IQueryable<Comment>, IOrderedQueryable<Comment>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<CursorPagedResponse<CommentResponseDto>>> GetRecentCommentsAsync(
+    int count,
+    Expression<Func<Comment, bool>>? filter = null,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
+    Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);

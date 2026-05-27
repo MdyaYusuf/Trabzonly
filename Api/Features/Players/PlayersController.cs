@@ -1,4 +1,5 @@
 using Api.Core.Controllers;
+using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +11,13 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
 {
   [HttpGet]
   public async Task<IActionResult> GetAll(
-    CancellationToken cancellationToken)
+    [FromQuery] PaginationRequest pagination,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _playerService.GetAllAsync(cancellationToken: cancellationToken);
+    var result = await _playerService.GetAllAsync(
+      pageNumber: pagination.PageNumber,
+      pageSize: pagination.PageSize,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -30,9 +35,15 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
   [HttpGet("top-valued/{count:int}")]
   public async Task<IActionResult> GetTopValuedPlayers(
     int count,
-    CancellationToken cancellationToken)
+    [FromQuery] decimal? lastValue = null,
+    [FromQuery] Guid? lastId = null,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _playerService.GetTopValuedPlayersAsync(count: count, cancellationToken: cancellationToken);
+    var result = await _playerService.GetTopValuedPlayersAsync(
+      count: count,
+      lastValueCursor: lastValue,
+      lastIdCursor: lastId,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }

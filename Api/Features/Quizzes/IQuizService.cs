@@ -26,8 +26,10 @@ public interface IQuizService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<QuizResponseDto>>> GetRecentQuizzesAsync(
+  Task<ReturnModel<CursorPagedResponse<QuizResponseDto>>> GetRecentQuizzesAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

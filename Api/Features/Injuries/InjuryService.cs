@@ -14,15 +14,19 @@ public class InjuryService(
   IValidator<CreateInjuryRequest> _createValidator,
   IValidator<UpdateInjuryRequest> _updateValidator) : IInjuryService
 {
-  public async Task<ReturnModel<List<InjuryResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<InjuryResponseDto>>> GetAllAsync(
     Expression<Func<Injury, bool>>? filter = null,
     Func<IQueryable<Injury>, IQueryable<Injury>>? include = null,
     Func<IQueryable<Injury>, IOrderedQueryable<Injury>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Injury> injuries = await _injuryRepository.GetAllAsync(
+    var (injuries, totalCount) = await _injuryRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include: include ?? (query => query.Include(i => i.Player).Include(i => i.Season)),
       orderBy: orderBy ?? (query => query.OrderByDescending(i => i.CreatedDate)),
@@ -30,13 +34,14 @@ public class InjuryService(
       withDeleted,
       cancellationToken);
 
-    List<InjuryResponseDto> response = _mapper.EntityToResponseDtoList(injuries);
+    List<InjuryResponseDto> responseDtos = _mapper.EntityToResponseDtoList(injuries);
+    var pagedResponse = new PagedResponse<InjuryResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<InjuryResponseDto>>()
+    return new ReturnModel<PagedResponse<InjuryResponseDto>>()
     {
       Success = true,
       Message = "Sakatlık listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

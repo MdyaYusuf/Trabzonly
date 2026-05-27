@@ -13,16 +13,20 @@ public class RoleService(
   IValidator<CreateRoleRequest> _createValidator,
   IValidator<UpdateRoleRequest> _updateValidator) : IRoleService
 {
-  public async Task<ReturnModel<List<RoleResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<RoleResponseDto>>> GetAllAsync(
     string userRole,
     Expression<Func<Role, bool>>? filter = null,
     Func<IQueryable<Role>, IQueryable<Role>>? include = null,
     Func<IQueryable<Role>, IOrderedQueryable<Role>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Role> roles = await _roleRepository.GetAllAsync(
+    var (roles, totalCount) = await _roleRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include,
       orderBy,
@@ -30,13 +34,14 @@ public class RoleService(
       withDeleted,
       cancellationToken);
 
-    List<RoleResponseDto> response = _mapper.EntityToResponseDtoList(roles);
+    List<RoleResponseDto> responseDtos = _mapper.EntityToResponseDtoList(roles);
+    var pagedResponse = new PagedResponse<RoleResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<RoleResponseDto>>()
+    return new ReturnModel<PagedResponse<RoleResponseDto>>()
     {
       Success = true,
       Message = "Rol listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

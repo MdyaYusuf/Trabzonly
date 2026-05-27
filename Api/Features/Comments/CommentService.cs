@@ -14,15 +14,19 @@ public class CommentService(
   IValidator<CreateCommentRequest> _createValidator,
   IValidator<UpdateCommentRequest> _updateValidator) : ICommentService
 {
-  public async Task<ReturnModel<List<CommentResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<CommentResponseDto>>> GetAllAsync(
     Expression<Func<Comment, bool>>? filter = null,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
     Func<IQueryable<Comment>, IOrderedQueryable<Comment>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Comment> comments = await _commentRepository.GetAllAsync(
+    var (comments, totalCount) = await _commentRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include: include ?? (query => query.Include(c => c.User)),
       orderBy: orderBy ?? (query => query.OrderByDescending(c => c.CreatedDate)),
@@ -30,13 +34,56 @@ public class CommentService(
       withDeleted,
       cancellationToken);
 
-    List<CommentResponseDto> response = _mapper.EntityToResponseDtoList(comments);
+    List<CommentResponseDto> responseDtos = _mapper.EntityToResponseDtoList(comments);
+    var pagedResponse = new PagedResponse<CommentResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<CommentResponseDto>>()
+    return new ReturnModel<PagedResponse<CommentResponseDto>>()
     {
       Success = true,
       Message = "Yorum listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<CursorPagedResponse<CommentResponseDto>>> GetRecentCommentsAsync(
+    int count,
+    Expression<Func<Comment, bool>>? filter = null,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
+    Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Comment> comments = await _commentRepository.GetRecentCommentsAsync(
+      count + 1,
+      filter,
+      lastDateCursor,
+      lastIdCursor,
+      include: include ?? (query => query.Include(c => c.User)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    bool hasNextPage = comments.Count > count;
+    var itemsToReturn = hasNextPage ? comments.Take(count).ToList() : comments;
+
+    List<CommentResponseDto> response = _mapper.EntityToResponseDtoList(itemsToReturn);
+
+    var pagedResponse = new CursorPagedResponse<CommentResponseDto>
+    {
+      Items = response,
+      NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      HasNextPage = hasNextPage
+    };
+
+    return new ReturnModel<CursorPagedResponse<CommentResponseDto>>()
+    {
+      Success = true,
+      Message = "Yorumlar başarılı bir şekilde getirildi.",
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

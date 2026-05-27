@@ -13,15 +13,19 @@ public class PositionService(
   IValidator<CreatePositionRequest> _createValidator,
   IValidator<UpdatePositionRequest> _updateValidator) : IPositionService
 {
-  public async Task<ReturnModel<List<PositionResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<PositionResponseDto>>> GetAllAsync(
     Expression<Func<Position, bool>>? filter = null,
     Func<IQueryable<Position>, IQueryable<Position>>? include = null,
     Func<IQueryable<Position>, IOrderedQueryable<Position>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Position> positions = await _positionRepository.GetAllAsync(
+    var (positions, totalCount) = await _positionRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
       filter,
       include,
       orderBy,
@@ -29,13 +33,14 @@ public class PositionService(
       withDeleted,
       cancellationToken);
 
-    List<PositionResponseDto> response = _mapper.EntityToResponseDtoList(positions);
+    List<PositionResponseDto> responseDtos = _mapper.EntityToResponseDtoList(positions);
+    var pagedResponse = new PagedResponse<PositionResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<PositionResponseDto>>()
+    return new ReturnModel<PagedResponse<PositionResponseDto>>()
     {
       Success = true,
       Message = "Pozisyon listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }

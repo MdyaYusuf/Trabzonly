@@ -1,4 +1,6 @@
 using Api.Core.Controllers;
+using Api.Core.Requests;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +12,43 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
 {
   [HttpGet]
   public async Task<IActionResult> GetAll(
-    CancellationToken cancellationToken)
+    [FromQuery] PaginationRequest pagination,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _commentService.GetAllAsync(cancellationToken: cancellationToken);
+    var result = await _commentService.GetAllAsync(
+      pageNumber: pagination.PageNumber,
+      pageSize: pagination.PageSize,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("recent")]
+  public async Task<IActionResult> GetRecent(
+    [FromQuery] int count = 10,
+    [FromQuery] Guid? blogId = null,
+    [FromQuery] Guid? playerId = null,
+    [FromQuery] DateTime? lastDate = null,
+    [FromQuery] Guid? lastId = null,
+    CancellationToken cancellationToken = default)
+  {
+    Expression<Func<Comment, bool>>? filter = null;
+
+    if (blogId.HasValue)
+    {
+      filter = c => c.BlogId == blogId;
+    }
+    else if (playerId.HasValue)
+    {
+      filter = c => c.PlayerId == playerId;
+    }
+
+    var result = await _commentService.GetRecentCommentsAsync(
+      count: count,
+      filter: filter,
+      lastDateCursor: lastDate,
+      lastIdCursor: lastId,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }

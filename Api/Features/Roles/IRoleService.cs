@@ -5,11 +5,13 @@ namespace Api.Features.Roles;
 
 public interface IRoleService
 {
-  Task<ReturnModel<List<RoleResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<RoleResponseDto>>> GetAllAsync(
     string userRole,
     Expression<Func<Role, bool>>? filter = null,
     Func<IQueryable<Role>, IQueryable<Role>>? include = null,
     Func<IQueryable<Role>, IOrderedQueryable<Role>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);

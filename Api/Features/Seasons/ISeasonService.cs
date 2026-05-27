@@ -5,10 +5,12 @@ namespace Api.Features.Seasons;
 
 public interface ISeasonService
 {
-  Task<ReturnModel<List<SeasonResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<SeasonResponseDto>>> GetAllAsync(
     Expression<Func<Season, bool>>? filter = null,
     Func<IQueryable<Season>, IQueryable<Season>>? include = null,
     Func<IQueryable<Season>, IOrderedQueryable<Season>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);

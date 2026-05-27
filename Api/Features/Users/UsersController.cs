@@ -1,4 +1,5 @@
 using Api.Core.Controllers;
+using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,11 +12,15 @@ public class UsersController(IUserService _userService) : CustomBaseController
 {
   [HttpGet]
   [Authorize(Roles = "Admin")]
-  public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+  public async Task<IActionResult> GetAll(
+    [FromQuery] PaginationRequest pagination,
+    CancellationToken cancellationToken = default)
   {
     var result = await _userService.GetAllAsync(
       currentUserId: GetUserId(),
       userRole: GetUserRole(),
+      pageNumber: pagination.PageNumber,
+      pageSize: pagination.PageSize,
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
@@ -60,9 +65,15 @@ public class UsersController(IUserService _userService) : CustomBaseController
   [HttpGet("newest-members/{count:int}")]
   public async Task<IActionResult> GetNewestMembers(
     int count,
-    CancellationToken cancellationToken)
+    [FromQuery] DateTime? lastDate = null,
+    [FromQuery] Guid? lastId = null,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _userService.GetNewestMembersAsync(count: count, cancellationToken: cancellationToken);
+    var result = await _userService.GetNewestMembersAsync(
+      count: count,
+      lastDateCursor: lastDate,
+      lastIdCursor: lastId,
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }

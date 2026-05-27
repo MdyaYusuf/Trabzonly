@@ -8,6 +8,7 @@ public class EfBlogRepository : EfBaseRepository<BaseDbContext, Blog, Guid>, IBl
 {
   public EfBlogRepository(BaseDbContext context) : base(context)
   {
+
   }
 
   public async Task<List<Blog>> GetTopCommentedBlogsAsync(
@@ -33,6 +34,8 @@ public class EfBlogRepository : EfBaseRepository<BaseDbContext, Blog, Guid>, IBl
 
   public async Task<List<Blog>> GetRecentBlogsAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -45,9 +48,15 @@ public class EfBlogRepository : EfBaseRepository<BaseDbContext, Blog, Guid>, IBl
       query = include(query);
     }
 
+    if (lastDateCursor.HasValue && lastIdCursor.HasValue)
+    {
+      query = query.Where(b => b.CreatedDate < lastDateCursor ||
+                              (b.CreatedDate == lastDateCursor && b.Id.CompareTo(lastIdCursor.Value) < 0));
+    }
+
     return await query
       .Where(b => b.IsActive)
-      .OrderByDescending(b => b.CreatedDate)
+      .OrderByDescending(b => b.CreatedDate).ThenByDescending(b => b.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
   }

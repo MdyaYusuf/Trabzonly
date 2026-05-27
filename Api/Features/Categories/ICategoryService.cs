@@ -5,9 +5,11 @@ namespace Api.Features.Categories;
 
 public interface ICategoryService
 {
-  Task<ReturnModel<List<CategoryResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<CategoryResponseDto>>> GetAllAsync(
     Expression<Func<Category, bool>>? filter = null,
     Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);

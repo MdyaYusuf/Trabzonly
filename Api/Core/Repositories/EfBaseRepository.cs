@@ -54,6 +54,43 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     return await query.ToListAsync(cancellationToken);
   }
 
+  public async Task<(List<TEntity> Items, int TotalCount)> GetPagedListAsync(
+    int pageNumber,
+    int pageSize,
+    Expression<Func<TEntity, bool>>? filter = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<TEntity> query = Query(enableTracking, withDeleted);
+
+    if (filter != null)
+    {
+      query = query.Where(filter);
+    }
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    var totalCount = await query.CountAsync(cancellationToken);
+
+    if (orderBy != null)
+    {
+      query = orderBy(query);
+    }
+
+    var items = await query
+      .Skip((pageNumber - 1) * pageSize)
+      .Take(pageSize)
+      .ToListAsync(cancellationToken);
+
+    return (items, totalCount);
+  }
+
   public async Task<TEntity?> GetAsync(
     Expression<Func<TEntity, bool>> predicate,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,

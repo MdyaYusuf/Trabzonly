@@ -34,6 +34,8 @@ public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, Guid>, IQu
 
   public async Task<List<Quiz>> GetRecentQuizzesAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -46,9 +48,15 @@ public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, Guid>, IQu
       query = include(query);
     }
 
+    if (lastDateCursor.HasValue && lastIdCursor.HasValue)
+    {
+      query = query.Where(q => q.CreatedDate < lastDateCursor ||
+                              (q.CreatedDate == lastDateCursor && q.Id.CompareTo(lastIdCursor.Value) < 0));
+    }
+
     return await query
       .Where(q => q.IsActive)
-      .OrderByDescending(q => q.CreatedDate)
+      .OrderByDescending(q => q.CreatedDate).ThenByDescending(q => q.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
   }

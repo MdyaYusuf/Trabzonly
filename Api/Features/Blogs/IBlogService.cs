@@ -5,10 +5,12 @@ namespace Api.Features.Blogs;
 
 public interface IBlogService
 {
-  Task<ReturnModel<List<BlogResponseDto>>> GetAllAsync(
+  Task<ReturnModel<PagedResponse<BlogResponseDto>>> GetAllAsync(
     Expression<Func<Blog, bool>>? filter = null,
     Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
     Func<IQueryable<Blog>, IOrderedQueryable<Blog>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
@@ -32,8 +34,10 @@ public interface IBlogService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<BlogResponseDto>>> GetRecentBlogsAsync(
+  Task<ReturnModel<CursorPagedResponse<BlogResponseDto>>> GetRecentBlogsAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

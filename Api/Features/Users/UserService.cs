@@ -16,29 +16,38 @@ public class UserService(
   IValidator<UpdateUserRequest> _updateValidator,
   IValidator<ChangePasswordRequest> _changePasswordValidator) : IUserService
 {
-  public async Task<ReturnModel<List<UserResponseDto>>> GetAllAsync(
+  public async Task<ReturnModel<PagedResponse<UserResponseDto>>> GetAllAsync(
     Guid currentUserId,
     string userRole,
     Expression<Func<User, bool>>? filter = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
+    int pageNumber = 1,
+    int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
     _businessRules.UserMustBeOwnerOrAdmin(Guid.Empty, currentUserId, userRole);
 
-    List<User> users = await _userRepository.GetAllAsync(
-      include: query => query.Include(u => u.Role),
-      cancellationToken: cancellationToken);
+    var (users, totalCount) = await _userRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
+      filter,
+      include: include ?? (query => query.Include(u => u.Role)),
+      orderBy,
+      enableTracking,
+      withDeleted,
+      cancellationToken);
 
-    List<UserResponseDto> response = _mapper.EntityToResponseDtoList(users);
+    List<UserResponseDto> responseDtos = _mapper.EntityToResponseDtoList(users);
+    var pagedResponse = new PagedResponse<UserResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
-    return new ReturnModel<List<UserResponseDto>>()
+    return new ReturnModel<PagedResponse<UserResponseDto>>()
     {
       Success = true,
       Message = "Kullanıcı listesi başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }
@@ -133,27 +142,42 @@ public class UserService(
     };
   }
 
-  public async Task<ReturnModel<List<UserPreviewDto>>> GetNewestMembersAsync(
+  public async Task<ReturnModel<CursorPagedResponse<UserPreviewDto>>> GetNewestMembersAsync(
     int count,
+    DateTime? lastDateCursor = null,
+    Guid? lastIdCursor = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
     List<User> users = await _userRepository.GetNewestMembersAsync(
-      count,
+      count + 1,
+      lastDateCursor,
+      lastIdCursor,
       include: include ?? (query => query.Include(u => u.Role)),
       enableTracking,
       withDeleted,
       cancellationToken);
 
-    List<UserPreviewDto> response = _mapper.EntityToPreviewDtoList(users);
+    bool hasNextPage = users.Count > count;
+    var itemsToReturn = hasNextPage ? users.Take(count).ToList() : users;
 
-    return new ReturnModel<List<UserPreviewDto>>()
+    List<UserPreviewDto> response = _mapper.EntityToPreviewDtoList(itemsToReturn);
+
+    var pagedResponse = new CursorPagedResponse<UserPreviewDto>
+    {
+      Items = response,
+      NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      HasNextPage = hasNextPage
+    };
+
+    return new ReturnModel<CursorPagedResponse<UserPreviewDto>>()
     {
       Success = true,
       Message = "En yeni üyeler başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = pagedResponse,
       StatusCode = 200
     };
   }
