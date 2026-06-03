@@ -67,6 +67,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey)),
       ClockSkew = TimeSpan.Zero
     };
+    options.Events = new JwtBearerEvents
+    {
+      OnMessageReceived = context =>
+      {
+        if (context.Request.Cookies.ContainsKey("accessToken"))
+        {
+          context.Token = context.Request.Cookies["accessToken"];
+        }
+        return Task.CompletedTask;
+      }
+    };
   });
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
