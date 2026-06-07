@@ -10,5 +10,5 @@ public record TokenResponseDto(
   UserResponseDto User);
 
 // Requests
-public sealed record LoginRequest(string Email, string Password);
-public sealed record RegisterUserRequest(string Username, string Email, string Password);
+public sealed record LoginRequest(string Username, string Password);
+public sealed record RegisterUserRequest(string Username, string Password);

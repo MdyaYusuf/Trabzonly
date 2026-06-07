@@ -182,21 +182,6 @@ public class UserService(
     };
   }
 
-  public async Task<ReturnModel<bool>> CheckEmailUniqueAsync(
-    string email,
-    CancellationToken cancellationToken = default)
-  {
-    bool isUnique = await _userRepository.IsEmailUniqueAsync(email, cancellationToken);
-
-    return new ReturnModel<bool>()
-    {
-      Success = true,
-      Message = isUnique ? "E-posta adresi kullanılabilir." : "E-posta adresi zaten kullanımda.",
-      Data = isUnique,
-      StatusCode = 200
-    };
-  }
-
   public async Task<ReturnModel<NoData>> UpdateAsync(
     UpdateUserRequest request,
     Guid currentUserId,
@@ -214,7 +199,6 @@ public class UserService(
 
     _businessRules.UsernameCannotBeRestrictedWord(request.Username);
     await _businessRules.UsernameMustBeUniqueAsync(request.Username, user.Id, cancellationToken);
-    await _businessRules.EmailMustBeUniqueAsync(request.Email, user.Id, cancellationToken);
 
     user.ProfileImageUrl = await FileHelper.ReplaceImageOnDisk(
       request.ImageFile,

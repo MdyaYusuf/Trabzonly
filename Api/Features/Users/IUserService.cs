@@ -49,10 +49,6 @@ public interface IUserService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<bool>> CheckEmailUniqueAsync(
-    string email,
-    CancellationToken cancellationToken = default);
-
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
     Guid currentUserId,

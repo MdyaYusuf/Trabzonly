@@ -35,7 +35,7 @@ public class AuthenticationService(
     }
 
     User? user = await _userRepository.GetAsync(
-      predicate: u => u.Email == request.Email,
+      predicate: u => u.Username == request.Username,
       include: query => query.Include(u => u.Role));
 
     _authBusinessRules.UserCredentialsMustMatch(user, request.Password);
@@ -67,7 +67,6 @@ public class AuthenticationService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    await _userBusinessRules.EmailMustBeUniqueAsync(request.Email, cancellationToken: cancellationToken);
     await _userBusinessRules.UsernameMustBeUniqueAsync(request.Username, cancellationToken: cancellationToken);
 
     User createdUser = _mapper.CreateToEntity(request);
@@ -148,7 +147,6 @@ public class AuthenticationService(
   {
     List<Claim> claims = [
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-      new(ClaimTypes.Email, user.Email),
       new(ClaimTypes.Name, user.Username),
       new(ClaimTypes.Role, user.Role.Name)
     ];

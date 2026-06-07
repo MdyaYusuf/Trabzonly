@@ -40,10 +40,6 @@ const getById = async (id: string): Promise<ApiResponse<UserResponseDto>> => {
   return await apiClient<UserResponseDto>(`${API_URL}/${id}`);
 };
 
-const getByEmail = async (email: string): Promise<ApiResponse<UserResponseDto>> => {
-  return await apiClient<UserResponseDto>(`${API_URL}/by-email/${email}`);
-};
-
 const getTopContributors = async (count: number): Promise<ApiResponse<UserPreviewDto[]>> => {
   return await apiClient<UserPreviewDto[]>(`${API_URL}/top-contributors/${count}`);
 };
@@ -65,11 +61,6 @@ const getNewestMembers = async (
 
   const qs = queryParams.toString() ? `?${queryParams.toString()}` : '';
   return await apiClient<CursorPagedResponse<UserPreviewDto>>(`${API_URL}/newest-members/${count}${qs}`);
-};
-
-const checkEmailUnique = async (email: string): Promise<ApiResponse<boolean>> => {
-  const queryParams = new URLSearchParams({ email });
-  return await apiClient<boolean>(`${API_URL}/check-email?${queryParams}`);
 };
 
 const updateProfile = async (request: UpdateUserRequest): Promise<ApiResponse<NoData>> => {
@@ -96,10 +87,8 @@ const remove = async (id: string): Promise<ApiResponse<NoData>> => {
 const userService = {
   getAll,
   getById,
-  getByEmail,
   getTopContributors,
   getNewestMembers,
-  checkEmailUnique,
   updateProfile,
   changePassword,
   remove,

@@ -38,18 +38,6 @@ public class UsersController(IUserService _userService) : CustomBaseController
     return CreateActionResult(result);
   }
 
-  [HttpGet("by-email/{email}")]
-  public async Task<IActionResult> GetByEmail(string email, CancellationToken cancellationToken)
-  {
-    var result = await _userService.GetAsync(
-      predicate: u => u.Email == email,
-      currentUserId: GetUserId(),
-      userRole: GetUserRole(),
-      cancellationToken: cancellationToken);
-
-    return CreateActionResult(result);
-  }
-
   [AllowAnonymous]
   [HttpGet("top-contributors/{count:int}")]
   public async Task<IActionResult> GetTopContributors(
@@ -75,14 +63,6 @@ public class UsersController(IUserService _userService) : CustomBaseController
       lastIdCursor: lastId,
       cancellationToken: cancellationToken);
 
-    return CreateActionResult(result);
-  }
-
-  [AllowAnonymous]
-  [HttpGet("check-email")]
-  public async Task<IActionResult> CheckEmailUnique([FromQuery] string email, CancellationToken cancellationToken)
-  {
-    var result = await _userService.CheckEmailUniqueAsync(email, cancellationToken);
     return CreateActionResult(result);
   }
 

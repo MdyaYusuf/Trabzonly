@@ -11,14 +11,6 @@ public class EfUserRepository : EfBaseRepository<BaseDbContext, User, Guid>, IUs
 
   }
 
-  public async Task<bool> IsEmailUniqueAsync(
-    string email,
-    CancellationToken cancellationToken = default)
-  {
-    return !await Query(enableTracking: false, withDeleted: true)
-      .AnyAsync(u => u.Email == email, cancellationToken);
-  }
-
   public async Task<List<User>> GetTopContributorsAsync(
     int count,
     Func<IQueryable<User>, IQueryable<User>>? include = null,

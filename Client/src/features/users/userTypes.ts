@@ -2,7 +2,6 @@
 export interface UserResponseDto {
   id: string; // Guid maps to string
   username: string;
-  email: string;
   bio?: string | null;
   profileImageUrl?: string | null;
   isActive: boolean;
@@ -26,7 +25,6 @@ export interface CreatedUserResponseDto {
 // Requests
 export interface UpdateUserRequest {
   username: string;
-  email: string;
   bio?: string | null;
   imageFile?: File | null;
 }

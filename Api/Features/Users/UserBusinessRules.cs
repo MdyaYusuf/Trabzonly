@@ -33,16 +33,6 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
     }
   }
 
-  public async Task EmailMustBeUniqueAsync(string email, Guid? id = null, CancellationToken cancellationToken = default)
-  {
-    var exists = await _userRepository.AnyAsync(u => u.Email == email && (id == null || u.Id != id), cancellationToken);
-
-    if (exists)
-    {
-      throw new BusinessException("Bu eposta adresi zaten kullanımda.");
-    }
-  }
-
   public async Task UsernameMustBeUniqueAsync(string username, Guid? id = null, CancellationToken cancellationToken = default)
   {
     var exists = await _userRepository.AnyAsync(u => u.Username == username && (id == null || u.Id != id), cancellationToken);
