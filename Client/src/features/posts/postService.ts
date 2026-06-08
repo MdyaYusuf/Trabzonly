@@ -1,13 +1,13 @@
 import { apiClient } from '../../core/api/apiClient';
 import type { ApiResponse, NoData, PaginationRequest, PagedResponse, CursorPagedResponse } from '../../core/types/ApiResponse';
 import type {
-  BlogResponseDto,
-  CreatedBlogResponseDto,
-  CreateBlogRequest,
-  UpdateBlogRequest,
-} from './blogTypes';
+  PostResponseDto,
+  CreatedPostResponseDto,
+  CreatePostRequest,
+  UpdatePostRequest,
+} from './postTypes';
 
-const API_URL = '/blogs';
+const API_URL = '/posts';
 
 const objectToFormData = (obj: any): FormData => {
   const formData = new FormData();
@@ -27,27 +27,27 @@ const objectToFormData = (obj: any): FormData => {
   return formData;
 };
 
-const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedResponse<BlogResponseDto>>> => {
+const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedResponse<PostResponseDto>>> => {
   const queryParams = new URLSearchParams({
     pageNumber: pagination.pageNumber.toString(),
     pageSize: pagination.pageSize.toString(),
   });
-  return await apiClient<PagedResponse<BlogResponseDto>>(`${API_URL}?${queryParams}`);
+  return await apiClient<PagedResponse<PostResponseDto>>(`${API_URL}?${queryParams}`);
 };
 
-const getById = async (id: string): Promise<ApiResponse<BlogResponseDto>> => {
-  return await apiClient<BlogResponseDto>(`${API_URL}/${id}`);
+const getById = async (id: string): Promise<ApiResponse<PostResponseDto>> => {
+  return await apiClient<PostResponseDto>(`${API_URL}/${id}`);
 };
 
-const getTopCommented = async (count: number): Promise<ApiResponse<BlogResponseDto[]>> => {
-  return await apiClient<BlogResponseDto[]>(`${API_URL}/top-commented/${count}`);
+const getTopCommented = async (count: number): Promise<ApiResponse<PostResponseDto[]>> => {
+  return await apiClient<PostResponseDto[]>(`${API_URL}/top-commented/${count}`);
 };
 
 const getRecent = async (
   count: number,
   lastDate?: string,
   lastId?: string
-): Promise<ApiResponse<CursorPagedResponse<BlogResponseDto>>> => {
+): Promise<ApiResponse<CursorPagedResponse<PostResponseDto>>> => {
   const queryParams = new URLSearchParams();
 
   if (lastDate) {
@@ -58,18 +58,18 @@ const getRecent = async (
   }
 
   const qs = queryParams.toString() ? `?${queryParams.toString()}` : '';
-  return await apiClient<CursorPagedResponse<BlogResponseDto>>(`${API_URL}/recent/${count}${qs}`);
+  return await apiClient<CursorPagedResponse<PostResponseDto>>(`${API_URL}/recent/${count}${qs}`);
 };
 
-const add = async (request: CreateBlogRequest): Promise<ApiResponse<CreatedBlogResponseDto>> => {
+const add = async (request: CreatePostRequest): Promise<ApiResponse<CreatedPostResponseDto>> => {
   const formData = objectToFormData(request);
-  return await apiClient<CreatedBlogResponseDto>(API_URL, {
+  return await apiClient<CreatedPostResponseDto>(API_URL, {
     method: 'POST',
     body: formData,
   });
 };
 
-const update = async (request: UpdateBlogRequest): Promise<ApiResponse<NoData>> => {
+const update = async (request: UpdatePostRequest): Promise<ApiResponse<NoData>> => {
   const formData = objectToFormData(request);
   return await apiClient<NoData>(API_URL, {
     method: 'PUT',
@@ -83,6 +83,6 @@ const remove = async (id: string): Promise<ApiResponse<NoData>> => {
   });
 };
 
-const blogService = { getAll, getById, getTopCommented, getRecent, add, update, remove };
+const postService = { getAll, getById, getTopCommented, getRecent, add, update, remove };
 
-export default blogService;
+export default postService;

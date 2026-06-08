@@ -11,8 +11,8 @@ public class CreateCommentRequestValidator : AbstractValidator<CreateCommentRequ
       .MaximumLength(1000).WithMessage("Yorum içeriği en fazla 1000 karakter olabilir.");
 
     RuleFor(x => x)
-      .Must(x => x.BlogId.HasValue || x.PlayerId.HasValue || x.ParentCommentId.HasValue)
-      .WithMessage("Yorum bir blog, oyuncu veya başka bir yoruma ait olmalıdır.");
+      .Must(x => x.PostId.HasValue || x.PlayerId.HasValue || x.ParentCommentId.HasValue)
+      .WithMessage("Yorum bir post, oyuncu veya başka bir yoruma ait olmalıdır.");
   }
 }
 

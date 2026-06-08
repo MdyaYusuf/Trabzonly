@@ -1,56 +1,56 @@
 using System.Linq.Expressions;
 using Api.Core.Responses;
 
-namespace Api.Features.Blogs;
+namespace Api.Features.Posts;
 
-public interface IBlogService
+public interface IPostService
 {
-  Task<ReturnModel<PagedResponse<BlogResponseDto>>> GetAllAsync(
-    Expression<Func<Blog, bool>>? filter = null,
-    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
-    Func<IQueryable<Blog>, IOrderedQueryable<Blog>>? orderBy = null,
+  Task<ReturnModel<PagedResponse<PostResponseDto>>> GetAllAsync(
+    Expression<Func<Post, bool>>? filter = null,
+    Func<IQueryable<Post>, IQueryable<Post>>? include = null,
+    Func<IQueryable<Post>, IOrderedQueryable<Post>>? orderBy = null,
     int pageNumber = 1,
     int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<BlogResponseDto>> GetAsync(
-    Expression<Func<Blog, bool>> predicate,
-    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+  Task<ReturnModel<PostResponseDto>> GetAsync(
+    Expression<Func<Post, bool>> predicate,
+    Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<BlogResponseDto>> GetByIdAsync(
+  Task<ReturnModel<PostResponseDto>> GetByIdAsync(
     Guid id,
-    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<BlogResponseDto>>> GetTopCommentedBlogsAsync(
+  Task<ReturnModel<List<PostResponseDto>>> GetTopCommentedPostsAsync(
     int count,
-    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<CursorPagedResponse<BlogResponseDto>>> GetRecentBlogsAsync(
+  Task<ReturnModel<CursorPagedResponse<PostResponseDto>>> GetRecentPostsAsync(
     int count,
     DateTime? lastDateCursor = null,
     Guid? lastIdCursor = null,
-    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<CreatedBlogResponseDto>> AddAsync(
-    CreateBlogRequest request,
+  Task<ReturnModel<CreatedPostResponseDto>> AddAsync(
+    CreatePostRequest request,
     Guid currentUserId,
     string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> UpdateAsync(
-    UpdateBlogRequest request,
+    UpdatePostRequest request,
     Guid currentUserId,
     string userRole,
     CancellationToken cancellationToken = default);

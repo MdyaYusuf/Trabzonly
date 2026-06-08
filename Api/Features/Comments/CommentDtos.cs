@@ -7,7 +7,7 @@ public sealed record CommentResponseDto(
   bool IsApproved,
   Guid UserId,
   string AuthorUsername,
-  Guid? BlogId,
+  Guid? PostId,
   Guid? PlayerId,
   Guid? ParentCommentId,
   DateTime CreatedDate);
@@ -20,7 +20,7 @@ public sealed record CreatedCommentResponseDto(
 // Requests
 public sealed record CreateCommentRequest(
   string Content,
-  Guid? BlogId,
+  Guid? PostId,
   Guid? PlayerId,
   Guid? ParentCommentId);
 

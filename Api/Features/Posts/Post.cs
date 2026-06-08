@@ -4,12 +4,12 @@ using Api.Features.Comments;
 using Api.Features.Users;
 using Api.Features.Categories;
 
-namespace Api.Features.Blogs;
+namespace Api.Features.Posts;
 
-public class Blog : Entity<Guid>
+public class Post : Entity<Guid>
 {
   [SetsRequiredMembers]
-  public Blog()
+  public Post()
   {
     Title = default!;
     Content = default!;
@@ -20,6 +20,8 @@ public class Blog : Entity<Guid>
   public required string Content { get; set; }
   public string? ImageUrl { get; set; }
   public bool IsActive { get; set; } = true;
+  public int LikeCount { get; set; } = 0;
+  public int DislikeCount { get; set; } = 0;
 
   // Navigation properties
   public Guid UserId { get; set; }

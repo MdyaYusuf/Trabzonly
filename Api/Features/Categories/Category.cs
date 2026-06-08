@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Api.Core.Entities;
-using Api.Features.Blogs;
+using Api.Features.Posts;
 
 namespace Api.Features.Categories;
 
@@ -17,5 +17,5 @@ public class Category : Entity<int>
   public bool IsActive { get; set; } = true;
 
   // Navigation properties
-  public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
+  public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
 }

@@ -1,14 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Api.Features.Categories;
 
-namespace Api.Features.Blogs;
+namespace Api.Features.Posts;
 
-public class BlogConfiguration : IEntityTypeConfiguration<Blog>
+public class PostConfiguration : IEntityTypeConfiguration<Post>
 {
-  public void Configure(EntityTypeBuilder<Blog> builder)
+  public void Configure(EntityTypeBuilder<Post> builder)
   {
-    builder.ToTable("Blogs");
+    builder.ToTable("Posts");
 
     builder.HasKey(b => b.Id);
 
@@ -38,13 +37,21 @@ public class BlogConfiguration : IEntityTypeConfiguration<Blog>
     builder.Property(b => b.ImageUrl)
       .HasMaxLength(500);
 
+    builder.Property(b => b.LikeCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
+    builder.Property(b => b.DislikeCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
     builder.HasOne(b => b.User)
-      .WithMany(u => u.Blogs)
+      .WithMany(u => u.Posts)
       .HasForeignKey(b => b.UserId)
       .OnDelete(DeleteBehavior.Restrict);
 
     builder.HasOne(b => b.Category)
-      .WithMany(c => c.Blogs)
+      .WithMany(c => c.Posts)
       .HasForeignKey(b => b.CategoryId)
       .OnDelete(DeleteBehavior.Restrict);
   }

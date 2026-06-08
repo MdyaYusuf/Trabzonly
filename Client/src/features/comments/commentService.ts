@@ -19,7 +19,7 @@ const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedR
 
 const getRecent = async (
   count: number = 10,
-  blogId?: string,
+  postId?: string,
   playerId?: string,
   lastDate?: string,
   lastId?: string
@@ -27,8 +27,8 @@ const getRecent = async (
   const queryParams = new URLSearchParams();
   queryParams.append('count', count.toString());
 
-  if (blogId) {
-    queryParams.append('blogId', blogId);
+  if (postId) {
+    queryParams.append('postId', postId);
   }
   if (playerId) {
     queryParams.append('playerId', playerId);

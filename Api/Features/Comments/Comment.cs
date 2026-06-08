@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Api.Core.Entities;
-using Api.Features.Blogs;
 using Api.Features.Players;
+using Api.Features.Posts;
 using Api.Features.Users;
 
 namespace Api.Features.Comments;
@@ -20,8 +20,8 @@ public class Comment : Entity<Guid>
   // Navigation properties
   public Guid UserId { get; set; }
   public virtual User User { get; set; } = default!;
-  public Guid? BlogId { get; set; }
-  public virtual Blog? Blog { get; set; }
+  public Guid? PostId { get; set; }
+  public virtual Post? Post { get; set; }
   public Guid? PlayerId { get; set; }
   public virtual Player? Player { get; set; }
   public Guid? ParentCommentId { get; set; }

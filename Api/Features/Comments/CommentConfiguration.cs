@@ -32,9 +32,9 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
       .HasForeignKey(c => c.UserId)
       .OnDelete(DeleteBehavior.Restrict);
 
-    builder.HasOne(c => c.Blog)
-      .WithMany(b => b.Comments)
-      .HasForeignKey(c => c.BlogId)
+    builder.HasOne(c => c.Post)
+      .WithMany(p => p.Comments)
+      .HasForeignKey(c => c.PostId)
       .OnDelete(DeleteBehavior.Cascade);
 
     builder.HasOne(c => c.Player)

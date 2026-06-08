@@ -1,24 +1,26 @@
 // Responses
-export interface BlogResponseDto {
+export interface PostResponseDto {
   id: string;
   title: string;
   description?: string;
   content: string;
   imageUrl?: string;
   isActive: boolean;
+  likeCount: number;
+  dislikeCount: number;
   userId: string;
   authorUsername: string;
   categoryId: number;
   categoryName: string;
 }
 
-export interface CreatedBlogResponseDto {
+export interface CreatedPostResponseDto {
   id: string;
   title: string;
   imageUrl?: string;
 }
 
-export interface BlogPreviewDto {
+export interface PostPreviewDto {
   id: string;
   title: string;
   description?: string;
@@ -26,10 +28,12 @@ export interface BlogPreviewDto {
   authorUsername: string;
   categoryName: string;
   createdDate: string;
+  likeCount: number;
+  dislikeCount: number;
 }
 
 // Requests
-export interface CreateBlogRequest {
+export interface CreatePostRequest {
   title: string;
   description?: string;
   content: string;
@@ -37,7 +41,7 @@ export interface CreateBlogRequest {
   imageFile?: File | null;
 }
 
-export interface UpdateBlogRequest extends CreateBlogRequest {
+export interface UpdatePostRequest extends CreatePostRequest {
   id: string;
   isActive: boolean;
 }

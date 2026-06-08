@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace Api.Features.Blogs;
+namespace Api.Features.Posts;
 
-public class CreateBlogRequestValidator : AbstractValidator<CreateBlogRequest>
+public class CreatePostRequestValidator : AbstractValidator<CreatePostRequest>
 {
-  public CreateBlogRequestValidator()
+  public CreatePostRequestValidator()
   {
     RuleFor(b => b.Title)
       .NotEmpty().WithMessage("Başlık boş olamaz.")
@@ -21,12 +21,12 @@ public class CreateBlogRequestValidator : AbstractValidator<CreateBlogRequest>
   }
 }
 
-public class UpdateBlogRequestValidator : AbstractValidator<UpdateBlogRequest>
+public class UpdatePostRequestValidator : AbstractValidator<UpdatePostRequest>
 {
-  public UpdateBlogRequestValidator()
+  public UpdatePostRequestValidator()
   {
     RuleFor(b => b.Id)
-      .NotEmpty().WithMessage("Geçersiz blog ID.");
+      .NotEmpty().WithMessage("Geçersiz post ID.");
 
     RuleFor(b => b.Title)
       .NotEmpty().WithMessage("Başlık boş olamaz.")

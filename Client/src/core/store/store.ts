@@ -3,7 +3,7 @@ import authReducer from "../../features/auth/authSlice";
 import roleReducer from "../../features/roles/roleSlice";
 import playerReducer from "../../features/players/playerSlice";
 import commentReducer from "../../features/comments/commentSlice";
-import blogReducer from "../../features/blogs/blogSlice";
+import postReducer from "../../features/posts/postSlice";
 import categoryReducer from "../../features/categories/categorySlice";
 import injuryReducer from "../../features/injuries/injurySlice";
 import positionReducer from "../../features/positions/positionSlice";
@@ -18,7 +18,7 @@ export const store = configureStore({
     roles: roleReducer,
     players: playerReducer,
     comments: commentReducer,
-    blogs: blogReducer,
+    posts: postReducer,
     categories: categoryReducer,
     injuries: injuryReducer,
     positions: positionReducer,

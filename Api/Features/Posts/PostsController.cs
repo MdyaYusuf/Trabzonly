@@ -3,18 +3,18 @@ using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Features.Blogs;
+namespace Api.Features.Posts;
 
 [ApiController]
-[Route("api/blogs")]
-public class BlogsController(IBlogService _blogService) : CustomBaseController
+[Route("api/posts")]
+public class PostsController(IPostService _postService) : CustomBaseController
 {
   [HttpGet]
   public async Task<IActionResult> GetAll(
     [FromQuery] PaginationRequest pagination,
     CancellationToken cancellationToken = default)
   {
-    var result = await _blogService.GetAllAsync(
+    var result = await _postService.GetAllAsync(
       pageNumber: pagination.PageNumber,
       pageSize: pagination.PageSize,
       cancellationToken: cancellationToken);
@@ -27,29 +27,29 @@ public class BlogsController(IBlogService _blogService) : CustomBaseController
     Guid id,
     CancellationToken cancellationToken)
   {
-    var result = await _blogService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
+    var result = await _postService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpGet("top-commented/{count:int}")]
-  public async Task<IActionResult> GetTopCommentedBlogs(
+  public async Task<IActionResult> GetTopCommentedPosts(
     int count,
     CancellationToken cancellationToken)
   {
-    var result = await _blogService.GetTopCommentedBlogsAsync(count: count, cancellationToken: cancellationToken);
+    var result = await _postService.GetTopCommentedPostsAsync(count: count, cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpGet("recent/{count:int}")]
-  public async Task<IActionResult> GetRecentBlogs(
+  public async Task<IActionResult> GetRecentPosts(
     int count,
     [FromQuery] DateTime? lastDate = null,
     [FromQuery] Guid? lastId = null,
     CancellationToken cancellationToken = default)
   {
-    var result = await _blogService.GetRecentBlogsAsync(
+    var result = await _postService.GetRecentPostsAsync(
       count: count,
       lastDateCursor: lastDate,
       lastIdCursor: lastId,
@@ -61,10 +61,10 @@ public class BlogsController(IBlogService _blogService) : CustomBaseController
   [Authorize]
   [HttpPost]
   public async Task<IActionResult> Add(
-    [FromForm] CreateBlogRequest request,
+    [FromForm] CreatePostRequest request,
     CancellationToken cancellationToken)
   {
-    var result = await _blogService.AddAsync(
+    var result = await _postService.AddAsync(
       request: request,
       currentUserId: GetUserId(),
       userRole: GetUserRole(),
@@ -76,10 +76,10 @@ public class BlogsController(IBlogService _blogService) : CustomBaseController
   [Authorize]
   [HttpPut]
   public async Task<IActionResult> Update(
-    [FromForm] UpdateBlogRequest request,
+    [FromForm] UpdatePostRequest request,
     CancellationToken cancellationToken)
   {
-    var result = await _blogService.UpdateAsync(
+    var result = await _postService.UpdateAsync(
       request: request,
       currentUserId: GetUserId(),
       userRole: GetUserRole(),
@@ -94,7 +94,7 @@ public class BlogsController(IBlogService _blogService) : CustomBaseController
     Guid id,
     CancellationToken cancellationToken)
   {
-    var result = await _blogService.RemoveAsync(
+    var result = await _postService.RemoveAsync(
       id: id,
       currentUserId: GetUserId(),
       userRole: GetUserRole(),

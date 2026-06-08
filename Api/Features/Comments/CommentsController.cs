@@ -26,7 +26,7 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
   [HttpGet("recent")]
   public async Task<IActionResult> GetRecent(
     [FromQuery] int count = 10,
-    [FromQuery] Guid? blogId = null,
+    [FromQuery] Guid? postId = null,
     [FromQuery] Guid? playerId = null,
     [FromQuery] DateTime? lastDate = null,
     [FromQuery] Guid? lastId = null,
@@ -34,9 +34,9 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
   {
     Expression<Func<Comment, bool>>? filter = null;
 
-    if (blogId.HasValue)
+    if (postId.HasValue)
     {
-      filter = c => c.BlogId == blogId;
+      filter = c => c.PostId == postId;
     }
     else if (playerId.HasValue)
     {

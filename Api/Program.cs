@@ -4,7 +4,6 @@ using Api.Core.Middlewares;
 using Api.Core.Security;
 using Api.Data;
 using Api.Features.Authentication;
-using Api.Features.Blogs;
 using Api.Features.Comments;
 using Api.Features.Injuries;
 using Api.Features.Players;
@@ -18,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Api.Features.Categories;
+using Api.Features.Posts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +42,7 @@ builder.Services.AddAuthenticationDependencies();
 builder.Services.AddPlayerDependencies();
 builder.Services.AddInjuryDependencies();
 builder.Services.AddQuizDependencies();
-builder.Services.AddBlogDependencies();
+builder.Services.AddPostDependencies();
 builder.Services.AddCategoryDependencies();
 builder.Services.AddCommentDependencies();
 builder.Services.AddPositionDependencies();

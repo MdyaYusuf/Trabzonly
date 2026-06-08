@@ -1,21 +1,21 @@
 using Api.Core.Repositories;
 
-namespace Api.Features.Blogs;
+namespace Api.Features.Posts;
 
-public interface IBlogRepository : IRepository<Blog, Guid>
+public interface IPostRepository : IRepository<Post, Guid>
 {
-  Task<List<Blog>> GetTopCommentedBlogsAsync(
+  Task<List<Post>> GetTopCommentedPostsAsync(
     int count,
-    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<List<Blog>> GetRecentBlogsAsync(
+  Task<List<Post>> GetRecentPostsAsync(
     int count,
     DateTime? lastDateCursor = null,
     Guid? lastIdCursor = null,
-    Func<IQueryable<Blog>, IQueryable<Blog>>? include = null,
+    Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);

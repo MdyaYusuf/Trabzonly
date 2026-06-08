@@ -27,7 +27,7 @@ public class EfUserRepository : EfBaseRepository<BaseDbContext, User, Guid>, IUs
 
     return await query
       .Where(u => u.IsActive)
-      .OrderByDescending(u => u.Blogs.Count + u.Comments.Count)
+      .OrderByDescending(u => u.Posts.Count + u.Comments.Count)
       .Take(count)
       .ToListAsync(cancellationToken);
   }

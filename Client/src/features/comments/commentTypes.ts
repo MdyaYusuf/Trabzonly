@@ -5,7 +5,7 @@ export interface CommentResponseDto {
   isApproved: boolean;
   userId: string;
   authorUsername: string;
-  blogId?: string;
+  postId?: string;
   playerId?: string;
   parentCommentId?: string;
   createdDate: string;
@@ -20,7 +20,7 @@ export interface CreatedCommentResponseDto {
 // Requests
 export interface CreateCommentRequest {
   content: string;
-  blogId?: string;
+  postId?: string;
   playerId?: string;
   parentCommentId?: string;
 }
