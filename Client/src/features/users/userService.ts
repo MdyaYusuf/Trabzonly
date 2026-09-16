@@ -40,6 +40,10 @@ const getById = async (id: string): Promise<ApiResponse<UserResponseDto>> => {
   return await apiClient<UserResponseDto>(`${API_URL}/${id}`);
 };
 
+const getMe = async (): Promise<ApiResponse<UserResponseDto>> => {
+  return await apiClient<UserResponseDto>(`${API_URL}/me`);
+};
+
 const getTopContributors = async (count: number): Promise<ApiResponse<UserPreviewDto[]>> => {
   return await apiClient<UserPreviewDto[]>(`${API_URL}/top-contributors/${count}`);
 };
@@ -87,6 +91,7 @@ const remove = async (id: string): Promise<ApiResponse<NoData>> => {
 const userService = {
   getAll,
   getById,
+  getMe,
   getTopContributors,
   getNewestMembers,
   updateProfile,

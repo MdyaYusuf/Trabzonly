@@ -15,6 +15,10 @@ export const apiClient = async <T>(
     headers.set("Content-Type", "application/json");
   }
 
+  if (!headers.has("X-Client-Platform")) {
+    headers.set("X-Client-Platform", "web");
+  }
+
   const config: RequestInit = {
     ...options,
     headers,
@@ -101,6 +105,9 @@ const processRefreshToken = async (): Promise<boolean> => {
     const refreshResponse = await fetch(`${BASE_URL}/authentication/refresh-token`, {
       method: "POST",
       credentials: "include",
+      headers: {
+        "X-Client-Platform": "web",
+      },
     });
 
     return refreshResponse.ok;
@@ -114,7 +121,10 @@ const processRefreshToken = async (): Promise<boolean> => {
 export const handleLogout = () => {
   fetch(`${BASE_URL}/authentication/revoke-refresh-token`, {
     method: "POST",
-    credentials: "include"
+    credentials: "include",
+    headers: {
+      "X-Client-Platform": "web",
+    },
   }).finally(() => {
     window.location.href = "/login";
   });

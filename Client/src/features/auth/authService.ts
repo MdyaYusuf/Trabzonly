@@ -1,6 +1,7 @@
 import { apiClient, handleLogout } from "../../core/api/apiClient";
 import type { LoginRequest, RegisterUserRequest } from "./authTypes";
 import type { UserResponseDto, CreatedUserResponseDto } from "../users/userTypes";
+import userService from "../users/userService";
 
 export const authService = {
   login: async (credentials: LoginRequest) => {
@@ -18,9 +19,7 @@ export const authService = {
   },
 
   checkAuth: async () => {
-    return await apiClient<UserResponseDto>("/Authentication/refresh-token", {
-      method: "POST",
-    });
+    return await userService.getMe();
   },
 
   logout: () => {

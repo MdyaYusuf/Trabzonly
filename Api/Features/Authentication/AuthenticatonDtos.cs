@@ -12,3 +12,4 @@ public record TokenResponseDto(
 // Requests
 public sealed record LoginRequest(string Username, string Password);
 public sealed record RegisterUserRequest(string Username, string Password);
+public sealed record RefreshTokenRequest(string RefreshToken);

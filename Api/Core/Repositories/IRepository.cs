@@ -16,7 +16,7 @@ where TId : notnull
     CancellationToken cancellationToken = default);
 
   Task<(List<TEntity> Items, int TotalCount)> GetPagedListAsync(
-    int pageNumber,
+    int currentPage,
     int pageSize,
     Expression<Func<TEntity, bool>>? filter = null,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
@@ -48,5 +48,6 @@ where TId : notnull
     CancellationToken cancellationToken = default);
 
   void Delete(TEntity entity);
+  void DeleteRange(IEnumerable<TEntity> entities);
   void Update(TEntity entity);
 }

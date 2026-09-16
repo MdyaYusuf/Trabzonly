@@ -5,12 +5,34 @@ import App from './App.tsx'
 import { Provider } from 'react-redux'
 import { store } from './core/store/store'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { ProtectedRoute } from './ProtectedRoute'
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
-    // Children (pages) will be added here later
+    children: [
+      {
+        index: true,
+        element: <div>Ana Sayfa</div>,
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          // Authenticated member routes
+        ],
+      },
+      {
+        element: <ProtectedRoute allowedRoles={['Admin']} />,
+        children: [
+          // Admin-only routes
+        ],
+      },
+    ],
+  },
+  {
+    path: '/login',
+    element: <div>Giriş</div>,
   },
 ]);
 

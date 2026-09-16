@@ -7,7 +7,7 @@ namespace Api.Features.Users;
 
 [Authorize]
 [ApiController]
-[Route("api/[users]")]
+[Route("api/[controller]")]
 public class UsersController(IUserService _userService) : CustomBaseController
 {
   [HttpGet]
@@ -21,6 +21,20 @@ public class UsersController(IUserService _userService) : CustomBaseController
       userRole: GetUserRole(),
       pageNumber: pagination.PageNumber,
       pageSize: pagination.PageSize,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("me")]
+  public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
+  {
+    Guid userId = GetUserId();
+
+    var result = await _userService.GetByIdAsync(
+      id: userId,
+      currentUserId: userId,
+      userRole: GetUserRole(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

@@ -13,6 +13,7 @@ using Api.Features.Quizzes;
 using Api.Features.Roles;
 using Api.Features.Seasons;
 using Api.Features.Users;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -29,6 +30,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -71,10 +73,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
       OnMessageReceived = context =>
       {
-        if (context.Request.Cookies.ContainsKey("accessToken"))
+        string? authorization = context.Request.Headers.Authorization;
+
+        if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
         {
-          context.Token = context.Request.Cookies["accessToken"];
+          return Task.CompletedTask;
         }
+
+        if (context.Request.Cookies.TryGetValue("accessToken", out string? accessToken))
+        {
+          context.Token = accessToken;
+        }
+
         return Task.CompletedTask;
       }
     };
