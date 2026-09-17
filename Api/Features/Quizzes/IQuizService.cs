@@ -52,5 +52,6 @@ public interface IQuizService
 
   Task<ReturnModel<UserQuizResultResponseDto>> SubmitQuizAsync(
     SubmitQuizRequest request,
+    Guid currentUserId,
     CancellationToken cancellationToken = default);
 }

@@ -45,3 +45,12 @@ export interface UpdatePostRequest extends CreatePostRequest {
   id: string;
   isActive: boolean;
 }
+
+export type PostReactionType = 1 | 2;
+
+export interface PostReactionResponseDto {
+  postId: string;
+  likeCount: number;
+  dislikeCount: number;
+  currentReaction?: PostReactionType | null;
+}

@@ -64,7 +64,6 @@ export interface QuestionAnswerDto {
 
 export interface SubmitQuizRequest {
   quizId: string;
-  userId: string;
   completionTime: string;
   answers: QuestionAnswerDto[];
 }

@@ -98,4 +98,12 @@ public class PostBusinessRules(IPostRepository _postRepository)
       throw new BusinessException("Çok sık post ekliyorsunuz. Lütfen yeni bir post eklemeden önce en az 5 dakika bekleyin.");
     }
   }
+
+  public void PostMustBeActive(Post post)
+  {
+    if (!post.IsActive)
+    {
+      throw new BusinessException("Bu post şu anda aktif değil.");
+    }
+  }
 }

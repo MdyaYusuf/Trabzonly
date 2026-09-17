@@ -5,6 +5,7 @@ import type {
   CreatedPostResponseDto,
   CreatePostRequest,
   UpdatePostRequest,
+  PostReactionResponseDto,
 } from './postTypes';
 
 const API_URL = '/posts';
@@ -83,6 +84,18 @@ const remove = async (id: string): Promise<ApiResponse<NoData>> => {
   });
 };
 
-const postService = { getAll, getById, getTopCommented, getRecent, add, update, remove };
+const like = async (id: string): Promise<ApiResponse<PostReactionResponseDto>> => {
+  return await apiClient<PostReactionResponseDto>(`${API_URL}/${id}/like`, {
+    method: 'POST',
+  });
+};
+
+const dislike = async (id: string): Promise<ApiResponse<PostReactionResponseDto>> => {
+  return await apiClient<PostReactionResponseDto>(`${API_URL}/${id}/dislike`, {
+    method: 'POST',
+  });
+};
+
+const postService = { getAll, getById, getTopCommented, getRecent, add, update, remove, like, dislike };
 
 export default postService;

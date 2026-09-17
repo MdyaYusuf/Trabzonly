@@ -5,6 +5,7 @@ public static class PostRegistration
   public static IServiceCollection AddPostDependencies(this IServiceCollection services)
   {
     services.AddScoped<IPostRepository, EfPostRepository>();
+    services.AddScoped<IPostReactionRepository, EfPostReactionRepository>();
     services.AddScoped<PostBusinessRules>();
     services.AddScoped<IPostService, PostService>();
     services.AddSingleton<PostMapper>();

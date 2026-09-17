@@ -46,6 +46,6 @@ public sealed record CreateAnswerRequest(string Text, bool IsCorrect);
 
 public sealed record UpdateQuizRequest(Guid Id, string Title, string? Description, bool IsActive);
 
-public sealed record SubmitQuizRequest(Guid QuizId, Guid UserId, TimeSpan CompletionTime, List<QuestionAnswerDto> Answers);
+public sealed record SubmitQuizRequest(Guid QuizId, TimeSpan CompletionTime, List<QuestionAnswerDto> Answers);
 
 public sealed record QuestionAnswerDto(Guid QuestionId, Guid AnswerId);

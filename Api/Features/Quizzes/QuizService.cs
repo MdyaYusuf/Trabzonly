@@ -218,6 +218,7 @@ public class QuizService(
 
   public async Task<ReturnModel<UserQuizResultResponseDto>> SubmitQuizAsync(
     SubmitQuizRequest request,
+    Guid currentUserId,
     CancellationToken cancellationToken = default)
   {
     var validationResult = await _submitValidator.ValidateAsync(request, cancellationToken);
@@ -255,7 +256,7 @@ public class QuizService(
     var result = new UserQuizResult
     {
       QuizId = quiz.Id,
-      UserId = request.UserId,
+      UserId = currentUserId,
       Score = totalScore,
       CompletionTime = request.CompletionTime,
       CompletedAt = DateTime.Now

@@ -73,9 +73,6 @@ public class SubmitQuizRequestValidator : AbstractValidator<SubmitQuizRequest>
     RuleFor(s => s.QuizId)
       .NotEmpty().WithMessage("Quiz ID boş olamaz.");
 
-    RuleFor(s => s.UserId)
-      .NotEmpty().WithMessage("Kullanıcı ID boş olamaz.");
-
     RuleFor(s => s.CompletionTime)
       .GreaterThan(TimeSpan.Zero).WithMessage("Tamamlanma süresi geçerli olmalıdır.");
 

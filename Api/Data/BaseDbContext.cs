@@ -26,6 +26,7 @@ public class BaseDbContext : DbContext
   public DbSet<Role> Roles { get; set; }
   public DbSet<Comment> Comments { get; set; }
   public DbSet<Post> Posts { get; set; }
+  public DbSet<PostReaction> PostReactions { get; set; }
   public DbSet<Category> Categories { get; set; }
   public DbSet<Player> Players { get; set; }
   public DbSet<Position> Positions { get; set; }

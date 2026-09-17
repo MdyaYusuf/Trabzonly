@@ -102,4 +102,34 @@ public class PostsController(IPostService _postService) : CustomBaseController
 
     return CreateActionResult(result);
   }
+
+  [Authorize]
+  [HttpPost("{id:guid}/like")]
+  public async Task<IActionResult> Like(
+    Guid id,
+    CancellationToken cancellationToken)
+  {
+    var result = await _postService.ReactAsync(
+      postId: id,
+      currentUserId: GetUserId(),
+      reactionType: PostReactionType.Like,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize]
+  [HttpPost("{id:guid}/dislike")]
+  public async Task<IActionResult> Dislike(
+    Guid id,
+    CancellationToken cancellationToken)
+  {
+    var result = await _postService.ReactAsync(
+      postId: id,
+      currentUserId: GetUserId(),
+      reactionType: PostReactionType.Dislike,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
 }

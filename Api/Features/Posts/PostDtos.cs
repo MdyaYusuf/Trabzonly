@@ -53,3 +53,9 @@ public sealed record UpdatePostRequest(
   int CategoryId,
   IFormFile? ImageFile,
   bool IsActive);
+
+public sealed record PostReactionResponseDto(
+  Guid PostId,
+  int LikeCount,
+  int DislikeCount,
+  PostReactionType? CurrentReaction);

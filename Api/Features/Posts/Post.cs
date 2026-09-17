@@ -29,4 +29,5 @@ public class Post : Entity<Guid>
   public int CategoryId { get; set; }
   public virtual Category Category { get; set; } = default!;
   public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+  public virtual ICollection<PostReaction> Reactions { get; set; } = new List<PostReaction>();
 }

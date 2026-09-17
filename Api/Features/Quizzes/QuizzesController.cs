@@ -95,6 +95,7 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [Authorize]
   [HttpPost("submit")]
   public async Task<IActionResult> Submit(
     [FromBody] SubmitQuizRequest request,
@@ -102,6 +103,7 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   {
     var result = await _quizService.SubmitQuizAsync(
       request: request,
+      currentUserId: GetUserId(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

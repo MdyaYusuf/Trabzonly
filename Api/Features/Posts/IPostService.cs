@@ -60,4 +60,10 @@ public interface IPostService
     Guid currentUserId,
     string userRole,
     CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<PostReactionResponseDto>> ReactAsync(
+    Guid postId,
+    Guid currentUserId,
+    PostReactionType reactionType,
+    CancellationToken cancellationToken = default);
 }

@@ -9,6 +9,7 @@ namespace Api.Features.Posts;
 
 public class PostService(
   IPostRepository _postRepository,
+  IPostReactionRepository _postReactionRepository,
   PostMapper _mapper,
   PostBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
@@ -272,5 +273,108 @@ public class PostService(
       Message = "Post başarılı bir şekilde silindi.",
       StatusCode = 200
     };
+  }
+
+  public async Task<ReturnModel<PostReactionResponseDto>> ReactAsync(
+    Guid postId,
+    Guid currentUserId,
+    PostReactionType reactionType,
+    CancellationToken cancellationToken = default)
+  {
+    Post post = await _businessRules.GetPostIfExistAsync(
+      postId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    _businessRules.PostMustBeActive(post);
+
+    PostReaction? existingReaction = await _postReactionRepository.GetAsync(
+      predicate: r => r.PostId == postId && r.UserId == currentUserId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    PostReactionType? currentReaction = await ApplyReactionAsync(
+      post,
+      existingReaction,
+      currentUserId,
+      reactionType,
+      cancellationToken);
+
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<PostReactionResponseDto>()
+    {
+      Success = true,
+      Message = "Tepki başarılı bir şekilde kaydedildi.",
+      Data = new PostReactionResponseDto(post.Id, post.LikeCount, post.DislikeCount, currentReaction),
+      StatusCode = 200
+    };
+  }
+
+  private async Task<PostReactionType?> ApplyReactionAsync(
+    Post post,
+    PostReaction? existingReaction,
+    Guid currentUserId,
+    PostReactionType reactionType,
+    CancellationToken cancellationToken)
+  {
+    if (existingReaction == null)
+    {
+      var reaction = new PostReaction
+      {
+        PostId = post.Id,
+        UserId = currentUserId,
+        Type = reactionType
+      };
+
+      await _postReactionRepository.AddAsync(reaction, cancellationToken);
+
+      if (reactionType == PostReactionType.Like)
+      {
+        post.LikeCount++;
+      }
+      else
+      {
+        post.DislikeCount++;
+      }
+
+      _postRepository.Update(post);
+
+      return reactionType;
+    }
+
+    if (existingReaction.Type == reactionType)
+    {
+      if (reactionType == PostReactionType.Like)
+      {
+        post.LikeCount = Math.Max(0, post.LikeCount - 1);
+      }
+      else
+      {
+        post.DislikeCount = Math.Max(0, post.DislikeCount - 1);
+      }
+
+      _postReactionRepository.Delete(existingReaction);
+      _postRepository.Update(post);
+
+      return null;
+    }
+
+    if (existingReaction.Type == PostReactionType.Like)
+    {
+      post.LikeCount = Math.Max(0, post.LikeCount - 1);
+      post.DislikeCount++;
+    }
+    else
+    {
+      post.DislikeCount = Math.Max(0, post.DislikeCount - 1);
+      post.LikeCount++;
+    }
+
+    existingReaction.Type = reactionType;
+    _postReactionRepository.Update(existingReaction);
+    _postRepository.Update(post);
+
+    return reactionType;
   }
 }
