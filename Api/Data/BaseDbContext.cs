@@ -12,6 +12,7 @@ using Api.Features.Stats;
 using Api.Features.Categories;
 using Api.Core.Helpers;
 using Api.Features.Posts;
+using Api.Features.Squads;
 
 namespace Api.Data;
 
@@ -37,6 +38,9 @@ public class BaseDbContext : DbContext
   public DbSet<Question> Questions { get; set; }
   public DbSet<Answer> Answers { get; set; }
   public DbSet<UserQuizResult> UserQuizResults { get; set; }
+  public DbSet<Squad> Squads { get; set; }
+  public DbSet<SquadSlot> SquadSlots { get; set; }
+  public DbSet<SquadRating> SquadRatings { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

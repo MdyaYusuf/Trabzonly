@@ -5,6 +5,7 @@ using Api.Features.Comments;
 using Api.Features.Positions;
 using Api.Features.Injuries;
 using Api.Features.Stats;
+using Api.Features.Squads;
 
 namespace Api.Features.Players;
 
@@ -41,4 +42,5 @@ public class Player : Entity<Guid>
   public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
   public virtual ICollection<Injury> Injuries { get; set; } = new List<Injury>();
   public virtual ICollection<PlayerStats> Stats { get; set; } = new List<PlayerStats>();
+  public virtual ICollection<SquadSlot> SquadSlots { get; set; } = new List<SquadSlot>();
 }

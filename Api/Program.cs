@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Api.Features.Categories;
 using Api.Features.Posts;
+using Api.Features.Squads;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,7 @@ builder.Services.AddPlayerDependencies();
 builder.Services.AddInjuryDependencies();
 builder.Services.AddQuizDependencies();
 builder.Services.AddPostDependencies();
+builder.Services.AddSquadDependencies();
 builder.Services.AddCategoryDependencies();
 builder.Services.AddCommentDependencies();
 builder.Services.AddPositionDependencies();

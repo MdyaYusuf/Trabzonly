@@ -4,6 +4,7 @@ using Api.Features.Comments;
 using Api.Features.Roles;
 using Api.Features.Quizzes;
 using Api.Features.Posts;
+using Api.Features.Squads;
 
 namespace Api.Features.Users;
 
@@ -32,4 +33,6 @@ public class User : Entity<Guid>
   public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
   public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
   public virtual ICollection<UserQuizResult> QuizResults { get; set; } = new List<UserQuizResult>();
+  public virtual ICollection<Squad> Squads { get; set; } = new List<Squad>();
+  public virtual ICollection<SquadRating> SquadRatings { get; set; } = new List<SquadRating>();
 }
