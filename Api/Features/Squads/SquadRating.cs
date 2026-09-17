@@ -5,7 +5,7 @@ namespace Api.Features.Squads;
 
 public class SquadRating : Entity<Guid>
 {
-  public int Score { get; set; }
+  public decimal Score { get; set; }
 
   public Guid SquadId { get; set; }
   public virtual Squad Squad { get; set; } = default!;

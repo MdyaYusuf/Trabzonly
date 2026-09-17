@@ -24,6 +24,7 @@ public class SquadRatingConfiguration : IEntityTypeConfiguration<SquadRating>
       .IsRequired(false);
 
     builder.Property(r => r.Score)
+      .HasPrecision(3, 1)
       .IsRequired();
 
     builder.HasIndex(r => new { r.UserId, r.SquadId })
