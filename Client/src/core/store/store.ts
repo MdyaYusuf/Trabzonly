@@ -11,6 +11,7 @@ import quizReducer from "../../features/quizzes/quizSlice";
 import seasonReducer from "../../features/seasons/seasonSlice";
 import playerStatsReducer from "../../features/stats/playerStatsSlice";
 import userReducer from "../../features/users/userSlice";
+import squadReducer from "../../features/squads/squadSlice";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     seasons: seasonReducer,
     playerStats: playerStatsReducer,
     users: userReducer,
+    squads: squadReducer,
   },
 });
 
