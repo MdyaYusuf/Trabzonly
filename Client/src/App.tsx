@@ -11,9 +11,9 @@ function App() {
   const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
-    authService.checkAuth()
+    authService
+      .checkAuth()
       .then((response) => {
-
         if (response.success && response.data) {
           dispatch(setCredentials(response.data))
         }
@@ -25,15 +25,16 @@ function App() {
   }, [dispatch])
 
   if (isInitializing) {
-    return <div>Yükleniyor...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background font-body text-body-md text-on-surface">
+        Yükleniyor...
+      </div>
+    )
   }
 
   return (
     <>
-      <h1>Trabzonly</h1>
-      <main>
-        <Outlet />
-      </main>
+      <Outlet />
       <ToastContainer position="bottom-right" />
     </>
   )

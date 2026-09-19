@@ -6,6 +6,8 @@ import { Provider } from 'react-redux'
 import { store } from './core/store/store'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
+import { PublicLayout } from './layouts/PublicLayout'
+import { HomePage } from './pages/HomePage'
 
 const router = createBrowserRouter([
   {
@@ -13,8 +15,13 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        index: true,
-        element: <div>Ana Sayfa</div>,
+        element: <PublicLayout />,
+        children: [
+          {
+            index: true,
+            element: <HomePage />,
+          },
+        ],
       },
       {
         element: <ProtectedRoute />,
@@ -34,7 +41,11 @@ const router = createBrowserRouter([
     path: '/login',
     element: <div>Giriş</div>,
   },
-]);
+  {
+    path: '/register',
+    element: <div>Kayıt</div>,
+  },
+])
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
