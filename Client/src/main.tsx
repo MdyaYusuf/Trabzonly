@@ -15,6 +15,7 @@ import { PlayerDetailPage } from '@/features/players/pages/PlayerDetailPage'
 import { PostsFeedPage } from '@/features/posts/pages/PostsFeedPage'
 import { PostDetailPage } from '@/features/posts/pages/PostDetailPage'
 import { PostCreateEditPage } from '@/features/posts/pages/PostCreateEditPage'
+import { ProfileSettingsPage } from '@/features/users/pages/ProfileSettingsPage'
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
           {
             path: 'gonderiler/:postId',
             element: <PostDetailPage />,
+          },
+          {
+            path: 'profil',
+            element: <ProfileSettingsPage />,
           },
         ],
       },
