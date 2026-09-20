@@ -1,6 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useState } from 'react'
-import { useAppSelector } from '../../core/store/hooks'
+import { useAppSelector } from '@/core/store/hooks'
 
 const navItems = [
   { to: '/oyuncular', label: 'Oyuncular' },

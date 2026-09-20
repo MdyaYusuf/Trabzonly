@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AuthCard, AuthPageShell } from '../components/auth/AuthPageShell'
-import { authService } from '../features/auth/authService'
+import { AuthCard, AuthPageShell } from '@/features/auth/components/AuthPageShell'
+import { authService } from '@/features/auth/authService'
 
 export function RegisterPage() {
   const navigate = useNavigate()

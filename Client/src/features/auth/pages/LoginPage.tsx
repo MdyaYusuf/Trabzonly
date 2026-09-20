@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AuthCard, AuthPageShell } from '../components/auth/AuthPageShell'
-import { authService } from '../features/auth/authService'
-import { setCredentials } from '../features/auth/authSlice'
-import { useAppDispatch } from '../core/store/hooks'
+import { AuthCard, AuthPageShell } from '@/features/auth/components/AuthPageShell'
+import { authService } from '@/features/auth/authService'
+import { setCredentials } from '@/features/auth/authSlice'
+import { useAppDispatch } from '@/core/store/hooks'
 
 export function LoginPage() {
   const dispatch = useAppDispatch()

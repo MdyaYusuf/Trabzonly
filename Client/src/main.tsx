@@ -8,8 +8,10 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
 import { PublicLayout } from './layouts/PublicLayout'
 import { HomePage } from './pages/HomePage'
-import { LoginPage } from './pages/LoginPage'
-import { RegisterPage } from './pages/RegisterPage'
+import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { PlayerDirectoryPage } from '@/features/players/pages/PlayerDirectoryPage'
+import { PlayerDetailPage } from '@/features/players/pages/PlayerDetailPage'
 
 const router = createBrowserRouter([
   {
@@ -30,6 +32,14 @@ const router = createBrowserRouter([
           {
             path: 'register',
             element: <RegisterPage />,
+          },
+          {
+            path: 'oyuncular',
+            element: <PlayerDirectoryPage />,
+          },
+          {
+            path: 'oyuncular/:playerId',
+            element: <PlayerDetailPage />,
           },
         ],
       },
