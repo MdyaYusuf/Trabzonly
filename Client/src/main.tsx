@@ -8,6 +8,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
 import { PublicLayout } from './layouts/PublicLayout'
 import { HomePage } from './pages/HomePage'
+import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,14 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <HomePage />,
+          },
+          {
+            path: 'login',
+            element: <LoginPage />,
+          },
+          {
+            path: 'register',
+            element: <RegisterPage />,
           },
         ],
       },
@@ -36,14 +46,6 @@ const router = createBrowserRouter([
         ],
       },
     ],
-  },
-  {
-    path: '/login',
-    element: <div>Giriş</div>,
-  },
-  {
-    path: '/register',
-    element: <div>Kayıt</div>,
   },
 ])
 
