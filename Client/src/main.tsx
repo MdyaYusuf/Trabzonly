@@ -16,6 +16,9 @@ import { PostsFeedPage } from '@/features/posts/pages/PostsFeedPage'
 import { PostDetailPage } from '@/features/posts/pages/PostDetailPage'
 import { PostCreateEditPage } from '@/features/posts/pages/PostCreateEditPage'
 import { ProfileSettingsPage } from '@/features/users/pages/ProfileSettingsPage'
+import { SquadsGalleryPage } from '@/features/squads/pages/SquadsGalleryPage'
+import { SquadBuilderPage } from '@/features/squads/pages/SquadBuilderPage'
+import { SquadDetailPage } from '@/features/squads/pages/SquadDetailPage'
 
 const router = createBrowserRouter([
   {
@@ -64,6 +67,18 @@ const router = createBrowserRouter([
           {
             path: 'profil',
             element: <ProfileSettingsPage />,
+          },
+          {
+            path: 'kadrolar',
+            element: <SquadsGalleryPage />,
+          },
+          {
+            path: 'kadrolar/olustur',
+            element: <SquadBuilderPage />,
+          },
+          {
+            path: 'kadrolar/:squadId',
+            element: <SquadDetailPage />,
           },
         ],
       },
