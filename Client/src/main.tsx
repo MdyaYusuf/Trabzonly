@@ -12,6 +12,9 @@ import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { PlayerDirectoryPage } from '@/features/players/pages/PlayerDirectoryPage'
 import { PlayerDetailPage } from '@/features/players/pages/PlayerDetailPage'
+import { PostsFeedPage } from '@/features/posts/pages/PostsFeedPage'
+import { PostDetailPage } from '@/features/posts/pages/PostDetailPage'
+import { PostCreateEditPage } from '@/features/posts/pages/PostCreateEditPage'
 
 const router = createBrowserRouter([
   {
@@ -40,6 +43,22 @@ const router = createBrowserRouter([
           {
             path: 'oyuncular/:playerId',
             element: <PlayerDetailPage />,
+          },
+          {
+            path: 'gonderiler',
+            element: <PostsFeedPage />,
+          },
+          {
+            path: 'gonderiler/yeni',
+            element: <PostCreateEditPage mode="create" />,
+          },
+          {
+            path: 'gonderiler/:postId/duzenle',
+            element: <PostCreateEditPage mode="edit" />,
+          },
+          {
+            path: 'gonderiler/:postId',
+            element: <PostDetailPage />,
           },
         ],
       },
