@@ -222,7 +222,14 @@ export function ProfileSettingsSidebar() {
         })}
 
         <Link
-          to="/kadrolar"
+          to="/kadrolarim"
+          className="w-full bg-surface-container py-space-xs text-center font-label text-label-md font-bold tracking-wider text-primary uppercase transition-colors hover:bg-surface-container-high"
+        >
+          Tüm Kadrolarımı Yönet →
+        </Link>
+
+        <Link
+          to="/kadrolar/olustur"
           className="font-label flex w-full items-center justify-center gap-space-xs bg-secondary py-space-sm text-label-md font-bold tracking-wider text-on-secondary uppercase shadow-sm transition-all hover:bg-secondary-container hover:text-on-secondary-container"
         >
           <span className="material-symbols-outlined text-[18px]">add</span>

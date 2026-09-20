@@ -19,6 +19,7 @@ import { ProfileSettingsPage } from '@/features/users/pages/ProfileSettingsPage'
 import { SquadsGalleryPage } from '@/features/squads/pages/SquadsGalleryPage'
 import { SquadBuilderPage } from '@/features/squads/pages/SquadBuilderPage'
 import { SquadDetailPage } from '@/features/squads/pages/SquadDetailPage'
+import { MySquadsPage } from '@/features/squads/pages/MySquadsPage'
 
 const router = createBrowserRouter([
   {
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
           {
             path: 'kadrolar/:squadId',
             element: <SquadDetailPage />,
+          },
+          {
+            path: 'kadrolarim',
+            element: <MySquadsPage />,
           },
         ],
       },
