@@ -20,6 +20,9 @@ import { SquadsGalleryPage } from '@/features/squads/pages/SquadsGalleryPage'
 import { SquadBuilderPage } from '@/features/squads/pages/SquadBuilderPage'
 import { SquadDetailPage } from '@/features/squads/pages/SquadDetailPage'
 import { MySquadsPage } from '@/features/squads/pages/MySquadsPage'
+import { QuizListPage } from '@/features/quizzes/pages/QuizListPage'
+import { TakeQuizPage } from '@/features/quizzes/pages/TakeQuizPage'
+import { QuizResultPage } from '@/features/quizzes/pages/QuizResultPage'
 
 const router = createBrowserRouter([
   {
@@ -84,6 +87,18 @@ const router = createBrowserRouter([
           {
             path: 'kadrolarim',
             element: <MySquadsPage />,
+          },
+          {
+            path: 'quizler',
+            element: <QuizListPage />,
+          },
+          {
+            path: 'quizler/:quizId/sonuc',
+            element: <QuizResultPage />,
+          },
+          {
+            path: 'quizler/:quizId',
+            element: <TakeQuizPage />,
           },
         ],
       },
