@@ -16,6 +16,7 @@ import { PostsFeedPage } from '@/features/posts/pages/PostsFeedPage'
 import { PostDetailPage } from '@/features/posts/pages/PostDetailPage'
 import { PostCreateEditPage } from '@/features/posts/pages/PostCreateEditPage'
 import { ProfileSettingsPage } from '@/features/users/pages/ProfileSettingsPage'
+import { PublicMemberProfilePage } from '@/features/users/pages/PublicMemberProfilePage'
 import { SquadsGalleryPage } from '@/features/squads/pages/SquadsGalleryPage'
 import { SquadBuilderPage } from '@/features/squads/pages/SquadBuilderPage'
 import { SquadDetailPage } from '@/features/squads/pages/SquadDetailPage'
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
           {
             path: 'profil',
             element: <ProfileSettingsPage />,
+          },
+          {
+            path: 'uyeler/:username',
+            element: <PublicMemberProfilePage />,
           },
           {
             path: 'kadrolar',
