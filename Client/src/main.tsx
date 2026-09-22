@@ -9,6 +9,8 @@ import { ProtectedRoute } from './ProtectedRoute'
 import { AdminLayout } from './layouts/AdminLayout'
 import { PublicLayout } from './layouts/PublicLayout'
 import { AdminHubPage } from '@/features/admin/pages/AdminHubPage'
+import { AdminPlayerListPage } from '@/features/admin/pages/AdminPlayerListPage'
+import { AdminPlayerCreateEditPage } from '@/features/admin/pages/AdminPlayerCreateEditPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -121,6 +123,18 @@ const router = createBrowserRouter([
           {
             path: 'yonetim',
             element: <AdminHubPage />,
+          },
+          {
+            path: 'yonetim/oyuncular',
+            element: <AdminPlayerListPage />,
+          },
+          {
+            path: 'yonetim/oyuncular/yeni',
+            element: <AdminPlayerCreateEditPage mode="create" />,
+          },
+          {
+            path: 'yonetim/oyuncular/:playerId/duzenle',
+            element: <AdminPlayerCreateEditPage mode="edit" />,
           },
         ],
       },

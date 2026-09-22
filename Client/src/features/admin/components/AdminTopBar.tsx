@@ -1,12 +1,33 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { adminHubProfile } from '../utils/adminHubPlaceholders'
 
 type AdminTopBarProps = {
   onLogout?: () => void
 }
 
+function resolveBreadcrumb(pathname: string): { root: string; current: string } {
+  if (pathname.includes('/oyuncular/yeni')) {
+    return { root: 'Yönetim Masası', current: 'Oyuncular / Yeni Oyuncu' }
+  }
+
+  if (pathname.includes('/oyuncular/') && pathname.includes('/duzenle')) {
+    return { root: 'Yönetim Masası', current: 'Oyuncular / Oyuncuyu Düzenle' }
+  }
+
+  if (pathname.endsWith('/oyuncular') || pathname.includes('/oyuncular?')) {
+    return { root: 'Yönetim Masası', current: 'Oyuncular' }
+  }
+
+  return {
+    root: adminHubProfile.breadcrumbRoot,
+    current: adminHubProfile.breadcrumbCurrent,
+  }
+}
+
 export function AdminTopBar({ onLogout }: AdminTopBarProps) {
+  const location = useLocation()
   const hub = adminHubProfile
+  const crumb = resolveBreadcrumb(location.pathname)
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/50 bg-surface-container-lowest px-space-md py-space-sm lg:px-space-lg">
@@ -14,9 +35,9 @@ export function AdminTopBar({ onLogout }: AdminTopBarProps) {
         aria-label="Breadcrumb"
         className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
       >
-        <span className="font-bold text-primary uppercase">{hub.breadcrumbRoot}</span>
+        <span className="font-bold text-primary uppercase">{crumb.root}</span>
         <span>/</span>
-        <span>{hub.breadcrumbCurrent}</span>
+        <span>{crumb.current}</span>
       </nav>
 
       <div className="flex flex-wrap items-center gap-space-md">
