@@ -11,6 +11,8 @@ import { PublicLayout } from './layouts/PublicLayout'
 import { AdminHubPage } from '@/features/admin/pages/AdminHubPage'
 import { AdminPlayerListPage } from '@/features/admin/pages/AdminPlayerListPage'
 import { AdminPlayerCreateEditPage } from '@/features/admin/pages/AdminPlayerCreateEditPage'
+import { AdminCategoryListPage } from '@/features/admin/pages/AdminCategoryListPage'
+import { AdminCategoryCreateEditPage } from '@/features/admin/pages/AdminCategoryCreateEditPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -135,6 +137,18 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/oyuncular/:playerId/duzenle',
             element: <AdminPlayerCreateEditPage mode="edit" />,
+          },
+          {
+            path: 'yonetim/kategoriler',
+            element: <AdminCategoryListPage />,
+          },
+          {
+            path: 'yonetim/kategoriler/yeni',
+            element: <AdminCategoryCreateEditPage mode="create" />,
+          },
+          {
+            path: 'yonetim/kategoriler/:categoryId/duzenle',
+            element: <AdminCategoryCreateEditPage mode="edit" />,
           },
         ],
       },
