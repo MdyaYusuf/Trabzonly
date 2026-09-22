@@ -30,6 +30,18 @@ function resolveBreadcrumb(pathname: string): { root: string; current: string } 
     return { root: 'Yönetim Masası', current: 'Kategoriler' }
   }
 
+  if (pathname.includes('/pozisyonlar/yeni')) {
+    return { root: 'Yönetim Masası', current: 'Pozisyonlar / Yeni Pozisyon' }
+  }
+
+  if (pathname.includes('/pozisyonlar/') && pathname.includes('/duzenle')) {
+    return { root: 'Yönetim Masası', current: 'Pozisyonlar / Pozisyonu Düzenle' }
+  }
+
+  if (pathname.endsWith('/pozisyonlar') || pathname.includes('/pozisyonlar?')) {
+    return { root: 'Yönetim Masası', current: 'Pozisyonlar' }
+  }
+
   return {
     root: adminHubProfile.breadcrumbRoot,
     current: adminHubProfile.breadcrumbCurrent,

@@ -13,6 +13,8 @@ import { AdminPlayerListPage } from '@/features/admin/pages/AdminPlayerListPage'
 import { AdminPlayerCreateEditPage } from '@/features/admin/pages/AdminPlayerCreateEditPage'
 import { AdminCategoryListPage } from '@/features/admin/pages/AdminCategoryListPage'
 import { AdminCategoryCreateEditPage } from '@/features/admin/pages/AdminCategoryCreateEditPage'
+import { AdminPositionListPage } from '@/features/admin/pages/AdminPositionListPage'
+import { AdminPositionCreateEditPage } from '@/features/admin/pages/AdminPositionCreateEditPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -149,6 +151,18 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/kategoriler/:categoryId/duzenle',
             element: <AdminCategoryCreateEditPage mode="edit" />,
+          },
+          {
+            path: 'yonetim/pozisyonlar',
+            element: <AdminPositionListPage />,
+          },
+          {
+            path: 'yonetim/pozisyonlar/yeni',
+            element: <AdminPositionCreateEditPage mode="create" />,
+          },
+          {
+            path: 'yonetim/pozisyonlar/:positionId/duzenle',
+            element: <AdminPositionCreateEditPage mode="edit" />,
           },
         ],
       },
