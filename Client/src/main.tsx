@@ -6,7 +6,9 @@ import { Provider } from 'react-redux'
 import { store } from './core/store/store'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
+import { AdminLayout } from './layouts/AdminLayout'
 import { PublicLayout } from './layouts/PublicLayout'
+import { AdminHubPage } from '@/features/admin/pages/AdminHubPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -114,9 +116,18 @@ const router = createBrowserRouter([
         ],
       },
       {
+        element: <AdminLayout />,
+        children: [
+          {
+            path: 'yonetim',
+            element: <AdminHubPage />,
+          },
+        ],
+      },
+      {
         element: <ProtectedRoute allowedRoles={['Admin']} />,
         children: [
-          // Admin-only routes
+          // Admin-only routes (API-backed)
         ],
       },
     ],
