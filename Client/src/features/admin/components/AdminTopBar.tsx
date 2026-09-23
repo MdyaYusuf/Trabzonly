@@ -42,6 +42,18 @@ function resolveBreadcrumb(pathname: string): { root: string; current: string } 
     return { root: 'Yönetim Masası', current: 'Pozisyonlar' }
   }
 
+  if (pathname.includes('/sezonlar/yeni')) {
+    return { root: 'Yönetim Masası', current: 'Sezonlar / Yeni Sezon' }
+  }
+
+  if (pathname.includes('/sezonlar/') && pathname.includes('/duzenle')) {
+    return { root: 'Yönetim Masası', current: 'Sezonlar / Sezonu Düzenle' }
+  }
+
+  if (pathname.endsWith('/sezonlar') || pathname.includes('/sezonlar?')) {
+    return { root: 'Yönetim Masası', current: 'Sezonlar' }
+  }
+
   return {
     root: adminHubProfile.breadcrumbRoot,
     current: adminHubProfile.breadcrumbCurrent,
