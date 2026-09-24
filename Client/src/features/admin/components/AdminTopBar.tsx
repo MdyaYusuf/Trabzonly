@@ -54,6 +54,18 @@ function resolveBreadcrumb(pathname: string): { root: string; current: string } 
     return { root: 'Yönetim Masası', current: 'Sezonlar' }
   }
 
+  if (pathname.includes('/istatistikler/yeni')) {
+    return { root: 'Yönetim Masası', current: 'İstatistikler / Yeni İstatistik' }
+  }
+
+  if (pathname.includes('/istatistikler/') && pathname.includes('/duzenle')) {
+    return { root: 'Yönetim Masası', current: 'İstatistikler / İstatistik Düzenle' }
+  }
+
+  if (pathname.endsWith('/istatistikler') || pathname.includes('/istatistikler?')) {
+    return { root: 'Yönetim Masası', current: 'İstatistikler' }
+  }
+
   return {
     root: adminHubProfile.breadcrumbRoot,
     current: adminHubProfile.breadcrumbCurrent,
