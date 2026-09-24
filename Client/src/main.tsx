@@ -19,6 +19,8 @@ import { AdminSeasonListPage } from '@/features/admin/pages/AdminSeasonListPage'
 import { AdminSeasonCreateEditPage } from '@/features/admin/pages/AdminSeasonCreateEditPage'
 import { AdminStatisticListPage } from '@/features/admin/pages/AdminStatisticListPage'
 import { AdminStatisticCreateEditPage } from '@/features/admin/pages/AdminStatisticCreateEditPage'
+import { AdminInjuryListPage } from '@/features/admin/pages/AdminInjuryListPage'
+import { AdminInjuryCreateEditPage } from '@/features/admin/pages/AdminInjuryCreateEditPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -191,6 +193,18 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/istatistikler/:statisticId/duzenle',
             element: <AdminStatisticCreateEditPage mode="edit" />,
+          },
+          {
+            path: 'yonetim/sakatliklar',
+            element: <AdminInjuryListPage />,
+          },
+          {
+            path: 'yonetim/sakatliklar/yeni',
+            element: <AdminInjuryCreateEditPage mode="create" />,
+          },
+          {
+            path: 'yonetim/sakatliklar/:injuryId/duzenle',
+            element: <AdminInjuryCreateEditPage mode="edit" />,
           },
         ],
       },
