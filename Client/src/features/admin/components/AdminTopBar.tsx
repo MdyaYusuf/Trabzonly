@@ -78,6 +78,18 @@ function resolveBreadcrumb(pathname: string): { root: string; current: string } 
     return { root: 'Yönetim Masası', current: 'Sakatlıklar' }
   }
 
+  if (pathname.includes('/quizler/yeni')) {
+    return { root: 'Yönetim Masası', current: 'Quizler / Yeni Quiz' }
+  }
+
+  if (pathname.includes('/quizler/') && pathname.includes('/duzenle')) {
+    return { root: 'Yönetim Masası', current: 'Quizler / Quiz Düzenle' }
+  }
+
+  if (pathname.endsWith('/quizler') || pathname.includes('/quizler?')) {
+    return { root: 'Yönetim Masası', current: 'Quizler' }
+  }
+
   return {
     root: adminHubProfile.breadcrumbRoot,
     current: adminHubProfile.breadcrumbCurrent,
