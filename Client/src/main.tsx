@@ -24,6 +24,8 @@ import { AdminInjuryCreateEditPage } from '@/features/admin/pages/AdminInjuryCre
 import { AdminQuizListPage } from '@/features/admin/pages/AdminQuizListPage'
 import { AdminQuizCreatePage } from '@/features/admin/pages/AdminQuizCreatePage'
 import { AdminQuizEditPage } from '@/features/admin/pages/AdminQuizEditPage'
+import { AdminMemberListPage } from '@/features/admin/pages/AdminMemberListPage'
+import { AdminMemberDetailPage } from '@/features/admin/pages/AdminMemberDetailPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -220,6 +222,14 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/quizler/:quizId/duzenle',
             element: <AdminQuizEditPage />,
+          },
+          {
+            path: 'yonetim/uyeler',
+            element: <AdminMemberListPage />,
+          },
+          {
+            path: 'yonetim/uyeler/:memberId',
+            element: <AdminMemberDetailPage />,
           },
         ],
       },

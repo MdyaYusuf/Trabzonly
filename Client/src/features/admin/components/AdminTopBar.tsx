@@ -90,6 +90,14 @@ function resolveBreadcrumb(pathname: string): { root: string; current: string } 
     return { root: 'Yönetim Masası', current: 'Quizler' }
   }
 
+  if (pathname.includes('/uyeler/') && pathname !== '/yonetim/uyeler') {
+    return { root: 'Yönetim Masası', current: 'Üyeler / Üye Detayı' }
+  }
+
+  if (pathname.endsWith('/uyeler') || pathname.includes('/uyeler?')) {
+    return { root: 'Yönetim Masası', current: 'Üyeler' }
+  }
+
   return {
     root: adminHubProfile.breadcrumbRoot,
     current: adminHubProfile.breadcrumbCurrent,
