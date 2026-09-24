@@ -26,6 +26,8 @@ import { AdminQuizCreatePage } from '@/features/admin/pages/AdminQuizCreatePage'
 import { AdminQuizEditPage } from '@/features/admin/pages/AdminQuizEditPage'
 import { AdminMemberListPage } from '@/features/admin/pages/AdminMemberListPage'
 import { AdminMemberDetailPage } from '@/features/admin/pages/AdminMemberDetailPage'
+import { AdminRoleListPage } from '@/features/admin/pages/AdminRoleListPage'
+import { AdminRoleCreateEditPage } from '@/features/admin/pages/AdminRoleCreateEditPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -230,6 +232,18 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/uyeler/:memberId',
             element: <AdminMemberDetailPage />,
+          },
+          {
+            path: 'yonetim/roller',
+            element: <AdminRoleListPage />,
+          },
+          {
+            path: 'yonetim/roller/yeni',
+            element: <AdminRoleCreateEditPage mode="create" />,
+          },
+          {
+            path: 'yonetim/roller/:roleId/duzenle',
+            element: <AdminRoleCreateEditPage mode="edit" />,
           },
         ],
       },
