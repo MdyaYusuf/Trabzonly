@@ -5,6 +5,8 @@ import type {
   CreatedPlayerResponseDto,
   CreatePlayerRequest,
   UpdatePlayerRequest,
+  RatePlayerRequest,
+  PlayerRatingResponseDto,
 } from './playerTypes';
 
 const API_URL = '/players';
@@ -59,6 +61,10 @@ const getMostCommented = async (count: number): Promise<ApiResponse<PlayerRespon
   return await apiClient<PlayerResponseDto[]>(`${API_URL}/most-commented/${count}`);
 };
 
+const getTopRated = async (count: number): Promise<ApiResponse<PlayerResponseDto[]>> => {
+  return await apiClient<PlayerResponseDto[]>(`${API_URL}/top-rated/${count}`);
+};
+
 const add = async (request: CreatePlayerRequest): Promise<ApiResponse<CreatedPlayerResponseDto>> => {
   const formData = objectToFormData(request);
   return await apiClient<CreatedPlayerResponseDto>(API_URL, {
@@ -81,14 +87,23 @@ const remove = async (id: string): Promise<ApiResponse<NoData>> => {
   });
 };
 
+const rate = async (id: string, request: RatePlayerRequest): Promise<ApiResponse<PlayerRatingResponseDto>> => {
+  return await apiClient<PlayerRatingResponseDto>(`${API_URL}/${id}/rate`, {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+};
+
 const playerService = {
   getAll,
   getById,
   getTopValued,
   getMostCommented,
+  getTopRated,
   add,
   update,
-  remove
+  remove,
+  rate,
 };
 
 export default playerService;

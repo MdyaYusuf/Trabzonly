@@ -8,6 +8,8 @@ export interface PostResponseDto {
   isActive: boolean;
   likeCount: number;
   dislikeCount: number;
+  commentCount: number;
+  createdDate: string;
   userId: string;
   authorUsername: string;
   categoryId: number;
@@ -30,6 +32,7 @@ export interface PostPreviewDto {
   createdDate: string;
   likeCount: number;
   dislikeCount: number;
+  commentCount: number;
 }
 
 // Requests

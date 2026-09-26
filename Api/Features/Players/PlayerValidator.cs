@@ -47,6 +47,11 @@ public class CreatePlayerRequestValidator : AbstractValidator<CreatePlayerReques
       .GreaterThanOrEqualTo(0)
       .When(p => p.Wage.HasValue)
       .WithMessage("Maaş 0'dan küçük olamaz.");
+
+    RuleFor(p => p.ShirtNumber)
+      .InclusiveBetween(1, 99)
+      .When(p => p.ShirtNumber.HasValue)
+      .WithMessage("Forma numarası 1 ile 99 arasında olmalıdır.");
   }
 }
 
@@ -94,5 +99,25 @@ public class UpdatePlayerRequestValidator : AbstractValidator<UpdatePlayerReques
     RuleFor(p => p.Wage)
       .GreaterThanOrEqualTo(0).When(p => p.Wage.HasValue)
       .WithMessage("Maaş 0'dan küçük olamaz.");
+
+    RuleFor(p => p.ShirtNumber)
+      .InclusiveBetween(1, 99)
+      .When(p => p.ShirtNumber.HasValue)
+      .WithMessage("Forma numarası 1 ile 99 arasında olmalıdır.");
+  }
+}
+
+public class RatePlayerRequestValidator : AbstractValidator<RatePlayerRequest>
+{
+  public RatePlayerRequestValidator()
+  {
+    RuleFor(r => r.Score)
+      .InclusiveBetween(1m, 10m).WithMessage("Taraftar puanı 1 ile 10 arasında olmalıdır.")
+      .Must(BeHalfStep).WithMessage("Puan 0.5'lik adımlarla verilmelidir (ör. 7.0, 7.5, 8.0).");
+  }
+
+  private static bool BeHalfStep(decimal score)
+  {
+    return score * 2m == Math.Floor(score * 2m);
   }
 }

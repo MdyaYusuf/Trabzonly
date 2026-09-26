@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Api.Core.Repositories;
 using Api.Data;
 
@@ -8,56 +7,5 @@ public class EfUserRepository : EfBaseRepository<BaseDbContext, User, Guid>, IUs
 {
   public EfUserRepository(BaseDbContext context) : base(context)
   {
-
-  }
-
-  public async Task<List<User>> GetTopContributorsAsync(
-    int count,
-    Func<IQueryable<User>, IQueryable<User>>? include = null,
-    bool enableTracking = false,
-    bool withDeleted = false,
-    CancellationToken cancellationToken = default)
-  {
-    IQueryable<User> query = Query(enableTracking, withDeleted);
-
-    if (include != null)
-    {
-      query = include(query);
-    }
-
-    return await query
-      .Where(u => u.IsActive)
-      .OrderByDescending(u => u.Posts.Count + u.Comments.Count)
-      .Take(count)
-      .ToListAsync(cancellationToken);
-  }
-
-  public async Task<List<User>> GetNewestMembersAsync(
-    int count,
-    DateTime? lastDateCursor = null,
-    Guid? lastIdCursor = null,
-    Func<IQueryable<User>, IQueryable<User>>? include = null,
-    bool enableTracking = false,
-    bool withDeleted = false,
-    CancellationToken cancellationToken = default)
-  {
-    IQueryable<User> query = Query(enableTracking, withDeleted);
-
-    if (include != null)
-    {
-      query = include(query);
-    }
-
-    if (lastDateCursor.HasValue && lastIdCursor.HasValue)
-    {
-      query = query.Where(u => u.CreatedDate < lastDateCursor ||
-                              (u.CreatedDate == lastDateCursor && u.Id.CompareTo(lastIdCursor.Value) < 0));
-    }
-
-    return await query
-      .Where(u => u.IsActive)
-      .OrderByDescending(u => u.CreatedDate).ThenByDescending(u => u.Id)
-      .Take(count)
-      .ToListAsync(cancellationToken);
   }
 }

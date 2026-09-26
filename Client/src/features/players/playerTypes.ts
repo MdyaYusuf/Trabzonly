@@ -13,9 +13,13 @@ export interface PlayerResponseDto {
   currentTeam: string;
   description?: string;
   imageUrl?: string;
+  shirtNumber?: number | null;
+  averageRating: number;
+  ratingCount: number;
   isActive: boolean;
   positionId: string;
   positionName: string;
+  currentUserScore?: number | null;
 }
 
 export interface CreatedPlayerResponseDto {
@@ -32,7 +36,17 @@ export interface PlayerPreviewDto {
   marketValue?: number;
   currentTeam: string;
   imageUrl?: string;
+  shirtNumber?: number | null;
+  averageRating: number;
+  ratingCount: number;
   positionName: string;
+}
+
+export interface PlayerRatingResponseDto {
+  playerId: string;
+  score: number;
+  averageRating: number;
+  ratingCount: number;
 }
 
 // Requests
@@ -47,6 +61,7 @@ export interface CreatePlayerRequest {
   wage?: number;
   currentTeam: string;
   description?: string;
+  shirtNumber?: number | null;
   positionId: string;
   imageFile?: File | null;
 }
@@ -54,4 +69,8 @@ export interface CreatePlayerRequest {
 export interface UpdatePlayerRequest extends CreatePlayerRequest {
   id: string;
   isActive: boolean;
+}
+
+export interface RatePlayerRequest {
+  score: number;
 }

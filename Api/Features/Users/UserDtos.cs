@@ -19,6 +19,9 @@ public sealed record UserPreviewDto
   public string Username { get; init; } = null!;
   public string? ProfileImageUrl { get; init; }
   public string RoleName { get; init; } = null!;
+  public int PostCount { get; init; }
+  public int TotalLikeCount { get; init; }
+  public DateTime CreatedDate { get; init; }
 }
 
 public sealed record CreatedUserResponseDto

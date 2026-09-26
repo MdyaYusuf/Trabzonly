@@ -9,11 +9,13 @@ namespace Api.Features.Players;
 
 public class PlayerService(
   IPlayerRepository _playerRepository,
+  IPlayerRatingRepository _playerRatingRepository,
   PlayerMapper _mapper,
   PlayerBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
   IValidator<CreatePlayerRequest> _createValidator,
-  IValidator<UpdatePlayerRequest> _updateValidator) : IPlayerService
+  IValidator<UpdatePlayerRequest> _updateValidator,
+  IValidator<RatePlayerRequest> _rateValidator) : IPlayerService
 {
   public async Task<ReturnModel<PagedResponse<PlayerResponseDto>>> GetAllAsync(
     Expression<Func<Player, bool>>? filter = null,
@@ -49,6 +51,7 @@ public class PlayerService(
 
   public async Task<ReturnModel<PlayerResponseDto>> GetByIdAsync(
     Guid id,
+    Guid? currentUserId = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -59,7 +62,20 @@ public class PlayerService(
       enableTracking,
       cancellationToken);
 
-    PlayerResponseDto response = _mapper.EntityToResponseDto(player);
+    decimal? currentUserScore = null;
+
+    if (currentUserId.HasValue)
+    {
+      PlayerRating? rating = await _playerRatingRepository.GetAsync(
+        predicate: r => r.PlayerId == id && r.UserId == currentUserId.Value,
+        enableTracking: false,
+        cancellationToken: cancellationToken);
+
+      currentUserScore = rating?.Score;
+    }
+
+    PlayerResponseDto mapped = _mapper.EntityToResponseDto(player);
+    PlayerResponseDto response = mapped with { CurrentUserScore = currentUserScore };
 
     return new ReturnModel<PlayerResponseDto>()
     {
@@ -130,6 +146,31 @@ public class PlayerService(
     {
       Success = true,
       Message = "En çok konuşulan oyuncular başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<PlayerResponseDto>>> GetTopRatedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<Player> players = await _playerRepository.GetTopRatedPlayersAsync(
+      count,
+      include: include ?? (query => query.Include(p => p.Position)),
+      enableTracking,
+      withDeleted,
+      cancellationToken);
+
+    List<PlayerResponseDto> response = _mapper.EntityToResponseDtoList(players);
+
+    return new ReturnModel<List<PlayerResponseDto>>()
+    {
+      Success = true,
+      Message = "En yüksek taraftar puanlı oyuncular başarılı bir şekilde getirildi.",
       Data = response,
       StatusCode = 200
     };
@@ -226,5 +267,82 @@ public class PlayerService(
       Message = "Oyuncu başarılı bir şekilde silindi.",
       StatusCode = 200
     };
+  }
+
+  public async Task<ReturnModel<PlayerRatingResponseDto>> RateAsync(
+    Guid playerId,
+    RatePlayerRequest request,
+    Guid currentUserId,
+    CancellationToken cancellationToken = default)
+  {
+    var validationResult = await _rateValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    _businessRules.ScoreMustBeValid(request.Score);
+
+    Player player = await _businessRules.GetPlayerIfExistAsync(
+      playerId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    PlayerRating? existingRating = await _playerRatingRepository.GetAsync(
+      predicate: r => r.PlayerId == playerId && r.UserId == currentUserId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    if (existingRating == null)
+    {
+      await _playerRatingRepository.AddAsync(
+        new PlayerRating
+        {
+          PlayerId = playerId,
+          UserId = currentUserId,
+          Score = request.Score
+        },
+        cancellationToken);
+    }
+    else
+    {
+      existingRating.Score = request.Score;
+      _playerRatingRepository.Update(existingRating);
+    }
+
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+    await RecalculatePlayerRatingAsync(player, cancellationToken);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<PlayerRatingResponseDto>()
+    {
+      Success = true,
+      Message = "Taraftar puanı başarılı bir şekilde kaydedildi.",
+      Data = new PlayerRatingResponseDto(
+        player.Id,
+        request.Score,
+        player.AverageRating,
+        player.RatingCount),
+      StatusCode = 200
+    };
+  }
+
+  private async Task RecalculatePlayerRatingAsync(
+    Player player,
+    CancellationToken cancellationToken)
+  {
+    List<decimal> scores = await _playerRatingRepository
+      .Query(enableTracking: false)
+      .Where(r => r.PlayerId == player.Id)
+      .Select(r => r.Score)
+      .ToListAsync(cancellationToken);
+
+    player.RatingCount = scores.Count;
+    player.AverageRating = scores.Count == 0
+      ? 0m
+      : Math.Round(scores.Average(), 2);
+
+    _playerRepository.Update(player);
   }
 }

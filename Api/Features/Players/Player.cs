@@ -31,6 +31,9 @@ public class Player : Entity<Guid>
   public required string CurrentTeam { get; set; }
   public string? Description { get; set; }
   public string? ImageUrl { get; set; }
+  public int? ShirtNumber { get; set; }
+  public decimal AverageRating { get; set; }
+  public int RatingCount { get; set; }
   public bool IsActive { get; set; } = true;
 
   [NotMapped]
@@ -43,4 +46,5 @@ public class Player : Entity<Guid>
   public virtual ICollection<Injury> Injuries { get; set; } = new List<Injury>();
   public virtual ICollection<PlayerStats> Stats { get; set; } = new List<PlayerStats>();
   public virtual ICollection<SquadSlot> SquadSlots { get; set; } = new List<SquadSlot>();
+  public virtual ICollection<PlayerRating> Ratings { get; set; } = new List<PlayerRating>();
 }

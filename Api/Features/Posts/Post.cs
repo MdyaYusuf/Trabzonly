@@ -22,6 +22,7 @@ public class Post : Entity<Guid>
   public bool IsActive { get; set; } = true;
   public int LikeCount { get; set; } = 0;
   public int DislikeCount { get; set; } = 0;
+  public int CommentCount { get; set; } = 0;
 
   // Navigation properties
   public Guid UserId { get; set; }

@@ -7,6 +7,7 @@ public static class PlayerRegistration
   public static IServiceCollection AddPlayerDependencies(this IServiceCollection services)
   {
     services.AddScoped<IPlayerRepository, EfPlayerRepository>();
+    services.AddScoped<IPlayerRatingRepository, EfPlayerRatingRepository>();
     services.AddScoped<PlayerBusinessRules>();
     services.AddScoped<IPlayerService, PlayerService>();
     services.AddSingleton<PlayerMapper>();

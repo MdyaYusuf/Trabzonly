@@ -51,6 +51,18 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
       .HasColumnType("decimal(18,2)")
       .IsRequired(false);
 
+    builder.Property(p => p.ShirtNumber)
+      .IsRequired(false);
+
+    builder.Property(p => p.AverageRating)
+      .HasPrecision(4, 2)
+      .HasDefaultValue(0m)
+      .IsRequired();
+
+    builder.Property(p => p.RatingCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
     builder.HasOne(p => p.Position)
       .WithMany(pos => pos.Players)
       .HasForeignKey(p => p.PositionId)

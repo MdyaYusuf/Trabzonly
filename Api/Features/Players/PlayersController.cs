@@ -27,7 +27,10 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
     Guid id,
     CancellationToken cancellationToken)
   {
-    var result = await _playerService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
+    var result = await _playerService.GetByIdAsync(
+      id: id,
+      currentUserId: TryGetUserId(),
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -54,6 +57,16 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
     CancellationToken cancellationToken)
   {
     var result = await _playerService.GetMostCommentedPlayersAsync(count: count, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("top-rated/{count:int}")]
+  public async Task<IActionResult> GetTopRatedPlayers(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _playerService.GetTopRatedPlayersAsync(count: count, cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -95,6 +108,22 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
     var result = await _playerService.RemoveAsync(
       id: id,
       userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize]
+  [HttpPost("{id:guid}/rate")]
+  public async Task<IActionResult> Rate(
+    Guid id,
+    [FromBody] RatePlayerRequest request,
+    CancellationToken cancellationToken)
+  {
+    var result = await _playerService.RateAsync(
+      playerId: id,
+      request: request,
+      currentUserId: GetUserId(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

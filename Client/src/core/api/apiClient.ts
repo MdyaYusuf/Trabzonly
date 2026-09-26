@@ -1,9 +1,16 @@
 import { toast } from "react-toastify";
 import type { ApiResponse } from "../types/ApiResponse";
+import { store } from "../store/store";
+import { logoutUser } from "../../features/auth/authSlice";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "/api";
+const SESSION_EXPIRED_MESSAGE = "Oturum süresi doldu.";
 
 let refreshPromise: Promise<boolean> | null = null;
+
+function isPublicAuthPath(pathname: string = window.location.pathname): boolean {
+  return pathname === "/login" || pathname === "/register";
+}
 
 export const apiClient = async <T>(
   endpoint: string,
@@ -29,7 +36,6 @@ export const apiClient = async <T>(
     let response = await fetch(`${BASE_URL}${endpoint}`, config);
 
     if (response.status === 401 && !endpoint.includes("/authentication/refresh-token")) {
-
       if (!refreshPromise) {
         refreshPromise = processRefreshToken();
       }
@@ -39,8 +45,13 @@ export const apiClient = async <T>(
       if (refreshSuccess) {
         response = await fetch(`${BASE_URL}${endpoint}`, config);
       } else {
-        handleLogout();
-        throw new Error("Oturum süresi doldu.");
+        const wasAuthenticated = store.getState().auth.isAuthenticated;
+
+        if (wasAuthenticated) {
+          handleLogout();
+        }
+
+        throw new Error(SESSION_EXPIRED_MESSAGE);
       }
     }
 
@@ -51,17 +62,17 @@ export const apiClient = async <T>(
       result = responseText
         ? JSON.parse(responseText)
         : {
-          success: response.ok,
-          message: response.ok ? "" : "Sunucudan içerik dönmedi.",
-          data: null as T,
-          statusCode: response.status
-        };
+            success: response.ok,
+            message: response.ok ? "" : "Sunucudan içerik dönmedi.",
+            data: null as T,
+            statusCode: response.status,
+          };
     } catch {
       result = {
         success: false,
         message: "Sunucu yanıtı okunamadı (Geçersiz format).",
         data: null as T,
-        statusCode: response.status
+        statusCode: response.status,
       };
     }
 
@@ -76,22 +87,24 @@ export const apiClient = async <T>(
     }
 
     return result;
-
   } catch (error: unknown) {
     const isApiResponse = (err: unknown): err is ApiResponse<T> => {
       return (
         err !== null &&
-        typeof err === 'object' &&
-        'success' in err &&
-        'statusCode' in err
+        typeof err === "object" &&
+        "success" in err &&
+        "statusCode" in err
       );
     };
 
     if (isApiResponse(error)) {
-
       if (!error.success) {
         throw error;
       }
+    }
+
+    if (error instanceof Error && error.message === SESSION_EXPIRED_MESSAGE) {
+      throw error;
     }
 
     const errorMessage = error instanceof Error ? error.message : "Sunucuya bağlanılamadı.";
@@ -119,6 +132,8 @@ const processRefreshToken = async (): Promise<boolean> => {
 };
 
 export const handleLogout = () => {
+  store.dispatch(logoutUser());
+
   fetch(`${BASE_URL}/authentication/revoke-refresh-token`, {
     method: "POST",
     credentials: "include",
@@ -126,7 +141,9 @@ export const handleLogout = () => {
       "X-Client-Platform": "web",
     },
   }).finally(() => {
-    window.location.href = "/login";
+    if (!isPublicAuthPath()) {
+      window.location.href = "/login";
+    }
   });
 };
 

@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
+using Api.Core.Exceptions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
+using Api.Features.Posts;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,7 @@ namespace Api.Features.Comments;
 
 public class CommentService(
   ICommentRepository _commentRepository,
+  IPostRepository _postRepository,
   CommentMapper _mapper,
   CommentBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
@@ -133,6 +136,12 @@ public class CommentService(
     comment.IsApproved = true;
 
     await _commentRepository.AddAsync(comment, cancellationToken);
+
+    if (comment.PostId.HasValue)
+    {
+      await AdjustPostCommentCountAsync(comment.PostId.Value, delta: 1, cancellationToken);
+    }
+
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
     CreatedCommentResponseDto response = _mapper.EntityToCreatedResponseDto(comment);
@@ -186,6 +195,11 @@ public class CommentService(
 
     _businessRules.UserMustBeOwnerOrAdmin(comment.UserId, currentUserId, userRole);
 
+    if (comment.PostId.HasValue)
+    {
+      await AdjustPostCommentCountAsync(comment.PostId.Value, delta: -1, cancellationToken);
+    }
+
     _commentRepository.Delete(comment);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -195,5 +209,24 @@ public class CommentService(
       Message = "Yorum başarılı bir şekilde silindi.",
       StatusCode = 200
     };
+  }
+
+  private async Task AdjustPostCommentCountAsync(
+    Guid postId,
+    int delta,
+    CancellationToken cancellationToken)
+  {
+    Post? post = await _postRepository.GetByIdAsync(
+      postId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    if (post == null)
+    {
+      throw new NotFoundException($"{postId} numaralı post bulunamadı.");
+    }
+
+    post.CommentCount = Math.Max(0, post.CommentCount + delta);
+    _postRepository.Update(post);
   }
 }

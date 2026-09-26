@@ -41,6 +41,7 @@ public class BaseDbContext : DbContext
   public DbSet<Squad> Squads { get; set; }
   public DbSet<SquadSlot> SquadSlots { get; set; }
   public DbSet<SquadRating> SquadRatings { get; set; }
+  public DbSet<PlayerRating> PlayerRatings { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

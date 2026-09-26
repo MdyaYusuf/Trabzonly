@@ -17,6 +17,7 @@ public interface IPlayerService
 
   Task<ReturnModel<PlayerResponseDto>> GetByIdAsync(
     Guid id,
+    Guid? currentUserId = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
@@ -37,6 +38,13 @@ public interface IPlayerService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<PlayerResponseDto>>> GetTopRatedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CreatedPlayerResponseDto>> AddAsync(
     CreatePlayerRequest request,
     string userRole,
@@ -50,5 +58,11 @@ public interface IPlayerService
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
     string userRole,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<PlayerRatingResponseDto>> RateAsync(
+    Guid playerId,
+    RatePlayerRequest request,
+    Guid currentUserId,
     CancellationToken cancellationToken = default);
 }

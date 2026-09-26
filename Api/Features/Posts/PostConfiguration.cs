@@ -45,6 +45,12 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
       .HasDefaultValue(0)
       .IsRequired();
 
+    builder.Property(b => b.CommentCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
+    builder.HasIndex(b => b.CommentCount);
+
     builder.HasOne(b => b.User)
       .WithMany(u => u.Posts)
       .HasForeignKey(b => b.UserId)

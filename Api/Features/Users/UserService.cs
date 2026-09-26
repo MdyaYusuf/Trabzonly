@@ -124,14 +124,28 @@ public class UserService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<User> users = await _userRepository.GetTopContributorsAsync(
-      count,
-      include: include ?? (query => query.Include(u => u.Role)),
-      enableTracking,
-      withDeleted,
-      cancellationToken);
+    IQueryable<User> query = _userRepository.Query(enableTracking, withDeleted)
+      .Where(u => u.IsActive);
 
-    List<UserPreviewDto> response = _mapper.EntityToPreviewDtoList(users);
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    List<UserPreviewDto> response = await query
+      .OrderByDescending(u => u.Posts.Count + u.Comments.Count)
+      .Take(count)
+      .Select(u => new UserPreviewDto
+      {
+        Id = u.Id,
+        Username = u.Username,
+        ProfileImageUrl = u.ProfileImageUrl,
+        RoleName = u.Role.Name,
+        PostCount = u.Posts.Count(p => p.IsActive),
+        TotalLikeCount = u.Posts.Where(p => p.IsActive).Sum(p => p.LikeCount),
+        CreatedDate = u.CreatedDate
+      })
+      .ToListAsync(cancellationToken);
 
     return new ReturnModel<List<UserPreviewDto>>()
     {
@@ -151,23 +165,46 @@ public class UserService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<User> users = await _userRepository.GetNewestMembersAsync(
-      count + 1,
-      lastDateCursor,
-      lastIdCursor,
-      include: include ?? (query => query.Include(u => u.Role)),
-      enableTracking,
-      withDeleted,
-      cancellationToken);
+    IQueryable<User> query = _userRepository.Query(enableTracking, withDeleted)
+      .Where(u => u.IsActive);
+
+    if (lastDateCursor.HasValue && lastIdCursor.HasValue)
+    {
+      DateTime cursorDate = lastDateCursor.Value;
+      Guid cursorId = lastIdCursor.Value;
+
+      query = query.Where(u =>
+        u.CreatedDate < cursorDate ||
+        (u.CreatedDate == cursorDate && u.Id.CompareTo(cursorId) < 0));
+    }
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    List<UserPreviewDto> users = await query
+      .OrderByDescending(u => u.CreatedDate)
+      .ThenByDescending(u => u.Id)
+      .Take(count + 1)
+      .Select(u => new UserPreviewDto
+      {
+        Id = u.Id,
+        Username = u.Username,
+        ProfileImageUrl = u.ProfileImageUrl,
+        RoleName = u.Role.Name,
+        PostCount = u.Posts.Count(p => p.IsActive),
+        TotalLikeCount = u.Posts.Where(p => p.IsActive).Sum(p => p.LikeCount),
+        CreatedDate = u.CreatedDate
+      })
+      .ToListAsync(cancellationToken);
 
     bool hasNextPage = users.Count > count;
-    var itemsToReturn = hasNextPage ? users.Take(count).ToList() : users;
-
-    List<UserPreviewDto> response = _mapper.EntityToPreviewDtoList(itemsToReturn);
+    List<UserPreviewDto> itemsToReturn = hasNextPage ? users.Take(count).ToList() : users;
 
     var pagedResponse = new CursorPagedResponse<UserPreviewDto>
     {
-      Items = response,
+      Items = itemsToReturn,
       NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
       NextCursorId = itemsToReturn.LastOrDefault()?.Id,
       HasNextPage = hasNextPage

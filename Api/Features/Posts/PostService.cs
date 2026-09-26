@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Api.Core.Exceptions;
 using Api.Core.Helpers;
 using Api.Core.Repositories;
 using Api.Core.Responses;
@@ -26,17 +27,47 @@ public class PostService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    var (posts, totalCount) = await _postRepository.GetPagedListAsync(
-      pageNumber,
-      pageSize,
-      filter,
-      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
-      orderBy,
-      enableTracking,
-      withDeleted,
-      cancellationToken);
+    IQueryable<Post> query = _postRepository.Query(enableTracking, withDeleted);
 
-    List<PostResponseDto> responseDtos = _mapper.EntityToResponseDtoList(posts);
+    if (filter != null)
+    {
+      query = query.Where(filter);
+    }
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    if (orderBy != null)
+    {
+      query = orderBy(query);
+    }
+
+    int totalCount = await query.CountAsync(cancellationToken);
+
+    List<PostResponseDto> responseDtos = await query
+      .Skip((pageNumber - 1) * pageSize)
+      .Take(pageSize)
+      .Select(p => new PostResponseDto
+      {
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        Content = p.Content,
+        ImageUrl = p.ImageUrl,
+        IsActive = p.IsActive,
+        LikeCount = p.LikeCount,
+        DislikeCount = p.DislikeCount,
+        CommentCount = p.CommentCount,
+        CreatedDate = p.CreatedDate,
+        UserId = p.UserId,
+        AuthorUsername = p.User.Username,
+        CategoryId = p.CategoryId,
+        CategoryName = p.Category.Name
+      })
+      .ToListAsync(cancellationToken);
+
     var pagedResponse = new PagedResponse<PostResponseDto>(responseDtos, totalCount, pageNumber, pageSize);
 
     return new ReturnModel<PagedResponse<PostResponseDto>>()
@@ -54,13 +85,35 @@ public class PostService(
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
-    Post? post = await _postRepository.GetAsync(
-      predicate,
-      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
-      enableTracking,
-      cancellationToken);
+    IQueryable<Post> query = _postRepository.Query(enableTracking);
 
-    if (post == null)
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    PostResponseDto? response = await query
+      .Where(predicate)
+      .Select(p => new PostResponseDto
+      {
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        Content = p.Content,
+        ImageUrl = p.ImageUrl,
+        IsActive = p.IsActive,
+        LikeCount = p.LikeCount,
+        DislikeCount = p.DislikeCount,
+        CommentCount = p.CommentCount,
+        CreatedDate = p.CreatedDate,
+        UserId = p.UserId,
+        AuthorUsername = p.User.Username,
+        CategoryId = p.CategoryId,
+        CategoryName = p.Category.Name
+      })
+      .FirstOrDefaultAsync(cancellationToken);
+
+    if (response == null)
     {
       return new ReturnModel<PostResponseDto>()
       {
@@ -70,8 +123,6 @@ public class PostService(
         StatusCode = 200
       };
     }
-
-    PostResponseDto response = _mapper.EntityToResponseDto(post);
 
     return new ReturnModel<PostResponseDto>()
     {
@@ -88,13 +139,38 @@ public class PostService(
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
-    Post post = await _businessRules.GetPostIfExistAsync(
-      id,
-      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
-      enableTracking,
-      cancellationToken);
+    IQueryable<Post> query = _postRepository.Query(enableTracking);
 
-    PostResponseDto response = _mapper.EntityToResponseDto(post);
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    PostResponseDto? response = await query
+      .Where(p => p.Id == id)
+      .Select(p => new PostResponseDto
+      {
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        Content = p.Content,
+        ImageUrl = p.ImageUrl,
+        IsActive = p.IsActive,
+        LikeCount = p.LikeCount,
+        DislikeCount = p.DislikeCount,
+        CommentCount = p.CommentCount,
+        CreatedDate = p.CreatedDate,
+        UserId = p.UserId,
+        AuthorUsername = p.User.Username,
+        CategoryId = p.CategoryId,
+        CategoryName = p.Category.Name
+      })
+      .FirstOrDefaultAsync(cancellationToken);
+
+    if (response == null)
+    {
+      throw new NotFoundException($"{id} numaralı post bulunamadı.");
+    }
 
     return new ReturnModel<PostResponseDto>()
     {
@@ -112,14 +188,35 @@ public class PostService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Post> posts = await _postRepository.GetTopCommentedPostsAsync(
-      count,
-      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
-      enableTracking,
-      withDeleted,
-      cancellationToken);
+    IQueryable<Post> query = _postRepository.Query(enableTracking, withDeleted)
+      .Where(p => p.IsActive);
 
-    List<PostResponseDto> response = _mapper.EntityToResponseDtoList(posts);
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    List<PostResponseDto> response = await query
+      .OrderByDescending(p => p.CommentCount)
+      .Take(count)
+      .Select(p => new PostResponseDto
+      {
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        Content = p.Content,
+        ImageUrl = p.ImageUrl,
+        IsActive = p.IsActive,
+        LikeCount = p.LikeCount,
+        DislikeCount = p.DislikeCount,
+        CommentCount = p.CommentCount,
+        CreatedDate = p.CreatedDate,
+        UserId = p.UserId,
+        AuthorUsername = p.User.Username,
+        CategoryId = p.CategoryId,
+        CategoryName = p.Category.Name
+      })
+      .ToListAsync(cancellationToken);
 
     return new ReturnModel<List<PostResponseDto>>()
     {
@@ -139,23 +236,53 @@ public class PostService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<Post> posts = await _postRepository.GetRecentPostsAsync(
-      count + 1,
-      lastDateCursor,
-      lastIdCursor,
-      include: include ?? (query => query.Include(b => b.User).Include(b => b.Category)),
-      enableTracking,
-      withDeleted,
-      cancellationToken);
+    IQueryable<Post> query = _postRepository.Query(enableTracking, withDeleted)
+      .Where(p => p.IsActive);
+
+    if (lastDateCursor.HasValue && lastIdCursor.HasValue)
+    {
+      DateTime cursorDate = lastDateCursor.Value;
+      Guid cursorId = lastIdCursor.Value;
+
+      query = query.Where(p =>
+        p.CreatedDate < cursorDate ||
+        (p.CreatedDate == cursorDate && p.Id.CompareTo(cursorId) < 0));
+    }
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    List<PostResponseDto> posts = await query
+      .OrderByDescending(p => p.CreatedDate)
+      .ThenByDescending(p => p.Id)
+      .Take(count + 1)
+      .Select(p => new PostResponseDto
+      {
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        Content = p.Content,
+        ImageUrl = p.ImageUrl,
+        IsActive = p.IsActive,
+        LikeCount = p.LikeCount,
+        DislikeCount = p.DislikeCount,
+        CommentCount = p.CommentCount,
+        CreatedDate = p.CreatedDate,
+        UserId = p.UserId,
+        AuthorUsername = p.User.Username,
+        CategoryId = p.CategoryId,
+        CategoryName = p.Category.Name
+      })
+      .ToListAsync(cancellationToken);
 
     bool hasNextPage = posts.Count > count;
-    var itemsToReturn = hasNextPage ? posts.Take(count).ToList() : posts;
-
-    List<PostResponseDto> response = _mapper.EntityToResponseDtoList(itemsToReturn);
+    List<PostResponseDto> itemsToReturn = hasNextPage ? posts.Take(count).ToList() : posts;
 
     var pagedResponse = new CursorPagedResponse<PostResponseDto>
     {
-      Items = response,
+      Items = itemsToReturn,
       NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
       NextCursorId = itemsToReturn.LastOrDefault()?.Id,
       HasNextPage = hasNextPage

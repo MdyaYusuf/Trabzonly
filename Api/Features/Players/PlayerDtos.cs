@@ -17,9 +17,13 @@ public sealed record PlayerResponseDto(
   string CurrentTeam,
   string? Description,
   string? ImageUrl,
+  int? ShirtNumber,
+  decimal AverageRating,
+  int RatingCount,
   bool IsActive,
   Guid PositionId,
-  string PositionName);
+  string PositionName,
+  decimal? CurrentUserScore = null);
 
 public sealed record CreatedPlayerResponseDto(
   Guid Id,
@@ -34,7 +38,16 @@ public sealed record PlayerPreviewDto(
   decimal? MarketValue,
   string CurrentTeam,
   string? ImageUrl,
+  int? ShirtNumber,
+  decimal AverageRating,
+  int RatingCount,
   string PositionName);
+
+public sealed record PlayerRatingResponseDto(
+  Guid PlayerId,
+  decimal Score,
+  decimal AverageRating,
+  int RatingCount);
 
 // Requests
 public sealed record CreatePlayerRequest(
@@ -48,6 +61,7 @@ public sealed record CreatePlayerRequest(
   decimal? Wage,
   string CurrentTeam,
   string? Description,
+  int? ShirtNumber,
   Guid PositionId,
   IFormFile? ImageFile);
 
@@ -63,6 +77,9 @@ public sealed record UpdatePlayerRequest(
   decimal? Wage,
   string CurrentTeam,
   string? Description,
+  int? ShirtNumber,
   Guid PositionId,
   IFormFile? ImageFile,
   bool IsActive);
+
+public sealed record RatePlayerRequest(decimal Score);

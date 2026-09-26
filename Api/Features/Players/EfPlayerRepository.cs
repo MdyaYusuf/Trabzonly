@@ -8,7 +8,6 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>,
 {
   public EfPlayerRepository(BaseDbContext context) : base(context)
   {
-
   }
 
   public async Task<List<Player>> GetTopValuedPlayersAsync(
@@ -57,6 +56,29 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>,
     return await query
       .Where(p => p.IsActive)
       .OrderByDescending(p => p.Comments.Count)
+      .Take(count)
+      .ToListAsync(cancellationToken);
+  }
+
+  public async Task<List<Player>> GetTopRatedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<Player> query = Query(enableTracking, withDeleted);
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    return await query
+      .Where(p => p.IsActive && p.RatingCount > 0)
+      .OrderByDescending(p => p.AverageRating)
+      .ThenByDescending(p => p.RatingCount)
+      .ThenByDescending(p => p.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
   }

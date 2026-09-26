@@ -15,6 +15,9 @@ export interface UserPreviewDto {
   username: string;
   profileImageUrl?: string | null;
   roleName: string;
+  postCount: number;
+  totalLikeCount: number;
+  createdDate: string;
 }
 
 export interface CreatedUserResponseDto {
