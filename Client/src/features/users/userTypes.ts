@@ -2,6 +2,7 @@
 export interface UserResponseDto {
   id: string; // Guid maps to string
   username: string;
+  email: string;
   bio?: string | null;
   profileImageUrl?: string | null;
   isActive: boolean;

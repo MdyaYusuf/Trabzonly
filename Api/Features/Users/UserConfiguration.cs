@@ -27,6 +27,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
       .HasMaxLength(50)
       .IsRequired();
 
+    builder.Property(u => u.Email)
+      .HasMaxLength(150)
+      .IsRequired();
+
     builder.Property(u => u.PasswordHash)
       .IsRequired();
 
@@ -38,6 +42,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
       .IsRequired(false);
 
     builder.Property(u => u.RefreshTokenExpiration)
+      .IsRequired(false);
+
+    builder.Property(u => u.PasswordResetToken)
+      .HasMaxLength(500)
+      .IsRequired(false);
+
+    builder.Property(u => u.PasswordResetTokenExpiration)
       .IsRequired(false);
 
     builder.Property(u => u.ProfileImageUrl)
@@ -53,6 +64,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
       .IsRequired();
 
     builder.HasIndex(u => u.Username)
+      .IsUnique();
+
+    builder.HasIndex(u => u.Email)
       .IsUnique();
 
     builder.HasOne(u => u.Role)

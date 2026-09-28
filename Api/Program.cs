@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using Api.Core.Email;
 using Api.Core.Middlewares;
 using Api.Core.Security;
 using Api.Data;
@@ -13,6 +14,7 @@ using Api.Features.Quizzes;
 using Api.Features.Roles;
 using Api.Features.Seasons;
 using Api.Features.Users;
+using Api.Features.Metrics;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -52,8 +54,11 @@ builder.Services.AddCommentDependencies();
 builder.Services.AddPositionDependencies();
 builder.Services.AddSeasonDependencies();
 builder.Services.AddPlayerStatsDependencies();
+builder.Services.AddMetricsDependencies();
 
 builder.Services.Configure<TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
+builder.Services.AddScoped<IEmailSender, LoggingEmailSender>();
 
 var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() ?? throw new InvalidOperationException("TokenOptions bölümü yapılandırma dosyasında appsettings bulunamadı.");
 

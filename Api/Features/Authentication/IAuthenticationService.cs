@@ -16,4 +16,12 @@ public interface IAuthenticationService
   Task<ReturnModel<TokenResponseDto>> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
 
   Task<ReturnModel<NoData>> RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
+
+  Task<ReturnModel<NoData>> ForgotPasswordAsync(
+    ForgotPasswordRequest request,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> ResetPasswordAsync(
+    ResetPasswordRequest request,
+    CancellationToken cancellationToken = default);
 }

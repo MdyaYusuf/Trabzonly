@@ -81,6 +81,26 @@ public class AuthenticationController(
     });
   }
 
+  [HttpPost("forgot-password")]
+  public async Task<IActionResult> ForgotPassword(
+    [FromBody] ForgotPasswordRequest request,
+    CancellationToken cancellationToken)
+  {
+    var result = await _authService.ForgotPasswordAsync(request, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpPost("reset-password")]
+  public async Task<IActionResult> ResetPassword(
+    [FromBody] ResetPasswordRequest request,
+    CancellationToken cancellationToken)
+  {
+    var result = await _authService.ResetPasswordAsync(request, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   private IActionResult CreateAuthActionResult(ReturnModel<TokenResponseDto> result)
   {
     if (!result.Success || result.Data == null)

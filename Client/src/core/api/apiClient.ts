@@ -9,7 +9,12 @@ const SESSION_EXPIRED_MESSAGE = "Oturum süresi doldu.";
 let refreshPromise: Promise<boolean> | null = null;
 
 function isPublicAuthPath(pathname: string = window.location.pathname): boolean {
-  return pathname === "/login" || pathname === "/register";
+  return (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/sifremi-unuttum" ||
+    pathname === "/sifre-sifirla"
+  );
 }
 
 export const apiClient = async <T>(

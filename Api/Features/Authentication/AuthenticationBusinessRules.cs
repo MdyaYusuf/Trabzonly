@@ -10,7 +10,7 @@ public class AuthenticationBusinessRules
   {
     if (user == null || !HashingHelper.VerifyPasswordHash(password, user.PasswordHash, user.PasswordKey))
     {
-      throw new BusinessException("Kullanıcı adı veya şifre hatalı.");
+      throw new BusinessException("E-posta veya şifre hatalı.");
     }
 
     if (!user.IsActive)

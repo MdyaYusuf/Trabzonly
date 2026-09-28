@@ -33,6 +33,20 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
     }
   }
 
+  public async Task EmailMustBeUniqueAsync(string email, Guid? id = null, CancellationToken cancellationToken = default)
+  {
+    string normalized = email.Trim().ToLowerInvariant();
+
+    var exists = await _userRepository.AnyAsync(
+      u => u.Email == normalized && (id == null || u.Id != id),
+      cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu e-posta adresi zaten kullanımda.");
+    }
+  }
+
   public async Task UsernameMustBeUniqueAsync(string username, Guid? id = null, CancellationToken cancellationToken = default)
   {
     var exists = await _userRepository.AnyAsync(u => u.Username == username && (id == null || u.Id != id), cancellationToken);
@@ -92,6 +106,29 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
       {
         throw new BusinessException("Sistemdeki son yönetici (Admin) hesabı silinemez.");
       }
+    }
+  }
+
+  public void PasswordResetTokenMustBeValid(User? user, string rawToken)
+  {
+    if (user == null
+        || string.IsNullOrWhiteSpace(user.PasswordResetToken)
+        || !user.PasswordResetTokenExpiration.HasValue
+        || user.PasswordResetTokenExpiration.Value < DateTime.UtcNow)
+    {
+      throw new BusinessException("Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.");
+    }
+
+    string hashedToken = HashingHelper.HashRefreshToken(rawToken);
+
+    if (user.PasswordResetToken != hashedToken)
+    {
+      throw new BusinessException("Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.");
+    }
+
+    if (!user.IsActive)
+    {
+      throw new BusinessException("Hesabınız pasif durumdadır. Lütfen yönetici ile iletişime geçin.");
     }
   }
 }

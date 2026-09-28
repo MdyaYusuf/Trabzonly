@@ -6,8 +6,9 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
 {
   public LoginRequestValidator()
   {
-    RuleFor(u => u.Username)
-      .NotEmpty().WithMessage("Kullanıcı adı gereklidir.");
+    RuleFor(u => u.Email)
+      .NotEmpty().WithMessage("E-posta adresi gereklidir.")
+      .EmailAddress().WithMessage("Geçerli bir e-posta formatı giriniz.");
 
     RuleFor(u => u.Password)
       .NotEmpty().WithMessage("Şifre gereklidir.");
@@ -23,11 +24,52 @@ public class RegisterUserRequestValidator : AbstractValidator<RegisterUserReques
       .MinimumLength(3).WithMessage("Kullanıcı adı en az 3 karakter olmalıdır.")
       .MaximumLength(50).WithMessage("Kullanıcı adı en fazla 50 karakter olabilir.");
 
+    RuleFor(u => u.Email)
+      .NotEmpty().WithMessage("E-posta adresi boş olamaz.")
+      .EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.")
+      .MaximumLength(150);
+
     RuleFor(u => u.Password)
       .NotEmpty().WithMessage("Şifre boş olamaz.")
       .MinimumLength(8).WithMessage("Şifre en az 8 karakter olmalıdır.")
       .Matches(@"[A-Z]").WithMessage("Şifre en az bir büyük harf içermelidir.")
       .Matches(@"[a-z]").WithMessage("Şifre en az bir küçük harf içermelidir.")
       .Matches(@"[0-9]").WithMessage("Şifre en az bir rakam içermelidir.");
+
+    RuleFor(u => u.ConfirmPassword)
+      .Equal(u => u.Password).WithMessage("Şifreler eşleşmiyor.");
+  }
+}
+
+public class ForgotPasswordRequestValidator : AbstractValidator<ForgotPasswordRequest>
+{
+  public ForgotPasswordRequestValidator()
+  {
+    RuleFor(r => r.Email)
+      .NotEmpty().WithMessage("E-posta adresi gereklidir.")
+      .EmailAddress().WithMessage("Geçerli bir e-posta formatı giriniz.");
+  }
+}
+
+public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequest>
+{
+  public ResetPasswordRequestValidator()
+  {
+    RuleFor(r => r.Email)
+      .NotEmpty().WithMessage("E-posta adresi gereklidir.")
+      .EmailAddress().WithMessage("Geçerli bir e-posta formatı giriniz.");
+
+    RuleFor(r => r.Token)
+      .NotEmpty().WithMessage("Sıfırlama tokeni gereklidir.");
+
+    RuleFor(r => r.NewPassword)
+      .NotEmpty().WithMessage("Yeni şifre boş olamaz.")
+      .MinimumLength(8).WithMessage("Şifre en az 8 karakter olmalıdır.")
+      .Matches(@"[A-Z]").WithMessage("Şifre en az bir büyük harf içermelidir.")
+      .Matches(@"[a-z]").WithMessage("Şifre en az bir küçük harf içermelidir.")
+      .Matches(@"[0-9]").WithMessage("Şifre en az bir rakam içermelidir.");
+
+    RuleFor(r => r.ConfirmNewPassword)
+      .Equal(r => r.NewPassword).WithMessage("Şifreler eşleşmiyor.");
   }
 }

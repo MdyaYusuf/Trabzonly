@@ -5,6 +5,7 @@ public class UserResponseDto
 {
   public Guid Id { get; set; }
   public string Username { get; set; } = null!;
+  public string Email { get; set; } = null!;
   public string? Bio { get; set; }
   public string? ProfileImageUrl { get; set; }
   public bool IsActive { get; set; }

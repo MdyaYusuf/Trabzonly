@@ -1,18 +1,74 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { metricsService } from '@/features/metrics/metricsService'
+import type { ShellMetricsDto } from '@/features/metrics/metricsTypes'
 
 const HERO_BG = '/assets/background.jpeg'
 
-const stats = [
-  { value: '61.000+', label: 'Aktif Yoldaş', valueClass: 'text-secondary-container' },
-  { value: '8', label: 'Kupa & Yıldız', valueClass: 'text-tertiary-fixed-dim' },
-  { value: '#1', label: 'Özgür Tribün', valueClass: 'text-surface' },
-] as const
+type ShellStat = {
+  value: string
+  label: string
+  valueClass: string
+}
+
+const fallbackStats: ShellStat[] = [
+  { value: '—', label: 'Aktif Kullanıcı', valueClass: 'text-secondary-container' },
+  { value: '—', label: 'Toplam Gönderi', valueClass: 'text-tertiary-fixed-dim' },
+  { value: '—', label: 'Kurulan Kadrolar', valueClass: 'text-surface' },
+]
+
+function formatStatCount(value: number): string {
+  return value.toLocaleString('tr-TR')
+}
+
+function mapShellStats(data: ShellMetricsDto): ShellStat[] {
+  return [
+    {
+      value: formatStatCount(data.activeUserCount),
+      label: 'Aktif Kullanıcı',
+      valueClass: 'text-secondary-container',
+    },
+    {
+      value: formatStatCount(data.totalPostCount),
+      label: 'Toplam Gönderi',
+      valueClass: 'text-tertiary-fixed-dim',
+    },
+    {
+      value: formatStatCount(data.totalSquadCount),
+      label: 'Kurulan Kadrolar',
+      valueClass: 'text-surface',
+    },
+  ]
+}
 
 type AuthPageShellProps = {
   children: ReactNode
 }
 
 export function AuthPageShell({ children }: AuthPageShellProps) {
+  const [stats, setStats] = useState<ShellStat[]>(fallbackStats)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadStats() {
+      try {
+        const response = await metricsService.getShellMetrics()
+
+        if (!cancelled && response.success && response.data) {
+          setStats(mapShellStats(response.data))
+        }
+      } catch {
+        // Keep fallback placeholders when stats are unavailable.
+      }
+    }
+
+    void loadStats()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
       <section className="relative flex min-h-[calc(100vh-4rem)] items-stretch overflow-hidden bg-surface sm:min-h-[calc(100vh-5rem)]">
@@ -88,13 +144,6 @@ export function AuthPageShell({ children }: AuthPageShellProps) {
             <p className="font-body text-center text-body-sm drop-shadow md:text-left">
               Bağımsız Trabzonspor taraftar topluluğudur. Resmi kulüp sitesi değildir.
             </p>
-            <div className="font-kicker mt-space-xs flex flex-wrap items-center justify-center gap-space-md text-kicker tracking-widest text-surface-container-high uppercase drop-shadow md:mt-0">
-              <span>TARAFTAR ETİĞİ</span>
-              <span>•</span>
-              <span>GİZLİLİK POLİTİKASI</span>
-              <span>•</span>
-              <span>TRABZONLU TRIBÜN ARŞİVİ</span>
-            </div>
           </div>
         </div>
       </section>

@@ -6,6 +6,7 @@ import { authService } from '@/features/auth/authService'
 export function RegisterPage() {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [acceptRules, setAcceptRules] = useState(false)
@@ -37,7 +38,12 @@ export function RegisterPage() {
     setStatusMessage('Kayıt işlemi gerçekleştiriliyor...')
 
     try {
-      const response = await authService.register({ username, password })
+      const response = await authService.register({
+        username,
+        email,
+        password,
+        confirmPassword,
+      })
 
       if (response.success) {
         setStatusMessage('Kayıt tamamlandı. Giriş sayfasına yönlendiriliyorsunuz...')
@@ -77,12 +83,39 @@ export function RegisterPage() {
               <input
                 id="register-username"
                 className="w-full rounded bg-surface-container-low py-2.5 pr-4 pl-10 font-body text-body-md text-on-surface transition-all placeholder:text-outline/70 focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary focus:outline-none"
-                placeholder="@kullaniciadi veya bordo yoldaş adı"
+                placeholder="@kullaniciadi"
                 type="text"
                 autoComplete="username"
                 required
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label
+              className="font-label flex items-center justify-between text-label-md font-bold tracking-wider text-on-surface-variant uppercase"
+              htmlFor="register-email"
+            >
+              <span>E-posta</span>
+              <span className="font-kicker text-kicker font-normal text-outline normal-case">
+                Zorunlu
+              </span>
+            </label>
+            <div className="relative flex items-center">
+              <span className="material-symbols-outlined pointer-events-none absolute left-3 text-[20px] text-outline">
+                mail
+              </span>
+              <input
+                id="register-email"
+                className="w-full rounded bg-surface-container-low py-2.5 pr-4 pl-10 font-body text-body-md text-on-surface transition-all placeholder:text-outline/70 focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary focus:outline-none"
+                placeholder="ornek@eposta.com"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </div>
           </div>
@@ -170,14 +203,14 @@ export function RegisterPage() {
               className="font-body cursor-pointer text-body-sm leading-tight text-on-surface-variant select-none"
               htmlFor="accept-rules"
             >
-              <span className="font-bold text-primary underline hover:text-secondary">
+              <Link
+                to="/topluluk-kurallari"
+                className="font-bold text-primary underline hover:text-secondary"
+                onClick={(event) => event.stopPropagation()}
+              >
                 Topluluk Kuralları
-              </span>{' '}
-              ve{' '}
-              <span className="font-bold text-primary underline hover:text-secondary">
-                Bağımsız Taraftar İlkeleri
-              </span>
-              &apos;ni kabul ediyorum.
+              </Link>
+              &apos;nı kabul ediyorum.
             </label>
           </div>
 

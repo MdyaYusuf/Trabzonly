@@ -31,6 +31,8 @@ import { AdminRoleCreateEditPage } from '@/features/admin/pages/AdminRoleCreateE
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
+import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
 import { PlayerDirectoryPage } from '@/features/players/pages/PlayerDirectoryPage'
 import { PlayerDetailPage } from '@/features/players/pages/PlayerDetailPage'
 import { PostsFeedPage } from '@/features/posts/pages/PostsFeedPage'
@@ -65,6 +67,14 @@ const router = createBrowserRouter([
           {
             path: 'register',
             element: <RegisterPage />,
+          },
+          {
+            path: 'sifremi-unuttum',
+            element: <ForgotPasswordPage />,
+          },
+          {
+            path: 'sifre-sifirla',
+            element: <ResetPasswordPage />,
           },
           {
             path: 'oyuncular',

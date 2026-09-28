@@ -8,9 +8,8 @@ import { useAppDispatch } from '@/core/store/hooks'
 export function LoginPage() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
@@ -23,10 +22,10 @@ export function LoginPage() {
     }
 
     setIsSubmitting(true)
-    setStatusMessage(`${username || 'Yoldaş'}, Bordo-Mavi tribüne bağlanıyor...`)
+    setStatusMessage('Bordo-Mavi tribüne bağlanıyor...')
 
     try {
-      const response = await authService.login({ username, password })
+      const response = await authService.login({ email, password })
 
       if (response.success && response.data) {
         dispatch(setCredentials(response.data))
@@ -53,26 +52,26 @@ export function LoginPage() {
           <div className="flex flex-col gap-1">
             <label
               className="font-label flex items-center justify-between text-label-md font-bold tracking-wider text-on-surface-variant uppercase"
-              htmlFor="login-username"
+              htmlFor="login-email"
             >
-              <span>Kullanıcı Adı</span>
+              <span>E-posta</span>
               <span className="font-kicker text-kicker font-normal text-outline normal-case">
                 Zorunlu
               </span>
             </label>
             <div className="relative flex items-center">
               <span className="material-symbols-outlined pointer-events-none absolute left-3 text-[20px] text-outline">
-                person
+                mail
               </span>
               <input
-                id="login-username"
+                id="login-email"
                 className="w-full rounded bg-surface-container-low py-3 pr-4 pl-10 font-body text-body-md text-on-surface transition-all placeholder:text-outline/70 focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container focus:outline-none"
-                placeholder="@kadi veya kullanıcı adın"
-                type="text"
-                autoComplete="username"
+                placeholder="ornek@eposta.com"
+                type="email"
+                autoComplete="email"
                 required
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </div>
           </div>
@@ -111,19 +110,13 @@ export function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between py-1">
-            <label className="flex cursor-pointer items-center gap-2 select-none">
-              <input
-                className="h-4 w-4 cursor-pointer rounded bg-surface-container accent-primary-container focus:ring-0"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(event) => setRememberMe(event.target.checked)}
-              />
-              <span className="font-label text-label-md text-on-surface-variant">Beni hatırla</span>
-            </label>
-            <span className="font-label cursor-default text-label-md font-bold text-secondary">
+          <div className="flex items-center justify-end py-1">
+            <Link
+              to="/sifremi-unuttum"
+              className="font-label text-label-md font-bold text-secondary transition-colors hover:text-primary"
+            >
               Şifremi unuttum
-            </span>
+            </Link>
           </div>
 
           <button
