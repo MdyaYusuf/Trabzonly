@@ -47,6 +47,7 @@ import { MySquadsPage } from '@/features/squads/pages/MySquadsPage'
 import { QuizListPage } from '@/features/quizzes/pages/QuizListPage'
 import { TakeQuizPage } from '@/features/quizzes/pages/TakeQuizPage'
 import { QuizResultPage } from '@/features/quizzes/pages/QuizResultPage'
+import { CommunityRulesPage } from '@/features/community/pages/CommunityRulesPage'
 
 const router = createBrowserRouter([
   {
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
           {
             path: 'sifre-sifirla',
             element: <ResetPasswordPage />,
+          },
+          {
+            path: 'topluluk-kurallari',
+            element: <CommunityRulesPage />,
           },
           {
             path: 'oyuncular',

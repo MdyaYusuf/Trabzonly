@@ -31,6 +31,12 @@ export function SiteFooter() {
             </span>
             <div className="flex flex-col gap-space-xs">
               <Link
+                to="/topluluk-kurallari"
+                className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
+              >
+                Topluluk Kuralları
+              </Link>
+              <Link
                 to="/oyuncular"
                 className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
               >
