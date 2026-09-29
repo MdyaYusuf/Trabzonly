@@ -20,7 +20,7 @@ public class UpdatePositionRequestValidator : AbstractValidator<UpdatePositionRe
 {
   public UpdatePositionRequestValidator()
   {
-    RuleFor(p => p.Id).NotEmpty().WithMessage("Geçersiz pozisyon ID.");
+    RuleFor(p => p.Id).GreaterThan(0).WithMessage("Geçersiz pozisyon ID.");
 
     RuleFor(p => p.Name).NotEmpty().WithMessage("Pozisyon adı boş olamaz.").MaximumLength(50);
     RuleFor(p => p.Abbreviation).NotEmpty().WithMessage("Kısaltma boş olamaz.").MaximumLength(10);

@@ -16,7 +16,7 @@ const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedR
   return await apiClient<PagedResponse<PositionResponseDto>>(`${API_URL}?${queryParams}`);
 };
 
-const getById = async (id: string): Promise<ApiResponse<PositionResponseDto>> => {
+const getById = async (id: number): Promise<ApiResponse<PositionResponseDto>> => {
   return await apiClient<PositionResponseDto>(`${API_URL}/${id}`);
 };
 
@@ -34,7 +34,7 @@ const update = async (request: UpdatePositionRequest): Promise<ApiResponse<NoDat
   });
 };
 
-const remove = async (id: string): Promise<ApiResponse<NoData>> => {
+const remove = async (id: number): Promise<ApiResponse<NoData>> => {
   return await apiClient<NoData>(`${API_URL}/${id}`, {
     method: 'DELETE',
   });

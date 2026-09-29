@@ -1,6 +1,6 @@
 // Responses
 export interface PositionResponseDto {
-  id: string;
+  id: number;
   name: string;
   abbreviation: string;
   createdDate: string;
@@ -13,5 +13,5 @@ export interface CreatePositionRequest {
 }
 
 export interface UpdatePositionRequest extends CreatePositionRequest {
-  id: string;
+  id: number;
 }

@@ -41,7 +41,7 @@ export const positionSlice = createSlice({
         state.positions[index] = action.payload;
       }
     },
-    removePositionFromState: (state, action: PayloadAction<string>) => {
+    removePositionFromState: (state, action: PayloadAction<number>) => {
       state.positions = state.positions.filter((p) => p.id !== action.payload);
     },
     clearPositionState: () => initialState,

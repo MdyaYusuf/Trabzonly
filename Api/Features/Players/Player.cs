@@ -40,7 +40,7 @@ public class Player : Entity<Guid>
   public int Age => DateOfBirth != default ? (DateTime.Today.Year - DateOfBirth.Year - (DateTime.Today.DayOfYear < DateOfBirth.DayOfYear ? 1 : 0)) : 0;
 
   // Navigation properties
-  public Guid PositionId { get; set; }
+  public int PositionId { get; set; }
   public virtual Position Position { get; set; } = default!;
   public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
   public virtual ICollection<Injury> Injuries { get; set; } = new List<Injury>();

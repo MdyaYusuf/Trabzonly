@@ -5,7 +5,7 @@ namespace Api.Features.Positions;
 public class PositionBusinessRules(IPositionRepository _positionRepository)
 {
   public async Task<Position> GetPositionIfExistAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Position>, IQueryable<Position>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -33,7 +33,7 @@ public class PositionBusinessRules(IPositionRepository _positionRepository)
   }
 
   public async Task PositionAbbreviationCannotBeDuplicatedWhenUpdated(
-    Guid id,
+    int id,
     string abbreviation,
     CancellationToken cancellationToken)
   {
@@ -67,7 +67,7 @@ public class PositionBusinessRules(IPositionRepository _positionRepository)
   }
 
   public async Task PositionNameCannotBeDuplicatedWhenUpdated(
-    Guid id,
+    int id,
     string name,
     CancellationToken cancellationToken)
   {

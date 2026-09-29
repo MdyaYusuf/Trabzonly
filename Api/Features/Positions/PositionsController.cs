@@ -22,9 +22,9 @@ public class PositionsController(IPositionService _positionService) : CustomBase
     return CreateActionResult(result);
   }
 
-  [HttpGet("{id:guid}")]
+  [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _positionService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
@@ -61,9 +61,9 @@ public class PositionsController(IPositionService _positionService) : CustomBase
   }
 
   [Authorize(Roles = "Admin")]
-  [HttpDelete("{id:guid}")]
+  [HttpDelete("{id:int}")]
   public async Task<IActionResult> Delete(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _positionService.RemoveAsync(

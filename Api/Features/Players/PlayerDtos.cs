@@ -21,7 +21,7 @@ public sealed record PlayerResponseDto(
   decimal AverageRating,
   int RatingCount,
   bool IsActive,
-  Guid PositionId,
+  int PositionId,
   string PositionName,
   decimal? CurrentUserScore = null);
 
@@ -62,7 +62,7 @@ public sealed record CreatePlayerRequest(
   string CurrentTeam,
   string? Description,
   int? ShirtNumber,
-  Guid PositionId,
+  int PositionId,
   IFormFile? ImageFile);
 
 public sealed record UpdatePlayerRequest(
@@ -78,7 +78,7 @@ public sealed record UpdatePlayerRequest(
   string CurrentTeam,
   string? Description,
   int? ShirtNumber,
-  Guid PositionId,
+  int PositionId,
   IFormFile? ImageFile,
   bool IsActive);
 

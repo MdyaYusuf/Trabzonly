@@ -4,7 +4,7 @@ using Api.Features.Players;
 
 namespace Api.Features.Positions;
 
-public class Position : Entity<Guid>
+public class Position : Entity<int>
 {
   [SetsRequiredMembers]
   public Position()

@@ -46,7 +46,7 @@ public class PositionService(
   }
 
   public async Task<ReturnModel<PositionResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Position>, IQueryable<Position>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -133,7 +133,7 @@ public class PositionService(
   }
 
   public async Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default)
   {

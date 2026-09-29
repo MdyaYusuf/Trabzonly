@@ -17,7 +17,7 @@ export interface PlayerResponseDto {
   averageRating: number;
   ratingCount: number;
   isActive: boolean;
-  positionId: string;
+  positionId: number;
   positionName: string;
   currentUserScore?: number | null;
 }
@@ -62,7 +62,7 @@ export interface CreatePlayerRequest {
   currentTeam: string;
   description?: string;
   shirtNumber?: number | null;
-  positionId: string;
+  positionId: number;
   imageFile?: File | null;
 }
 

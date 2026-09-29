@@ -26,7 +26,7 @@ public class CreatePlayerRequestValidator : AbstractValidator<CreatePlayerReques
       .MaximumLength(100);
 
     RuleFor(p => p.PositionId)
-      .NotEmpty().WithMessage("Pozisyon ID boş olamaz.");
+      .GreaterThan(0).WithMessage("Pozisyon ID boş olamaz.");
 
     RuleFor(p => p.Height)
       .GreaterThan(0)
@@ -82,7 +82,7 @@ public class UpdatePlayerRequestValidator : AbstractValidator<UpdatePlayerReques
       .MaximumLength(100);
 
     RuleFor(p => p.PositionId)
-      .NotEmpty().WithMessage("Pozisyon ID boş olamaz.");
+      .GreaterThan(0).WithMessage("Pozisyon ID boş olamaz.");
 
     RuleFor(p => p.Height)
       .GreaterThan(0).When(p => p.Height.HasValue)

@@ -2,7 +2,7 @@ namespace Api.Features.Positions;
 
 // Responses
 public sealed record PositionResponseDto(
-  Guid Id,
+  int Id,
   string Name,
   string Abbreviation,
   DateTime CreatedDate);
@@ -13,6 +13,6 @@ public sealed record CreatePositionRequest(
   string Abbreviation);
 
 public sealed record UpdatePositionRequest(
-  Guid Id,
+  int Id,
   string Name,
   string Abbreviation);
