@@ -15,6 +15,13 @@ public interface IPlayerService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<PlayerResponseDto>>> GetRosterAsync(
+    PlayerListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<PlayerRosterOverviewDto>> GetRosterOverviewAsync(
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<PlayerResponseDto>> GetByIdAsync(
     Guid id,
     Guid? currentUserId = null,

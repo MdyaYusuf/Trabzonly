@@ -26,4 +26,8 @@ public interface IPlayerRepository : IRepository<Player, Guid>
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
+
+  Task<PlayerRosterOverviewDto> GetRosterOverviewAsync(
+    Guid? currentSeasonId = null,
+    CancellationToken cancellationToken = default);
 }

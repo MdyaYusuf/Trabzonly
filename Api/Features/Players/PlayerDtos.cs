@@ -3,6 +3,14 @@ using Microsoft.AspNetCore.Http;
 namespace Api.Features.Players;
 
 // Responses
+public sealed record PlayerSeasonStatsDto(
+  int Appearances,
+  int MinutesPlayed,
+  int Goals,
+  int Assists,
+  int CleanSheets,
+  int Saves);
+
 public sealed record PlayerResponseDto(
   Guid Id,
   string Name,
@@ -21,8 +29,15 @@ public sealed record PlayerResponseDto(
   decimal AverageRating,
   int RatingCount,
   bool IsActive,
+  bool IsDomestic,
+  bool IsCaptain,
   int PositionId,
   string PositionName,
+  string PositionAbbreviation = "",
+  int CommentCount = 0,
+  DateTime CreatedDate = default,
+  DateTime? UpdatedDate = null,
+  PlayerSeasonStatsDto? CurrentSeasonStats = null,
   decimal? CurrentUserScore = null);
 
 public sealed record CreatedPlayerResponseDto(
@@ -49,6 +64,12 @@ public sealed record PlayerRatingResponseDto(
   decimal AverageRating,
   int RatingCount);
 
+public sealed record PlayerRosterOverviewDto(
+  decimal TotalMarketValue,
+  int ActivePlayerCount,
+  DateTime? LastUpdated,
+  string? CurrentSeasonName);
+
 // Requests
 public sealed record CreatePlayerRequest(
   string Name,
@@ -63,6 +84,8 @@ public sealed record CreatePlayerRequest(
   string? Description,
   int? ShirtNumber,
   int PositionId,
+  bool IsDomestic,
+  bool IsCaptain,
   IFormFile? ImageFile);
 
 public sealed record UpdatePlayerRequest(
@@ -79,7 +102,17 @@ public sealed record UpdatePlayerRequest(
   string? Description,
   int? ShirtNumber,
   int PositionId,
+  bool IsDomestic,
+  bool IsCaptain,
   IFormFile? ImageFile,
   bool IsActive);
 
 public sealed record RatePlayerRequest(decimal Score);
+
+public sealed record PlayerListQueryRequest(
+  string? Search = null,
+  string? PositionGroup = null,
+  bool? IsDomestic = null,
+  string? Sort = null,
+  int PageNumber = 1,
+  int PageSize = 12);

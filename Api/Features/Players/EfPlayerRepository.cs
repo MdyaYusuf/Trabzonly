@@ -1,5 +1,6 @@
 using Api.Core.Repositories;
 using Api.Data;
+using Api.Features.Seasons;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Players;
@@ -81,5 +82,44 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>,
       .ThenByDescending(p => p.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
+  }
+
+  public async Task<PlayerRosterOverviewDto> GetRosterOverviewAsync(
+    Guid? currentSeasonId = null,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<Player> query = Query(enableTracking: false)
+      .Where(p => p.IsActive);
+
+    bool hasPlayers = await query.AnyAsync(cancellationToken);
+
+    decimal totalMarketValue = hasPlayers
+      ? await query.SumAsync(p => p.MarketValue ?? 0m, cancellationToken)
+      : 0m;
+
+    int activePlayerCount = hasPlayers
+      ? await query.CountAsync(cancellationToken)
+      : 0;
+
+    DateTime? lastUpdated = hasPlayers
+      ? await query.MaxAsync(p => p.UpdatedDate ?? p.CreatedDate, cancellationToken)
+      : null;
+
+    string? currentSeasonName = null;
+
+    if (currentSeasonId.HasValue)
+    {
+      currentSeasonName = await _context.Set<Season>()
+        .AsNoTracking()
+        .Where(s => s.Id == currentSeasonId.Value)
+        .Select(s => s.Name)
+        .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    return new PlayerRosterOverviewDto(
+      totalMarketValue,
+      activePlayerCount,
+      lastUpdated,
+      currentSeasonName);
   }
 }

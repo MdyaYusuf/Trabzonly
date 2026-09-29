@@ -15,20 +15,20 @@ export function PlayerDirectoryCta() {
               TARAFTAR PUANLAMASI
             </span>
             <h3 className="font-headline text-headline-md font-bold tracking-tight uppercase">
-              HER MAÇ SONRASI 11&apos;İNİ VE OYUNCULARI SEN DE OYLA!
+              OYUNCULARA TARAFTAR PUANI VER
             </h3>
             <p className="font-body text-body-sm leading-normal text-primary-fixed">
-              Bordo-Mavili renklere gönül veren 40.000+ taraftarın oluşturduğu haftalık ortalama
-              oyuncu reytingine kendi analizini kat.
+              Bordo-Mavili renklere gönül veren taraftarların oluşturduğu haftalık ortalama oyuncu
+              reytingine kendi analizini kat.
             </p>
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-stretch gap-space-sm sm:flex-row sm:items-center">
           <Link
-            to="/gonderiler"
+            to="#kadro-listesi"
             className="bg-secondary-container px-space-lg py-3 text-center font-headline text-label-md font-bold tracking-wider text-on-secondary-container uppercase shadow-sm transition-colors hover:bg-surface-container-lowest"
           >
-            Son Maçı Puanla
+            Oyuncuları Puanla
           </Link>
           <Link
             to="/kadrolar/olustur"

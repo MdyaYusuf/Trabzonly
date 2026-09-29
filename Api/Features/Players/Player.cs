@@ -35,6 +35,8 @@ public class Player : Entity<Guid>
   public decimal AverageRating { get; set; }
   public int RatingCount { get; set; }
   public bool IsActive { get; set; } = true;
+  public bool IsDomestic { get; set; }
+  public bool IsCaptain { get; set; }
 
   [NotMapped]
   public int Age => DateOfBirth != default ? (DateTime.Today.Year - DateOfBirth.Year - (DateTime.Today.DayOfYear < DateOfBirth.DayOfYear ? 1 : 0)) : 0;

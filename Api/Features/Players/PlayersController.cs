@@ -1,5 +1,4 @@
 using Api.Core.Controllers;
-using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,13 +10,21 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
 {
   [HttpGet]
   public async Task<IActionResult> GetAll(
-    [FromQuery] PaginationRequest pagination,
+    [FromQuery] PlayerListQueryRequest query,
     CancellationToken cancellationToken = default)
   {
-    var result = await _playerService.GetAllAsync(
-      pageNumber: pagination.PageNumber,
-      pageSize: pagination.PageSize,
+    var result = await _playerService.GetRosterAsync(
+      query: query,
       cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("roster-overview")]
+  public async Task<IActionResult> GetRosterOverview(
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _playerService.GetRosterOverviewAsync(cancellationToken);
 
     return CreateActionResult(result);
   }

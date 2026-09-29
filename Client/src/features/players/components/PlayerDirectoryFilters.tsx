@@ -4,20 +4,11 @@ import {
   type SortOption,
 } from '../utils/playerDirectoryTypes'
 
-type PositionCounts = {
-  all: number
-  gk: number
-  def: number
-  mid: number
-  fwd: number
-}
-
 type PlayerDirectoryFiltersProps = {
   positionFilter: PositionGroup
   search: string
   sort: SortOption
   nationFilter: NationFilter
-  positionCounts: PositionCounts
   onPositionFilterChange: (next: PositionGroup) => void
   onSearchChange: (value: string) => void
   onSortChange: (value: SortOption) => void
@@ -29,18 +20,17 @@ export function PlayerDirectoryFilters({
   search,
   sort,
   nationFilter,
-  positionCounts,
   onPositionFilterChange,
   onSearchChange,
   onSortChange,
   onNationFilterChange,
 }: PlayerDirectoryFiltersProps) {
-  const positionPills: { key: PositionGroup; label: string; count: number }[] = [
-    { key: 'all', label: 'Tümü', count: positionCounts.all },
-    { key: 'gk', label: 'Kaleciler', count: positionCounts.gk },
-    { key: 'def', label: 'Defans', count: positionCounts.def },
-    { key: 'mid', label: 'Orta Saha', count: positionCounts.mid },
-    { key: 'fwd', label: 'Hücum / Forvet', count: positionCounts.fwd },
+  const positionPills: { key: PositionGroup; label: string }[] = [
+    { key: 'all', label: 'Tümü' },
+    { key: 'gk', label: 'Kaleciler' },
+    { key: 'def', label: 'Defans' },
+    { key: 'mid', label: 'Orta Saha' },
+    { key: 'fwd', label: 'Hücum / Forvet' },
   ]
 
   return (
@@ -61,7 +51,7 @@ export function PlayerDirectoryFilters({
                     : 'bg-surface-container px-space-md py-2 font-label text-label-md font-semibold tracking-wider whitespace-nowrap text-on-surface uppercase transition-all hover:bg-surface-container-high'
                 }
               >
-                {pill.label} ({pill.count})
+                {pill.label}
               </button>
             )
           })}

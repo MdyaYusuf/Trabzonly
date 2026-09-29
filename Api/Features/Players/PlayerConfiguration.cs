@@ -63,6 +63,14 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
       .HasDefaultValue(0)
       .IsRequired();
 
+    builder.Property(p => p.IsDomestic)
+      .HasDefaultValue(false)
+      .IsRequired();
+
+    builder.Property(p => p.IsCaptain)
+      .HasDefaultValue(false)
+      .IsRequired();
+
     builder.HasOne(p => p.Position)
       .WithMany(pos => pos.Players)
       .HasForeignKey(p => p.PositionId)
