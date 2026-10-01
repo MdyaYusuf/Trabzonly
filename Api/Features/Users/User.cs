@@ -30,6 +30,7 @@ public class User : Entity<Guid>
   public DateTime? PasswordResetTokenExpiration { get; set; }
   public string? ProfileImageUrl { get; set; }
   public string? Bio { get; set; }
+  public string? DisplayTag { get; set; }
   public bool IsActive { get; set; } = true;
 
   // Navigation properties

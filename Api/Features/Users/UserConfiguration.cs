@@ -59,6 +59,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
       .HasMaxLength(1000)
       .IsRequired(false);
 
+    builder.Property(u => u.DisplayTag)
+      .HasMaxLength(50)
+      .IsRequired(false);
+
     builder.Property(u => u.IsActive)
       .HasDefaultValue(true)
       .IsRequired();

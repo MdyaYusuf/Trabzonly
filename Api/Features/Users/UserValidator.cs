@@ -12,6 +12,11 @@ public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
 
     RuleFor(u => u.Bio)
       .MaximumLength(1000).WithMessage("Bio en fazla 1000 karakter olabilir.");
+
+    RuleFor(u => u.DisplayTag)
+      .MaximumLength(50).WithMessage("Görünen etiket en fazla 50 karakter olabilir.")
+      .Must(UserDisplayTags.IsAllowed)
+      .WithMessage("Seçilen görünen etiket geçersiz.");
   }
 }
 

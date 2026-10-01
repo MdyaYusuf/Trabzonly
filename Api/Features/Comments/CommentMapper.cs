@@ -8,6 +8,7 @@ public partial class CommentMapper
   public partial Comment CreateToEntity(CreateCommentRequest request);
   public partial void UpdateEntityFromRequest(UpdateCommentRequest request, Comment entity);
   [MapProperty("User.Username", "AuthorUsername")]
+  [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
   public partial CommentResponseDto EntityToResponseDto(Comment entity);
   public partial CreatedCommentResponseDto EntityToCreatedResponseDto(Comment entity);
   public partial List<CommentResponseDto> EntityToResponseDtoList(List<Comment> entities);

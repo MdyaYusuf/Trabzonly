@@ -246,6 +246,15 @@ public class UserService(
 
     _mapper.UpdateEntityFromRequest(request, user);
 
+    if (string.IsNullOrWhiteSpace(user.DisplayTag))
+    {
+      user.DisplayTag = null;
+    }
+    else
+    {
+      user.DisplayTag = user.DisplayTag.Trim();
+    }
+
     _userRepository.Update(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 

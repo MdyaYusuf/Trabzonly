@@ -7,6 +7,7 @@ public class UserResponseDto
   public string Username { get; set; } = null!;
   public string Email { get; set; } = null!;
   public string? Bio { get; set; }
+  public string? DisplayTag { get; set; }
   public string? ProfileImageUrl { get; set; }
   public bool IsActive { get; set; }
   public DateTime CreatedDate { get; set; }
@@ -35,6 +36,7 @@ public sealed record CreatedUserResponseDto
 public sealed record UpdateUserRequest(
   string Username,
   string? Bio,
+  string? DisplayTag,
   IFormFile? ImageFile);
 
 public sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword, string ConfirmNewPassword);

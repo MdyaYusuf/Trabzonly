@@ -124,8 +124,8 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
 
     setComments((current) => (append ? [...current, ...items] : items))
     setHasNextPage(result.data.hasNextPage)
-    setNextCursorDate(result.data.nextCursorDate)
-    setNextCursorId(result.data.nextCursorId)
+    setNextCursorDate(result.data.nextCursorDate ?? undefined)
+    setNextCursorId(result.data.nextCursorId ?? undefined)
     setIsLoading(false)
     setIsLoadingMore(false)
   }
@@ -152,8 +152,8 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
       if (result.success && result.data) {
         setComments(result.data.items)
         setHasNextPage(result.data.hasNextPage)
-        setNextCursorDate(result.data.nextCursorDate)
-        setNextCursorId(result.data.nextCursorId)
+        setNextCursorDate(result.data.nextCursorDate ?? undefined)
+        setNextCursorId(result.data.nextCursorId ?? undefined)
       } else {
         setComments([])
         setHasNextPage(false)
@@ -369,9 +369,16 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
                       {initialsFromUsername(comment.authorUsername)}
                     </div>
                     <div>
-                      <span className="font-headline block text-[16px] font-bold text-on-surface">
-                        {comment.authorUsername}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-space-xs">
+                        <span className="font-headline text-[16px] font-bold text-on-surface">
+                          {comment.authorUsername}
+                        </span>
+                        {comment.authorDisplayTag ? (
+                          <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
+                            {comment.authorDisplayTag}
+                          </span>
+                        ) : null}
+                      </div>
                       <span className="font-body text-[11px] text-on-surface-variant">
                         @{comment.authorUsername} • {formatRelativeTime(comment.createdDate)}
                       </span>
@@ -473,6 +480,11 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
                         <span className="font-label text-label-md font-bold text-on-surface">
                           {reply.authorUsername}
                         </span>
+                        {reply.authorDisplayTag ? (
+                          <span className="bg-primary-container px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-primary uppercase">
+                            {reply.authorDisplayTag}
+                          </span>
+                        ) : null}
                         <span className="font-body text-[11px] text-on-surface-variant">
                           @{reply.authorUsername} • {formatRelativeTime(reply.createdDate)}
                         </span>

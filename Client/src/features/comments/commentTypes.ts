@@ -16,6 +16,7 @@ export interface CommentResponseDto {
   dislikeCount: number
   userId: string
   authorUsername: string
+  authorDisplayTag?: string | null
   postId?: string
   playerId?: number
   parentCommentId?: string

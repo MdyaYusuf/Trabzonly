@@ -9,6 +9,7 @@ public sealed record CommentResponseDto(
   int DislikeCount,
   Guid UserId,
   string AuthorUsername,
+  string? AuthorDisplayTag,
   Guid? PostId,
   int? PlayerId,
   Guid? ParentCommentId,
