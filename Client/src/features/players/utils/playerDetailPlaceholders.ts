@@ -1,11 +1,5 @@
 export type CommentSort = 'liked' | 'newest' | 'analysis'
 
-export type CareerClub = {
-  club: string
-  years: string
-  record: string
-}
-
 export type RivalForward = {
   name: string
   line: string
@@ -29,12 +23,6 @@ export type PlaceholderComment = {
     body: string
   }
 }
-
-export const careerClubs: CareerClub[] = [
-  { club: 'SC Braga', years: '2022 — 2024', record: '41 Gol / 68 Maç' },
-  { club: 'Famalicão', years: '2021 — 2022', record: '17 Gol / 33 Maç' },
-  { club: 'RC Lens', years: '2019 — 2021', record: '8 Gol / 41 Maç' },
-]
 
 export const rivalForwards: RivalForward[] = [
   { name: 'Enis Destan', line: '4 Gol • 2 Asist', initials: 'ED' },

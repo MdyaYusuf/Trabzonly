@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  careerClubs,
-  rivalForwards,
-} from '../utils/playerDetailPlaceholders'
+import { rivalForwards } from '../utils/playerDetailPlaceholders'
+import { PlayerCareerArchive } from './PlayerCareerArchive'
 
 type PlayerDetailSidebarProps = {
+  playerId: number
   playerName: string
+  positionAbbreviation: string
 }
 
-export function PlayerDetailSidebar({ playerName }: PlayerDetailSidebarProps) {
+export function PlayerDetailSidebar({
+  playerId,
+  playerName,
+  positionAbbreviation,
+}: PlayerDetailSidebarProps) {
   const [pollChoice, setPollChoice] = useState<'yes' | 'no' | null>('yes')
 
   return (
@@ -129,25 +133,10 @@ export function PlayerDetailSidebar({ playerName }: PlayerDetailSidebarProps) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-              <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-                KARİYER ARŞİVİ
-              </span>
-              <div className="relative flex flex-col gap-space-md border-l-2 border-l-border-subtle pl-space-md">
-                {careerClubs.map((club) => (
-                  <div key={club.club} className="relative">
-                    <span className="absolute top-1 -left-[1.4rem] h-3 w-3 rounded-full bg-primary" />
-                    <span className="font-headline block text-sm font-bold text-primary">
-                      {club.club}
-                    </span>
-                    <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                      {club.years}
-                    </span>
-                    <span className="font-body block text-body-sm text-on-surface">{club.record}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <PlayerCareerArchive
+              playerId={playerId}
+              positionAbbreviation={positionAbbreviation}
+            />
 
             <div className="flex flex-col gap-space-sm bg-surface-container p-space-md shadow-sm">
               <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Api.Core.Controllers;
 using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,26 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
     var result = await _playerStatsService.GetAllAsync(
       pageNumber: pagination.PageNumber,
       pageSize: pagination.PageSize,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("by-player/{playerId:int}")]
+  public async Task<IActionResult> GetByPlayer(
+    int playerId,
+    CancellationToken cancellationToken = default)
+  {
+    int resolvedPlayerId = playerId;
+    Expression<Func<PlayerStats, bool>> filter = stats => stats.PlayerId == resolvedPlayerId;
+
+    var result = await _playerStatsService.GetAllAsync(
+      filter: filter,
+      orderBy: query => query
+        .OrderByDescending(stats => stats.Season!.StartDate)
+        .ThenByDescending(stats => stats.Id),
+      pageNumber: 1,
+      pageSize: 50,
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

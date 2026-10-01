@@ -21,6 +21,14 @@ const getById = async (id: number): Promise<ApiResponse<PlayerStatsResponseDto>>
   return await apiClient<PlayerStatsResponseDto>(`${API_URL}/${id}`);
 };
 
+const getByPlayer = async (
+  playerId: number,
+): Promise<ApiResponse<PagedResponse<PlayerStatsResponseDto>>> => {
+  return await apiClient<PagedResponse<PlayerStatsResponseDto>>(
+    `${API_URL}/by-player/${playerId}`,
+  );
+};
+
 const getTopScorers = async (
   count: number,
   lastValue?: number,
@@ -82,6 +90,7 @@ const remove = async (id: number): Promise<ApiResponse<NoData>> => {
 const playerStatsService = {
   getAll,
   getById,
+  getByPlayer,
   getTopScorers,
   getTopAssisters,
   add,
