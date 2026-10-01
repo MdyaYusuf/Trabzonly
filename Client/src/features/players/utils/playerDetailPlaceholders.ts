@@ -1,11 +1,5 @@
 export type CommentSort = 'liked' | 'newest' | 'analysis'
 
-export type RivalForward = {
-  name: string
-  line: string
-  initials: string
-}
-
 export type PlaceholderComment = {
   id: string
   initials: string
@@ -23,11 +17,6 @@ export type PlaceholderComment = {
     body: string
   }
 }
-
-export const rivalForwards: RivalForward[] = [
-  { name: 'Enis Destan', line: '4 Gol • 2 Asist', initials: 'ED' },
-  { name: 'Denis Drăguș', line: '5 Gol • 1 Asist', initials: 'DD' },
-]
 
 export const placeholderComments: PlaceholderComment[] = [
   {

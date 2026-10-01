@@ -1,161 +1,223 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { rivalForwards } from '../utils/playerDetailPlaceholders'
+import playerService from '../playerService'
+import type { PlayerResponseDto, PlayerPositionGroup } from '../playerTypes'
+import { formatMarketValue } from '../utils/formatMarketValue'
+import { positionGroupFromAbbreviation } from '../utils/mapPlayerToCardData'
+import type { PositionGroup } from '../utils/playerDirectoryTypes'
 import { PlayerCareerArchive } from './PlayerCareerArchive'
 
 type PlayerDetailSidebarProps = {
-  playerId: number
-  playerName: string
-  positionAbbreviation: string
+  player: PlayerResponseDto
 }
 
-export function PlayerDetailSidebar({
-  playerId,
-  playerName,
-  positionAbbreviation,
-}: PlayerDetailSidebarProps) {
-  const [pollChoice, setPollChoice] = useState<'yes' | 'no' | null>('yes')
+const RIVAL_LIMIT = 4
+
+function toListPositionGroup(group: PositionGroup): PlayerPositionGroup {
+  if (group === 'all') {
+    return 'all'
+  }
+
+  return group
+}
+
+function formatRivalLine(peer: PlayerResponseDto, group: PositionGroup): string {
+  const stats = peer.currentSeasonStats
+
+  if (group === 'gk' || group === 'def') {
+    return `${stats?.cleanSheets ?? 0} Golsüz`
+  }
+
+  return `${stats?.goals ?? 0} Gol • ${stats?.assists ?? 0} Asist`
+}
+
+function rivalScore(peer: PlayerResponseDto, group: PositionGroup): number {
+  const stats = peer.currentSeasonStats
+
+  if (group === 'gk' || group === 'def') {
+    return stats?.cleanSheets ?? 0
+  }
+
+  return (stats?.goals ?? 0) * 2 + (stats?.assists ?? 0)
+}
+
+function averageMarketValue(peers: PlayerResponseDto[]): number | null {
+  const valued = peers.filter((peer) => peer.marketValue != null && peer.marketValue > 0)
+
+  if (valued.length === 0) {
+    return null
+  }
+
+  const total = valued.reduce((sum, peer) => sum + (peer.marketValue ?? 0), 0)
+  return total / valued.length
+}
+
+function averageRating(peers: PlayerResponseDto[]): number | null {
+  const rated = peers.filter((peer) => peer.ratingCount > 0)
+
+  if (rated.length === 0) {
+    return null
+  }
+
+  const total = rated.reduce((sum, peer) => sum + peer.averageRating, 0)
+  return total / rated.length
+}
+
+function formatRating(value: number): string {
+  return value.toFixed(1)
+}
+
+function positionGroupLabel(group: PositionGroup): string {
+  if (group === 'gk') {
+    return 'Kaleci'
+  }
+
+  if (group === 'def') {
+    return 'Defans'
+  }
+
+  if (group === 'mid') {
+    return 'Orta Saha'
+  }
+
+  if (group === 'fwd') {
+    return 'Forvet'
+  }
+
+  return 'Kadro'
+}
+
+export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
+  const group = positionGroupFromAbbreviation(player.positionAbbreviation)
+  const [peers, setPeers] = useState<PlayerResponseDto[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadPeers() {
+      setIsLoading(true)
+
+      const result = await playerService.getAll({
+        pageNumber: 1,
+        pageSize: 50,
+        positionGroup: toListPositionGroup(group),
+        sort: 'rating-desc',
+      })
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setPeers(result.data.items)
+      } else {
+        setPeers([])
+      }
+
+      setIsLoading(false)
+    }
+
+    void loadPeers()
+
+    return () => {
+      cancelled = true
+    }
+  }, [group])
+
+  const groupPeers = peers.filter((peer) => peer.id !== player.id)
+  const rivals = [...groupPeers]
+    .sort((a, b) => rivalScore(b, group) - rivalScore(a, group))
+    .slice(0, RIVAL_LIMIT)
+
+  const groupForAverages = peers.length > 0 ? peers : [player]
+  const marketAvg = averageMarketValue(groupForAverages)
+  const ratingAvg = averageRating(groupForAverages)
+  const groupLabel = positionGroupLabel(group)
 
   return (
-          <aside className="flex flex-col gap-space-lg lg:col-span-4">
-            <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-              <div className="flex items-center justify-between pb-space-xs">
-                <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-                  GÜNÜN TARAFTAR ANKETİ
-                </span>
-                <span className="font-kicker flex items-center gap-1 text-[10px] font-bold text-primary">
-                  <span className="h-2 w-2 animate-ping rounded-full bg-secondary-container" />
-                  AKTİF
-                </span>
-              </div>
-              <h3 className="font-headline text-headline-sm leading-tight font-bold text-primary">
-                {playerName}&apos;nın bonservisi sezon sonu mutlaka alınmalı mı?
-              </h3>
-              <div className="flex flex-col gap-space-sm">
-                <button
-                  type="button"
-                  onClick={() => setPollChoice('yes')}
-                  className="flex cursor-pointer flex-col gap-1 bg-surface-container p-space-sm transition-colors hover:bg-surface-container-high"
-                >
-                  <div className="font-label flex justify-between text-label-md font-bold text-on-surface">
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] text-on-primary ${
-                          pollChoice === 'yes' ? 'bg-primary' : 'bg-outline-variant'
-                        }`}
-                      >
-                        ✓
-                      </span>
-                      Evet, Ne Pahasına Olursa Olsun
-                    </span>
-                    <span className="font-bold text-primary">%88</span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden bg-surface-container-highest">
-                    <div className="h-full w-[88%] bg-primary" />
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPollChoice('no')}
-                  className="flex cursor-pointer flex-col gap-1 bg-surface-container p-space-sm transition-colors hover:bg-surface-container-high"
-                >
-                  <div className="font-label flex justify-between text-label-md font-bold text-on-surface">
-                    <span>Hayır, Maliyet Çok Yüksek</span>
-                    <span className="font-bold text-on-surface-variant">%12</span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden bg-surface-container-highest">
-                    <div className="h-full w-[12%] bg-outline-variant" />
-                  </div>
-                </button>
-              </div>
-              <div className="font-kicker flex items-center justify-between pt-space-xs text-kicker text-on-surface-variant">
-                <span>Toplam Oy: 9.420</span>
-                <span className="font-bold text-secondary">Sonuçları İncele →</span>
-              </div>
-            </div>
+    <aside className="flex flex-col gap-space-lg lg:col-span-4">
+      <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
+        <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
+          POZİSYON BAĞLAMI · {groupLabel}
+        </span>
 
-            <div className="flex flex-col gap-space-sm bg-primary p-space-md text-on-primary shadow-md">
-              <div className="flex items-center justify-between">
-                <span className="font-kicker text-kicker font-bold tracking-widest text-secondary-container uppercase">
-                  HÜCUM DİNAMİĞİ
-                </span>
-                <span className="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">bolt</span>
-              </div>
-              <h3 className="font-headline text-headline-sm font-bold uppercase">
-                Ölümcül Karadeniz Üçlüsü
-              </h3>
-              <p className="font-body text-body-sm text-on-primary/80">
-                {playerName}, Višća ve Nwakaeme aynı 11&apos;de çıktığında maç başı 2.35 gol
-                ortalaması ve %76 galibiyet oranı.
-              </p>
-              <div className="mt-space-xs grid grid-cols-2 gap-space-sm">
-                <div className="bg-primary-container/60 p-space-sm">
-                  <span className="font-kicker block text-kicker text-secondary-fixed-dim uppercase">
-                    Gol Ort.
-                  </span>
-                  <span className="font-headline text-headline-md font-extrabold">2.35</span>
-                </div>
-                <div className="bg-primary-container/60 p-space-sm">
-                  <span className="font-kicker block text-kicker text-secondary-fixed-dim uppercase">
-                    Galibiyet
-                  </span>
-                  <span className="font-headline text-headline-md font-extrabold">%76</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-              <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-                KADRO İÇİ RAKİP / PAYLAŞIM
+        {isLoading ? (
+          <p className="font-body text-body-sm text-on-surface-variant">Kadro verisi yükleniyor...</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-space-sm">
+            <div className="bg-surface-container-low p-space-sm">
+              <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
+                Piyasa Değeri
               </span>
-              <div className="flex flex-col gap-space-sm">
-                {rivalForwards.map((rival) => (
-                  <div
-                    key={rival.name}
-                    className="flex items-center justify-between gap-space-sm bg-surface-container-low p-space-sm"
-                  >
-                    <div className="flex items-center gap-space-sm">
-                      <div className="flex h-10 w-10 items-center justify-center bg-primary-container font-bold text-on-primary">
-                        {rival.initials}
-                      </div>
-                      <div>
-                        <span className="font-headline block text-sm font-bold text-primary">
-                          {rival.name}
-                        </span>
-                        <span className="font-body text-body-sm text-on-surface-variant">
-                          {rival.line}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="material-symbols-outlined text-outline">compare_arrows</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <PlayerCareerArchive
-              playerId={playerId}
-              positionAbbreviation={positionAbbreviation}
-            />
-
-            <div className="flex flex-col gap-space-sm bg-surface-container p-space-md shadow-sm">
-              <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-                SONRAKİ RANDEVU
+              <span className="font-headline block text-headline-sm font-bold text-primary">
+                {player.marketValue != null
+                  ? formatMarketValue(player.marketValue)
+                  : '—'}
               </span>
-              <h3 className="font-headline text-headline-sm font-bold text-primary uppercase">
-                Papara Park&apos;ta Fırtına
-              </h3>
-              <p className="font-body text-body-sm text-on-surface-variant">
-                Trabzonspor vs Galatasaray • Süper Lig • Cumartesi 20:00
-              </p>
+              <span className="font-body mt-1 block text-[12px] text-on-surface-variant">
+                Grup ort.{' '}
+                {marketAvg != null ? formatMarketValue(Math.round(marketAvg)) : '—'}
+              </span>
+            </div>
+            <div className="bg-surface-container-low p-space-sm">
+              <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
+                Ortalama Puan
+              </span>
+              <span className="font-headline block text-headline-sm font-bold text-primary">
+                {player.ratingCount > 0 ? formatRating(player.averageRating) : '—'}
+              </span>
+              <span className="font-body mt-1 block text-[12px] text-on-surface-variant">
+                Grup ort. {ratingAvg != null ? formatRating(ratingAvg) : '—'}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
+        <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
+          KADRO İÇİ RAKİP / PAYLAŞIM
+        </span>
+
+        {isLoading ? (
+          <p className="font-body text-body-sm text-on-surface-variant">Rakipler yükleniyor...</p>
+        ) : rivals.length === 0 ? (
+          <p className="font-body text-body-sm text-on-surface-variant">
+            Aynı pozisyon grubunda başka oyuncu bulunmuyor.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-space-sm">
+            {rivals.map((rival) => (
               <Link
-                to="/kadrolar"
-                className="font-label mt-space-xs inline-flex items-center gap-1 text-label-md font-bold tracking-wider text-primary uppercase hover:text-secondary"
+                key={rival.id}
+                to={`/oyuncular/${rival.id}`}
+                className="flex items-center justify-between gap-space-sm bg-surface-container-low p-space-sm transition-colors hover:bg-surface-container"
               >
-                Kadronu Kur
-                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                <div className="flex items-center gap-space-sm">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-primary-container font-headline text-sm font-bold text-on-primary">
+                    {rival.shirtNumber != null ? rival.shirtNumber : '—'}
+                  </div>
+                  <div>
+                    <span className="font-headline block text-sm font-bold text-primary">
+                      {rival.name}
+                    </span>
+                    <span className="font-body text-body-sm text-on-surface-variant">
+                      {formatRivalLine(rival, group)}
+                    </span>
+                  </div>
+                </div>
+                <span className="material-symbols-outlined text-outline">compare_arrows</span>
               </Link>
-            </div>
-          </aside>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <PlayerCareerArchive
+        playerId={player.id}
+        positionAbbreviation={player.positionAbbreviation}
+      />
+    </aside>
   )
 }

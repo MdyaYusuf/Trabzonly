@@ -128,11 +128,7 @@ export function PlayerDetailPage() {
             <PlayerCommentsSection playerName={player.name} />
           </div>
 
-          <PlayerDetailSidebar
-            playerId={player.id}
-            playerName={player.name}
-            positionAbbreviation={player.positionAbbreviation}
-          />
+          <PlayerDetailSidebar player={player} />
         </div>
       </div>
     </main>
