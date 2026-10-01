@@ -14,6 +14,7 @@ using Api.Core.Helpers;
 using Api.Features.Posts;
 using Api.Features.Squads;
 using Api.Features.Metrics;
+using Api.Features.Polls;
 
 namespace Api.Data;
 
@@ -45,6 +46,9 @@ public class BaseDbContext : DbContext
   public DbSet<SquadRating> SquadRatings { get; set; }
   public DbSet<PlayerRating> PlayerRatings { get; set; }
   public DbSet<Metric> Metrics { get; set; }
+  public DbSet<Poll> Polls { get; set; }
+  public DbSet<PollOption> PollOptions { get; set; }
+  public DbSet<PollVote> PollVotes { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

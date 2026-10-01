@@ -15,6 +15,7 @@ using Api.Features.Roles;
 using Api.Features.Seasons;
 using Api.Features.Users;
 using Api.Features.Metrics;
+using Api.Features.Polls;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +56,7 @@ builder.Services.AddPositionDependencies();
 builder.Services.AddSeasonDependencies();
 builder.Services.AddPlayerStatsDependencies();
 builder.Services.AddMetricsDependencies();
+builder.Services.AddPollDependencies();
 
 builder.Services.Configure<TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));

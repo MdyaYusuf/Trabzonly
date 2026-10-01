@@ -6,6 +6,7 @@ import { formatMarketValue } from '../utils/formatMarketValue'
 import { positionGroupFromAbbreviation } from '../utils/mapPlayerToCardData'
 import type { PositionGroup } from '../utils/playerDirectoryTypes'
 import { PlayerCareerArchive } from './PlayerCareerArchive'
+import { PlayerPollCard } from './PlayerPollCard'
 
 type PlayerDetailSidebarProps = {
   player: PlayerResponseDto
@@ -137,6 +138,8 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
 
   return (
     <aside className="flex flex-col gap-space-lg lg:col-span-4">
+      <PlayerPollCard playerId={player.id} playerName={player.name} />
+
       <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
         <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
           POZİSYON BAĞLAMI · {groupLabel}
