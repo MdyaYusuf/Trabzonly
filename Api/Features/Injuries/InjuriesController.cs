@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Api.Core.Controllers;
 using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +13,19 @@ public class InjuriesController(IInjuryService _injuryService) : CustomBaseContr
   [HttpGet]
   public async Task<IActionResult> GetAll(
     [FromQuery] PaginationRequest pagination,
+    [FromQuery] int? playerId = null,
     CancellationToken cancellationToken = default)
   {
+    Expression<Func<Injury, bool>>? filter = null;
+
+    if (playerId.HasValue)
+    {
+      int resolvedPlayerId = playerId.Value;
+      filter = injury => injury.PlayerId == resolvedPlayerId;
+    }
+
     var result = await _injuryService.GetAllAsync(
+      filter: filter,
       pageNumber: pagination.PageNumber,
       pageSize: pagination.PageSize,
       cancellationToken: cancellationToken);

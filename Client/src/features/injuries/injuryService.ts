@@ -9,11 +9,19 @@ import type {
 
 const API_URL = '/injuries';
 
-const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedResponse<InjuryResponseDto>>> => {
+const getAll = async (
+  pagination: PaginationRequest,
+  playerId?: number,
+): Promise<ApiResponse<PagedResponse<InjuryResponseDto>>> => {
   const queryParams = new URLSearchParams({
     pageNumber: pagination.pageNumber.toString(),
     pageSize: pagination.pageSize.toString(),
   });
+
+  if (playerId != null) {
+    queryParams.append('playerId', playerId.toString());
+  }
+
   return await apiClient<PagedResponse<InjuryResponseDto>>(`${API_URL}?${queryParams}`);
 };
 

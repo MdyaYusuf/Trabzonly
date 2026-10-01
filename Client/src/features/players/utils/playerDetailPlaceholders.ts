@@ -1,14 +1,5 @@
 export type CommentSort = 'liked' | 'newest' | 'analysis'
 
-export type Injury = {
-  title: string
-  detail: string
-  duration: string
-  recovered: string
-  accent: boolean
-  icon: string
-}
-
 export type CareerClub = {
   club: string
   years: string
@@ -38,33 +29,6 @@ export type PlaceholderComment = {
     body: string
   }
 }
-
-export const injuries: Injury[] = [
-  {
-    title: 'Uyluk Gerilmesi (Hamstring Strain)',
-    detail: 'Süper Lig 9. Hafta sonrasında antrenmanda hafif zorlanma.',
-    duration: '12 Gün (2 Maç Kaçırdı)',
-    recovered: 'Ekim 2024 - İyileşti',
-    accent: true,
-    icon: 'healing',
-  },
-  {
-    title: 'Ayak Bileği Burkulması',
-    detail: 'SC Braga döneminde maç içi darbe kaynaklı hafif esneme.',
-    duration: '8 Gün (1 Maç Kaçırdı)',
-    recovered: 'Ocak 2024 - İyileşti',
-    accent: false,
-    icon: 'personal_injury',
-  },
-  {
-    title: 'Kas Yorgunluğu & Aşırı Yükleme',
-    detail: 'Sezon başı kamp yüklemesi tedbir amaçlı dinlendirme.',
-    duration: '5 Gün (0 Maç)',
-    recovered: 'Ağustos 2023 - İyileşti',
-    accent: false,
-    icon: 'vital_signs',
-  },
-]
 
 export const careerClubs: CareerClub[] = [
   { club: 'SC Braga', years: '2022 — 2024', record: '41 Gol / 68 Maç' },
