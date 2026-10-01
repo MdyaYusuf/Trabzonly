@@ -27,6 +27,14 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
       .HasMaxLength(1000)
       .IsRequired();
 
+    builder.Property(c => c.LikeCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
+    builder.Property(c => c.DislikeCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
     builder.HasOne(c => c.User)
       .WithMany(u => u.Comments)
       .HasForeignKey(c => c.UserId)

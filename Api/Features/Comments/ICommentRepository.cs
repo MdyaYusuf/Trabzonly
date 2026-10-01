@@ -11,6 +11,7 @@ public interface ICommentRepository : IRepository<Comment, Guid>
     DateTime? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
+    Func<IQueryable<Comment>, IOrderedQueryable<Comment>>? orderBy = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default

@@ -9,7 +9,6 @@ public class EfCommentRepository : EfBaseRepository<BaseDbContext, Comment, Guid
 {
   public EfCommentRepository(BaseDbContext context) : base(context)
   {
-
   }
 
   public async Task<List<Comment>> GetRecentCommentsAsync(
@@ -18,6 +17,7 @@ public class EfCommentRepository : EfBaseRepository<BaseDbContext, Comment, Guid
     DateTime? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
+    Func<IQueryable<Comment>, IOrderedQueryable<Comment>>? orderBy = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
@@ -34,16 +34,19 @@ public class EfCommentRepository : EfBaseRepository<BaseDbContext, Comment, Guid
       query = include(query);
     }
 
+    query = query.Where(c => c.IsApproved);
+
     if (lastDateCursor.HasValue && lastIdCursor.HasValue)
     {
       query = query.Where(c => c.CreatedDate < lastDateCursor ||
                               (c.CreatedDate == lastDateCursor && c.Id.CompareTo(lastIdCursor.Value) < 0));
     }
 
-    return await query
-      .Where(c => c.IsApproved)
-      .OrderByDescending(c => c.CreatedDate)
-      .ThenByDescending(c => c.Id)
+    IOrderedQueryable<Comment> orderedQuery = orderBy != null
+      ? orderBy(query)
+      : query.OrderByDescending(c => c.CreatedDate).ThenByDescending(c => c.Id);
+
+    return await orderedQuery
       .Take(count)
       .ToListAsync(cancellationToken);
   }

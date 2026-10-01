@@ -125,7 +125,7 @@ export function PlayerDetailPage() {
           <div className="flex flex-col gap-space-xl lg:col-span-8">
             <PlayerSeasonStatsSection player={player} />
             <PlayerInjurySection playerId={player.id} />
-            <PlayerCommentsSection playerName={player.name} />
+            <PlayerCommentsSection playerId={player.id} playerName={player.name} />
           </div>
 
           <PlayerDetailSidebar player={player} />

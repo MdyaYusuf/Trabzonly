@@ -13,6 +13,7 @@ public interface ICommentService
     int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
+    Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<CursorPagedResponse<CommentResponseDto>>> GetRecentCommentsAsync(
@@ -21,14 +22,17 @@ public interface ICommentService
     DateTime? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
+    Func<IQueryable<Comment>, IOrderedQueryable<Comment>>? orderBy = null,
     bool enableTracking = false,
     bool withDeleted = false,
+    Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<CommentResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
     bool enableTracking = false,
+    Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<CreatedCommentResponseDto>> AddAsync(
@@ -47,5 +51,11 @@ public interface ICommentService
     Guid id,
     Guid currentUserId,
     string userRole,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<CommentReactionResponseDto>> ReactAsync(
+    Guid commentId,
+    Guid currentUserId,
+    CommentReactionType reactionType,
     CancellationToken cancellationToken = default);
 }

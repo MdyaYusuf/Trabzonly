@@ -16,6 +16,8 @@ public class Comment : Entity<Guid>
 
   public required string Content { get; set; }
   public bool IsApproved { get; set; } = true;
+  public int LikeCount { get; set; } = 0;
+  public int DislikeCount { get; set; } = 0;
 
   // Navigation properties
   public Guid UserId { get; set; }
@@ -27,4 +29,5 @@ public class Comment : Entity<Guid>
   public Guid? ParentCommentId { get; set; }
   public virtual Comment? ParentComment { get; set; }
   public virtual ICollection<Comment> Replies { get; set; } = new List<Comment>();
+  public virtual ICollection<CommentReaction> Reactions { get; set; } = new List<CommentReaction>();
 }
