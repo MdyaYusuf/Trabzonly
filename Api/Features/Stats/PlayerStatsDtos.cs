@@ -11,7 +11,6 @@ public sealed record PlayerStatsResponseDto(
   int YellowCards,
   int RedCards,
   int CleanSheets,
-  int Saves,
   int GoalsConceded,
   Guid PlayerId,
   string PlayerName,
@@ -35,7 +34,6 @@ public sealed record CreatePlayerStatsRequest(
   int YellowCards,
   int RedCards,
   int CleanSheets,
-  int Saves,
   int GoalsConceded,
   Guid PlayerId,
   Guid SeasonId);
@@ -50,7 +48,6 @@ public sealed record UpdatePlayerStatsRequest(
   int YellowCards,
   int RedCards,
   int CleanSheets,
-  int Saves,
   int GoalsConceded,
   Guid PlayerId,
   Guid SeasonId);

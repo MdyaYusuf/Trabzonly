@@ -276,24 +276,6 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
             </p>
           </div>
           <div>
-            <label htmlFor="saves" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Kurtarış
-            </label>
-            <input
-              id="saves"
-              type="number"
-              min={0}
-              className={inputClass}
-              value={draft.saves}
-              onChange={(event) => {
-                onChange('saves', event.target.value)
-              }}
-            />
-            <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-              Toplam başarılı kurtarış
-            </p>
-          </div>
-          <div>
             <label htmlFor="conceded" className="font-label mb-1 block text-label-md text-on-surface-variant">
               Yediği Gol
             </label>

@@ -78,14 +78,12 @@ export function PlayerDirectoryHero({
             >
               <div className="z-10 flex flex-1 flex-col justify-between p-space-lg">
                 <div className="flex flex-col gap-space-xs">
-                  <div className="flex flex-wrap items-center gap-space-xs">
-                    <span className="bg-primary-container px-space-xs py-0.5 font-kicker text-kicker font-bold tracking-widest text-on-primary uppercase">
-                      EN DEĞERLİ
-                    </span>
-                    <span className="font-kicker text-kicker font-bold text-secondary uppercase">
-                      {topValued.positionLabel} • #{topValued.number || '—'}
-                    </span>
-                  </div>
+                  <span className="w-fit bg-primary-container px-space-xs py-0.5 font-kicker text-kicker font-bold tracking-widest text-on-primary uppercase">
+                    EN DEĞERLİ
+                  </span>
+                  <span className="font-kicker text-kicker font-bold text-secondary uppercase">
+                    {topValued.positionLabel} • #{topValued.number || '—'}
+                  </span>
                   <h3 className="font-headline mt-1 text-headline-md font-bold tracking-tight text-primary uppercase transition-colors group-hover:text-secondary">
                     {topValued.name}
                   </h3>
@@ -134,14 +132,12 @@ export function PlayerDirectoryHero({
             >
               <div className="z-10 flex flex-1 flex-col justify-between p-space-lg">
                 <div className="flex flex-col gap-space-xs">
-                  <div className="flex flex-wrap items-center gap-space-xs">
-                    <span className="bg-secondary px-space-xs py-0.5 font-kicker text-kicker font-bold tracking-widest text-on-secondary uppercase">
-                      EN ÇOK YORUMLANAN
-                    </span>
-                    <span className="font-kicker text-kicker font-bold text-primary uppercase">
-                      {mostCommented.positionLabel} • #{mostCommented.number || '—'}
-                    </span>
-                  </div>
+                  <span className="w-fit bg-secondary px-space-xs py-0.5 font-kicker text-kicker font-bold tracking-widest text-on-secondary uppercase">
+                    EN ÇOK YORUMLANAN
+                  </span>
+                  <span className="font-kicker text-kicker font-bold text-primary uppercase">
+                    {mostCommented.positionLabel} • #{mostCommented.number || '—'}
+                  </span>
                   <h3 className="font-headline mt-1 text-headline-md font-bold tracking-tight text-primary uppercase transition-colors group-hover:text-secondary">
                     {mostCommented.name}
                   </h3>

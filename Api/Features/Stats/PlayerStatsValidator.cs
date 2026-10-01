@@ -31,9 +31,6 @@ public class CreatePlayerStatsRequestValidator : AbstractValidator<CreatePlayerS
     RuleFor(s => s.CleanSheets)
       .GreaterThanOrEqualTo(0).WithMessage("Gol yemeden bitirilen maç sayısı 0'dan küçük olamaz.");
 
-    RuleFor(s => s.Saves)
-      .GreaterThanOrEqualTo(0).WithMessage("Kurtarış sayısı 0'dan küçük olamaz.");
-
     RuleFor(s => s.GoalsConceded)
       .GreaterThanOrEqualTo(0).WithMessage("Yenilen gol sayısı 0'dan küçük olamaz.");
 
@@ -76,9 +73,6 @@ public class UpdatePlayerStatsRequestValidator : AbstractValidator<UpdatePlayerS
 
     RuleFor(s => s.CleanSheets)
       .GreaterThanOrEqualTo(0).WithMessage("Gol yemeden bitirilen maç sayısı 0'dan küçük olamaz.");
-
-    RuleFor(s => s.Saves)
-      .GreaterThanOrEqualTo(0).WithMessage("Kurtarış sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.GoalsConceded)
       .GreaterThanOrEqualTo(0).WithMessage("Yenilen gol sayısı 0'dan küçük olamaz.");

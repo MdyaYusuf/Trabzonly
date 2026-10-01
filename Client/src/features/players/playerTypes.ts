@@ -5,7 +5,6 @@ export interface PlayerSeasonStatsDto {
   goals: number
   assists: number
   cleanSheets: number
-  saves: number
 }
 
 export interface PlayerResponseDto {

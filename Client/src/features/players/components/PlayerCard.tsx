@@ -20,17 +20,17 @@ type PlayerCardProps = {
 
 export function PlayerCard({ player }: PlayerCardProps) {
   return (
-    <article className="group relative flex flex-col overflow-hidden bg-surface-container-lowest shadow-sm transition-shadow hover:shadow-md">
+    <article className="group relative flex h-full flex-col overflow-hidden bg-surface-container-lowest shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between p-space-md pb-0">
-        <div className="flex items-center gap-space-xs">
-          <span className="font-headline flex h-7 w-7 items-center justify-center bg-primary-container text-body-md font-black text-on-primary">
+        <div className="flex min-w-0 items-center gap-space-xs">
+          <span className="font-headline flex h-7 w-7 shrink-0 items-center justify-center bg-primary-container text-body-md font-black text-on-primary">
             {player.number}
           </span>
-          <span className="bg-surface-container px-2 py-0.5 font-kicker text-kicker font-bold text-primary uppercase">
+          <span className="truncate bg-surface-container px-2 py-0.5 font-kicker text-kicker font-bold text-primary uppercase">
             {player.positionCode} • {player.positionLabel}
           </span>
         </div>
-        <div className="flex items-center gap-1 bg-surface-container-low px-2 py-0.5">
+        <div className="flex shrink-0 items-center gap-1 bg-surface-container-low px-2 py-0.5">
           <span
             className="material-symbols-outlined text-body-md text-tertiary-fixed-dim"
             style={{ fontVariationSettings: "'FILL' 1" }}
@@ -43,7 +43,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
         </div>
       </div>
 
-      <div className="relative mt-space-xs h-56 w-full overflow-hidden bg-surface-container">
+      <div className="relative mt-space-xs h-56 w-full shrink-0 overflow-hidden bg-surface-container">
         <div className={`absolute inset-0 bg-gradient-to-br ${player.tone}`} />
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="font-display text-5xl font-extrabold text-white/15">
@@ -63,21 +63,25 @@ export function PlayerCard({ player }: PlayerCardProps) {
 
       <div className="flex flex-1 flex-col justify-between p-space-md">
         <div>
-          <div className="flex items-baseline justify-between gap-2">
-            <h3 className="font-headline text-headline-sm font-bold text-primary transition-colors group-hover:text-secondary">
+          <div className="min-h-[3.75rem]">
+            <h3 className="font-headline line-clamp-2 text-headline-sm font-bold text-primary transition-colors group-hover:text-secondary">
               {player.name}
             </h3>
-            <span className="font-kicker shrink-0 text-kicker font-bold text-secondary uppercase">
+            <span className="font-kicker mt-0.5 block truncate text-kicker font-bold text-secondary uppercase">
               {player.nationality}
             </span>
           </div>
-          <p className="font-body mt-1 text-body-sm text-on-surface-variant">
+          <p className="font-body mt-0.5 truncate text-body-sm text-on-surface-variant">
             {player.age} Yaşında • {player.height} • {player.note}
           </p>
-          <div className="my-space-sm grid grid-cols-3 gap-1 bg-surface-container-low p-space-xs text-center">
+          <div
+            className={`my-space-sm grid gap-1 bg-surface-container-low p-space-xs text-center ${
+              player.stats.length === 2 ? 'grid-cols-2' : 'grid-cols-3'
+            }`}
+          >
             {player.stats.map((stat) => (
-              <div key={stat.label}>
-                <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
+              <div key={stat.label} className="min-w-0">
+                <span className="font-kicker block truncate text-kicker whitespace-nowrap text-on-surface-variant uppercase">
                   {stat.label}
                 </span>
                 <span className="font-headline text-label-md font-bold text-primary">

@@ -30,26 +30,17 @@ export function positionGroupFromAbbreviation(abbreviation: string): PositionGro
 function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
   const stats = player.currentSeasonStats
   const group = positionGroupFromAbbreviation(player.positionAbbreviation)
-  const appearances = String(stats?.appearances ?? 0)
+  const minutes = String(stats?.minutesPlayed ?? 0)
 
-  if (group === 'gk') {
+  if (group === 'gk' || group === 'def') {
     return [
-      { label: 'Maç', value: appearances },
-      { label: 'Golsüz Maç', value: String(stats?.cleanSheets ?? 0) },
-      { label: 'Kurtarış', value: String(stats?.saves ?? 0) },
-    ]
-  }
-
-  if (group === 'def') {
-    return [
-      { label: 'Maç', value: appearances },
-      { label: 'Dakika', value: String(stats?.minutesPlayed ?? 0) },
+      { label: 'Dakika', value: minutes },
       { label: 'Golsüz Maç', value: String(stats?.cleanSheets ?? 0) },
     ]
   }
 
   return [
-    { label: 'Maç', value: appearances },
+    { label: 'Dakika', value: minutes },
     { label: 'Gol', value: String(stats?.goals ?? 0) },
     { label: 'Asist', value: String(stats?.assists ?? 0) },
   ]

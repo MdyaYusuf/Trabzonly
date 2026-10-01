@@ -504,8 +504,7 @@ public class PlayerService(
           stats.MinutesPlayed,
           stats.Goals,
           stats.Assists,
-          stats.CleanSheets,
-          stats.Saves);
+          stats.CleanSheets);
       }
 
       return mapped with

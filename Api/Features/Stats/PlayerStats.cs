@@ -21,7 +21,6 @@ public class PlayerStats : Entity<Guid>
   public int YellowCards { get; set; }
   public int RedCards { get; set; }
   public int CleanSheets { get; set; }
-  public int Saves { get; set; }
   public int GoalsConceded { get; set; }
 
   // Navigation properties

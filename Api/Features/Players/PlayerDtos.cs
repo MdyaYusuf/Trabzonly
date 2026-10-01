@@ -8,8 +8,7 @@ public sealed record PlayerSeasonStatsDto(
   int MinutesPlayed,
   int Goals,
   int Assists,
-  int CleanSheets,
-  int Saves);
+  int CleanSheets);
 
 public sealed record PlayerResponseDto(
   Guid Id,

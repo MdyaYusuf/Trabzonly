@@ -23,7 +23,6 @@ export type AdminStatisticListRow = {
   yellowCards: number
   redCards: number
   cleanSheets: number | null
-  saves: number | null
   goalsConceded: number | null
   isVerified?: boolean
   initials: string
@@ -47,7 +46,6 @@ export type AdminStatisticFormDraft = {
   yellowCards: string
   redCards: string
   cleanSheets: string
-  saves: string
   goalsConceded: string
   minutesPerGoalLabel: string
   minutesPerGoalNote: string

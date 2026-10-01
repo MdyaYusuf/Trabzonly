@@ -9,7 +9,6 @@ export interface PlayerStatsResponseDto {
   yellowCards: number;
   redCards: number;
   cleanSheets: number;
-  saves: number;
   goalsConceded: number;
   playerId: string;
   playerName: string;
@@ -35,7 +34,6 @@ export interface CreatePlayerStatsRequest {
   yellowCards: number;
   redCards: number;
   cleanSheets: number;
-  saves: number;
   goalsConceded: number;
   playerId: string;
   seasonId: string;
@@ -51,7 +49,6 @@ export interface UpdatePlayerStatsRequest {
   yellowCards: number;
   redCards: number;
   cleanSheets: number;
-  saves: number;
   goalsConceded: number;
   playerId: string;
   seasonId: string;

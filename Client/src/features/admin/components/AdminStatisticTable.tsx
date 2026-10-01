@@ -40,7 +40,6 @@ export function AdminStatisticTable({ rows }: AdminStatisticTableProps) {
             <th className="px-space-sm py-space-sm">Sarı</th>
             <th className="px-space-sm py-space-sm">Kırmızı</th>
             <th className="px-space-sm py-space-sm">Clean Sheet</th>
-            <th className="px-space-sm py-space-sm">Kurtarış</th>
             <th className="px-space-sm py-space-sm">Yediği</th>
             <th className="px-space-sm py-space-sm">İşlemler</th>
           </tr>
@@ -110,9 +109,6 @@ export function AdminStatisticTable({ rows }: AdminStatisticTableProps) {
               </td>
               <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
                 {row.cleanSheets !== null ? `${row.cleanSheets} Maç` : '—'}
-              </td>
-              <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
-                {dashOrValue(row.saves)}
               </td>
               <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
                 {dashOrValue(row.goalsConceded)}
