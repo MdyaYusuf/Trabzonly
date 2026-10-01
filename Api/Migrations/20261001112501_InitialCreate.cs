@@ -117,7 +117,6 @@ namespace Trabzonly.Api.Migrations
                     Nationality = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Height = table.Column<int>(type: "int", nullable: true),
-                    Weight = table.Column<int>(type: "int", nullable: true),
                     PreferredFoot = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     MarketValue = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Wage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
@@ -128,6 +127,8 @@ namespace Trabzonly.Api.Migrations
                     AverageRating = table.Column<decimal>(type: "decimal(4,2)", precision: 4, scale: 2, nullable: false, defaultValue: 0m),
                     RatingCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDomestic = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsCaptain = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)

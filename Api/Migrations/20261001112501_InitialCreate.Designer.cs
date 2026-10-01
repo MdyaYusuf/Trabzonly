@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Trabzonly.Api.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20260929113206_InitialCreate")]
+    [Migration("20261001112501_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -226,6 +226,16 @@ namespace Trabzonly.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsCaptain")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDomestic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<decimal?>("MarketValue")
                         .HasColumnType("decimal(18,2)");
 
@@ -261,9 +271,6 @@ namespace Trabzonly.Api.Migrations
 
                     b.Property<decimal?>("Wage")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("Weight")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

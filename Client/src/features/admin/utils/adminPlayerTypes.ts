@@ -63,7 +63,6 @@ export type AdminPlayerFormDraft = {
   preferredFoot: 'right' | 'left' | 'both'
   isActiveInSquad: boolean
   heightCm: string
-  weightKg: string
   primaryPosition: string
   secondaryPosition: string
   currentSquad: string

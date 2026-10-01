@@ -33,11 +33,6 @@ public class CreatePlayerRequestValidator : AbstractValidator<CreatePlayerReques
       .When(p => p.Height.HasValue)
       .WithMessage("Boy 0'dan büyük olmalıdır.");
 
-    RuleFor(p => p.Weight)
-      .GreaterThan(0)
-      .When(p => p.Weight.HasValue)
-      .WithMessage("Kilo 0'dan büyük olmalıdır.");
-
     RuleFor(p => p.MarketValue)
       .GreaterThanOrEqualTo(0)
       .When(p => p.MarketValue.HasValue)
@@ -87,10 +82,6 @@ public class UpdatePlayerRequestValidator : AbstractValidator<UpdatePlayerReques
     RuleFor(p => p.Height)
       .GreaterThan(0).When(p => p.Height.HasValue)
       .WithMessage("Boy 0'dan büyük olmalıdır.");
-
-    RuleFor(p => p.Weight)
-      .GreaterThan(0).When(p => p.Weight.HasValue)
-      .WithMessage("Kilo 0'dan büyük olmalıdır.");
 
     RuleFor(p => p.MarketValue)
       .GreaterThanOrEqualTo(0).When(p => p.MarketValue.HasValue)

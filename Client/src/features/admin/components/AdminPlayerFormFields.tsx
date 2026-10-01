@@ -196,22 +196,6 @@ export function AdminPlayerFormFields({ draft, onChange }: AdminPlayerFormFields
             </div>
           </div>
           <div>
-            <FieldLabel htmlFor="weightKg">Kilo (kg)</FieldLabel>
-            <div className="relative">
-              <input
-                id="weightKg"
-                className={`${inputClass} pr-14`}
-                value={draft.weightKg}
-                onChange={(event) => {
-                  onChange('weightKg', event.target.value)
-                }}
-              />
-              <span className="font-kicker absolute top-1/2 right-3 -translate-y-1/2 text-kicker text-on-surface-variant">
-                KG
-              </span>
-            </div>
-          </div>
-          <div>
             <FieldLabel htmlFor="primaryPosition" required>
               Birincil Pozisyon
             </FieldLabel>

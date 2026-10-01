@@ -15,7 +15,6 @@ export interface PlayerResponseDto {
   dateOfBirth: string
   age: number
   height?: number
-  weight?: number
   preferredFoot: string
   marketValue?: number
   wage?: number
@@ -90,7 +89,6 @@ export interface CreatePlayerRequest {
   nationality: string
   dateOfBirth: string
   height?: number
-  weight?: number
   preferredFoot: string
   marketValue?: number
   wage?: number

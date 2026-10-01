@@ -24,7 +24,6 @@ public class Player : Entity<Guid>
   public required string Nationality { get; set; }
   public DateTime DateOfBirth { get; set; }
   public int? Height { get; set; }
-  public int? Weight { get; set; }
   public required string PreferredFoot { get; set; }
   public decimal? MarketValue { get; set; }
   public decimal? Wage { get; set; }

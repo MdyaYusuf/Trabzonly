@@ -223,6 +223,16 @@ namespace Trabzonly.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsCaptain")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDomestic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<decimal?>("MarketValue")
                         .HasColumnType("decimal(18,2)");
 
@@ -258,9 +268,6 @@ namespace Trabzonly.Api.Migrations
 
                     b.Property<decimal?>("Wage")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("Weight")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
