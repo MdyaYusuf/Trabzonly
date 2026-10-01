@@ -5,10 +5,15 @@ export interface PlayerSeasonStatsDto {
   goals: number
   assists: number
   cleanSheets: number
+  yellowCards: number
+  redCards: number
+  goalsConceded: number
+  team: string
+  seasonName: string
 }
 
 export interface PlayerResponseDto {
-  id: string
+  id: number
   name: string
   nationality: string
   dateOfBirth: string
@@ -44,13 +49,13 @@ export interface PlayerRosterOverviewDto {
 }
 
 export interface CreatedPlayerResponseDto {
-  id: string
+  id: number
   name: string
   imageUrl?: string
 }
 
 export interface PlayerPreviewDto {
-  id: string
+  id: number
   name: string
   nationality: string
   age: number
@@ -64,7 +69,7 @@ export interface PlayerPreviewDto {
 }
 
 export interface PlayerRatingResponseDto {
-  playerId: string
+  playerId: number
   score: number
   averageRating: number
   ratingCount: number
@@ -101,7 +106,7 @@ export interface CreatePlayerRequest {
 }
 
 export interface UpdatePlayerRequest extends CreatePlayerRequest {
-  id: string
+  id: number
   isActive: boolean
 }
 

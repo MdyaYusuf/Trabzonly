@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Stats;
 
-public class EfPlayerStatsRepository : EfBaseRepository<BaseDbContext, PlayerStats, Guid>, IPlayerStatsRepository
+public class EfPlayerStatsRepository : EfBaseRepository<BaseDbContext, PlayerStats, int>, IPlayerStatsRepository
 {
   public EfPlayerStatsRepository(BaseDbContext context) : base(context)
   {
@@ -14,7 +14,7 @@ public class EfPlayerStatsRepository : EfBaseRepository<BaseDbContext, PlayerSta
   public async Task<List<PlayerStats>> GetTopScorersAsync(
     int count,
     int? lastValueCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -42,7 +42,7 @@ public class EfPlayerStatsRepository : EfBaseRepository<BaseDbContext, PlayerSta
   public async Task<List<PlayerStats>> GetTopAssistersAsync(
     int count,
     int? lastValueCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

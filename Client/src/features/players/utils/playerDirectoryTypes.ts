@@ -8,7 +8,7 @@ export type PlayerCardStat = {
 }
 
 export type PlayerCardData = {
-  id: string
+  id: number
   number: number
   name: string
   nationality: string

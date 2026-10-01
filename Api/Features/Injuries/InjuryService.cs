@@ -47,7 +47,7 @@ public class InjuryService(
   }
 
   public async Task<ReturnModel<InjuryResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Injury>, IQueryable<Injury>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -148,7 +148,7 @@ public class InjuryService(
   }
 
   public async Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default)
   {

@@ -16,7 +16,7 @@ public interface IInjuryService
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<InjuryResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Injury>, IQueryable<Injury>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
@@ -32,7 +32,7 @@ public interface IInjuryService
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default);
 }

@@ -29,9 +29,9 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
-  [HttpGet("{id:guid}")]
+  [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _playerService.GetByIdAsync(
@@ -46,7 +46,7 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
   public async Task<IActionResult> GetTopValuedPlayers(
     int count,
     [FromQuery] decimal? lastValue = null,
-    [FromQuery] Guid? lastId = null,
+    [FromQuery] int? lastId = null,
     CancellationToken cancellationToken = default)
   {
     var result = await _playerService.GetTopValuedPlayersAsync(
@@ -107,9 +107,9 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
   }
 
   [Authorize(Roles = "Admin")]
-  [HttpDelete("{id:guid}")]
+  [HttpDelete("{id:int}")]
   public async Task<IActionResult> Delete(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _playerService.RemoveAsync(
@@ -121,9 +121,9 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
   }
 
   [Authorize]
-  [HttpPost("{id:guid}/rate")]
+  [HttpPost("{id:int}/rate")]
   public async Task<IActionResult> Rate(
-    Guid id,
+    int id,
     [FromBody] RatePlayerRequest request,
     CancellationToken cancellationToken)
   {

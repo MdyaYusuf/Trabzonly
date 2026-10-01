@@ -41,7 +41,7 @@ export const injurySlice = createSlice({
         state.injuries[index] = action.payload;
       }
     },
-    removeInjuryFromState: (state, action: PayloadAction<string>) => {
+    removeInjuryFromState: (state, action: PayloadAction<number>) => {
       state.injuries = state.injuries.filter((i) => i.id !== action.payload);
     },
     clearInjuryState: () => initialState,

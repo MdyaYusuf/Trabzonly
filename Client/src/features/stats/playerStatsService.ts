@@ -17,14 +17,14 @@ const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedR
   return await apiClient<PagedResponse<PlayerStatsResponseDto>>(`${API_URL}?${queryParams}`);
 };
 
-const getById = async (id: string): Promise<ApiResponse<PlayerStatsResponseDto>> => {
+const getById = async (id: number): Promise<ApiResponse<PlayerStatsResponseDto>> => {
   return await apiClient<PlayerStatsResponseDto>(`${API_URL}/${id}`);
 };
 
 const getTopScorers = async (
   count: number,
   lastValue?: number,
-  lastId?: string
+  lastId?: number
 ): Promise<ApiResponse<CursorPagedResponse<PlayerStatsResponseDto>>> => {
   const queryParams = new URLSearchParams();
 
@@ -33,7 +33,7 @@ const getTopScorers = async (
   }
 
   if (lastId) {
-    queryParams.append('lastId', lastId);
+    queryParams.append('lastId', lastId.toString());
   }
 
   const qs = queryParams.toString() ? `?${queryParams.toString()}` : '';
@@ -43,7 +43,7 @@ const getTopScorers = async (
 const getTopAssisters = async (
   count: number,
   lastValue?: number,
-  lastId?: string
+  lastId?: number
 ): Promise<ApiResponse<CursorPagedResponse<PlayerStatsResponseDto>>> => {
   const queryParams = new URLSearchParams();
 
@@ -52,7 +52,7 @@ const getTopAssisters = async (
   }
 
   if (lastId) {
-    queryParams.append('lastId', lastId);
+    queryParams.append('lastId', lastId.toString());
   }
 
   const qs = queryParams.toString() ? `?${queryParams.toString()}` : '';
@@ -73,7 +73,7 @@ const update = async (request: UpdatePlayerStatsRequest): Promise<ApiResponse<No
   });
 };
 
-const remove = async (id: string): Promise<ApiResponse<NoData>> => {
+const remove = async (id: number): Promise<ApiResponse<NoData>> => {
   return await apiClient<NoData>(`${API_URL}/${id}`, {
     method: 'DELETE',
   });

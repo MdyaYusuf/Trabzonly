@@ -16,7 +16,7 @@ const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedR
   return await apiClient<PagedResponse<SeasonResponseDto>>(`${API_URL}?${queryParams}`);
 };
 
-const getById = async (id: string): Promise<ApiResponse<SeasonResponseDto>> => {
+const getById = async (id: number): Promise<ApiResponse<SeasonResponseDto>> => {
   return await apiClient<SeasonResponseDto>(`${API_URL}/${id}`);
 };
 
@@ -34,7 +34,7 @@ const update = async (request: UpdateSeasonRequest): Promise<ApiResponse<NoData>
   });
 };
 
-const remove = async (id: string): Promise<ApiResponse<NoData>> => {
+const remove = async (id: number): Promise<ApiResponse<NoData>> => {
   return await apiClient<NoData>(`${API_URL}/${id}`, {
     method: 'DELETE',
   });

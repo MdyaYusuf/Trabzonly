@@ -8,7 +8,7 @@ public sealed record CommentResponseDto(
   Guid UserId,
   string AuthorUsername,
   Guid? PostId,
-  Guid? PlayerId,
+  int? PlayerId,
   Guid? ParentCommentId,
   DateTime CreatedDate);
 
@@ -21,7 +21,7 @@ public sealed record CreatedCommentResponseDto(
 public sealed record CreateCommentRequest(
   string Content,
   Guid? PostId,
-  Guid? PlayerId,
+  int? PlayerId,
   Guid? ParentCommentId);
 
 public sealed record UpdateCommentRequest(

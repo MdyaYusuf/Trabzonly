@@ -22,9 +22,9 @@ public class SeasonsController(ISeasonService _seasonService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
-  [HttpGet("{id:guid}")]
+  [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _seasonService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
@@ -61,9 +61,9 @@ public class SeasonsController(ISeasonService _seasonService) : CustomBaseContro
   }
 
   [Authorize(Roles = "Admin")]
-  [HttpDelete("{id:guid}")]
+  [HttpDelete("{id:int}")]
   public async Task<IActionResult> Delete(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _seasonService.RemoveAsync(

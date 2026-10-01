@@ -1,6 +1,6 @@
 // Responses
 export interface PlayerStatsResponseDto {
-  id: string;
+  id: number;
   team: string;
   appearances: number;
   minutesPlayed: number;
@@ -10,18 +10,18 @@ export interface PlayerStatsResponseDto {
   redCards: number;
   cleanSheets: number;
   goalsConceded: number;
-  playerId: string;
+  playerId: number;
   playerName: string;
-  seasonId: string;
+  seasonId: number;
   seasonName: string;
   createdDate: string;
 }
 
 export interface CreatedPlayerStatsResponseDto {
-  id: string;
+  id: number;
   team: string;
-  playerId: string;
-  seasonId: string;
+  playerId: number;
+  seasonId: number;
 }
 
 // Requests
@@ -35,12 +35,12 @@ export interface CreatePlayerStatsRequest {
   redCards: number;
   cleanSheets: number;
   goalsConceded: number;
-  playerId: string;
-  seasonId: string;
+  playerId: number;
+  seasonId: number;
 }
 
 export interface UpdatePlayerStatsRequest {
-  id: string;
+  id: number;
   team: string;
   appearances: number;
   minutesPlayed: number;
@@ -50,6 +50,6 @@ export interface UpdatePlayerStatsRequest {
   redCards: number;
   cleanSheets: number;
   goalsConceded: number;
-  playerId: string;
-  seasonId: string;
+  playerId: number;
+  seasonId: number;
 }

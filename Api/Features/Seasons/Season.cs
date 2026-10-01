@@ -5,7 +5,7 @@ using Api.Features.Stats;
 
 namespace Api.Features.Seasons;
 
-public class Season : Entity<Guid>
+public class Season : Entity<int>
 {
   [SetsRequiredMembers]
   public Season()

@@ -9,7 +9,7 @@ using Api.Features.Squads;
 
 namespace Api.Features.Players;
 
-public class Player : Entity<Guid>
+public class Player : Entity<int>
 {
   [SetsRequiredMembers]
   public Player()

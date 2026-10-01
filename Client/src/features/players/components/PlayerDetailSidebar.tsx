@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom'
 import {
   careerClubs,
   rivalForwards,
-  type PlayerProfile,
 } from '../utils/playerDetailPlaceholders'
 
 type PlayerDetailSidebarProps = {
-  profile: PlayerProfile
+  playerName: string
 }
 
-export function PlayerDetailSidebar({ profile }: PlayerDetailSidebarProps) {
+export function PlayerDetailSidebar({ playerName }: PlayerDetailSidebarProps) {
   const [pollChoice, setPollChoice] = useState<'yes' | 'no' | null>('yes')
 
   return (
@@ -26,7 +25,7 @@ export function PlayerDetailSidebar({ profile }: PlayerDetailSidebarProps) {
                 </span>
               </div>
               <h3 className="font-headline text-headline-sm leading-tight font-bold text-primary">
-                {profile.name}&apos;nın bonservisi sezon sonu mutlaka alınmalı mı?
+                {playerName}&apos;nın bonservisi sezon sonu mutlaka alınmalı mı?
               </h3>
               <div className="flex flex-col gap-space-sm">
                 <button
@@ -82,7 +81,7 @@ export function PlayerDetailSidebar({ profile }: PlayerDetailSidebarProps) {
                 Ölümcül Karadeniz Üçlüsü
               </h3>
               <p className="font-body text-body-sm text-on-primary/80">
-                {profile.name}, Višća ve Nwakaeme aynı 11&apos;de çıktığında maç başı 2.35 gol
+                {playerName}, Višća ve Nwakaeme aynı 11&apos;de çıktığında maç başı 2.35 gol
                 ortalaması ve %76 galibiyet oranı.
               </p>
               <div className="mt-space-xs grid grid-cols-2 gap-space-sm">

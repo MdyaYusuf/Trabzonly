@@ -5,7 +5,7 @@ namespace Api.Features.Players;
 public class PlayerBusinessRules(IPlayerRepository _playerRepository)
 {
   public async Task<Player> GetPlayerIfExistAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -43,7 +43,7 @@ public class PlayerBusinessRules(IPlayerRepository _playerRepository)
   }
 
   public async Task PlayerCannotBeDuplicatedWhenUpdatedAsync(
-    Guid id, string name, DateTime dateOfBirth, CancellationToken cancellationToken = default)
+    int id, string name, DateTime dateOfBirth, CancellationToken cancellationToken = default)
   {
     bool exists = await _playerRepository.AnyAsync(
       p => p.Id != id && p.Name == name && p.DateOfBirth == dateOfBirth, cancellationToken);

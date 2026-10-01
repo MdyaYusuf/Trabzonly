@@ -18,6 +18,6 @@ public class SquadSlot : Entity<Guid>
   public Guid SquadId { get; set; }
   public virtual Squad Squad { get; set; } = default!;
 
-  public Guid PlayerId { get; set; }
+  public int PlayerId { get; set; }
   public virtual Player Player { get; set; } = default!;
 }

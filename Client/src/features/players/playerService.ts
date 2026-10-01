@@ -67,14 +67,14 @@ const getRosterOverview = async (): Promise<ApiResponse<PlayerRosterOverviewDto>
   return await apiClient<PlayerRosterOverviewDto>(`${API_URL}/roster-overview`)
 }
 
-const getById = async (id: string): Promise<ApiResponse<PlayerResponseDto>> => {
+const getById = async (id: number): Promise<ApiResponse<PlayerResponseDto>> => {
   return await apiClient<PlayerResponseDto>(`${API_URL}/${id}`)
 }
 
 const getTopValued = async (
   count: number,
   lastValue?: number,
-  lastId?: string,
+  lastId?: number,
 ): Promise<ApiResponse<CursorPagedResponse<PlayerResponseDto>>> => {
   const queryParams = new URLSearchParams()
 
@@ -83,7 +83,7 @@ const getTopValued = async (
   }
 
   if (lastId) {
-    queryParams.append('lastId', lastId)
+    queryParams.append('lastId', lastId.toString())
   }
 
   const qs = queryParams.toString() ? `?${queryParams.toString()}` : ''
@@ -121,14 +121,14 @@ const update = async (request: UpdatePlayerRequest): Promise<ApiResponse<NoData>
   })
 }
 
-const remove = async (id: string): Promise<ApiResponse<NoData>> => {
+const remove = async (id: number): Promise<ApiResponse<NoData>> => {
   return await apiClient<NoData>(`${API_URL}/${id}`, {
     method: 'DELETE',
   })
 }
 
 const rate = async (
-  id: string,
+  id: number,
   request: RatePlayerRequest,
 ): Promise<ApiResponse<PlayerRatingResponseDto>> => {
   return await apiClient<PlayerRatingResponseDto>(`${API_URL}/${id}/rate`, {

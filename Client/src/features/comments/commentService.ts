@@ -20,7 +20,7 @@ const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedR
 const getRecent = async (
   count: number = 10,
   postId?: string,
-  playerId?: string,
+  playerId?: number,
   lastDate?: string,
   lastId?: string
 ): Promise<ApiResponse<CursorPagedResponse<CommentResponseDto>>> => {
@@ -31,7 +31,7 @@ const getRecent = async (
     queryParams.append('postId', postId);
   }
   if (playerId) {
-    queryParams.append('playerId', playerId);
+    queryParams.append('playerId', playerId.toString());
   }
   if (lastDate) {
     queryParams.append('lastDate', lastDate);

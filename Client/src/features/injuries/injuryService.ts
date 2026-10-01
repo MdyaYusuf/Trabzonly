@@ -17,7 +17,7 @@ const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedR
   return await apiClient<PagedResponse<InjuryResponseDto>>(`${API_URL}?${queryParams}`);
 };
 
-const getById = async (id: string): Promise<ApiResponse<InjuryResponseDto>> => {
+const getById = async (id: number): Promise<ApiResponse<InjuryResponseDto>> => {
   return await apiClient<InjuryResponseDto>(`${API_URL}/${id}`);
 };
 
@@ -35,7 +35,7 @@ const update = async (request: UpdateInjuryRequest): Promise<ApiResponse<NoData>
   });
 };
 
-const remove = async (id: string): Promise<ApiResponse<NoData>> => {
+const remove = async (id: number): Promise<ApiResponse<NoData>> => {
   return await apiClient<NoData>(`${API_URL}/${id}`, {
     method: 'DELETE',
   });

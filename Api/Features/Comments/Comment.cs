@@ -22,7 +22,7 @@ public class Comment : Entity<Guid>
   public virtual User User { get; set; } = default!;
   public Guid? PostId { get; set; }
   public virtual Post? Post { get; set; }
-  public Guid? PlayerId { get; set; }
+  public int? PlayerId { get; set; }
   public virtual Player? Player { get; set; }
   public Guid? ParentCommentId { get; set; }
   public virtual Comment? ParentComment { get; set; }

@@ -60,7 +60,7 @@ public class PlayerService(
   {
     int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
     int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 50);
-    Guid? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
 
     return await GetAllAsync(
       filter: BuildListFilter(query),
@@ -74,7 +74,7 @@ public class PlayerService(
   public async Task<ReturnModel<PlayerRosterOverviewDto>> GetRosterOverviewAsync(
     CancellationToken cancellationToken = default)
   {
-    Guid? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
     PlayerRosterOverviewDto overview = await _playerRepository.GetRosterOverviewAsync(
       currentSeasonId,
       cancellationToken);
@@ -89,13 +89,13 @@ public class PlayerService(
   }
 
   public async Task<ReturnModel<PlayerResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Guid? currentUserId = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
-    Guid? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
 
     Player player = await _businessRules.GetPlayerIfExistAsync(
       id,
@@ -131,13 +131,13 @@ public class PlayerService(
   public async Task<ReturnModel<CursorPagedResponse<PlayerResponseDto>>> GetTopValuedPlayersAsync(
     int count,
     decimal? lastValueCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    Guid? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
 
     List<Player> players = await _playerRepository.GetTopValuedPlayersAsync(
       count + 1,
@@ -157,7 +157,7 @@ public class PlayerService(
     {
       Items = response,
       NextCursorValue = itemsToReturn.LastOrDefault()?.MarketValue,
-      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id.ToString(),
       HasNextPage = hasNextPage
     };
 
@@ -177,7 +177,7 @@ public class PlayerService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    Guid? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
 
     List<Player> players = await _playerRepository.GetMostCommentedPlayersAsync(
       count,
@@ -204,7 +204,7 @@ public class PlayerService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    Guid? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
 
     List<Player> players = await _playerRepository.GetTopRatedPlayersAsync(
       count,
@@ -296,7 +296,7 @@ public class PlayerService(
   }
 
   public async Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default)
   {
@@ -318,7 +318,7 @@ public class PlayerService(
   }
 
   public async Task<ReturnModel<PlayerRatingResponseDto>> RateAsync(
-    Guid playerId,
+    int playerId,
     RatePlayerRequest request,
     Guid currentUserId,
     CancellationToken cancellationToken = default)
@@ -394,7 +394,7 @@ public class PlayerService(
     _playerRepository.Update(player);
   }
 
-  private async Task<Guid?> ResolveCurrentSeasonIdAsync(CancellationToken cancellationToken)
+  private async Task<int?> ResolveCurrentSeasonIdAsync(CancellationToken cancellationToken)
   {
     DateTime now = DateTime.UtcNow;
 
@@ -416,15 +416,16 @@ public class PlayerService(
     return seasons.FirstOrDefault()?.Id;
   }
 
-  private static Func<IQueryable<Player>, IQueryable<Player>> BuildDefaultInclude(Guid? currentSeasonId)
+  private static Func<IQueryable<Player>, IQueryable<Player>> BuildDefaultInclude(int? currentSeasonId)
   {
     if (currentSeasonId.HasValue)
     {
-      Guid seasonId = currentSeasonId.Value;
+      int seasonId = currentSeasonId.Value;
 
       return query => query
         .Include(p => p.Position)
-        .Include(p => p.Stats.Where(s => s.SeasonId == seasonId));
+        .Include(p => p.Stats.Where(s => s.SeasonId == seasonId))
+          .ThenInclude(s => s.Season);
     }
 
     return query => query.Include(p => p.Position);
@@ -447,7 +448,7 @@ public class PlayerService(
 
   private static Func<IQueryable<Player>, IOrderedQueryable<Player>> BuildListOrderBy(
     string? sort,
-    Guid? currentSeasonId)
+    int? currentSeasonId)
   {
     string normalized = sort?.Trim().ToLowerInvariant() ?? PlayerSortOptions.ValueDesc;
 
@@ -483,9 +484,9 @@ public class PlayerService(
       return [];
     }
 
-    List<Guid> playerIds = players.Select(p => p.Id).ToList();
+    List<int> playerIds = players.Select(p => p.Id).ToList();
 
-    Dictionary<Guid, int> commentCounts = await _playerRepository
+    Dictionary<int, int> commentCounts = await _playerRepository
       .Query(enableTracking: false)
       .Where(p => playerIds.Contains(p.Id))
       .Select(p => new { p.Id, Count = p.Comments.Count })
@@ -504,7 +505,12 @@ public class PlayerService(
           stats.MinutesPlayed,
           stats.Goals,
           stats.Assists,
-          stats.CleanSheets);
+          stats.CleanSheets,
+          stats.YellowCards,
+          stats.RedCards,
+          stats.GoalsConceded,
+          stats.Team,
+          stats.Season?.Name ?? string.Empty);
       }
 
       return mapped with

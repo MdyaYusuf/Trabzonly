@@ -5,7 +5,7 @@ using Api.Features.Seasons;
 
 namespace Api.Features.Injuries;
 
-public class Injury : Entity<Guid>
+public class Injury : Entity<int>
 {
   [SetsRequiredMembers]
   public Injury()
@@ -18,8 +18,8 @@ public class Injury : Entity<Guid>
   public int GamesMissed { get; set; }
 
   // Navigation properties
-  public Guid PlayerId { get; set; }
+  public int PlayerId { get; set; }
   public virtual Player Player { get; set; } = default!;
-  public Guid? SeasonId { get; set; }
+  public int? SeasonId { get; set; }
   public virtual Season? Season { get; set; }
 }

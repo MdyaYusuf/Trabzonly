@@ -2,33 +2,33 @@ namespace Api.Features.Injuries;
 
 // Responses
 public sealed record InjuryResponseDto(
-  Guid Id,
+  int Id,
   string Name,
   int DaysInjured,
   int GamesMissed,
-  Guid PlayerId,
+  int PlayerId,
   string PlayerName,
-  Guid? SeasonId,
+  int? SeasonId,
   string? SeasonName,
   DateTime CreatedDate);
 
 public sealed record CreatedInjuryResponseDto(
-  Guid Id,
+  int Id,
   string Name,
-  Guid PlayerId);
+  int PlayerId);
 
 // Requests
 public sealed record CreateInjuryRequest(
   string Name,
   int DaysInjured,
   int GamesMissed,
-  Guid PlayerId,
-  Guid? SeasonId);
+  int PlayerId,
+  int? SeasonId);
 
 public sealed record UpdateInjuryRequest(
-  Guid Id,
+  int Id,
   string Name,
   int DaysInjured,
   int GamesMissed,
-  Guid PlayerId,
-  Guid? SeasonId);
+  int PlayerId,
+  int? SeasonId);

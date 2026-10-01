@@ -1,20 +1,20 @@
 // Responses
 export interface InjuryResponseDto {
-  id: string;
+  id: number;
   name: string;
   daysInjured: number;
   gamesMissed: number;
-  playerId: string;
+  playerId: number;
   playerName: string;
-  seasonId?: string;
+  seasonId?: number;
   seasonName?: string;
   createdDate: string;
 }
 
 export interface CreatedInjuryResponseDto {
-  id: string;
+  id: number;
   name: string;
-  playerId: string;
+  playerId: number;
 }
 
 // Requests
@@ -22,10 +22,10 @@ export interface CreateInjuryRequest {
   name: string;
   daysInjured: number;
   gamesMissed: number;
-  playerId: string;
-  seasonId?: string;
+  playerId: number;
+  seasonId?: number;
 }
 
 export interface UpdateInjuryRequest extends CreateInjuryRequest {
-  id: string;
+  id: number;
 }

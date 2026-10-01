@@ -22,9 +22,9 @@ public class InjuriesController(IInjuryService _injuryService) : CustomBaseContr
     return CreateActionResult(result);
   }
 
-  [HttpGet("{id:guid}")]
+  [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _injuryService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
@@ -61,9 +61,9 @@ public class InjuriesController(IInjuryService _injuryService) : CustomBaseContr
   }
 
   [Authorize(Roles = "Admin")]
-  [HttpDelete("{id:guid}")]
+  [HttpDelete("{id:int}")]
   public async Task<IActionResult> Delete(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _injuryService.RemoveAsync(

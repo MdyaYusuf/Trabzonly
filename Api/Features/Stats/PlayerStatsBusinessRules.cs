@@ -5,7 +5,7 @@ namespace Api.Features.Stats;
 public class PlayerStatsBusinessRules(IPlayerStatsRepository _playerStatsRepository)
 {
   public async Task<PlayerStats> GetPlayerStatsIfExistAsync(
-    Guid id,
+    int id,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -21,8 +21,8 @@ public class PlayerStatsBusinessRules(IPlayerStatsRepository _playerStatsReposit
   }
 
   public async Task PlayerStatsCannotBeDuplicatedWhenInserted(
-    Guid playerId,
-    Guid seasonId,
+    int playerId,
+    int seasonId,
     string team,
     CancellationToken cancellationToken)
   {
@@ -36,9 +36,9 @@ public class PlayerStatsBusinessRules(IPlayerStatsRepository _playerStatsReposit
   }
 
   public async Task PlayerStatsCannotBeDuplicatedWhenUpdated(
-    Guid id,
-    Guid playerId,
-    Guid seasonId,
+    int id,
+    int playerId,
+    int seasonId,
     string team,
     CancellationToken cancellationToken)
   {

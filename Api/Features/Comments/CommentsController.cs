@@ -27,7 +27,7 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
   public async Task<IActionResult> GetRecent(
     [FromQuery] int count = 10,
     [FromQuery] Guid? postId = null,
-    [FromQuery] Guid? playerId = null,
+    [FromQuery] int? playerId = null,
     [FromQuery] DateTime? lastDate = null,
     [FromQuery] Guid? lastId = null,
     CancellationToken cancellationToken = default)

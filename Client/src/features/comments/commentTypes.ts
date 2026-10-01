@@ -6,7 +6,7 @@ export interface CommentResponseDto {
   userId: string;
   authorUsername: string;
   postId?: string;
-  playerId?: string;
+  playerId?: number;
   parentCommentId?: string;
   createdDate: string;
 }
@@ -21,7 +21,7 @@ export interface CreatedCommentResponseDto {
 export interface CreateCommentRequest {
   content: string;
   postId?: string;
-  playerId?: string;
+  playerId?: number;
   parentCommentId?: string;
 }
 

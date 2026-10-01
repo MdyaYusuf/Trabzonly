@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Players;
 
-public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>, IPlayerRepository
+public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, IPlayerRepository
 {
   public EfPlayerRepository(BaseDbContext context) : base(context)
   {
@@ -14,7 +14,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>,
   public async Task<List<Player>> GetTopValuedPlayersAsync(
     int count,
     decimal? lastValueCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -85,7 +85,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, Guid>,
   }
 
   public async Task<PlayerRosterOverviewDto> GetRosterOverviewAsync(
-    Guid? currentSeasonId = null,
+    int? currentSeasonId = null,
     CancellationToken cancellationToken = default)
   {
     IQueryable<Player> query = Query(enableTracking: false)

@@ -1,13 +1,87 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { type PlayerProfile } from '../utils/playerDetailPlaceholders'
+import { formatMarketValue } from '../utils/formatMarketValue'
+import type { PlayerResponseDto } from '../playerTypes'
 
-type PlayerDetailHeroProps = {
-  profile: PlayerProfile
-  favorited: boolean
-  setFavorited: (value: boolean | ((prev: boolean) => boolean)) => void
+const CARD_TONES = [
+  'from-[#5A0E27] to-[#1A040B]',
+  'from-[#3f2900] to-[#1A040B]',
+  'from-[#12648e] to-[#1A040B]',
+  'from-[#1A3A2A] to-[#1A040B]',
+  'from-[#4A1A4A] to-[#1A040B]',
+] as const
+
+function formatBirthDate(value: string) {
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+
+  return new Intl.DateTimeFormat('tr-TR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(date)
 }
 
-export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDetailHeroProps) {
+function formatHeight(height?: number) {
+  if (height == null) {
+    return '—'
+  }
+
+  return `${(height / 100).toFixed(2).replace('.', ',')} m`
+}
+
+function formatFoot(preferredFoot: string) {
+  const normalized = preferredFoot.trim().toLowerCase()
+
+  if (normalized === 'left' || normalized === 'sol') {
+    return 'Sol Ayak'
+  }
+
+  if (normalized === 'right' || normalized === 'sağ' || normalized === 'sag') {
+    return 'Sağ Ayak'
+  }
+
+  return preferredFoot
+}
+
+function formatVoteCount(count: number) {
+  return count.toLocaleString('tr-TR')
+}
+
+type PlayerDetailHeroProps = {
+  player: PlayerResponseDto
+  seasonLabel?: string | null
+  onRate: (score: number) => Promise<boolean>
+}
+
+export function PlayerDetailHero({
+  player,
+  seasonLabel,
+  onRate,
+}: PlayerDetailHeroProps) {
+  const [isRatingOpen, setIsRatingOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const tone = CARD_TONES[player.name.length % CARD_TONES.length]
+  const shirtNumber = player.shirtNumber ?? '—'
+  const positionLabel = `${player.positionName.toUpperCase()} / NO: ${shirtNumber}`
+
+  async function handleScoreSelect(score: number) {
+    if (isSubmitting) {
+      return
+    }
+
+    setIsSubmitting(true)
+    const ok = await onRate(score)
+    setIsSubmitting(false)
+
+    if (ok) {
+      setIsRatingOpen(false)
+    }
+  }
+
   return (
     <>
       <div className="border-b border-border-subtle bg-surface-container-low">
@@ -21,11 +95,14 @@ export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDet
           </Link>
           <div className="font-kicker flex flex-wrap items-center gap-space-sm text-kicker tracking-wider text-on-surface-variant uppercase">
             <span>
-              SEZON: <strong className="text-primary">2024 / 2025</strong>
+              SEZON:{' '}
+              <strong className="text-primary">
+                {seasonLabel?.trim() || player.currentSeasonStats?.seasonName || '—'}
+              </strong>
             </span>
             <span className="text-outline-variant">•</span>
             <span>
-              LİG: <strong className="text-primary">TRENDYOL SÜPER LİG</strong>
+              TAKIM: <strong className="text-primary">{player.currentTeam}</strong>
             </span>
           </div>
         </div>
@@ -41,20 +118,28 @@ export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDet
           <div className="grid grid-cols-1 items-end gap-gutter lg:grid-cols-12">
             <div className="relative flex flex-col justify-end lg:col-span-4">
               <div
-                className={`relative flex aspect-[4/5] max-h-[480px] w-full items-end justify-center overflow-hidden bg-gradient-to-br shadow-2xl ${profile.tone}`}
+                className={`relative flex aspect-[4/5] max-h-[480px] w-full items-end justify-center overflow-hidden bg-gradient-to-br shadow-2xl ${tone}`}
               >
                 <span className="absolute top-space-md left-space-md font-display text-display-xl leading-none font-extrabold text-on-primary/20 select-none">
-                  {profile.number}
+                  {shirtNumber}
                 </span>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-6xl font-extrabold text-white/15">
-                    #{profile.number}
-                  </span>
-                </div>
+                {player.imageUrl ? (
+                  <img
+                    src={player.imageUrl}
+                    alt={player.name}
+                    className="absolute inset-0 h-full w-full object-cover object-top"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-display text-6xl font-extrabold text-white/15">
+                      #{shirtNumber}
+                    </span>
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent" />
                 <div className="absolute right-space-md bottom-space-md left-space-md flex items-center justify-between bg-primary/90 px-space-sm py-space-xs backdrop-blur-md">
                   <span className="font-kicker text-kicker tracking-widest text-secondary-container uppercase">
-                    A TAKIM {profile.position.split('/')[0]?.trim() ?? 'OYUNCU'}
+                    A TAKIM {player.positionName.toUpperCase()}
                   </span>
                   <span className="font-label flex items-center gap-1 text-label-md font-bold text-tertiary-fixed-dim uppercase">
                     <span
@@ -63,7 +148,7 @@ export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDet
                     >
                       verified
                     </span>
-                    KULÜP LİSANSLI
+                    {player.isActive ? 'Aktif Kadro' : 'Pasif'}
                   </span>
                 </div>
               </div>
@@ -73,17 +158,14 @@ export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDet
               <div className="flex flex-wrap items-center justify-between gap-space-md pb-space-md">
                 <div className="flex flex-wrap items-center gap-space-xs">
                   <span className="bg-secondary px-space-sm py-space-xs font-kicker text-kicker font-bold tracking-wider text-on-secondary uppercase">
-                    {profile.position}
+                    {positionLabel}
                   </span>
-                  {profile.loanLabel ? (
-                    <span className="bg-surface-container-highest/20 px-space-sm py-space-xs font-kicker text-kicker font-semibold text-on-primary uppercase">
-                      {profile.loanLabel}
+                  {player.isCaptain ? (
+                    <span className="flex items-center gap-1 bg-tertiary-container px-space-sm py-space-xs font-kicker text-kicker font-bold text-tertiary-fixed-dim uppercase">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-tertiary-fixed-dim" />
+                      KAPTAN
                     </span>
                   ) : null}
-                  <span className="flex items-center gap-1 bg-tertiary-container px-space-sm py-space-xs font-kicker text-kicker font-bold text-tertiary-fixed-dim uppercase">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-tertiary-fixed-dim" />
-                    {profile.statusBadge}
-                  </span>
                 </div>
                 <div className="flex items-center gap-space-xs bg-primary-container px-space-md py-space-xs shadow-md">
                   <span
@@ -95,12 +177,12 @@ export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDet
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-1">
                       <span className="font-headline text-headline-sm font-bold text-tertiary-fixed-dim">
-                        {profile.rating.toFixed(1)}
+                        {player.averageRating.toFixed(1)}
                       </span>
                       <span className="font-kicker text-kicker text-on-primary/60">/ 10</span>
                     </div>
                     <span className="font-kicker text-[9px] tracking-wider text-on-primary/80 uppercase">
-                      {profile.votes} Taraftar Oyu
+                      {formatVoteCount(player.ratingCount)} Taraftar Oyu
                     </span>
                   </div>
                 </div>
@@ -109,32 +191,27 @@ export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDet
               <div className="my-space-sm">
                 <div className="mb-space-xs flex flex-wrap items-center gap-space-sm">
                   <span className="font-label text-label-md font-semibold tracking-wider text-on-primary/90 uppercase">
-                    {profile.nationality}
+                    {player.nationality}
                   </span>
-                  {profile.dualNationality ? (
+                  {player.isDomestic ? (
                     <>
                       <span className="h-1 w-1 rounded-full bg-secondary-container" />
-                      <span className="font-label text-label-md text-secondary-fixed-dim">
-                        {profile.dualNationality}
-                      </span>
+                      <span className="font-label text-label-md text-secondary-fixed-dim">Yerli</span>
                     </>
                   ) : null}
                 </div>
                 <h1 className="-ml-1 font-display text-display-xl-mobile leading-none font-black tracking-tight text-on-primary uppercase sm:text-display-xl">
-                  {profile.name}
+                  {player.name}
                 </h1>
               </div>
 
-              <div className="my-space-md grid grid-cols-2 gap-space-sm bg-primary-container/80 p-space-md sm:grid-cols-4">
+              <div className="my-space-md grid grid-cols-2 gap-space-sm bg-primary-container/80 p-space-md sm:grid-cols-3">
                 <div>
                   <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
                     Piyasa Değeri
                   </span>
                   <span className="font-headline text-headline-md font-bold text-tertiary-fixed-dim">
-                    {profile.marketValue}
-                  </span>
-                  <span className="font-body block text-[11px] text-on-primary/60">
-                    Zirve Değeri: {profile.peakValue}
+                    {player.marketValue != null ? formatMarketValue(player.marketValue) : '—'}
                   </span>
                 </div>
                 <div>
@@ -142,71 +219,81 @@ export function PlayerDetailHero({ profile, favorited, setFavorited }: PlayerDet
                     Yaş / Doğum
                   </span>
                   <span className="font-headline text-headline-md font-bold text-on-primary">
-                    {profile.age} Yaş
+                    {player.age} Yaş
                   </span>
                   <span className="font-body block text-[11px] text-on-primary/60">
-                    {profile.birthDate}
+                    {formatBirthDate(player.dateOfBirth)}
                   </span>
                 </div>
                 <div>
                   <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
-                    Fiziki Yapı / Ayak
+                    Boy / Ayak
                   </span>
                   <span className="font-headline text-headline-md font-bold text-on-primary">
-                    {profile.height}
+                    {formatHeight(player.height)}
                   </span>
                   <span className="font-body block text-[11px] font-semibold text-secondary-container">
-                    {profile.foot}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
-                    Sözleşme Sonu
-                  </span>
-                  <span className="font-headline text-headline-md font-bold text-on-primary">
-                    {profile.contractEnd}
-                  </span>
-                  <span className="font-body block text-[11px] text-on-primary/60">
-                    {profile.contractNote}
+                    {formatFoot(player.preferredFoot)}
                   </span>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-space-md pt-space-xs">
-                <div className="flex flex-wrap items-center gap-space-sm">
-                  <button
-                    type="button"
-                    className="font-label flex items-center gap-2 bg-secondary-container px-space-lg py-space-sm text-label-md font-bold tracking-wider text-on-secondary-container uppercase shadow-md transition-all hover:bg-surface-container-lowest"
-                  >
-                    <span
-                      className="material-symbols-outlined text-[18px]"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
+                <div className="flex flex-col gap-space-sm">
+                  <div className="flex flex-wrap items-center gap-space-sm">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRatingOpen((open) => !open)
+                      }}
+                      className="font-label flex items-center gap-2 bg-secondary-container px-space-lg py-space-sm text-label-md font-bold tracking-wider text-on-secondary-container uppercase shadow-md transition-all hover:bg-surface-container-lowest"
                     >
-                      star
-                    </span>
-                    Oyuncuyu Puanla
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFavorited((value) => !value)}
-                    className="font-label flex items-center gap-2 bg-surface-container-highest/20 px-space-md py-space-sm text-label-md font-semibold tracking-wider text-on-primary uppercase transition-colors hover:bg-surface-container-highest/40"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      {favorited ? 'favorite' : 'favorite'}
-                    </span>
-                    Favorilere Ekle
-                  </button>
-                  <button
-                    type="button"
-                    title="Profili Paylaş"
-                    className="flex items-center justify-center bg-surface-container-highest/20 p-space-sm text-on-primary transition-colors hover:bg-surface-container-highest/40"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">share</span>
-                  </button>
-                </div>
-                <div className="font-kicker flex items-center gap-space-xs text-kicker text-secondary-fixed uppercase">
-                  <span className="h-2 w-2 rounded-full bg-secondary-container" />
-                  <span>{profile.squadStatus}</span>
+                      <span
+                        className="material-symbols-outlined text-[18px]"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        star
+                      </span>
+                      {player.currentUserScore != null
+                        ? `Puanın: ${player.currentUserScore.toFixed(1)}`
+                        : 'Oyuncuyu Puanla'}
+                    </button>
+                    <button
+                      type="button"
+                      title="Profili Paylaş"
+                      onClick={() => {
+                        void navigator.clipboard?.writeText(window.location.href)
+                      }}
+                      className="flex items-center justify-center bg-surface-container-highest/20 p-space-sm text-on-primary transition-colors hover:bg-surface-container-highest/40"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">share</span>
+                    </button>
+                  </div>
+                  {isRatingOpen ? (
+                    <div className="flex flex-wrap items-center gap-1">
+                      {Array.from({ length: 10 }, (_, index) => {
+                        const score = index + 1
+
+                        return (
+                          <button
+                            key={score}
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={() => {
+                              void handleScoreSelect(score)
+                            }}
+                            className={`font-label h-9 w-9 text-label-md font-bold transition-colors ${
+                              player.currentUserScore === score
+                                ? 'bg-secondary-container text-on-secondary-container'
+                                : 'bg-surface-container-highest/20 text-on-primary hover:bg-surface-container-highest/40'
+                            }`}
+                          >
+                            {score}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>

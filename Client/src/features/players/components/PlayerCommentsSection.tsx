@@ -2,20 +2,19 @@ import { useMemo, useState, type FormEvent } from 'react'
 import {
   placeholderComments,
   type CommentSort,
-  type PlayerProfile,
 } from '../utils/playerDetailPlaceholders'
 
 type PlayerCommentsSectionProps = {
-  profile: PlayerProfile
+  playerName: string
 }
 
-export function PlayerCommentsSection({ profile }: PlayerCommentsSectionProps) {
+export function PlayerCommentsSection({ playerName }: PlayerCommentsSectionProps) {
   const [commentSort, setCommentSort] = useState<CommentSort>('liked')
   const [commentDraft, setCommentDraft] = useState('')
 
   const commentPlaceholder = useMemo(
-    () => `${profile.name}'ın performansı hakkında ne düşünüyorsun? Görüşünü bordo-mavi tribünle paylaş...`,
-    [profile.name],
+    () => `${playerName}'ın performansı hakkında ne düşünüyorsun? Görüşünü bordo-mavi tribünle paylaş...`,
+    [playerName],
   )
 
   function handleCommentSubmit(event: FormEvent<HTMLFormElement>) {

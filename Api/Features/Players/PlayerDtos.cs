@@ -8,10 +8,15 @@ public sealed record PlayerSeasonStatsDto(
   int MinutesPlayed,
   int Goals,
   int Assists,
-  int CleanSheets);
+  int CleanSheets,
+  int YellowCards,
+  int RedCards,
+  int GoalsConceded,
+  string Team,
+  string SeasonName);
 
 public sealed record PlayerResponseDto(
-  Guid Id,
+  int Id,
   string Name,
   string Nationality,
   DateTime DateOfBirth,
@@ -39,12 +44,12 @@ public sealed record PlayerResponseDto(
   decimal? CurrentUserScore = null);
 
 public sealed record CreatedPlayerResponseDto(
-  Guid Id,
+  int Id,
   string Name,
   string? ImageUrl);
 
 public sealed record PlayerPreviewDto(
-  Guid Id,
+  int Id,
   string Name,
   string Nationality,
   int Age,
@@ -57,7 +62,7 @@ public sealed record PlayerPreviewDto(
   string PositionName);
 
 public sealed record PlayerRatingResponseDto(
-  Guid PlayerId,
+  int PlayerId,
   decimal Score,
   decimal AverageRating,
   int RatingCount);
@@ -86,7 +91,7 @@ public sealed record CreatePlayerRequest(
   IFormFile? ImageFile);
 
 public sealed record UpdatePlayerRequest(
-  Guid Id,
+  int Id,
   string Name,
   string Nationality,
   DateTime DateOfBirth,

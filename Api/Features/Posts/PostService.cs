@@ -284,7 +284,7 @@ public class PostService(
     {
       Items = itemsToReturn,
       NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
-      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id.ToString(),
       HasNextPage = hasNextPage
     };
 

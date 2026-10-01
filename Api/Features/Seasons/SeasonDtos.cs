@@ -2,7 +2,7 @@ namespace Api.Features.Seasons;
 
 // Responses
 public sealed record SeasonResponseDto(
-  Guid Id,
+  int Id,
   string Name,
   DateTime StartDate,
   DateTime EndDate,
@@ -15,7 +15,7 @@ public sealed record CreateSeasonRequest(
   DateTime EndDate);
 
 public sealed record UpdateSeasonRequest(
-  Guid Id,
+  int Id,
   string Name,
   DateTime StartDate,
   DateTime EndDate);

@@ -78,7 +78,7 @@ public class CommentService(
     {
       Items = response,
       NextCursorDate = itemsToReturn.LastOrDefault()?.CreatedDate,
-      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id.ToString(),
       HasNextPage = hasNextPage
     };
 

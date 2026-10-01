@@ -22,9 +22,9 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
     return CreateActionResult(result);
   }
 
-  [HttpGet("{id:guid}")]
+  [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _playerStatsService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
@@ -36,7 +36,7 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
   public async Task<IActionResult> GetTopScorers(
     int count,
     [FromQuery] int? lastValue = null,
-    [FromQuery] Guid? lastId = null,
+    [FromQuery] int? lastId = null,
     CancellationToken cancellationToken = default)
   {
     var result = await _playerStatsService.GetTopScorersAsync(
@@ -52,7 +52,7 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
   public async Task<IActionResult> GetTopAssisters(
     int count,
     [FromQuery] int? lastValue = null,
-    [FromQuery] Guid? lastId = null,
+    [FromQuery] int? lastId = null,
     CancellationToken cancellationToken = default)
   {
     var result = await _playerStatsService.GetTopAssistersAsync(
@@ -93,9 +93,9 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
   }
 
   [Authorize(Roles = "Admin")]
-  [HttpDelete("{id:guid}")]
+  [HttpDelete("{id:int}")]
   public async Task<IActionResult> Delete(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _playerStatsService.RemoveAsync(

@@ -5,7 +5,7 @@ namespace Api.Features.Injuries;
 public class InjuryBusinessRules(IInjuryRepository _injuryRepository)
 {
   public async Task<Injury> GetInjuryIfExistAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Injury>, IQueryable<Injury>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -37,7 +37,7 @@ public class InjuryBusinessRules(IInjuryRepository _injuryRepository)
   }
 
   public async Task InjuryCannotBeDuplicatedAsync(
-    Guid playerId, Guid? seasonId, string name, int daysInjured, int gamesMissed, CancellationToken cancellationToken = default)
+    int playerId, int? seasonId, string name, int daysInjured, int gamesMissed, CancellationToken cancellationToken = default)
   {
     bool exists = await _injuryRepository.AnyAsync(
       i => i.PlayerId == playerId &&
@@ -54,7 +54,7 @@ public class InjuryBusinessRules(IInjuryRepository _injuryRepository)
   }
 
   public async Task InjuryCannotBeDuplicatedWhenUpdatedAsync(
-    Guid id, Guid playerId, Guid? seasonId, string name, int daysInjured, int gamesMissed, CancellationToken cancellationToken = default)
+    int id, int playerId, int? seasonId, string name, int daysInjured, int gamesMissed, CancellationToken cancellationToken = default)
   {
     bool exists = await _injuryRepository.AnyAsync(
       i => i.Id != id &&

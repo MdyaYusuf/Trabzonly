@@ -7,7 +7,7 @@ public class PlayerRating : Entity<Guid>
 {
   public decimal Score { get; set; }
 
-  public Guid PlayerId { get; set; }
+  public int PlayerId { get; set; }
   public virtual Player Player { get; set; } = default!;
 
   public Guid UserId { get; set; }

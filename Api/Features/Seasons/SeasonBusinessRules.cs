@@ -5,7 +5,7 @@ namespace Api.Features.Seasons;
 public class SeasonBusinessRules(ISeasonRepository _seasonRepository)
 {
   public async Task<Season> GetSeasonIfExistAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Season>, IQueryable<Season>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -38,7 +38,7 @@ public class SeasonBusinessRules(ISeasonRepository _seasonRepository)
     }
   }
 
-  public async Task SeasonNameCannotBeDuplicatedWhenUpdatedAsync(Guid id, string name, CancellationToken cancellationToken = default)
+  public async Task SeasonNameCannotBeDuplicatedWhenUpdatedAsync(int id, string name, CancellationToken cancellationToken = default)
   {
     bool exists = await _seasonRepository.AnyAsync(s => s.Id != id && s.Name == name, cancellationToken);
 
@@ -48,7 +48,7 @@ public class SeasonBusinessRules(ISeasonRepository _seasonRepository)
     }
   }
 
-  public async Task SeasonDatesCannotOverlapAsync(DateTime startDate, DateTime endDate, Guid? idToIgnore = null, CancellationToken cancellationToken = default)
+  public async Task SeasonDatesCannotOverlapAsync(DateTime startDate, DateTime endDate, int? idToIgnore = null, CancellationToken cancellationToken = default)
   {
     bool overlaps = await _seasonRepository.AnyAsync(
       s => (!idToIgnore.HasValue || s.Id != idToIgnore.Value) && startDate < s.EndDate && endDate > s.StartDate,

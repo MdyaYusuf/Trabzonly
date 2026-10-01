@@ -3,7 +3,7 @@ export interface SquadSlotResponseDto {
   id: string;
   slotKey: string;
   sortOrder: number;
-  playerId: string;
+  playerId: number;
   playerName: string;
   playerImageUrl?: string;
   positionAbbreviation: string;
@@ -50,7 +50,7 @@ export interface SquadRatingResponseDto {
 export interface SquadSlotRequest {
   slotKey: string;
   sortOrder: number;
-  playerId: string;
+  playerId: number;
 }
 
 export interface CreateSquadRequest {

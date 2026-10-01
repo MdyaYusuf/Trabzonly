@@ -5,7 +5,7 @@ public sealed record SquadSlotResponseDto(
   Guid Id,
   string SlotKey,
   int SortOrder,
-  Guid PlayerId,
+  int PlayerId,
   string PlayerName,
   string? PlayerImageUrl,
   string PositionAbbreviation);
@@ -47,7 +47,7 @@ public sealed record SquadRatingResponseDto(
 public sealed record SquadSlotRequest(
   string SlotKey,
   int SortOrder,
-  Guid PlayerId);
+  int PlayerId);
 
 public sealed record CreateSquadRequest(
   string Title,

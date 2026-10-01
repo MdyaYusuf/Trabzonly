@@ -46,7 +46,7 @@ public class SeasonService(
   }
 
   public async Task<ReturnModel<SeasonResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Season>, IQueryable<Season>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -130,7 +130,7 @@ public class SeasonService(
   }
 
   public async Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default)
   {

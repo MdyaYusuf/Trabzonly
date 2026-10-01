@@ -47,7 +47,7 @@ public class PlayerStatsService(
   }
 
   public async Task<ReturnModel<PlayerStatsResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -72,7 +72,7 @@ public class PlayerStatsService(
   public async Task<ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>> GetTopScorersAsync(
     int count,
     int? lastValueCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -96,7 +96,7 @@ public class PlayerStatsService(
     {
       Items = response,
       NextCursorValue = itemsToReturn.LastOrDefault()?.Goals,
-      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id.ToString(),
       HasNextPage = hasNextPage
     };
 
@@ -112,7 +112,7 @@ public class PlayerStatsService(
   public async Task<ReturnModel<CursorPagedResponse<PlayerStatsResponseDto>>> GetTopAssistersAsync(
     int count,
     int? lastValueCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -136,7 +136,7 @@ public class PlayerStatsService(
     {
       Items = response,
       NextCursorValue = itemsToReturn.LastOrDefault()?.Assists,
-      NextCursorId = itemsToReturn.LastOrDefault()?.Id,
+      NextCursorId = itemsToReturn.LastOrDefault()?.Id.ToString(),
       HasNextPage = hasNextPage
     };
 
@@ -227,7 +227,7 @@ public class PlayerStatsService(
   }
 
   public async Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default)
   {

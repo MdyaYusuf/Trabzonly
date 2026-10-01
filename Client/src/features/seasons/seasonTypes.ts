@@ -1,6 +1,6 @@
 // Responses
 export interface SeasonResponseDto {
-  id: string;
+  id: number;
   name: string;
   startDate: string;
   endDate: string;
@@ -15,5 +15,5 @@ export interface CreateSeasonRequest {
 }
 
 export interface UpdateSeasonRequest extends CreateSeasonRequest {
-  id: string;
+  id: number;
 }

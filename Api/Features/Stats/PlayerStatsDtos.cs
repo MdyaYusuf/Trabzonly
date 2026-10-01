@@ -2,7 +2,7 @@ namespace Api.Features.Stats;
 
 // Responses
 public sealed record PlayerStatsResponseDto(
-  Guid Id,
+  int Id,
   string Team,
   int Appearances,
   int MinutesPlayed,
@@ -12,17 +12,17 @@ public sealed record PlayerStatsResponseDto(
   int RedCards,
   int CleanSheets,
   int GoalsConceded,
-  Guid PlayerId,
+  int PlayerId,
   string PlayerName,
-  Guid SeasonId,
+  int SeasonId,
   string SeasonName,
   DateTime CreatedDate);
 
 public sealed record CreatedPlayerStatsResponseDto(
-  Guid Id,
+  int Id,
   string Team,
-  Guid PlayerId,
-  Guid SeasonId);
+  int PlayerId,
+  int SeasonId);
 
 // Requests
 public sealed record CreatePlayerStatsRequest(
@@ -35,11 +35,11 @@ public sealed record CreatePlayerStatsRequest(
   int RedCards,
   int CleanSheets,
   int GoalsConceded,
-  Guid PlayerId,
-  Guid SeasonId);
+  int PlayerId,
+  int SeasonId);
 
 public sealed record UpdatePlayerStatsRequest(
-  Guid Id,
+  int Id,
   string Team,
   int Appearances,
   int MinutesPlayed,
@@ -49,5 +49,5 @@ public sealed record UpdatePlayerStatsRequest(
   int RedCards,
   int CleanSheets,
   int GoalsConceded,
-  Guid PlayerId,
-  Guid SeasonId);
+  int PlayerId,
+  int SeasonId);

@@ -2,12 +2,12 @@ using Api.Core.Repositories;
 
 namespace Api.Features.Players;
 
-public interface IPlayerRepository : IRepository<Player, Guid>
+public interface IPlayerRepository : IRepository<Player, int>
 {
   Task<List<Player>> GetTopValuedPlayersAsync(
     int count,
     decimal? lastValueCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -28,6 +28,6 @@ public interface IPlayerRepository : IRepository<Player, Guid>
     CancellationToken cancellationToken = default);
 
   Task<PlayerRosterOverviewDto> GetRosterOverviewAsync(
-    Guid? currentSeasonId = null,
+    int? currentSeasonId = null,
     CancellationToken cancellationToken = default);
 }
