@@ -13,6 +13,14 @@ export interface PostPollSummaryDto {
   options: PostPollOptionSummaryDto[];
 }
 
+export interface PostTopCommentDto {
+  id: string;
+  content: string;
+  authorUsername: string;
+  authorDisplayTag?: string | null;
+  likeCount: number;
+}
+
 export interface PostResponseDto {
   id: string;
   title: string;
@@ -30,6 +38,7 @@ export interface PostResponseDto {
   categoryId: number;
   categoryName: string;
   poll?: PostPollSummaryDto | null;
+  topComment?: PostTopCommentDto | null;
 }
 
 export interface CreatedPostResponseDto {

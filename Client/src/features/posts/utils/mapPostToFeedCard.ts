@@ -104,5 +104,14 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
     commentCount: post.commentCount,
     imageUrl: post.imageUrl,
     poll: post.poll ? mapPollSummary(post.poll) : null,
+    topComment: post.topComment
+      ? {
+          id: post.topComment.id,
+          content: post.topComment.content,
+          authorUsername: post.topComment.authorUsername,
+          authorDisplayTag: post.topComment.authorDisplayTag,
+          likeCount: post.topComment.likeCount,
+        }
+      : null,
   }
 }

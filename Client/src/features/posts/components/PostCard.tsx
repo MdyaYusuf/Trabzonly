@@ -115,6 +115,32 @@ export function PostCard({ post }: PostCardProps) {
         <p className="font-body line-clamp-3 text-body-md text-on-surface-variant">{post.excerpt}</p>
       </div>
 
+      {post.topComment ? (
+        <div className="border-l-2 border-secondary bg-surface p-space-sm">
+          <div className="mb-1 flex flex-wrap items-center justify-between gap-space-xs">
+            <span className="font-kicker text-kicker font-bold tracking-wider text-secondary uppercase">
+              Öne Çıkan Yorum
+            </span>
+            <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
+              {post.topComment.likeCount} beğeni
+            </span>
+          </div>
+          <p className="font-body text-body-sm text-on-surface italic">
+            &quot;{post.topComment.content}&quot;
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-space-xs">
+            <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+              — @{post.topComment.authorUsername}
+            </span>
+            {post.topComment.authorDisplayTag ? (
+              <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
+                {post.topComment.authorDisplayTag}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       {post.poll ? (
         <div className="border-l-2 border-secondary bg-surface p-space-sm">
           <div className="mb-space-xs flex items-center justify-between gap-space-xs">

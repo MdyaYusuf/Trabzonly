@@ -18,6 +18,14 @@ export type FeedPostPoll = {
   options: FeedPostPollOption[]
 }
 
+export type FeedPostTopComment = {
+  id: string
+  content: string
+  authorUsername: string
+  authorDisplayTag?: string | null
+  likeCount: number
+}
+
 export type FeedPostCard = {
   id: string
   categoryId: number
@@ -36,6 +44,7 @@ export type FeedPostCard = {
   commentCount: number
   imageUrl?: string
   poll?: FeedPostPoll | null
+  topComment?: FeedPostTopComment | null
 }
 
 export const PAGE_SIZE = 10

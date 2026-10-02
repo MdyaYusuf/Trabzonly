@@ -86,6 +86,19 @@ public class PostService(
               })
               .ToList()
           })
+          .FirstOrDefault(),
+        TopComment = p.Comments
+          .Where(comment => comment.ParentCommentId == null && comment.IsApproved)
+          .OrderByDescending(comment => comment.LikeCount)
+          .ThenByDescending(comment => comment.CreatedDate)
+          .Select(comment => new PostTopCommentDto
+          {
+            Id = comment.Id,
+            Content = comment.Content,
+            AuthorUsername = comment.User.Username,
+            AuthorDisplayTag = comment.User.DisplayTag,
+            LikeCount = comment.LikeCount
+          })
           .FirstOrDefault()
       })
       .ToListAsync(cancellationToken);
@@ -151,6 +164,19 @@ public class PostService(
                 VoteCount = option.VoteCount
               })
               .ToList()
+          })
+          .FirstOrDefault(),
+        TopComment = p.Comments
+          .Where(comment => comment.ParentCommentId == null && comment.IsApproved)
+          .OrderByDescending(comment => comment.LikeCount)
+          .ThenByDescending(comment => comment.CreatedDate)
+          .Select(comment => new PostTopCommentDto
+          {
+            Id = comment.Id,
+            Content = comment.Content,
+            AuthorUsername = comment.User.Username,
+            AuthorDisplayTag = comment.User.DisplayTag,
+            LikeCount = comment.LikeCount
           })
           .FirstOrDefault()
       })
@@ -227,6 +253,19 @@ public class PostService(
               })
               .ToList()
           })
+          .FirstOrDefault(),
+        TopComment = p.Comments
+          .Where(comment => comment.ParentCommentId == null && comment.IsApproved)
+          .OrderByDescending(comment => comment.LikeCount)
+          .ThenByDescending(comment => comment.CreatedDate)
+          .Select(comment => new PostTopCommentDto
+          {
+            Id = comment.Id,
+            Content = comment.Content,
+            AuthorUsername = comment.User.Username,
+            AuthorDisplayTag = comment.User.DisplayTag,
+            LikeCount = comment.LikeCount
+          })
           .FirstOrDefault()
       })
       .FirstOrDefaultAsync(cancellationToken);
@@ -298,6 +337,19 @@ public class PostService(
                 VoteCount = option.VoteCount
               })
               .ToList()
+          })
+          .FirstOrDefault(),
+        TopComment = p.Comments
+          .Where(comment => comment.ParentCommentId == null && comment.IsApproved)
+          .OrderByDescending(comment => comment.LikeCount)
+          .ThenByDescending(comment => comment.CreatedDate)
+          .Select(comment => new PostTopCommentDto
+          {
+            Id = comment.Id,
+            Content = comment.Content,
+            AuthorUsername = comment.User.Username,
+            AuthorDisplayTag = comment.User.DisplayTag,
+            LikeCount = comment.LikeCount
           })
           .FirstOrDefault()
       })
@@ -378,6 +430,19 @@ public class PostService(
                 VoteCount = option.VoteCount
               })
               .ToList()
+          })
+          .FirstOrDefault(),
+        TopComment = p.Comments
+          .Where(comment => comment.ParentCommentId == null && comment.IsApproved)
+          .OrderByDescending(comment => comment.LikeCount)
+          .ThenByDescending(comment => comment.CreatedDate)
+          .Select(comment => new PostTopCommentDto
+          {
+            Id = comment.Id,
+            Content = comment.Content,
+            AuthorUsername = comment.User.Username,
+            AuthorDisplayTag = comment.User.DisplayTag,
+            LikeCount = comment.LikeCount
           })
           .FirstOrDefault()
       })

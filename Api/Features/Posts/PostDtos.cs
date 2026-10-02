@@ -17,6 +17,15 @@ public sealed record PostPollSummaryDto
   public IReadOnlyList<PostPollOptionSummaryDto> Options { get; init; } = [];
 }
 
+public sealed record PostTopCommentDto
+{
+  public Guid Id { get; init; }
+  public string Content { get; init; } = default!;
+  public string AuthorUsername { get; init; } = default!;
+  public string? AuthorDisplayTag { get; init; }
+  public int LikeCount { get; init; }
+}
+
 public sealed record PostResponseDto
 {
   public Guid Id { get; init; }
@@ -35,6 +44,7 @@ public sealed record PostResponseDto
   public int CategoryId { get; init; }
   public string CategoryName { get; init; } = default!;
   public PostPollSummaryDto? Poll { get; init; }
+  public PostTopCommentDto? TopComment { get; init; }
 }
 
 public sealed record CreatedPostResponseDto
