@@ -10,6 +10,7 @@ namespace Api.Features.Users;
 
 public class UserService(
   IUserRepository _userRepository,
+  IUserFollowRepository _userFollowRepository,
   UserMapper _mapper,
   UserBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
@@ -80,6 +81,7 @@ public class UserService(
     _businessRules.UserMustBeOwnerOrAdmin(user.Id, currentUserId, userRole);
 
     UserResponseDto response = _mapper.EntityToResponseDto(user);
+    await PopulateFollowFieldsAsync(response, currentUserId, cancellationToken);
 
     return new ReturnModel<UserResponseDto>()
     {
@@ -107,6 +109,7 @@ public class UserService(
     _businessRules.UserMustBeOwnerOrAdmin(user.Id, currentUserId, userRole);
 
     UserResponseDto response = _mapper.EntityToResponseDto(user);
+    await PopulateFollowFieldsAsync(response, currentUserId, cancellationToken);
 
     return new ReturnModel<UserResponseDto>()
     {
@@ -143,6 +146,8 @@ public class UserService(
         RoleName = u.Role.Name,
         PostCount = u.Posts.Count(p => p.IsActive),
         TotalLikeCount = u.Posts.Where(p => p.IsActive).Sum(p => p.LikeCount),
+        FollowerCount = u.Followers.Count,
+        FollowingCount = u.Following.Count,
         CreatedDate = u.CreatedDate
       })
       .ToListAsync(cancellationToken);
@@ -195,6 +200,8 @@ public class UserService(
         RoleName = u.Role.Name,
         PostCount = u.Posts.Count(p => p.IsActive),
         TotalLikeCount = u.Posts.Where(p => p.IsActive).Sum(p => p.LikeCount),
+        FollowerCount = u.Followers.Count,
+        FollowingCount = u.Following.Count,
         CreatedDate = u.CreatedDate
       })
       .ToListAsync(cancellationToken);
@@ -318,5 +325,100 @@ public class UserService(
       Message = "Kullanıcı hesabı başarılı bir şekilde silindi.",
       StatusCode = 200
     };
+  }
+
+  public async Task<ReturnModel<UserFollowResponseDto>> FollowAsync(
+    Guid targetUserId,
+    Guid currentUserId,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.CannotFollowSelf(currentUserId, targetUserId);
+    await _businessRules.UserMustBeActiveAsync(targetUserId, cancellationToken);
+
+    bool alreadyFollowing = await _userFollowRepository.AnyAsync(
+      f => f.FollowerId == currentUserId && f.FollowingId == targetUserId,
+      cancellationToken);
+
+    if (!alreadyFollowing)
+    {
+      await _userFollowRepository.AddAsync(
+        new UserFollow
+        {
+          FollowerId = currentUserId,
+          FollowingId = targetUserId
+        },
+        cancellationToken);
+
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    int followerCount = await _userFollowRepository.Query(enableTracking: false)
+      .CountAsync(f => f.FollowingId == targetUserId, cancellationToken);
+
+    return new ReturnModel<UserFollowResponseDto>()
+    {
+      Success = true,
+      Message = alreadyFollowing
+        ? "Bu kullanıcıyı zaten takip ediyorsunuz."
+        : "Kullanıcı başarılı bir şekilde takip edildi.",
+      Data = new UserFollowResponseDto(targetUserId, followerCount, true),
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<UserFollowResponseDto>> UnfollowAsync(
+    Guid targetUserId,
+    Guid currentUserId,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.CannotFollowSelf(currentUserId, targetUserId);
+    await _businessRules.UserMustBeActiveAsync(targetUserId, cancellationToken);
+
+    UserFollow? existing = await _userFollowRepository.GetAsync(
+      predicate: f => f.FollowerId == currentUserId && f.FollowingId == targetUserId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    if (existing != null)
+    {
+      _userFollowRepository.Delete(existing);
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    int followerCount = await _userFollowRepository.Query(enableTracking: false)
+      .CountAsync(f => f.FollowingId == targetUserId, cancellationToken);
+
+    return new ReturnModel<UserFollowResponseDto>()
+    {
+      Success = true,
+      Message = existing == null
+        ? "Bu kullanıcıyı zaten takip etmiyorsunuz."
+        : "Takip başarıyla bırakıldı.",
+      Data = new UserFollowResponseDto(targetUserId, followerCount, false),
+      StatusCode = 200
+    };
+  }
+
+  private async Task PopulateFollowFieldsAsync(
+    UserResponseDto response,
+    Guid currentUserId,
+    CancellationToken cancellationToken)
+  {
+    response.FollowerCount = await _userFollowRepository.Query(enableTracking: false)
+      .CountAsync(f => f.FollowingId == response.Id, cancellationToken);
+
+    response.FollowingCount = await _userFollowRepository.Query(enableTracking: false)
+      .CountAsync(f => f.FollowerId == response.Id, cancellationToken);
+
+    if (currentUserId != response.Id)
+    {
+      response.IsFollowedByCurrentUser = await _userFollowRepository.AnyAsync(
+        f => f.FollowerId == currentUserId && f.FollowingId == response.Id,
+        cancellationToken);
+    }
+    else
+    {
+      response.IsFollowedByCurrentUser = null;
+    }
   }
 }

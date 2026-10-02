@@ -26,6 +26,7 @@ public class PostService(
     int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
+    Guid? currentUserId = null,
     CancellationToken cancellationToken = default)
   {
     IQueryable<Post> query = _postRepository.Query(enableTracking, withDeleted);
@@ -46,6 +47,7 @@ public class PostService(
     }
 
     int totalCount = await query.CountAsync(cancellationToken);
+    Guid? viewerId = currentUserId;
 
     List<PostResponseDto> responseDtos = await query
       .Skip((pageNumber - 1) * pageSize)
@@ -99,7 +101,9 @@ public class PostService(
             AuthorDisplayTag = comment.User.DisplayTag,
             LikeCount = comment.LikeCount
           })
-          .FirstOrDefault()
+          .FirstOrDefault(),
+        IsAuthorFollowedByCurrentUser = viewerId.HasValue &&
+          p.User.Followers.Any(follow => follow.FollowerId == viewerId.Value)
       })
       .ToListAsync(cancellationToken);
 

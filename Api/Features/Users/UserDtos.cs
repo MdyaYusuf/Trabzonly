@@ -13,6 +13,9 @@ public class UserResponseDto
   public DateTime CreatedDate { get; set; }
   public int RoleId { get; set; }
   public string RoleName { get; set; } = null!;
+  public int FollowerCount { get; set; }
+  public int FollowingCount { get; set; }
+  public bool? IsFollowedByCurrentUser { get; set; }
 }
 
 public sealed record UserPreviewDto
@@ -23,6 +26,8 @@ public sealed record UserPreviewDto
   public string RoleName { get; init; } = null!;
   public int PostCount { get; init; }
   public int TotalLikeCount { get; init; }
+  public int FollowerCount { get; init; }
+  public int FollowingCount { get; init; }
   public DateTime CreatedDate { get; init; }
 }
 
@@ -31,6 +36,11 @@ public sealed record CreatedUserResponseDto
   public Guid Id { get; init; }
   public string Username { get; init; } = null!;
 }
+
+public sealed record UserFollowResponseDto(
+  Guid UserId,
+  int FollowerCount,
+  bool IsFollowedByCurrentUser);
 
 // Requests
 public sealed record UpdateUserRequest(

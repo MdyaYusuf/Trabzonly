@@ -45,6 +45,7 @@ public sealed record PostResponseDto
   public string CategoryName { get; init; } = default!;
   public PostPollSummaryDto? Poll { get; init; }
   public PostTopCommentDto? TopComment { get; init; }
+  public bool IsAuthorFollowedByCurrentUser { get; init; }
 }
 
 public sealed record CreatedPostResponseDto

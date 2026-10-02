@@ -42,4 +42,6 @@ public class User : Entity<Guid>
   public virtual ICollection<Squad> Squads { get; set; } = new List<Squad>();
   public virtual ICollection<SquadRating> SquadRatings { get; set; } = new List<SquadRating>();
   public virtual ICollection<PlayerRating> PlayerRatings { get; set; } = new List<PlayerRating>();
+  public virtual ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();
+  public virtual ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
 }

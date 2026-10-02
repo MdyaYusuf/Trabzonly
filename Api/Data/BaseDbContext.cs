@@ -26,6 +26,7 @@ public class BaseDbContext : DbContext
   }
 
   public DbSet<User> Users { get; set; }
+  public DbSet<UserFollow> UserFollows { get; set; }
   public DbSet<Role> Roles { get; set; }
   public DbSet<Comment> Comments { get; set; }
   public DbSet<CommentReaction> CommentReactions { get; set; }

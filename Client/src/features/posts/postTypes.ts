@@ -39,6 +39,7 @@ export interface PostResponseDto {
   categoryName: string;
   poll?: PostPollSummaryDto | null;
   topComment?: PostTopCommentDto | null;
+  isAuthorFollowedByCurrentUser?: boolean;
 }
 
 export interface CreatedPostResponseDto {

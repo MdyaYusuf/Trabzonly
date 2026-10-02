@@ -13,6 +13,7 @@ public interface IPostService
     int pageSize = 10,
     bool enableTracking = false,
     bool withDeleted = false,
+    Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<PostResponseDto>> GetAsync(

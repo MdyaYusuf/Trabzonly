@@ -103,6 +103,28 @@ public class UsersController(IUserService _userService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [HttpPost("{id:guid}/follow")]
+  public async Task<IActionResult> Follow(Guid id, CancellationToken cancellationToken)
+  {
+    var result = await _userService.FollowAsync(
+      targetUserId: id,
+      currentUserId: GetUserId(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpDelete("{id:guid}/unfollow")]
+  public async Task<IActionResult> Unfollow(Guid id, CancellationToken cancellationToken)
+  {
+    var result = await _userService.UnfollowAsync(
+      targetUserId: id,
+      currentUserId: GetUserId(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpDelete("{id:guid}")]
   public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
   {

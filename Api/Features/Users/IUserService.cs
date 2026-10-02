@@ -65,4 +65,14 @@ public interface IUserService
     ChangePasswordRequest request,
     Guid currentUserId,
     CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<UserFollowResponseDto>> FollowAsync(
+    Guid targetUserId,
+    Guid currentUserId,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<UserFollowResponseDto>> UnfollowAsync(
+    Guid targetUserId,
+    Guid currentUserId,
+    CancellationToken cancellationToken = default);
 }

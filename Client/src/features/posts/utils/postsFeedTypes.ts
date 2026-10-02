@@ -45,6 +45,8 @@ export type FeedPostCard = {
   imageUrl?: string
   poll?: FeedPostPoll | null
   topComment?: FeedPostTopComment | null
+  authorUserId: string
+  isAuthorFollowedByCurrentUser: boolean
 }
 
 export const PAGE_SIZE = 10

@@ -5,6 +5,7 @@ import type {
   UserPreviewDto,
   UpdateUserRequest,
   ChangePasswordRequest,
+  UserFollowResponseDto,
 } from './userTypes';
 
 const API_URL = '/users';
@@ -88,6 +89,18 @@ const remove = async (id: string): Promise<ApiResponse<NoData>> => {
   });
 };
 
+const follow = async (id: string): Promise<ApiResponse<UserFollowResponseDto>> => {
+  return await apiClient<UserFollowResponseDto>(`${API_URL}/${id}/follow`, {
+    method: 'POST',
+  });
+};
+
+const unfollow = async (id: string): Promise<ApiResponse<UserFollowResponseDto>> => {
+  return await apiClient<UserFollowResponseDto>(`${API_URL}/${id}/unfollow`, {
+    method: 'DELETE',
+  });
+};
+
 const userService = {
   getAll,
   getById,
@@ -97,6 +110,8 @@ const userService = {
   updateProfile,
   changePassword,
   remove,
+  follow,
+  unfollow,
 };
 
 export default userService;

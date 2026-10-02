@@ -113,5 +113,7 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
           likeCount: post.topComment.likeCount,
         }
       : null,
+    authorUserId: post.userId,
+    isAuthorFollowedByCurrentUser: post.isAuthorFollowedByCurrentUser ?? false,
   }
 }

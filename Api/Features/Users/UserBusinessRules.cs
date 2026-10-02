@@ -131,4 +131,24 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
       throw new BusinessException("Hesabınız pasif durumdadır. Lütfen yönetici ile iletişime geçin.");
     }
   }
+
+  public void CannotFollowSelf(Guid followerId, Guid followingId)
+  {
+    if (followerId == followingId)
+    {
+      throw new BusinessException("Kendinizi takip edemezsiniz.");
+    }
+  }
+
+  public async Task UserMustBeActiveAsync(Guid userId, CancellationToken cancellationToken = default)
+  {
+    bool exists = await _userRepository.AnyAsync(
+      u => u.Id == userId && u.IsActive,
+      cancellationToken);
+
+    if (!exists)
+    {
+      throw new NotFoundException($"{userId} numaralı kullanıcı bulunamadı.");
+    }
+  }
 }

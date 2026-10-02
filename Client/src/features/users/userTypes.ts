@@ -10,6 +10,9 @@ export interface UserResponseDto {
   createdDate: string
   roleId: number
   roleName: string
+  followerCount?: number
+  followingCount?: number
+  isFollowedByCurrentUser?: boolean | null
 }
 
 export interface UserPreviewDto {
@@ -19,12 +22,20 @@ export interface UserPreviewDto {
   roleName: string
   postCount: number
   totalLikeCount: number
+  followerCount?: number
+  followingCount?: number
   createdDate: string
 }
 
 export interface CreatedUserResponseDto {
   id: string
   username: string
+}
+
+export interface UserFollowResponseDto {
+  userId: string
+  followerCount: number
+  isFollowedByCurrentUser: boolean
 }
 
 // Requests

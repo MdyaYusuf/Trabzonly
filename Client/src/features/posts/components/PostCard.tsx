@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '../../../core/store/hooks'
+import userService from '../../users/userService'
 import postService from '../postService'
 import type { PostReactionType } from '../postTypes'
 import type { CategoryBadgeTone, FeedPostCard } from '../utils/postsFeedTypes'
@@ -27,14 +28,45 @@ type PostCardProps = {
 
 export function PostCard({ post }: PostCardProps) {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const currentUserId = useAppSelector((state) => state.auth.user?.id)
   const detailPath = `/gonderiler/${post.id}`
   const [likeCount, setLikeCount] = useState(post.likeCount)
   const [dislikeCount, setDislikeCount] = useState(post.dislikeCount)
   const [currentReaction, setCurrentReaction] = useState<PostReactionType | null>(null)
   const [isReacting, setIsReacting] = useState(false)
+  const [isFollowingAuthor, setIsFollowingAuthor] = useState(post.isAuthorFollowedByCurrentUser)
+  const [isFollowUpdating, setIsFollowUpdating] = useState(false)
 
   const liked = currentReaction === LIKE
   const disliked = currentReaction === DISLIKE
+  const canFollowAuthor =
+    isAuthenticated &&
+    currentUserId != null &&
+    currentUserId !== post.authorUserId
+
+  async function handleFollowToggle() {
+    if (!canFollowAuthor || isFollowUpdating) {
+      return
+    }
+
+    setIsFollowUpdating(true)
+
+    try {
+      const result = isFollowingAuthor
+        ? await userService.unfollow(post.authorUserId)
+        : await userService.follow(post.authorUserId)
+
+      if (!result.success || !result.data) {
+        return
+      }
+
+      setIsFollowingAuthor(result.data.isFollowedByCurrentUser)
+    } catch {
+      // apiClient already surfaces errors via toast
+    } finally {
+      setIsFollowUpdating(false)
+    }
+  }
 
   async function handleReact(type: PostReactionType) {
     if (!isAuthenticated || isReacting) {
@@ -191,6 +223,23 @@ export function PostCard({ post }: PostCardProps) {
                 <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
                   {post.authorDisplayTag}
                 </span>
+              ) : null}
+              {canFollowAuthor ? (
+                <button
+                  type="button"
+                  disabled={isFollowUpdating}
+                  onClick={() => {
+                    void handleFollowToggle()
+                  }}
+                  className={[
+                    'px-space-xs py-0.5 font-kicker text-kicker font-bold uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+                    isFollowingAuthor
+                      ? 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                      : 'text-secondary hover:text-on-secondary-container',
+                  ].join(' ')}
+                >
+                  {isFollowingAuthor ? 'Takiptesin' : 'Takip Et'}
+                </button>
               ) : null}
             </div>
           </div>

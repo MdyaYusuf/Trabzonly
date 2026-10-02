@@ -59,6 +59,7 @@ public class PostsController(IPostService _postService) : CustomBaseController
       orderBy: orderBy,
       pageNumber: pagination.PageNumber,
       pageSize: pagination.PageSize,
+      currentUserId: TryGetUserId(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
