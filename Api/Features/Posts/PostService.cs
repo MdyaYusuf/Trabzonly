@@ -210,6 +210,7 @@ public class PostService(
     Guid id,
     Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
+    Guid? currentUserId = null,
     CancellationToken cancellationToken = default)
   {
     IQueryable<Post> query = _postRepository.Query(enableTracking);
@@ -218,6 +219,8 @@ public class PostService(
     {
       query = include(query);
     }
+
+    Guid? viewerId = currentUserId;
 
     PostResponseDto? response = await query
       .Where(p => p.Id == id)
@@ -270,7 +273,9 @@ public class PostService(
             AuthorDisplayTag = comment.User.DisplayTag,
             LikeCount = comment.LikeCount
           })
-          .FirstOrDefault()
+          .FirstOrDefault(),
+        IsAuthorFollowedByCurrentUser = viewerId.HasValue &&
+          p.User.Followers.Any(follow => follow.FollowerId == viewerId.Value)
       })
       .FirstOrDefaultAsync(cancellationToken);
 
@@ -503,25 +508,7 @@ public class PostService(
 
     if (request.Poll != null)
     {
-      List<string> pollOptions = request.Poll.Options
-        .Where(option => !string.IsNullOrWhiteSpace(option))
-        .Select(option => option.Trim())
-        .ToList();
-
-      post.Polls.Add(new Poll
-      {
-        Question = request.Poll.Question.Trim(),
-        IsActive = true,
-        PlayerId = null,
-        Options = pollOptions
-          .Select((label, index) => new PollOption
-          {
-            Label = label,
-            SortOrder = index + 1,
-            VoteCount = 0
-          })
-          .ToList()
-      });
+      AttachPollToPost(post, request.Poll);
     }
 
     await _postRepository.AddAsync(post, cancellationToken);
@@ -553,7 +540,11 @@ public class PostService(
 
     await _businessRules.PostTitleCannotBeDuplicatedWhenUpdated(request.Id, request.Title, cancellationToken);
 
-    Post post = await _businessRules.GetPostIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+    Post post = await _businessRules.GetPostIfExistAsync(
+      request.Id,
+      include: query => query.Include(p => p.Polls),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
 
     _businessRules.UserMustBeOwnerOrAdmin(post.UserId, currentUserId, userRole);
 
@@ -565,6 +556,18 @@ public class PostService(
       cancellationToken);
 
     _mapper.UpdateEntityFromRequest(request, post);
+
+    if (request.DeactivatePoll)
+    {
+      Poll activePoll = _businessRules.GetActivePostPollIfExist(post);
+      activePoll.IsActive = false;
+    }
+
+    if (request.Poll != null)
+    {
+      _businessRules.PostMustNotHaveActivePoll(post);
+      AttachPollToPost(post, request.Poll);
+    }
 
     _postRepository.Update(post);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -701,5 +704,28 @@ public class PostService(
     _postRepository.Update(post);
 
     return reactionType;
+  }
+
+  private static void AttachPollToPost(Post post, CreatePostPollRequest request)
+  {
+    List<string> pollOptions = request.Options
+      .Where(option => !string.IsNullOrWhiteSpace(option))
+      .Select(option => option.Trim())
+      .ToList();
+
+    post.Polls.Add(new Poll
+    {
+      Question = request.Question.Trim(),
+      IsActive = true,
+      PlayerId = null,
+      Options = pollOptions
+        .Select((label, index) => new PollOption
+        {
+          Label = label,
+          SortOrder = index + 1,
+          VoteCount = 0
+        })
+        .ToList()
+    });
   }
 }

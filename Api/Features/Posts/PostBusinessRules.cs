@@ -1,4 +1,5 @@
 using Api.Core.Exceptions;
+using Api.Features.Polls;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Posts;
@@ -105,5 +106,27 @@ public class PostBusinessRules(IPostRepository _postRepository)
     {
       throw new BusinessException("Bu post şu anda aktif değil.");
     }
+  }
+
+  public void PostMustNotHaveActivePoll(Post post)
+  {
+    bool hasActivePoll = post.Polls.Any(poll => poll.IsActive);
+
+    if (hasActivePoll)
+    {
+      throw new BusinessException("Bu gönderide zaten aktif bir anket var. Önce mevcut anketi kapatın.");
+    }
+  }
+
+  public Poll GetActivePostPollIfExist(Post post)
+  {
+    Poll? poll = post.Polls.FirstOrDefault(p => p.IsActive);
+
+    if (poll == null)
+    {
+      throw new BusinessException("Bu gönderide kapatılacak aktif bir anket yok.");
+    }
+
+    return poll;
   }
 }

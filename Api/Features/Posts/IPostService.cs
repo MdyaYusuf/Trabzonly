@@ -26,6 +26,7 @@ public interface IPostService
     Guid id,
     Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,
+    Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<List<PostResponseDto>>> GetTopCommentedPostsAsync(

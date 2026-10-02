@@ -70,7 +70,10 @@ public class PostsController(IPostService _postService) : CustomBaseController
     Guid id,
     CancellationToken cancellationToken)
   {
-    var result = await _postService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
+    var result = await _postService.GetByIdAsync(
+      id: id,
+      currentUserId: TryGetUserId(),
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }

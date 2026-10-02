@@ -76,9 +76,16 @@ export interface CreatePostRequest {
   poll?: CreatePostPollRequest | null;
 }
 
-export interface UpdatePostRequest extends CreatePostRequest {
+export interface UpdatePostRequest {
   id: string;
+  title: string;
+  description?: string;
+  content: string;
+  categoryId: number;
+  imageFile?: File | null;
   isActive: boolean;
+  poll?: CreatePostPollRequest | null;
+  deactivatePoll?: boolean;
 }
 
 export type PostReactionType = 1 | 2;

@@ -89,7 +89,9 @@ public sealed record UpdatePostRequest(
   string Content,
   int CategoryId,
   IFormFile? ImageFile,
-  bool IsActive);
+  bool IsActive,
+  CreatePostPollRequest? Poll = null,
+  bool DeactivatePoll = false);
 
 public sealed record PostReactionResponseDto(
   Guid PostId,

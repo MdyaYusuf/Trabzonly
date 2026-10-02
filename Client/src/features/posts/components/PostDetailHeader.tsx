@@ -1,10 +1,22 @@
 import { useState } from 'react'
-import type { PostDetailProfile } from '../utils/postDetailTypes'
+import { toast } from 'react-toastify'
+import { useAppSelector } from '../../../core/store/hooks'
+import userService from '../../users/userService'
+import type { PostResponseDto } from '../postTypes'
+import { estimateReadTimeLabel } from '../utils/estimateReadTime'
 
 type PostDetailHeaderProps = {
-  post: PostDetailProfile
+  post: PostResponseDto
   textScale: number
   onTextScaleChange: (value: number) => void
+}
+
+function formatPublishedLabel(isoDate: string): string {
+  return new Date(isoDate).toLocaleDateString('tr-TR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 
 export function PostDetailHeader({
@@ -12,115 +24,122 @@ export function PostDetailHeader({
   textScale,
   onTextScaleChange,
 }: PostDetailHeaderProps) {
-  const [following, setFollowing] = useState(false)
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const currentUserId = useAppSelector((state) => state.auth.user?.id)
+  const [isFollowing, setIsFollowing] = useState(post.isAuthorFollowedByCurrentUser ?? false)
+  const [isFollowUpdating, setIsFollowUpdating] = useState(false)
+  const readTimeLabel = estimateReadTimeLabel(post.description, post.content)
+  const canFollow =
+    isAuthenticated && currentUserId != null && currentUserId !== post.userId
+
+  async function handleFollowToggle() {
+    if (!canFollow || isFollowUpdating) {
+      return
+    }
+
+    setIsFollowUpdating(true)
+
+    try {
+      const result = isFollowing
+        ? await userService.unfollow(post.userId)
+        : await userService.follow(post.userId)
+
+      if (result.success && result.data) {
+        setIsFollowing(result.data.isFollowedByCurrentUser)
+      }
+    } catch {
+      // apiClient already surfaces errors via toast
+    } finally {
+      setIsFollowUpdating(false)
+    }
+  }
+
+  async function handleShare() {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success('Bağlantı panoya kopyalandı.')
+    } catch {
+      toast.error('Bağlantı kopyalanamadı.')
+    }
+  }
 
   return (
-    <>
-      <div className="mb-space-lg max-w-4xl">
-        <div className="font-body mb-space-xs flex flex-wrap items-center gap-space-md text-body-sm text-on-surface-variant">
-          <span className="flex items-center gap-1 font-bold text-secondary">
-            <span className="h-2 w-2 rounded-full bg-secondary-container" />
-            {post.dossierLabel}
-          </span>
-          <span>•</span>
-          <span>{post.readTimeLabel}</span>
-          <span>•</span>
-          <span className="flex items-center gap-1">
-            <span className="material-symbols-outlined text-[14px]">visibility</span>
-            {post.viewsLabel}
-          </span>
-        </div>
-        <h1 className="font-display mb-space-md text-headline-lg leading-none tracking-tight text-primary uppercase md:text-display-xl">
-          {post.title}
-        </h1>
-        <p className="font-body bg-surface-container-lowest p-space-md text-body-lg leading-relaxed font-normal text-on-surface-variant shadow-sm">
-          {post.lead}
-        </p>
+    <header className="mb-space-lg flex flex-col gap-space-md">
+      <div className="flex flex-wrap items-center gap-space-sm">
+        <span className="bg-primary-container px-space-sm py-space-xs font-kicker text-kicker font-bold text-on-primary uppercase">
+          {post.categoryName}
+        </span>
+        <span className="font-body text-body-sm text-on-surface-variant">
+          {formatPublishedLabel(post.createdDate)}
+        </span>
+        {readTimeLabel ? (
+          <span className="font-body text-body-sm text-on-surface-variant">{readTimeLabel}</span>
+        ) : null}
       </div>
 
-      <div className="mb-space-lg flex flex-col justify-between gap-space-md bg-surface-container-lowest p-space-md shadow-sm md:flex-row md:items-center">
-        <div className="flex items-center gap-space-md">
-          <div className="relative">
-            <img
-              src={post.author.imageUrl}
-              alt=""
-              className="h-14 w-14 object-cover ring-2 ring-primary-container"
-            />
-            <span className="absolute -right-1 -bottom-1 flex h-4 w-4 items-center justify-center rounded-full bg-secondary-container text-[10px] font-bold text-primary">
-              ✓
+      <h1 className="font-headline text-headline-lg font-bold tracking-tight text-primary uppercase lg:text-display-sm">
+        {post.title}
+      </h1>
+
+      {post.description ? (
+        <p className="font-body max-w-3xl text-body-lg text-on-surface-variant">{post.description}</p>
+      ) : null}
+
+      <div className="flex flex-wrap items-center justify-between gap-space-sm border-y border-surface-container py-space-sm">
+        <div className="flex flex-wrap items-center gap-space-sm">
+          <span className="font-label text-label-md font-bold text-on-surface">
+            @{post.authorUsername}
+          </span>
+          {post.authorDisplayTag ? (
+            <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
+              {post.authorDisplayTag}
             </span>
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-space-xs">
-              <span className="font-headline text-headline-sm text-primary">
-                {post.author.username}
-              </span>
-              <span className="bg-surface-container px-space-xs py-0.5 font-kicker text-kicker text-on-surface-variant uppercase">
-                {post.author.roleBadge}
-              </span>
-            </div>
-            <p className="font-body text-body-sm text-on-surface-variant">
-              {post.author.subtitle}
-            </p>
-            <div className="font-label mt-0.5 flex flex-wrap items-center gap-space-sm text-label-md text-on-surface">
-              <span className="font-bold text-primary">{post.author.postsLabel}</span>
-              <span className="text-outline">•</span>
-              <span>{post.author.readsLabel}</span>
-              <span className="text-outline">•</span>
-              <span className="font-bold text-secondary">{post.author.trustLabel}</span>
-            </div>
-          </div>
+          ) : null}
+          {canFollow ? (
+            <button
+              type="button"
+              disabled={isFollowUpdating}
+              onClick={() => {
+                void handleFollowToggle()
+              }}
+              className="font-kicker px-space-xs py-0.5 text-kicker font-bold text-secondary uppercase disabled:opacity-50"
+            >
+              {isFollowing ? 'Takiptesin' : 'Takip Et'}
+            </button>
+          ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-space-xs">
+        <div className="flex items-center gap-space-xs">
           <button
             type="button"
             onClick={() => {
-              setFollowing((value) => !value)
+              onTextScaleChange(Math.max(0.9, textScale - 0.1))
             }}
-            className="bg-primary-container px-space-md py-space-xs font-label text-label-md tracking-wider text-on-primary uppercase shadow-sm transition-colors hover:bg-primary"
+            className="bg-surface-container px-space-sm py-1 font-label text-label-md"
           >
-            {following ? 'Takip Ediliyor' : 'Yazarı Takip Et'}
-          </button>
-          <div className="flex items-center bg-surface-container p-0.5">
-            <button
-              type="button"
-              title="Küçült"
-              onClick={() => {
-                onTextScaleChange(Math.max(0.9, textScale - 0.05))
-              }}
-              className="px-space-xs py-1 text-on-surface transition-colors hover:text-primary"
-            >
-              <span className="font-headline text-label-md font-bold">A-</span>
-            </button>
-            <span className="px-1 text-outline-variant">|</span>
-            <button
-              type="button"
-              title="Büyüt"
-              onClick={() => {
-                onTextScaleChange(Math.min(1.2, textScale + 0.05))
-              }}
-              className="px-space-xs py-1 text-on-surface transition-colors hover:text-primary"
-            >
-              <span className="font-headline text-label-md font-bold">A+</span>
-            </button>
-          </div>
-          <button
-            type="button"
-            title="Kaydet"
-            className="bg-surface-container p-space-xs text-on-surface transition-colors hover:bg-surface-container-high"
-          >
-            <span className="material-symbols-outlined text-[20px]">bookmark</span>
+            A-
           </button>
           <button
             type="button"
-            title="Paylaş"
-            className="bg-surface-container p-space-xs text-on-surface transition-colors hover:bg-surface-container-high"
+            onClick={() => {
+              onTextScaleChange(Math.min(1.3, textScale + 0.1))
+            }}
+            className="bg-surface-container px-space-sm py-1 font-label text-label-md"
           >
-            <span className="material-symbols-outlined text-[20px]">share</span>
+            A+
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              void handleShare()
+            }}
+            className="bg-surface-container p-space-xs text-on-surface"
+            aria-label="Paylaş"
+          >
+            <span className="material-symbols-outlined text-base">share</span>
           </button>
         </div>
       </div>
-    </>
+    </header>
   )
 }
