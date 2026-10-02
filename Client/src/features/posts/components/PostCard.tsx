@@ -1,5 +1,13 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { useAppSelector } from '../../../core/store/hooks'
+import postService from '../postService'
+import type { PostReactionType } from '../postTypes'
 import type { CategoryBadgeTone, FeedPostCard } from '../utils/postsFeedTypes'
+
+const LIKE: PostReactionType = 1
+const DISLIKE: PostReactionType = 2
 
 const categoryToneClass: Record<CategoryBadgeTone, string> = {
   primary: 'bg-primary text-on-primary',
@@ -18,7 +26,50 @@ type PostCardProps = {
 }
 
 export function PostCard({ post }: PostCardProps) {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const detailPath = `/gonderiler/${post.id}`
+  const [likeCount, setLikeCount] = useState(post.likeCount)
+  const [dislikeCount, setDislikeCount] = useState(post.dislikeCount)
+  const [currentReaction, setCurrentReaction] = useState<PostReactionType | null>(null)
+  const [isReacting, setIsReacting] = useState(false)
+
+  const liked = currentReaction === LIKE
+  const disliked = currentReaction === DISLIKE
+
+  async function handleReact(type: PostReactionType) {
+    if (!isAuthenticated || isReacting) {
+      return
+    }
+
+    setIsReacting(true)
+
+    try {
+      const result = type === LIKE ? await postService.like(post.id) : await postService.dislike(post.id)
+
+      if (!result.success || !result.data) {
+        return
+      }
+
+      setLikeCount(result.data.likeCount)
+      setDislikeCount(result.data.dislikeCount)
+      setCurrentReaction(result.data.currentReaction ?? null)
+    } catch {
+      // apiClient already surfaces errors via toast
+    } finally {
+      setIsReacting(false)
+    }
+  }
+
+  async function handleShare() {
+    const shareUrl = `${window.location.origin}/gonderiler/${post.id}`
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success('Bağlantı panoya kopyalandı.')
+    } catch {
+      toast.error('Bağlantı kopyalanamadı.')
+    }
+  }
 
   return (
     <article className="group relative flex flex-col gap-space-md bg-surface-container-lowest p-space-lg shadow-sm">
@@ -33,7 +84,15 @@ export function PostCard({ post }: PostCardProps) {
             {post.categoryLabel}
           </span>
         </div>
-        <span className="font-body text-body-sm text-on-surface-variant">{post.publishedLabel}</span>
+        <div className="flex flex-wrap items-center gap-space-sm font-body text-body-sm text-on-surface-variant">
+          <span>{post.publishedLabel}</span>
+          {post.readTimeLabel ? (
+            <>
+              <span aria-hidden="true">•</span>
+              <span>{post.readTimeLabel}</span>
+            </>
+          ) : null}
+        </div>
       </div>
 
       {post.imageUrl ? (
@@ -84,18 +143,36 @@ export function PostCard({ post }: PostCardProps) {
           <div className="flex items-center bg-surface-container">
             <button
               type="button"
-              className="flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold text-primary transition-colors hover:bg-secondary-container hover:text-on-secondary-container"
+              disabled={!isAuthenticated || isReacting}
+              onClick={() => {
+                void handleReact(LIKE)
+              }}
+              className={[
+                'flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+                liked
+                  ? 'bg-secondary-container text-on-secondary-container'
+                  : 'text-primary hover:bg-secondary-container hover:text-on-secondary-container',
+              ].join(' ')}
             >
               <span className="font-bold text-secondary">▲</span>
-              <span>{post.likeCount}</span>
+              <span>{likeCount}</span>
             </button>
             <div className="h-4 w-px bg-surface-container-highest" />
             <button
               type="button"
-              className="flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold text-on-surface-variant transition-colors hover:bg-error-container hover:text-on-error-container"
+              disabled={!isAuthenticated || isReacting}
+              onClick={() => {
+                void handleReact(DISLIKE)
+              }}
+              className={[
+                'flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+                disliked
+                  ? 'bg-error-container text-on-error-container'
+                  : 'text-on-surface-variant hover:bg-error-container hover:text-on-error-container',
+              ].join(' ')}
             >
               <span className="font-bold text-error">▼</span>
-              <span>{post.dislikeCount}</span>
+              <span>{dislikeCount}</span>
             </button>
           </div>
 
@@ -109,7 +186,11 @@ export function PostCard({ post }: PostCardProps) {
 
           <button
             type="button"
+            onClick={() => {
+              void handleShare()
+            }}
             className="bg-surface-container p-space-xs text-on-surface transition-colors hover:bg-surface-container-high"
+            aria-label="Bağlantıyı kopyala"
           >
             <span className="material-symbols-outlined text-base">share</span>
           </button>

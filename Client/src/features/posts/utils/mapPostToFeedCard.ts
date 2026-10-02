@@ -1,4 +1,5 @@
 import type { PostResponseDto } from '../postTypes'
+import { estimateReadTimeLabel } from './estimateReadTime'
 import type { CategoryBadgeTone, FeedPostCard } from './postsFeedTypes'
 
 const CATEGORY_TONES: CategoryBadgeTone[] = [
@@ -55,6 +56,7 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
     categoryLabel: post.categoryName,
     categoryTone: tone,
     publishedLabel: formatRelativeTime(post.createdDate),
+    readTimeLabel: estimateReadTimeLabel(post.description, post.content),
     title: post.title,
     excerpt: post.description?.trim() || post.content.slice(0, 220),
     content: post.content,

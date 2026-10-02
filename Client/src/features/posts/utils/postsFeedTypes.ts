@@ -8,6 +8,7 @@ export type FeedPostCard = {
   categoryLabel: string
   categoryTone: CategoryBadgeTone
   publishedLabel: string
+  readTimeLabel?: string | null
   title: string
   excerpt: string
   content: string
