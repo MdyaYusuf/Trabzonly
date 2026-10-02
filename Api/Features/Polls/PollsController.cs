@@ -15,6 +15,21 @@ public class PollsController(IPollService _pollService) : CustomBaseController
   {
     var result = await _pollService.GetActiveAsync(
       playerId: playerId,
+      postId: null,
+      currentUserId: TryGetUserId(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("active/by-post/{postId:guid}")]
+  public async Task<IActionResult> GetActiveByPost(
+    Guid postId,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _pollService.GetActiveAsync(
+      playerId: null,
+      postId: postId,
       currentUserId: TryGetUserId(),
       cancellationToken: cancellationToken);
 
@@ -27,6 +42,7 @@ public class PollsController(IPollService _pollService) : CustomBaseController
   {
     var result = await _pollService.GetActiveAsync(
       playerId: null,
+      postId: null,
       currentUserId: TryGetUserId(),
       cancellationToken: cancellationToken);
 

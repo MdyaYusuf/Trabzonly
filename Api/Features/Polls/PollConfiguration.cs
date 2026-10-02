@@ -37,6 +37,13 @@ public class PollConfiguration : IEntityTypeConfiguration<Poll>
       .OnDelete(DeleteBehavior.Cascade)
       .IsRequired(false);
 
+    builder.HasOne(p => p.Post)
+      .WithMany(post => post.Polls)
+      .HasForeignKey(p => p.PostId)
+      .OnDelete(DeleteBehavior.Cascade)
+      .IsRequired(false);
+
     builder.HasIndex(p => new { p.PlayerId, p.IsActive });
+    builder.HasIndex(p => new { p.PostId, p.IsActive });
   }
 }

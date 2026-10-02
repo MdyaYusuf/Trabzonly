@@ -11,6 +11,7 @@ export interface PollResponseDto {
   question: string
   isActive: boolean
   playerId?: number | null
+  postId?: string | null
   totalVotes: number
   currentUserOptionId?: number | null
   options: PollOptionResponseDto[]

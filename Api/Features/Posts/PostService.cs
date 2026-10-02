@@ -3,6 +3,7 @@ using Api.Core.Exceptions;
 using Api.Core.Helpers;
 using Api.Core.Repositories;
 using Api.Core.Responses;
+using Api.Features.Polls;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,7 +66,27 @@ public class PostService(
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
-        CategoryName = p.Category.Name
+        CategoryName = p.Category.Name,
+        Poll = p.Polls
+          .Where(poll => poll.IsActive)
+          .Select(poll => new PostPollSummaryDto
+          {
+            Id = poll.Id,
+            Question = poll.Question,
+            TotalVotes = poll.Options.Sum(option => option.VoteCount),
+            Options = poll.Options
+              .OrderBy(option => option.SortOrder)
+              .ThenBy(option => option.Id)
+              .Select(option => new PostPollOptionSummaryDto
+              {
+                Id = option.Id,
+                Label = option.Label,
+                SortOrder = option.SortOrder,
+                VoteCount = option.VoteCount
+              })
+              .ToList()
+          })
+          .FirstOrDefault()
       })
       .ToListAsync(cancellationToken);
 
@@ -111,7 +132,27 @@ public class PostService(
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
-        CategoryName = p.Category.Name
+        CategoryName = p.Category.Name,
+        Poll = p.Polls
+          .Where(poll => poll.IsActive)
+          .Select(poll => new PostPollSummaryDto
+          {
+            Id = poll.Id,
+            Question = poll.Question,
+            TotalVotes = poll.Options.Sum(option => option.VoteCount),
+            Options = poll.Options
+              .OrderBy(option => option.SortOrder)
+              .ThenBy(option => option.Id)
+              .Select(option => new PostPollOptionSummaryDto
+              {
+                Id = option.Id,
+                Label = option.Label,
+                SortOrder = option.SortOrder,
+                VoteCount = option.VoteCount
+              })
+              .ToList()
+          })
+          .FirstOrDefault()
       })
       .FirstOrDefaultAsync(cancellationToken);
 
@@ -166,7 +207,27 @@ public class PostService(
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
-        CategoryName = p.Category.Name
+        CategoryName = p.Category.Name,
+        Poll = p.Polls
+          .Where(poll => poll.IsActive)
+          .Select(poll => new PostPollSummaryDto
+          {
+            Id = poll.Id,
+            Question = poll.Question,
+            TotalVotes = poll.Options.Sum(option => option.VoteCount),
+            Options = poll.Options
+              .OrderBy(option => option.SortOrder)
+              .ThenBy(option => option.Id)
+              .Select(option => new PostPollOptionSummaryDto
+              {
+                Id = option.Id,
+                Label = option.Label,
+                SortOrder = option.SortOrder,
+                VoteCount = option.VoteCount
+              })
+              .ToList()
+          })
+          .FirstOrDefault()
       })
       .FirstOrDefaultAsync(cancellationToken);
 
@@ -218,7 +279,27 @@ public class PostService(
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
-        CategoryName = p.Category.Name
+        CategoryName = p.Category.Name,
+        Poll = p.Polls
+          .Where(poll => poll.IsActive)
+          .Select(poll => new PostPollSummaryDto
+          {
+            Id = poll.Id,
+            Question = poll.Question,
+            TotalVotes = poll.Options.Sum(option => option.VoteCount),
+            Options = poll.Options
+              .OrderBy(option => option.SortOrder)
+              .ThenBy(option => option.Id)
+              .Select(option => new PostPollOptionSummaryDto
+              {
+                Id = option.Id,
+                Label = option.Label,
+                SortOrder = option.SortOrder,
+                VoteCount = option.VoteCount
+              })
+              .ToList()
+          })
+          .FirstOrDefault()
       })
       .ToListAsync(cancellationToken);
 
@@ -278,7 +359,27 @@ public class PostService(
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
-        CategoryName = p.Category.Name
+        CategoryName = p.Category.Name,
+        Poll = p.Polls
+          .Where(poll => poll.IsActive)
+          .Select(poll => new PostPollSummaryDto
+          {
+            Id = poll.Id,
+            Question = poll.Question,
+            TotalVotes = poll.Options.Sum(option => option.VoteCount),
+            Options = poll.Options
+              .OrderBy(option => option.SortOrder)
+              .ThenBy(option => option.Id)
+              .Select(option => new PostPollOptionSummaryDto
+              {
+                Id = option.Id,
+                Label = option.Label,
+                SortOrder = option.SortOrder,
+                VoteCount = option.VoteCount
+              })
+              .ToList()
+          })
+          .FirstOrDefault()
       })
       .ToListAsync(cancellationToken);
 
@@ -329,6 +430,29 @@ public class PostService(
         "posts",
         request.Title,
         cancellationToken);
+    }
+
+    if (request.Poll != null)
+    {
+      List<string> pollOptions = request.Poll.Options
+        .Where(option => !string.IsNullOrWhiteSpace(option))
+        .Select(option => option.Trim())
+        .ToList();
+
+      post.Polls.Add(new Poll
+      {
+        Question = request.Poll.Question.Trim(),
+        IsActive = true,
+        PlayerId = null,
+        Options = pollOptions
+          .Select((label, index) => new PollOption
+          {
+            Label = label,
+            SortOrder = index + 1,
+            VoteCount = 0
+          })
+          .ToList()
+      });
     }
 
     await _postRepository.AddAsync(post, cancellationToken);

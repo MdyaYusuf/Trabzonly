@@ -15,12 +15,18 @@ public class PollService(
   IValidator<VotePollRequest> _voteValidator) : IPollService
 {
   public async Task<ReturnModel<PollResponseDto?>> GetActiveAsync(
-    int? playerId,
+    int? playerId = null,
+    Guid? postId = null,
     Guid? currentUserId = null,
     CancellationToken cancellationToken = default)
   {
+    _businessRules.PollScopeMustBeValid(playerId, postId);
+
     Poll? poll = await _pollRepository.GetAsync(
-      predicate: p => p.IsActive && p.PlayerId == playerId,
+      predicate: p =>
+        p.IsActive &&
+        p.PlayerId == playerId &&
+        p.PostId == postId,
       include: query => query.Include(p => p.Options),
       enableTracking: false,
       cancellationToken: cancellationToken);
@@ -70,25 +76,22 @@ public class PollService(
     }
 
     _businessRules.AdminRoleRequired(userRole);
+    _businessRules.PollScopeMustBeValid(request.PlayerId, request.PostId);
 
     if (request.IsActive)
     {
-      if (request.PlayerId.HasValue)
-      {
-        await _businessRules.PlayerPollMustBeUniqueWhenActiveAsync(
-          request.PlayerId.Value,
-          cancellationToken: cancellationToken);
-      }
-      else
-      {
-        await _businessRules.GlobalPollMustBeUniqueWhenActiveAsync(cancellationToken: cancellationToken);
-      }
+      await EnsureActiveScopeUniqueAsync(
+        request.PlayerId,
+        request.PostId,
+        excludePollId: null,
+        cancellationToken);
     }
 
     var poll = new Poll
     {
       Question = request.Question.Trim(),
       PlayerId = request.PlayerId,
+      PostId = request.PostId,
       IsActive = request.IsActive,
       Options = request.Options
         .OrderBy(o => o.SortOrder)
@@ -108,7 +111,12 @@ public class PollService(
     {
       Success = true,
       Message = "Anket başarılı bir şekilde eklendi.",
-      Data = new CreatedPollResponseDto(poll.Id, poll.Question, poll.IsActive, poll.PlayerId),
+      Data = new CreatedPollResponseDto(
+        poll.Id,
+        poll.Question,
+        poll.IsActive,
+        poll.PlayerId,
+        poll.PostId),
       StatusCode = 201
     };
   }
@@ -134,19 +142,11 @@ public class PollService(
 
     if (request.IsActive && !poll.IsActive)
     {
-      if (poll.PlayerId.HasValue)
-      {
-        await _businessRules.PlayerPollMustBeUniqueWhenActiveAsync(
-          poll.PlayerId.Value,
-          excludePollId: poll.Id,
-          cancellationToken: cancellationToken);
-      }
-      else
-      {
-        await _businessRules.GlobalPollMustBeUniqueWhenActiveAsync(
-          excludePollId: poll.Id,
-          cancellationToken: cancellationToken);
-      }
+      await EnsureActiveScopeUniqueAsync(
+        poll.PlayerId,
+        poll.PostId,
+        excludePollId: poll.Id,
+        cancellationToken);
     }
 
     poll.Question = request.Question.Trim();
@@ -227,6 +227,35 @@ public class PollService(
     };
   }
 
+  private async Task EnsureActiveScopeUniqueAsync(
+    int? playerId,
+    Guid? postId,
+    int? excludePollId,
+    CancellationToken cancellationToken)
+  {
+    if (postId.HasValue)
+    {
+      await _businessRules.PostPollMustBeUniqueWhenActiveAsync(
+        postId.Value,
+        excludePollId,
+        cancellationToken);
+      return;
+    }
+
+    if (playerId.HasValue)
+    {
+      await _businessRules.PlayerPollMustBeUniqueWhenActiveAsync(
+        playerId.Value,
+        excludePollId,
+        cancellationToken);
+      return;
+    }
+
+    await _businessRules.GlobalPollMustBeUniqueWhenActiveAsync(
+      excludePollId,
+      cancellationToken);
+  }
+
   private static PollResponseDto MapToResponse(Poll poll, int? currentUserOptionId)
   {
     int totalVotes = poll.Options.Sum(o => o.VoteCount);
@@ -254,6 +283,7 @@ public class PollService(
       poll.Question,
       poll.IsActive,
       poll.PlayerId,
+      poll.PostId,
       totalVotes,
       currentUserOptionId,
       options);

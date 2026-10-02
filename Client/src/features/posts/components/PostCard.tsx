@@ -115,6 +115,37 @@ export function PostCard({ post }: PostCardProps) {
         <p className="font-body line-clamp-3 text-body-md text-on-surface-variant">{post.excerpt}</p>
       </div>
 
+      {post.poll ? (
+        <div className="border-l-2 border-secondary bg-surface p-space-sm">
+          <div className="mb-space-xs flex items-center justify-between gap-space-xs">
+            <span className="font-kicker text-kicker font-bold tracking-wider text-secondary uppercase">
+              Anket
+            </span>
+            <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
+              {post.poll.totalVotes} Oy
+            </span>
+          </div>
+          <p className="font-label mb-space-xs text-label-md font-bold text-on-surface">
+            {post.poll.question}
+          </p>
+          <div className="flex items-center justify-between gap-space-sm bg-surface-container px-space-sm py-space-xs">
+            <span className="font-body line-clamp-1 text-body-sm text-on-surface">
+              {post.poll.leadingOption.label}
+            </span>
+            <span className="font-label shrink-0 text-label-md font-bold text-primary">
+              {post.poll.leadingOption.percentage}%
+            </span>
+          </div>
+          <Link
+            to={detailPath}
+            className="font-kicker mt-space-xs inline-flex items-center gap-1 text-kicker font-bold text-secondary uppercase hover:text-primary"
+          >
+            <span>Detayda oyla</span>
+            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+          </Link>
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-center justify-between gap-space-sm border-t border-surface-container pt-space-sm">
         <div className="flex items-center gap-space-sm">
           <div

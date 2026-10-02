@@ -10,6 +10,10 @@ public class CreatePollRequestValidator : AbstractValidator<CreatePollRequest>
       .NotEmpty().WithMessage("Anket sorusu boş olamaz.")
       .MaximumLength(300).WithMessage("Anket sorusu en fazla 300 karakter olabilir.");
 
+    RuleFor(p => p)
+      .Must(p => !(p.PlayerId.HasValue && p.PostId.HasValue))
+      .WithMessage("Anket hem oyuncuya hem gönderiye bağlanamaz.");
+
     RuleFor(p => p.Options)
       .NotNull().WithMessage("Anket seçenekleri zorunludur.")
       .Must(options => options.Count >= 2)

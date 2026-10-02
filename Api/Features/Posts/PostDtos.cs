@@ -1,6 +1,22 @@
 namespace Api.Features.Posts;
 
 // Responses
+public sealed record PostPollOptionSummaryDto
+{
+  public int Id { get; init; }
+  public string Label { get; init; } = default!;
+  public int SortOrder { get; init; }
+  public int VoteCount { get; init; }
+}
+
+public sealed record PostPollSummaryDto
+{
+  public int Id { get; init; }
+  public string Question { get; init; } = default!;
+  public int TotalVotes { get; init; }
+  public IReadOnlyList<PostPollOptionSummaryDto> Options { get; init; } = [];
+}
+
 public sealed record PostResponseDto
 {
   public Guid Id { get; init; }
@@ -18,6 +34,7 @@ public sealed record PostResponseDto
   public string? AuthorDisplayTag { get; init; }
   public int CategoryId { get; init; }
   public string CategoryName { get; init; } = default!;
+  public PostPollSummaryDto? Poll { get; init; }
 }
 
 public sealed record CreatedPostResponseDto
@@ -42,12 +59,17 @@ public sealed record PostPreviewDto
 }
 
 // Requests
+public sealed record CreatePostPollRequest(
+  string Question,
+  IReadOnlyList<string> Options);
+
 public sealed record CreatePostRequest(
   string Title,
   string? Description,
   string Content,
   int CategoryId,
-  IFormFile? ImageFile);
+  IFormFile? ImageFile,
+  CreatePostPollRequest? Poll = null);
 
 public sealed record UpdatePostRequest(
   Guid Id,

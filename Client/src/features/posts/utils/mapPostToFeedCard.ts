@@ -1,6 +1,6 @@
-import type { PostResponseDto } from '../postTypes'
+import type { PostPollSummaryDto, PostResponseDto } from '../postTypes'
 import { estimateReadTimeLabel } from './estimateReadTime'
-import type { CategoryBadgeTone, FeedPostCard } from './postsFeedTypes'
+import type { CategoryBadgeTone, FeedPostCard, FeedPostPoll } from './postsFeedTypes'
 
 const CATEGORY_TONES: CategoryBadgeTone[] = [
   'primary-container',
@@ -47,6 +47,42 @@ function formatRelativeTime(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('tr-TR')
 }
 
+function mapPollSummary(poll: PostPollSummaryDto): FeedPostPoll | null {
+  if (!poll.options || poll.options.length === 0) {
+    return null
+  }
+
+  const totalVotes = poll.totalVotes
+  const options = poll.options.map((option) => {
+    const percentage =
+      totalVotes === 0 ? 0 : Math.round((option.voteCount * 1000) / totalVotes) / 10
+
+    return {
+      id: option.id,
+      label: option.label,
+      sortOrder: option.sortOrder,
+      voteCount: option.voteCount,
+      percentage,
+    }
+  })
+
+  const leadingOption = [...options].sort((a, b) => {
+    if (b.voteCount !== a.voteCount) {
+      return b.voteCount - a.voteCount
+    }
+
+    return a.sortOrder - b.sortOrder
+  })[0]
+
+  return {
+    id: poll.id,
+    question: poll.question,
+    totalVotes,
+    leadingOption,
+    options,
+  }
+}
+
 export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
   const tone = CATEGORY_TONES[Math.abs(post.categoryId) % CATEGORY_TONES.length]
 
@@ -67,5 +103,6 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
     dislikeCount: post.dislikeCount,
     commentCount: post.commentCount,
     imageUrl: post.imageUrl,
+    poll: post.poll ? mapPollSummary(post.poll) : null,
   }
 }

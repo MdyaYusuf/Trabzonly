@@ -3,6 +3,7 @@ using Api.Core.Entities;
 using Api.Features.Comments;
 using Api.Features.Users;
 using Api.Features.Categories;
+using Api.Features.Polls;
 
 namespace Api.Features.Posts;
 
@@ -31,4 +32,5 @@ public class Post : Entity<Guid>
   public virtual Category Category { get; set; } = default!;
   public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
   public virtual ICollection<PostReaction> Reactions { get; set; } = new List<PostReaction>();
+  public virtual ICollection<Poll> Polls { get; set; } = new List<Poll>();
 }

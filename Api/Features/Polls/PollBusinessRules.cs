@@ -46,6 +46,14 @@ public class PollBusinessRules(IPollRepository _pollRepository)
     }
   }
 
+  public void PollScopeMustBeValid(int? playerId, Guid? postId)
+  {
+    if (playerId.HasValue && postId.HasValue)
+    {
+      throw new BusinessException("Anket hem oyuncuya hem gönderiye bağlanamaz.");
+    }
+  }
+
   public async Task PlayerPollMustBeUniqueWhenActiveAsync(
     int playerId,
     int? excludePollId = null,
@@ -53,6 +61,7 @@ public class PollBusinessRules(IPollRepository _pollRepository)
   {
     bool exists = await _pollRepository.AnyAsync(
       p => p.PlayerId == playerId &&
+           p.PostId == null &&
            p.IsActive &&
            (!excludePollId.HasValue || p.Id != excludePollId.Value),
       cancellationToken);
@@ -63,12 +72,31 @@ public class PollBusinessRules(IPollRepository _pollRepository)
     }
   }
 
+  public async Task PostPollMustBeUniqueWhenActiveAsync(
+    Guid postId,
+    int? excludePollId = null,
+    CancellationToken cancellationToken = default)
+  {
+    bool exists = await _pollRepository.AnyAsync(
+      p => p.PostId == postId &&
+           p.PlayerId == null &&
+           p.IsActive &&
+           (!excludePollId.HasValue || p.Id != excludePollId.Value),
+      cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu gönderi için zaten aktif bir anket var.");
+    }
+  }
+
   public async Task GlobalPollMustBeUniqueWhenActiveAsync(
     int? excludePollId = null,
     CancellationToken cancellationToken = default)
   {
     bool exists = await _pollRepository.AnyAsync(
       p => p.PlayerId == null &&
+           p.PostId == null &&
            p.IsActive &&
            (!excludePollId.HasValue || p.Id != excludePollId.Value),
       cancellationToken);

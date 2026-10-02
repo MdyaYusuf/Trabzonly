@@ -10,6 +10,12 @@ const getActiveByPlayer = async (
   return await apiClient<PollResponseDto | null>(`${API_URL}/active/by-player/${playerId}`)
 }
 
+const getActiveByPost = async (
+  postId: string,
+): Promise<ApiResponse<PollResponseDto | null>> => {
+  return await apiClient<PollResponseDto | null>(`${API_URL}/active/by-post/${postId}`)
+}
+
 const getActiveGlobal = async (): Promise<ApiResponse<PollResponseDto | null>> => {
   return await apiClient<PollResponseDto | null>(`${API_URL}/active/global`)
 }
@@ -26,6 +32,7 @@ const vote = async (
 
 const pollService = {
   getActiveByPlayer,
+  getActiveByPost,
   getActiveGlobal,
   vote,
 }

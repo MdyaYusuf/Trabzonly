@@ -5,7 +5,8 @@ namespace Api.Features.Polls;
 public interface IPollService
 {
   Task<ReturnModel<PollResponseDto?>> GetActiveAsync(
-    int? playerId,
+    int? playerId = null,
+    Guid? postId = null,
     Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 

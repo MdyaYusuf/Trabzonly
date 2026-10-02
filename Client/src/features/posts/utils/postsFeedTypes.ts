@@ -2,6 +2,22 @@ export type FeedSortOption = 'newest' | 'popular' | 'discussed'
 
 export type CategoryBadgeTone = 'primary' | 'primary-container' | 'secondary'
 
+export type FeedPostPollOption = {
+  id: number
+  label: string
+  sortOrder: number
+  voteCount: number
+  percentage: number
+}
+
+export type FeedPostPoll = {
+  id: number
+  question: string
+  totalVotes: number
+  leadingOption: FeedPostPollOption
+  options: FeedPostPollOption[]
+}
+
 export type FeedPostCard = {
   id: string
   categoryId: number
@@ -19,6 +35,7 @@ export type FeedPostCard = {
   dislikeCount: number
   commentCount: number
   imageUrl?: string
+  poll?: FeedPostPoll | null
 }
 
 export const PAGE_SIZE = 10

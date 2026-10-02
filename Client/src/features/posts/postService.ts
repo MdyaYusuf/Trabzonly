@@ -14,15 +14,30 @@ const API_URL = '/posts';
 const objectToFormData = (obj: Record<string, unknown>): FormData => {
   const formData = new FormData();
   Object.entries(obj).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      if (value instanceof File) {
-        formData.append(key, value);
-      } else if (value instanceof Date) {
-        formData.append(key, value.toISOString());
-      } else {
-        formData.append(key, String(value));
-      }
+    if (value === undefined || value === null) {
+      return;
     }
+
+    if (value instanceof File) {
+      formData.append(key, value);
+      return;
+    }
+
+    if (key === 'poll' && typeof value === 'object') {
+      const poll = value as { question: string; options: string[] };
+      formData.append('Poll.Question', poll.question);
+      poll.options.forEach((option, index) => {
+        formData.append(`Poll.Options[${index}]`, option);
+      });
+      return;
+    }
+
+    if (value instanceof Date) {
+      formData.append(key, value.toISOString());
+      return;
+    }
+
+    formData.append(key, String(value));
   });
   return formData;
 };

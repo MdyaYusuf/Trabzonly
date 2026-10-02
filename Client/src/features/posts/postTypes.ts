@@ -1,4 +1,18 @@
 // Responses
+export interface PostPollOptionSummaryDto {
+  id: number;
+  label: string;
+  sortOrder: number;
+  voteCount: number;
+}
+
+export interface PostPollSummaryDto {
+  id: number;
+  question: string;
+  totalVotes: number;
+  options: PostPollOptionSummaryDto[];
+}
+
 export interface PostResponseDto {
   id: string;
   title: string;
@@ -15,6 +29,7 @@ export interface PostResponseDto {
   authorDisplayTag?: string | null;
   categoryId: number;
   categoryName: string;
+  poll?: PostPollSummaryDto | null;
 }
 
 export interface CreatedPostResponseDto {
@@ -37,12 +52,18 @@ export interface PostPreviewDto {
 }
 
 // Requests
+export interface CreatePostPollRequest {
+  question: string;
+  options: string[];
+}
+
 export interface CreatePostRequest {
   title: string;
   description?: string;
   content: string;
   categoryId: number;
   imageFile?: File | null;
+  poll?: CreatePostPollRequest | null;
 }
 
 export interface UpdatePostRequest extends CreatePostRequest {

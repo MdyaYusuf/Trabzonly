@@ -13,6 +13,7 @@ public sealed record PollResponseDto(
   string Question,
   bool IsActive,
   int? PlayerId,
+  Guid? PostId,
   int TotalVotes,
   int? CurrentUserOptionId,
   IReadOnlyList<PollOptionResponseDto> Options);
@@ -21,7 +22,8 @@ public sealed record CreatedPollResponseDto(
   int Id,
   string Question,
   bool IsActive,
-  int? PlayerId);
+  int? PlayerId,
+  Guid? PostId);
 
 // Requests
 public sealed record CreatePollOptionRequest(
@@ -31,6 +33,7 @@ public sealed record CreatePollOptionRequest(
 public sealed record CreatePollRequest(
   string Question,
   int? PlayerId,
+  Guid? PostId,
   bool IsActive,
   IReadOnlyList<CreatePollOptionRequest> Options);
 
