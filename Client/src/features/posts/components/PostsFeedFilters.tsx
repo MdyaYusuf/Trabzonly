@@ -1,60 +1,110 @@
-import type { PostCategoryId } from '../utils/postsFeedTypes'
-import { categoryTabs } from '../utils/postsFeedPlaceholders'
+import type { CategoryResponseDto } from '../../categories/categoryTypes'
+import type { FeedSortOption } from '../utils/postsFeedTypes'
+import { sortOptions } from '../utils/postsFeedTypes'
 
 type PostsFeedFiltersProps = {
-  categoryId: PostCategoryId
+  categories: CategoryResponseDto[]
+  categoryId: number | 'all'
   search: string
-  onCategoryChange: (value: PostCategoryId) => void
+  sort: FeedSortOption
+  onCategoryChange: (value: number | 'all') => void
   onSearchChange: (value: string) => void
+  onSortChange: (value: FeedSortOption) => void
 }
 
+const controlClass =
+  'h-10 border border-outline-variant/40 bg-surface-container-low font-label text-label-md font-semibold tracking-wider text-on-surface uppercase transition-colors focus:border-primary focus:bg-surface-container-lowest focus:outline-none'
+
 export function PostsFeedFilters({
+  categories,
   categoryId,
   search,
+  sort,
   onCategoryChange,
   onSearchChange,
+  onSortChange,
 }: PostsFeedFiltersProps) {
   return (
-    <section className="w-full bg-surface-container-lowest shadow-sm">
-      <div className="mx-auto max-w-[1360px] px-4 py-space-sm sm:px-6 lg:px-12">
-        <div className="flex flex-col items-center justify-between gap-space-md lg:flex-row">
-          <div className="scrollbar-none flex w-full items-center gap-space-xs overflow-x-auto py-1 lg:w-auto">
-            {categoryTabs.map((tab) => {
-              const isActive = categoryId === tab.id
+    <section className="sticky top-16 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur-sm sm:top-20">
+      <div className="mx-auto flex max-w-[1360px] flex-col gap-space-sm px-4 py-space-sm sm:px-6 lg:px-12">
+        <div
+          className="flex flex-wrap gap-1 bg-surface-container p-1"
+          role="tablist"
+          aria-label="Kategori filtresi"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={categoryId === 'all'}
+            onClick={() => {
+              onCategoryChange('all')
+            }}
+            className={
+              categoryId === 'all'
+                ? 'min-w-[30%] flex-1 bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
+                : 'min-w-[30%] flex-1 px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
+            }
+          >
+            Tümü
+          </button>
+          {categories.map((category) => {
+            const isActive = categoryId === category.id
 
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => {
-                    onCategoryChange(tab.id)
-                  }}
-                  className={[
-                    'px-space-md py-space-xs font-label text-label-md font-bold whitespace-nowrap uppercase transition-colors',
-                    isActive
-                      ? 'bg-primary-container text-on-primary shadow-sm'
-                      : 'bg-surface-container text-on-surface hover:bg-surface-container-high',
-                  ].join(' ')}
-                >
-                  {tab.label} ({tab.count.toLocaleString('tr-TR')})
-                </button>
-              )
-            })}
-          </div>
+            return (
+              <button
+                key={category.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => {
+                  onCategoryChange(category.id)
+                }}
+                className={
+                  isActive
+                    ? 'min-w-[30%] flex-1 bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
+                    : 'min-w-[30%] flex-1 px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
+                }
+              >
+                {category.name}
+              </button>
+            )
+          })}
+        </div>
 
-          <div className="relative w-full shrink-0 lg:w-72">
-            <span className="material-symbols-outlined absolute top-1/2 left-space-sm -translate-y-1/2 text-lg text-on-surface-variant">
+        <div className="grid grid-cols-1 gap-space-sm sm:grid-cols-[minmax(0,1fr)_auto]">
+          <label className="relative min-w-0">
+            <span className="material-symbols-outlined pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-outline">
               search
             </span>
             <input
-              type="text"
+              className={`${controlClass} w-full pr-space-md pl-10 normal-case tracking-normal`}
+              placeholder="Gönderi başlığı veya yazar ara…"
+              type="search"
               value={search}
               onChange={(event) => {
                 onSearchChange(event.target.value)
               }}
-              placeholder="Gönderi başlığı veya yazar ara..."
-              className="font-body w-full bg-surface-container py-space-xs pr-space-sm pl-10 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant focus:bg-surface"
             />
+          </label>
+
+          <div className="relative min-w-0 sm:min-w-[14rem]">
+            <select
+              className={`${controlClass} w-full cursor-pointer appearance-none px-space-md pr-9`}
+              value={sort}
+              aria-label="Sıralama"
+              onChange={(event) => {
+                onSortChange(event.target.value as FeedSortOption)
+              }}
+            >
+              {sortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="material-symbols-outlined pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-outline">
+              expand_more
+            </span>
           </div>
         </div>
       </div>

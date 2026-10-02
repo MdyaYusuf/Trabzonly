@@ -12,6 +12,7 @@ export interface PostResponseDto {
   createdDate: string;
   userId: string;
   authorUsername: string;
+  authorDisplayTag?: string | null;
   categoryId: number;
   categoryName: string;
 }
@@ -56,4 +57,14 @@ export interface PostReactionResponseDto {
   likeCount: number;
   dislikeCount: number;
   currentReaction?: PostReactionType | null;
+}
+
+export type PostFeedSort = 'newest' | 'popular' | 'discussed';
+
+export interface PostListQuery {
+  pageNumber?: number;
+  pageSize?: number;
+  categoryId?: number;
+  search?: string;
+  sort?: PostFeedSort;
 }

@@ -1,82 +1,64 @@
 type PostsFeedPaginationProps = {
-  currentPage: number
+  filteredCount: number
+  rangeStart: number
+  rangeEnd: number
   totalPages: number
+  currentPage: number
   onPageChange: (page: number) => void
-  onLoadMore: () => void
 }
 
 export function PostsFeedPagination({
-  currentPage,
+  filteredCount,
+  rangeStart,
+  rangeEnd,
   totalPages,
+  currentPage,
   onPageChange,
-  onLoadMore,
 }: PostsFeedPaginationProps) {
-  const pageNumbers = [1, 2, 3, 4].filter((page) => page <= totalPages)
-  const showEllipsis = totalPages > 5
-  const lastPage = totalPages
+  if (filteredCount === 0) {
+    return null
+  }
 
   return (
-    <div className="flex flex-col items-center justify-between gap-space-md border-t border-surface-container pt-space-md sm:flex-row">
-      <button
-        type="button"
-        onClick={onLoadMore}
-        className="w-full bg-surface-container-lowest px-space-lg py-space-sm font-label text-label-md font-bold text-primary uppercase shadow-sm transition-all duration-150 hover:bg-primary-container hover:text-on-primary sm:w-auto"
-      >
-        Daha Fazla Gönderi Yükle
-      </button>
-
+    <div className="mt-space-xl flex flex-col items-center justify-between gap-space-md border-t border-surface-container pt-space-lg sm:flex-row">
+      <span className="font-body text-body-sm text-on-surface-variant">
+        Toplam <strong>{filteredCount}</strong> gönderiden{' '}
+        <strong>
+          {rangeStart}-{rangeEnd}
+        </strong>{' '}
+        arası listeleniyor
+      </span>
       <div className="flex items-center gap-1">
-        {pageNumbers.map((page) => {
-          const isActive = page === currentPage
+        {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => {
+          const isActive = pageNumber === currentPage
 
           return (
             <button
-              key={page}
+              key={pageNumber}
               type="button"
               onClick={() => {
-                onPageChange(page)
+                onPageChange(pageNumber)
               }}
-              className={[
-                'flex h-8 w-8 items-center justify-center font-label text-label-md font-bold',
+              className={
                 isActive
-                  ? 'bg-primary-container text-on-primary'
-                  : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container',
-              ].join(' ')}
+                  ? 'font-label flex h-10 w-10 items-center justify-center bg-primary-container text-label-md font-bold text-on-primary'
+                  : 'font-label flex h-10 w-10 items-center justify-center bg-surface-container text-label-md font-semibold text-on-surface transition-colors hover:bg-surface-container-high'
+              }
             >
-              {page}
+              {pageNumber}
             </button>
           )
         })}
-
-        {showEllipsis ? <span className="px-1 text-on-surface-variant">...</span> : null}
-
-        {lastPage > 4 ? (
-          <button
-            type="button"
-            onClick={() => {
-              onPageChange(lastPage)
-            }}
-            className={[
-              'flex h-8 w-8 items-center justify-center font-label text-label-md font-bold',
-              currentPage === lastPage
-                ? 'bg-primary-container text-on-primary'
-                : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container',
-            ].join(' ')}
-          >
-            {lastPage}
-          </button>
-        ) : null}
-
         <button
           type="button"
           disabled={currentPage >= totalPages}
           onClick={() => {
             onPageChange(Math.min(totalPages, currentPage + 1))
           }}
-          className="flex h-8 items-center justify-center gap-1 bg-surface-container-lowest px-space-sm font-label text-label-md font-bold text-primary uppercase hover:bg-surface-container disabled:opacity-40"
+          className="font-label flex h-10 items-center justify-center gap-1 bg-surface-container px-space-sm text-label-md font-semibold text-on-surface transition-colors hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span>Sonraki</span>
-          <span>→</span>
+          <span className="material-symbols-outlined text-label-md">chevron_right</span>
         </button>
       </div>
     </div>

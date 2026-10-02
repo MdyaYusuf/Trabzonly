@@ -1,4 +1,5 @@
-import { forumPrinciples, weeklyAuthors } from '../utils/postsFeedPlaceholders'
+import { forumPrinciples } from '../utils/postsFeedTypes'
+import { weeklyAuthors } from '../utils/postsFeedPlaceholders'
 
 const avatarToneClass = {
   primary: 'bg-primary text-on-primary',

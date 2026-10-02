@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Api.Core.Controllers;
 using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +13,50 @@ public class PostsController(IPostService _postService) : CustomBaseController
   [HttpGet]
   public async Task<IActionResult> GetAll(
     [FromQuery] PaginationRequest pagination,
+    [FromQuery] int? categoryId = null,
+    [FromQuery] string? search = null,
+    [FromQuery] string sort = "newest",
     CancellationToken cancellationToken = default)
   {
+    int? resolvedCategoryId = categoryId;
+    string? searchTerm = string.IsNullOrWhiteSpace(search)
+      ? null
+      : search.Trim().ToLowerInvariant();
+
+    Expression<Func<Post, bool>> filter = post =>
+      post.IsActive &&
+      (!resolvedCategoryId.HasValue || post.CategoryId == resolvedCategoryId.Value) &&
+      (searchTerm == null ||
+       post.Title.ToLower().Contains(searchTerm) ||
+       post.User.Username.ToLower().Contains(searchTerm) ||
+       (post.Description != null && post.Description.ToLower().Contains(searchTerm)));
+
+    Func<IQueryable<Post>, IOrderedQueryable<Post>> orderBy;
+
+    if (string.Equals(sort, "popular", StringComparison.OrdinalIgnoreCase))
+    {
+      orderBy = query => query
+        .OrderByDescending(post => post.LikeCount)
+        .ThenByDescending(post => post.CreatedDate)
+        .ThenByDescending(post => post.Id);
+    }
+    else if (string.Equals(sort, "discussed", StringComparison.OrdinalIgnoreCase))
+    {
+      orderBy = query => query
+        .OrderByDescending(post => post.CommentCount)
+        .ThenByDescending(post => post.CreatedDate)
+        .ThenByDescending(post => post.Id);
+    }
+    else
+    {
+      orderBy = query => query
+        .OrderByDescending(post => post.CreatedDate)
+        .ThenByDescending(post => post.Id);
+    }
+
     var result = await _postService.GetAllAsync(
+      filter: filter,
+      orderBy: orderBy,
       pageNumber: pagination.PageNumber,
       pageSize: pagination.PageSize,
       cancellationToken: cancellationToken);

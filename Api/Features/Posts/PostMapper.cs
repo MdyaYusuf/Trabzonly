@@ -8,6 +8,7 @@ public partial class PostMapper
   public partial Post CreateToEntity(CreatePostRequest request);
   public partial void UpdateEntityFromRequest(UpdatePostRequest request, Post entity);
   [MapProperty("User.Username", "AuthorUsername")]
+  [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
   [MapProperty("Category.Name", "CategoryName")]
   public partial PostResponseDto EntityToResponseDto(Post entity);
   public partial CreatedPostResponseDto EntityToCreatedResponseDto(Post entity);

@@ -1,43 +1,44 @@
-export type PostCategoryId =
-  | 'all'
-  | 'taktik'
-  | 'mac'
-  | 'transfer'
-  | 'tribun'
-  | 'tarihce'
-  | 'kulup'
-
-export type FeedSortOption = 'newest' | 'popular' | 'discussed' | 'tactical'
+export type FeedSortOption = 'newest' | 'popular' | 'discussed'
 
 export type CategoryBadgeTone = 'primary' | 'primary-container' | 'secondary'
 
 export type FeedPostCard = {
   id: string
-  categoryId: Exclude<PostCategoryId, 'all'>
+  categoryId: number
   categoryLabel: string
   categoryTone: CategoryBadgeTone
-  badge?: string
-  badgeTone?: 'secondary' | 'tertiary'
   publishedLabel: string
-  readTimeLabel?: string
   title: string
   excerpt: string
+  content: string
   authorInitials: string
   authorUsername: string
-  authorRole: string
-  authorAvatarTone: CategoryBadgeTone
-  verified?: boolean
+  authorDisplayTag?: string | null
   likeCount: number
   dislikeCount: number
   commentCount: number
-  featured?: boolean
   imageUrl?: string
-  imageOverlayLabel?: string
-  pollSnippet?: {
-    label: string
-    result: string
-    votesLabel: string
-  }
-  showBookmark?: boolean
-  showSaveLabel?: boolean
 }
+
+export const PAGE_SIZE = 10
+
+export const sortOptions: { value: FeedSortOption; label: string }[] = [
+  { value: 'newest', label: 'En Yeniler' },
+  { value: 'popular', label: 'En Popülerler' },
+  { value: 'discussed', label: 'En Çok Tartışılanlar' },
+]
+
+export const forumPrinciples = [
+  {
+    title: 'Küfürsüz Bordo-Mavi Sevda',
+    body: 'Hakaret, argo ve küfür içeren yorumlar sistem tarafından anında filtrelenir.',
+  },
+  {
+    title: 'Taktik ve Yapıcı Eleştiri Kültürü',
+    body: 'Skordan bağımsız veri ve saha içi analizi desteklenir.',
+  },
+  {
+    title: 'Bağımsız Taraftar Duruşu',
+    body: 'Kulübün menfaatleri her türlü kişisel veya zümre çıkarının üzerindedir.',
+  },
+]

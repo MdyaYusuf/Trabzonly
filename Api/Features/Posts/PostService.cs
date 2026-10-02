@@ -63,6 +63,7 @@ public class PostService(
         CreatedDate = p.CreatedDate,
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
+        AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name
       })
@@ -108,6 +109,7 @@ public class PostService(
         CreatedDate = p.CreatedDate,
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
+        AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name
       })
@@ -162,6 +164,7 @@ public class PostService(
         CreatedDate = p.CreatedDate,
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
+        AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name
       })
@@ -213,6 +216,7 @@ public class PostService(
         CreatedDate = p.CreatedDate,
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
+        AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name
       })
@@ -272,6 +276,7 @@ public class PostService(
         CreatedDate = p.CreatedDate,
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
+        AuthorDisplayTag = p.User.DisplayTag,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name
       })

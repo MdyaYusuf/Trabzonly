@@ -1,38 +1,52 @@
 import { apiClient } from '../../core/api/apiClient';
-import type { ApiResponse, NoData, PaginationRequest, PagedResponse, CursorPagedResponse } from '../../core/types/ApiResponse';
+import type { ApiResponse, NoData, PagedResponse, CursorPagedResponse } from '../../core/types/ApiResponse';
 import type {
   PostResponseDto,
   CreatedPostResponseDto,
   CreatePostRequest,
   UpdatePostRequest,
   PostReactionResponseDto,
+  PostListQuery,
 } from './postTypes';
 
 const API_URL = '/posts';
 
-const objectToFormData = (obj: any): FormData => {
+const objectToFormData = (obj: Record<string, unknown>): FormData => {
   const formData = new FormData();
   Object.entries(obj).forEach(([key, value]) => {
-
     if (value !== undefined && value !== null) {
-
       if (value instanceof File) {
         formData.append(key, value);
       } else if (value instanceof Date) {
         formData.append(key, value.toISOString());
       } else {
-        formData.append(key, (value as any).toString());
+        formData.append(key, String(value));
       }
     }
   });
   return formData;
 };
 
-const getAll = async (pagination: PaginationRequest): Promise<ApiResponse<PagedResponse<PostResponseDto>>> => {
-  const queryParams = new URLSearchParams({
-    pageNumber: pagination.pageNumber.toString(),
-    pageSize: pagination.pageSize.toString(),
-  });
+const getAll = async (
+  query: PostListQuery = {},
+): Promise<ApiResponse<PagedResponse<PostResponseDto>>> => {
+  const queryParams = new URLSearchParams();
+
+  queryParams.set('pageNumber', String(query.pageNumber ?? 1));
+  queryParams.set('pageSize', String(query.pageSize ?? 10));
+
+  if (query.categoryId != null) {
+    queryParams.set('categoryId', String(query.categoryId));
+  }
+
+  if (query.search?.trim()) {
+    queryParams.set('search', query.search.trim());
+  }
+
+  if (query.sort) {
+    queryParams.set('sort', query.sort);
+  }
+
   return await apiClient<PagedResponse<PostResponseDto>>(`${API_URL}?${queryParams}`);
 };
 
@@ -63,7 +77,7 @@ const getRecent = async (
 };
 
 const add = async (request: CreatePostRequest): Promise<ApiResponse<CreatedPostResponseDto>> => {
-  const formData = objectToFormData(request);
+  const formData = objectToFormData(request as unknown as Record<string, unknown>);
   return await apiClient<CreatedPostResponseDto>(API_URL, {
     method: 'POST',
     body: formData,
@@ -71,7 +85,7 @@ const add = async (request: CreatePostRequest): Promise<ApiResponse<CreatedPostR
 };
 
 const update = async (request: UpdatePostRequest): Promise<ApiResponse<NoData>> => {
-  const formData = objectToFormData(request);
+  const formData = objectToFormData(request as unknown as Record<string, unknown>);
   return await apiClient<NoData>(API_URL, {
     method: 'PUT',
     body: formData,
