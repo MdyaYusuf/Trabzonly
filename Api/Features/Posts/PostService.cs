@@ -275,7 +275,13 @@ public class PostService(
           })
           .FirstOrDefault(),
         IsAuthorFollowedByCurrentUser = viewerId.HasValue &&
-          p.User.Followers.Any(follow => follow.FollowerId == viewerId.Value)
+          p.User.Followers.Any(follow => follow.FollowerId == viewerId.Value),
+        CurrentReaction = viewerId.HasValue
+          ? p.Reactions
+              .Where(reaction => reaction.UserId == viewerId.Value)
+              .Select(reaction => (PostReactionType?)reaction.Type)
+              .FirstOrDefault()
+          : null
       })
       .FirstOrDefaultAsync(cancellationToken);
 

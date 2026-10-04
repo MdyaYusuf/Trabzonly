@@ -12,6 +12,8 @@ import {
 type PostCommentsSectionProps = {
   postId: string
   postTitle: string
+  commentCount: number
+  onCommentCountChange: (count: number) => void
 }
 
 const PAGE_COUNT = 20
@@ -71,7 +73,12 @@ function applyReactionToComment(
   }
 }
 
-export function PostCommentsSection({ postId, postTitle }: PostCommentsSectionProps) {
+export function PostCommentsSection({
+  postId,
+  postTitle,
+  commentCount,
+  onCommentCountChange,
+}: PostCommentsSectionProps) {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth)
   const [commentSort, setCommentSort] = useState<CommentSort>('liked')
   const [commentDraft, setCommentDraft] = useState('')
@@ -204,6 +211,7 @@ export function PostCommentsSection({ postId, postTitle }: PostCommentsSectionPr
     }
 
     setCommentDraft('')
+    onCommentCountChange(commentCount + 1)
     await loadComments()
   }
 
@@ -232,6 +240,7 @@ export function PostCommentsSection({ postId, postTitle }: PostCommentsSectionPr
 
     setReplyDraft('')
     setReplyingToId(null)
+    onCommentCountChange(commentCount + 1)
     await loadComments()
   }
 
@@ -277,7 +286,7 @@ export function PostCommentsSection({ postId, postTitle }: PostCommentsSectionPr
           </h2>
         </div>
         <span className="font-label text-label-md text-on-surface-variant">
-          {rootComments.length} Yorum
+          {commentCount.toLocaleString('tr-TR')} Yorum
         </span>
       </div>
 

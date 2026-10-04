@@ -54,6 +54,10 @@ const getAll = async (
     queryParams.set('categoryId', String(query.categoryId));
   }
 
+  if (query.userId) {
+    queryParams.set('userId', query.userId);
+  }
+
   if (query.search?.trim()) {
     queryParams.set('search', query.search.trim());
   }

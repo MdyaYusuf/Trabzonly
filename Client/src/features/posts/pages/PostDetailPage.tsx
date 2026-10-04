@@ -93,9 +93,29 @@ export function PostDetailPage() {
           <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
             <article className="flex flex-col gap-space-lg lg:col-span-8">
               <PostDetailArticle post={post} textScale={textScale} />
-              <PostCommentsSection postId={post.id} postTitle={post.title} />
+              <PostCommentsSection
+                postId={post.id}
+                postTitle={post.title}
+                commentCount={post.commentCount}
+                onCommentCountChange={(count) => {
+                  setPost((current) => {
+                    if (!current) {
+                      return current
+                    }
+
+                    return {
+                      ...current,
+                      commentCount: count,
+                    }
+                  })
+                }}
+              />
             </article>
-            <PostDetailSidebar />
+            <PostDetailSidebar
+              authorUserId={post.userId}
+              authorUsername={post.authorUsername}
+              excludePostId={post.id}
+            />
           </div>
         </div>
       </div>

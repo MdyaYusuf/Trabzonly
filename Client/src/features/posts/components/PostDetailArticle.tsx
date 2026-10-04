@@ -17,7 +17,9 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const [likeCount, setLikeCount] = useState(post.likeCount)
   const [dislikeCount, setDislikeCount] = useState(post.dislikeCount)
-  const [currentReaction, setCurrentReaction] = useState<PostReactionType | null>(null)
+  const [currentReaction, setCurrentReaction] = useState<PostReactionType | null>(
+    post.currentReaction ?? null,
+  )
   const [isReacting, setIsReacting] = useState(false)
 
   const liked = currentReaction === LIKE

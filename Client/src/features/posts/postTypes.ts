@@ -21,6 +21,8 @@ export interface PostTopCommentDto {
   likeCount: number;
 }
 
+export type PostReactionType = 1 | 2;
+
 export interface PostResponseDto {
   id: string;
   title: string;
@@ -40,6 +42,7 @@ export interface PostResponseDto {
   poll?: PostPollSummaryDto | null;
   topComment?: PostTopCommentDto | null;
   isAuthorFollowedByCurrentUser?: boolean;
+  currentReaction?: PostReactionType | null;
 }
 
 export interface CreatedPostResponseDto {
@@ -88,8 +91,6 @@ export interface UpdatePostRequest {
   deactivatePoll?: boolean;
 }
 
-export type PostReactionType = 1 | 2;
-
 export interface PostReactionResponseDto {
   postId: string;
   likeCount: number;
@@ -103,6 +104,7 @@ export interface PostListQuery {
   pageNumber?: number;
   pageSize?: number;
   categoryId?: number;
+  userId?: string;
   search?: string;
   sort?: PostFeedSort;
 }

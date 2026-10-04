@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '../../../core/store/hooks'
 import userService from '../../users/userService'
@@ -25,12 +26,17 @@ export function PostDetailHeader({
   onTextScaleChange,
 }: PostDetailHeaderProps) {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
-  const currentUserId = useAppSelector((state) => state.auth.user?.id)
+  const currentUser = useAppSelector((state) => state.auth.user)
+  const currentUserId = currentUser?.id
   const [isFollowing, setIsFollowing] = useState(post.isAuthorFollowedByCurrentUser ?? false)
   const [isFollowUpdating, setIsFollowUpdating] = useState(false)
   const readTimeLabel = estimateReadTimeLabel(post.description, post.content)
   const canFollow =
     isAuthenticated && currentUserId != null && currentUserId !== post.userId
+  const canEdit =
+    isAuthenticated &&
+    currentUserId != null &&
+    (currentUserId === post.userId || currentUser?.roleName === 'Admin')
 
   async function handleFollowToggle() {
     if (!canFollow || isFollowUpdating) {
@@ -110,6 +116,14 @@ export function PostDetailHeader({
         </div>
 
         <div className="flex items-center gap-space-xs">
+          {canEdit ? (
+            <Link
+              to={`/gonderiler/${post.id}/duzenle`}
+              className="bg-surface-container px-space-sm py-1 font-label text-label-md font-bold text-primary uppercase"
+            >
+              Düzenle
+            </Link>
+          ) : null}
           <button
             type="button"
             onClick={() => {

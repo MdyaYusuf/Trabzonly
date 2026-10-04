@@ -46,6 +46,7 @@ public sealed record PostResponseDto
   public PostPollSummaryDto? Poll { get; init; }
   public PostTopCommentDto? TopComment { get; init; }
   public bool IsAuthorFollowedByCurrentUser { get; init; }
+  public PostReactionType? CurrentReaction { get; init; }
 }
 
 public sealed record CreatedPostResponseDto

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import userService from '../../users/userService'
 import type { UserPreviewDto } from '../../users/userTypes'
 import { forumPrinciples } from '../utils/postsFeedTypes'
@@ -83,6 +84,13 @@ export function PostsFeedSidebar() {
             </li>
           ))}
         </ul>
+        <Link
+          to="/topluluk-kurallari"
+          className="font-label mt-space-md inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
+        >
+          <span>Tüm topluluk kuralları</span>
+          <span className="material-symbols-outlined text-base">arrow_forward</span>
+        </Link>
       </div>
 
       <div className="bg-surface-container-lowest p-space-md shadow-sm">

@@ -14,11 +14,13 @@ public class PostsController(IPostService _postService) : CustomBaseController
   public async Task<IActionResult> GetAll(
     [FromQuery] PaginationRequest pagination,
     [FromQuery] int? categoryId = null,
+    [FromQuery] Guid? userId = null,
     [FromQuery] string? search = null,
     [FromQuery] string sort = "newest",
     CancellationToken cancellationToken = default)
   {
     int? resolvedCategoryId = categoryId;
+    Guid? resolvedUserId = userId;
     string? searchTerm = string.IsNullOrWhiteSpace(search)
       ? null
       : search.Trim().ToLowerInvariant();
@@ -26,6 +28,7 @@ public class PostsController(IPostService _postService) : CustomBaseController
     Expression<Func<Post, bool>> filter = post =>
       post.IsActive &&
       (!resolvedCategoryId.HasValue || post.CategoryId == resolvedCategoryId.Value) &&
+      (!resolvedUserId.HasValue || post.UserId == resolvedUserId.Value) &&
       (searchTerm == null ||
        post.Title.ToLower().Contains(searchTerm) ||
        post.User.Username.ToLower().Contains(searchTerm) ||
