@@ -41,8 +41,8 @@ export function PostsFeedFilters({
             }}
             className={
               categoryId === 'all'
-                ? 'min-w-[30%] flex-1 bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
-                : 'min-w-[30%] flex-1 px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
+                ? 'min-w-[30%] flex-1 cursor-pointer bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
+                : 'min-w-[30%] flex-1 cursor-pointer px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
             }
           >
             Tümü
@@ -61,8 +61,8 @@ export function PostsFeedFilters({
                 }}
                 className={
                   isActive
-                    ? 'min-w-[30%] flex-1 bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
-                    : 'min-w-[30%] flex-1 px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
+                    ? 'min-w-[30%] flex-1 cursor-pointer bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
+                    : 'min-w-[30%] flex-1 cursor-pointer px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
                 }
               >
                 {category.name}

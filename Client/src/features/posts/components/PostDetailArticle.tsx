@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
 import postService from '../postService'
 import type { PostReactionType, PostResponseDto } from '../postTypes'
@@ -21,9 +22,6 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
     post.currentReaction ?? null,
   )
   const [isReacting, setIsReacting] = useState(false)
-
-  const liked = currentReaction === LIKE
-  const disliked = currentReaction === DISLIKE
 
   async function handleReact(type: PostReactionType) {
     if (!isAuthenticated || isReacting) {
@@ -76,44 +74,27 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
       <PostPollCard postId={post.id} />
 
       <div className="flex flex-wrap items-center gap-space-xs border-t border-surface-container pt-space-md">
-        <div className="flex items-center bg-surface-container">
-          <button
-            type="button"
-            disabled={!isAuthenticated || isReacting}
-            onClick={() => {
-              void handleReact(LIKE)
-            }}
-            className={[
-              'flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold disabled:opacity-50',
-              liked ? 'bg-secondary-container text-on-secondary-container' : 'text-primary',
-            ].join(' ')}
-          >
-            <span className="text-secondary">▲</span>
-            <span>{likeCount}</span>
-          </button>
-          <div className="h-4 w-px bg-surface-container-highest" />
-          <button
-            type="button"
-            disabled={!isAuthenticated || isReacting}
-            onClick={() => {
-              void handleReact(DISLIKE)
-            }}
-            className={[
-              'flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold disabled:opacity-50',
-              disliked ? 'bg-error-container text-on-error-container' : 'text-on-surface-variant',
-            ].join(' ')}
-          >
-            <span className="text-error">▼</span>
-            <span>{dislikeCount}</span>
-          </button>
-        </div>
+        <ReactionButtons
+          likeCount={likeCount}
+          dislikeCount={dislikeCount}
+          currentReaction={currentReaction}
+          disabled={!isAuthenticated || isReacting}
+          onLike={() => {
+            void handleReact(LIKE)
+          }}
+          onDislike={() => {
+            void handleReact(DISLIKE)
+          }}
+        />
 
         <button
           type="button"
           onClick={() => {
             void handleShare()
           }}
-          className="bg-surface-container px-space-sm py-space-xs font-label text-label-md font-bold text-on-surface uppercase"
+          title="Bağlantıyı kopyala"
+          aria-label="Bağlantıyı kopyala"
+          className="cursor-pointer bg-surface-container px-space-sm py-space-xs font-label text-label-md font-bold text-on-surface uppercase"
         >
           Paylaş
         </button>

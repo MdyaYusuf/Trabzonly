@@ -138,11 +138,11 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
 
   return (
     <aside className="flex flex-col gap-space-lg lg:col-span-4">
-      <PlayerPollCard playerId={player.id} playerName={player.name} />
+      <PlayerPollCard playerId={player.id} />
 
       <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
         <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-          POZİSYON BAĞLAMI · {groupLabel}
+          POZİSYON KIYASI · {groupLabel}
         </span>
 
         {isLoading ? (
@@ -180,7 +180,7 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
 
       <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
         <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-          KADRO İÇİ RAKİP / PAYLAŞIM
+          Pozisyonundaki Diğer Oyuncular
         </span>
 
         {isLoading ? (

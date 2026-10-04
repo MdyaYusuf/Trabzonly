@@ -151,7 +151,7 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
                 <span className="bg-tertiary-fixed px-2 py-0.5 text-[12px] font-bold text-tertiary">
                   {yellowCards} Sarı
                 </span>
-                <span className="bg-surface-container-highest px-2 py-0.5 text-[12px] font-bold text-on-surface-variant">
+                <span className="bg-error-container px-2 py-0.5 text-[12px] font-bold text-on-error-container">
                   {redCards} Kırmızı
                 </span>
               </div>

@@ -19,6 +19,7 @@ export interface PostTopCommentDto {
   authorUsername: string;
   authorDisplayTag?: string | null;
   likeCount: number;
+  dislikeCount: number;
 }
 
 export type PostReactionType = 1 | 2;

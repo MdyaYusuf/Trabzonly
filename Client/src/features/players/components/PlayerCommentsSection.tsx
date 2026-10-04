@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
 import commentService from '../../comments/commentService'
 import {
@@ -339,8 +340,8 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
             onClick={() => setCommentSort(tab.key)}
             className={
               commentSort === tab.key
-                ? 'bg-primary px-space-md py-space-xs font-label text-label-md font-bold text-on-primary uppercase'
-                : 'bg-surface-container px-space-md py-space-xs font-label text-label-md text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high'
+                ? 'cursor-pointer bg-primary px-space-md py-space-xs font-label text-label-md font-bold text-on-primary uppercase'
+                : 'cursor-pointer bg-surface-container px-space-md py-space-xs font-label text-label-md text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high'
             }
           >
             {tab.label}
@@ -358,8 +359,6 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
         <div className="flex flex-col gap-space-md">
           {rootComments.map((comment) => {
             const replies = repliesByParent[comment.id] ?? []
-            const liked = comment.currentUserReaction === CommentReaction.Like
-            const disliked = comment.currentUserReaction === CommentReaction.Dislike
 
             return (
               <div key={comment.id} className="flex flex-col gap-space-sm bg-surface p-space-md">
@@ -384,33 +383,20 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 bg-surface-container-low px-space-xs py-1">
-                    <button
-                      type="button"
-                      disabled={!isAuthenticated}
-                      onClick={() => void handleReact(comment.id, CommentReaction.Like)}
-                      className={`material-symbols-outlined text-[18px] ${
-                        liked ? 'text-primary' : 'text-on-surface-variant'
-                      } disabled:opacity-40`}
-                      aria-label="Beğen"
-                    >
-                      keyboard_arrow_up
-                    </button>
-                    <span className="min-w-[1.5rem] text-center text-[13px] font-bold text-primary">
-                      {comment.likeCount - comment.dislikeCount}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={!isAuthenticated}
-                      onClick={() => void handleReact(comment.id, CommentReaction.Dislike)}
-                      className={`material-symbols-outlined text-[18px] ${
-                        disliked ? 'text-secondary' : 'text-on-surface-variant'
-                      } disabled:opacity-40`}
-                      aria-label="Beğenme"
-                    >
-                      keyboard_arrow_down
-                    </button>
-                  </div>
+                  <ReactionButtons
+                    size="sm"
+                    className="bg-surface-container-low"
+                    likeCount={comment.likeCount}
+                    dislikeCount={comment.dislikeCount}
+                    currentReaction={comment.currentUserReaction}
+                    disabled={!isAuthenticated}
+                    onLike={() => {
+                      void handleReact(comment.id, CommentReaction.Like)
+                    }}
+                    onDislike={() => {
+                      void handleReact(comment.id, CommentReaction.Dislike)
+                    }}
+                  />
                 </div>
                 <p className="font-body text-body-md text-on-surface">{comment.content}</p>
                 <div className="font-label flex items-center gap-space-md pt-space-xs text-label-md text-on-surface-variant">
@@ -489,37 +475,19 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
                           @{reply.authorUsername} • {formatRelativeTime(reply.createdDate)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          disabled={!isAuthenticated}
-                          onClick={() => void handleReact(reply.id, CommentReaction.Like)}
-                          className={`material-symbols-outlined text-[16px] ${
-                            reply.currentUserReaction === CommentReaction.Like
-                              ? 'text-primary'
-                              : 'text-on-surface-variant'
-                          } disabled:opacity-40`}
-                          aria-label="Beğen"
-                        >
-                          keyboard_arrow_up
-                        </button>
-                        <span className="text-[12px] font-bold text-secondary">
-                          {reply.likeCount - reply.dislikeCount}
-                        </span>
-                        <button
-                          type="button"
-                          disabled={!isAuthenticated}
-                          onClick={() => void handleReact(reply.id, CommentReaction.Dislike)}
-                          className={`material-symbols-outlined text-[16px] ${
-                            reply.currentUserReaction === CommentReaction.Dislike
-                              ? 'text-secondary'
-                              : 'text-on-surface-variant'
-                          } disabled:opacity-40`}
-                          aria-label="Beğenme"
-                        >
-                          keyboard_arrow_down
-                        </button>
-                      </div>
+                      <ReactionButtons
+                        size="sm"
+                        likeCount={reply.likeCount}
+                        dislikeCount={reply.dislikeCount}
+                        currentReaction={reply.currentUserReaction}
+                        disabled={!isAuthenticated}
+                        onLike={() => {
+                          void handleReact(reply.id, CommentReaction.Like)
+                        }}
+                        onDislike={() => {
+                          void handleReact(reply.id, CommentReaction.Dislike)
+                        }}
+                      />
                     </div>
                     <p className="font-body text-body-sm text-on-surface">{reply.content}</p>
                   </div>

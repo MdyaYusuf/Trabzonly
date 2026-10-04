@@ -28,7 +28,7 @@ export function PostsFeedHero() {
               className="flex shrink-0 items-center gap-space-xs bg-primary-container px-space-lg py-space-sm font-headline text-label-md font-bold text-on-primary uppercase shadow-sm transition-all duration-150 hover:bg-primary"
             >
               <span className="material-symbols-outlined text-lg">add</span>
-              <span>+ Yeni Gönderi</span>
+              <span>Yeni Gönderi</span>
             </Link>
           </div>
         </div>

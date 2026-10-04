@@ -108,7 +108,7 @@ export function PostDetailHeader({
               onClick={() => {
                 void handleFollowToggle()
               }}
-              className="font-kicker px-space-xs py-0.5 text-kicker font-bold text-secondary uppercase disabled:opacity-50"
+              className="font-kicker cursor-pointer px-space-xs py-0.5 text-kicker font-bold text-secondary uppercase disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isFollowing ? 'Takiptesin' : 'Takip Et'}
             </button>
@@ -129,7 +129,9 @@ export function PostDetailHeader({
             onClick={() => {
               onTextScaleChange(Math.max(0.9, textScale - 0.1))
             }}
-            className="bg-surface-container px-space-sm py-1 font-label text-label-md"
+            className="cursor-pointer bg-surface-container px-space-sm py-1 font-label text-label-md"
+            title="Yazı boyutunu küçült"
+            aria-label="Yazı boyutunu küçült"
           >
             A-
           </button>
@@ -138,7 +140,9 @@ export function PostDetailHeader({
             onClick={() => {
               onTextScaleChange(Math.min(1.3, textScale + 0.1))
             }}
-            className="bg-surface-container px-space-sm py-1 font-label text-label-md"
+            className="cursor-pointer bg-surface-container px-space-sm py-1 font-label text-label-md"
+            title="Yazı boyutunu büyüt"
+            aria-label="Yazı boyutunu büyüt"
           >
             A+
           </button>
@@ -147,7 +151,8 @@ export function PostDetailHeader({
             onClick={() => {
               void handleShare()
             }}
-            className="bg-surface-container p-space-xs text-on-surface"
+            className="cursor-pointer bg-surface-container p-space-xs text-on-surface"
+            title="Paylaş"
             aria-label="Paylaş"
           >
             <span className="material-symbols-outlined text-base">share</span>

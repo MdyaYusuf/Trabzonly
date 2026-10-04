@@ -99,7 +99,8 @@ public class PostService(
             Content = comment.Content,
             AuthorUsername = comment.User.Username,
             AuthorDisplayTag = comment.User.DisplayTag,
-            LikeCount = comment.LikeCount
+            LikeCount = comment.LikeCount,
+            DislikeCount = comment.DislikeCount
           })
           .FirstOrDefault(),
         IsAuthorFollowedByCurrentUser = viewerId.HasValue &&
@@ -180,7 +181,8 @@ public class PostService(
             Content = comment.Content,
             AuthorUsername = comment.User.Username,
             AuthorDisplayTag = comment.User.DisplayTag,
-            LikeCount = comment.LikeCount
+            LikeCount = comment.LikeCount,
+            DislikeCount = comment.DislikeCount
           })
           .FirstOrDefault()
       })
@@ -271,7 +273,8 @@ public class PostService(
             Content = comment.Content,
             AuthorUsername = comment.User.Username,
             AuthorDisplayTag = comment.User.DisplayTag,
-            LikeCount = comment.LikeCount
+            LikeCount = comment.LikeCount,
+            DislikeCount = comment.DislikeCount
           })
           .FirstOrDefault(),
         IsAuthorFollowedByCurrentUser = viewerId.HasValue &&
@@ -364,7 +367,8 @@ public class PostService(
             Content = comment.Content,
             AuthorUsername = comment.User.Username,
             AuthorDisplayTag = comment.User.DisplayTag,
-            LikeCount = comment.LikeCount
+            LikeCount = comment.LikeCount,
+            DislikeCount = comment.DislikeCount
           })
           .FirstOrDefault()
       })
@@ -457,7 +461,8 @@ public class PostService(
             Content = comment.Content,
             AuthorUsername = comment.User.Username,
             AuthorDisplayTag = comment.User.DisplayTag,
-            LikeCount = comment.LikeCount
+            LikeCount = comment.LikeCount,
+            DislikeCount = comment.DislikeCount
           })
           .FirstOrDefault()
       })

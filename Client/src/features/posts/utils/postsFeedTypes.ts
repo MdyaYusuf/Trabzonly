@@ -24,6 +24,7 @@ export type FeedPostTopComment = {
   authorUsername: string
   authorDisplayTag?: string | null
   likeCount: number
+  dislikeCount: number
 }
 
 export type FeedPostCard = {

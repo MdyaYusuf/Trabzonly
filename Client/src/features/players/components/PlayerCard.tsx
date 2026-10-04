@@ -19,8 +19,13 @@ type PlayerCardProps = {
 }
 
 export function PlayerCard({ player }: PlayerCardProps) {
+  const detailPath = `/oyuncular/${player.id}`
+
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden bg-surface-container-lowest shadow-sm transition-shadow hover:shadow-md">
+    <Link
+      to={detailPath}
+      className="group relative flex h-full cursor-pointer flex-col overflow-hidden bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md"
+    >
       <div className="flex items-start justify-between p-space-md pb-0">
         <div className="flex min-w-0 items-center gap-space-xs">
           <span className="font-headline flex h-7 w-7 shrink-0 items-center justify-center bg-primary-container text-body-md font-black text-on-primary">
@@ -100,15 +105,12 @@ export function PlayerCard({ player }: PlayerCardProps) {
               {formatMarketValue(player.marketValue)}
             </span>
           </div>
-          <Link
-            to={`/oyuncular/${player.id}`}
-            className="font-label inline-flex items-center gap-1 bg-primary-container px-space-sm py-1.5 text-label-md font-bold text-on-primary uppercase transition-colors hover:bg-primary"
-          >
+          <span className="font-label inline-flex items-center gap-1 bg-primary-container px-space-sm py-1.5 text-label-md font-bold text-on-primary uppercase transition-colors group-hover:bg-primary">
             <span>İncele</span>
             <span className="material-symbols-outlined text-body-sm">arrow_forward</span>
-          </Link>
+          </span>
         </div>
       </div>
-    </article>
+    </Link>
   )
 }

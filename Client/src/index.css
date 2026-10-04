@@ -56,6 +56,11 @@
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
+  --color-success: #1f7a3f;
+  --color-on-success: #ffffff;
+  --color-success-container: #d4edda;
+  --color-on-success-container: #0d3d1f;
+
   /* —— Brand aliases (palette architecture) —— */
   --color-bordo: #5a0e27;
   --color-mavi: #75b7e5;

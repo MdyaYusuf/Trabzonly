@@ -111,6 +111,7 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
           authorUsername: post.topComment.authorUsername,
           authorDisplayTag: post.topComment.authorDisplayTag,
           likeCount: post.topComment.likeCount,
+          dislikeCount: post.topComment.dislikeCount,
         }
       : null,
     authorUserId: post.userId,

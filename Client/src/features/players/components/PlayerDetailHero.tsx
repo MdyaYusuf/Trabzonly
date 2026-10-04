@@ -246,7 +246,7 @@ export function PlayerDetailHero({
                       onClick={() => {
                         setIsRatingOpen((open) => !open)
                       }}
-                      className="font-label flex items-center gap-2 bg-secondary-container px-space-lg py-space-sm text-label-md font-bold tracking-wider text-on-secondary-container uppercase shadow-md transition-all hover:bg-surface-container-lowest"
+                      className="font-label flex cursor-pointer items-center gap-2 bg-secondary-container px-space-lg py-space-sm text-label-md font-bold tracking-wider text-on-secondary-container uppercase shadow-md transition-all hover:bg-surface-container-lowest"
                     >
                       <span
                         className="material-symbols-outlined text-[18px]"
@@ -264,7 +264,7 @@ export function PlayerDetailHero({
                       onClick={() => {
                         void navigator.clipboard?.writeText(window.location.href)
                       }}
-                      className="flex items-center justify-center bg-surface-container-highest/20 p-space-sm text-on-primary transition-colors hover:bg-surface-container-highest/40"
+                      className="flex cursor-pointer items-center justify-center bg-surface-container-highest/20 p-space-sm text-on-primary transition-colors hover:bg-surface-container-highest/40"
                     >
                       <span className="material-symbols-outlined text-[18px]">share</span>
                     </button>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
 import userService from '../../users/userService'
 import postService from '../postService'
@@ -37,8 +38,6 @@ export function PostCard({ post }: PostCardProps) {
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(post.isAuthorFollowedByCurrentUser)
   const [isFollowUpdating, setIsFollowUpdating] = useState(false)
 
-  const liked = currentReaction === LIKE
-  const disliked = currentReaction === DISLIKE
   const canFollowAuthor =
     isAuthenticated &&
     currentUserId != null &&
@@ -153,8 +152,15 @@ export function PostCard({ post }: PostCardProps) {
             <span className="font-kicker text-kicker font-bold tracking-wider text-secondary uppercase">
               Öne Çıkan Yorum
             </span>
-            <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-              {post.topComment.likeCount} beğeni
+            <span className="font-kicker flex items-center gap-space-xs text-kicker font-bold uppercase">
+              <span className="inline-flex items-center gap-0.5 text-success">
+                <span className="material-symbols-outlined text-[14px]">thumb_up</span>
+                {post.topComment.likeCount}
+              </span>
+              <span className="inline-flex items-center gap-0.5 text-error">
+                <span className="material-symbols-outlined text-[14px]">thumb_down</span>
+                {post.topComment.dislikeCount}
+              </span>
             </span>
           </div>
           <p className="font-body text-body-sm text-on-surface italic">
@@ -246,41 +252,18 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         <div className="flex items-center gap-space-xs">
-          <div className="flex items-center bg-surface-container">
-            <button
-              type="button"
-              disabled={!isAuthenticated || isReacting}
-              onClick={() => {
-                void handleReact(LIKE)
-              }}
-              className={[
-                'flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-                liked
-                  ? 'bg-secondary-container text-on-secondary-container'
-                  : 'text-primary hover:bg-secondary-container hover:text-on-secondary-container',
-              ].join(' ')}
-            >
-              <span className="font-bold text-secondary">▲</span>
-              <span>{likeCount}</span>
-            </button>
-            <div className="h-4 w-px bg-surface-container-highest" />
-            <button
-              type="button"
-              disabled={!isAuthenticated || isReacting}
-              onClick={() => {
-                void handleReact(DISLIKE)
-              }}
-              className={[
-                'flex items-center gap-space-xs px-space-sm py-space-xs font-label text-label-md font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-                disliked
-                  ? 'bg-error-container text-on-error-container'
-                  : 'text-on-surface-variant hover:bg-error-container hover:text-on-error-container',
-              ].join(' ')}
-            >
-              <span className="font-bold text-error">▼</span>
-              <span>{dislikeCount}</span>
-            </button>
-          </div>
+          <ReactionButtons
+            likeCount={likeCount}
+            dislikeCount={dislikeCount}
+            currentReaction={currentReaction}
+            disabled={!isAuthenticated || isReacting}
+            onLike={() => {
+              void handleReact(LIKE)
+            }}
+            onDislike={() => {
+              void handleReact(DISLIKE)
+            }}
+          />
 
           <Link
             to={detailPath}
@@ -295,7 +278,8 @@ export function PostCard({ post }: PostCardProps) {
             onClick={() => {
               void handleShare()
             }}
-            className="bg-surface-container p-space-xs text-on-surface transition-colors hover:bg-surface-container-high"
+            className="cursor-pointer bg-surface-container p-space-xs text-on-surface transition-colors hover:bg-surface-container-high"
+            title="Bağlantıyı kopyala"
             aria-label="Bağlantıyı kopyala"
           >
             <span className="material-symbols-outlined text-base">share</span>

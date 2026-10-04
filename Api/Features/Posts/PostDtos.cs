@@ -24,6 +24,7 @@ public sealed record PostTopCommentDto
   public string AuthorUsername { get; init; } = default!;
   public string? AuthorDisplayTag { get; init; }
   public int LikeCount { get; init; }
+  public int DislikeCount { get; init; }
 }
 
 public sealed record PostResponseDto
