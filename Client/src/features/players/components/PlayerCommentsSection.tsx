@@ -101,14 +101,13 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
       setIsLoading(true)
     }
 
-    const result = await commentService.getRecent(
-      PAGE_COUNT,
-      undefined,
+    const result = await commentService.getRecent({
+      count: PAGE_COUNT,
       playerId,
-      append ? nextCursorDate : undefined,
-      append ? nextCursorId : undefined,
-      commentSort,
-    )
+      lastDate: append ? nextCursorDate : undefined,
+      lastId: append ? nextCursorId : undefined,
+      sort: commentSort,
+    })
 
     if (!result.success || !result.data) {
       if (!append) {
@@ -137,14 +136,11 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
     async function run() {
       setIsLoading(true)
 
-      const result = await commentService.getRecent(
-        PAGE_COUNT,
-        undefined,
+      const result = await commentService.getRecent({
+        count: PAGE_COUNT,
         playerId,
-        undefined,
-        undefined,
-        commentSort,
-      )
+        sort: commentSort,
+      })
 
       if (cancelled) {
         return

@@ -108,14 +108,13 @@ export function PostCommentsSection({
       setIsLoading(true)
     }
 
-    const result = await commentService.getRecent(
-      PAGE_COUNT,
+    const result = await commentService.getRecent({
+      count: PAGE_COUNT,
       postId,
-      undefined,
-      append ? nextCursorDate : undefined,
-      append ? nextCursorId : undefined,
-      commentSort,
-    )
+      lastDate: append ? nextCursorDate : undefined,
+      lastId: append ? nextCursorId : undefined,
+      sort: commentSort,
+    })
 
     if (!result.success || !result.data) {
       if (!append) {
@@ -144,14 +143,11 @@ export function PostCommentsSection({
     async function run() {
       setIsLoading(true)
 
-      const result = await commentService.getRecent(
-        PAGE_COUNT,
+      const result = await commentService.getRecent({
+        count: PAGE_COUNT,
         postId,
-        undefined,
-        undefined,
-        undefined,
-        commentSort,
-      )
+        sort: commentSort,
+      })
 
       if (cancelled) {
         return

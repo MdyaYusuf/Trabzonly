@@ -11,8 +11,35 @@ public class CreateCommentRequestValidator : AbstractValidator<CreateCommentRequ
       .MaximumLength(1000).WithMessage("Yorum içeriği en fazla 1000 karakter olabilir.");
 
     RuleFor(x => x)
-      .Must(x => x.PostId.HasValue || x.PlayerId.HasValue || x.SquadId.HasValue || x.ParentCommentId.HasValue)
-      .WithMessage("Yorum bir post, oyuncu, kadro veya başka bir yoruma ait olmalıdır.");
+      .Must(HaveExactlyOneTargetOrParent)
+      .WithMessage("Yorum tam olarak bir post, oyuncu veya kadroya ait olmalıdır. Yanıtlar için üst yorum yeterlidir.");
+  }
+
+  private static bool HaveExactlyOneTargetOrParent(CreateCommentRequest request)
+  {
+    int targetCount = 0;
+
+    if (request.PostId.HasValue)
+    {
+      targetCount++;
+    }
+
+    if (request.PlayerId.HasValue)
+    {
+      targetCount++;
+    }
+
+    if (request.SquadId.HasValue)
+    {
+      targetCount++;
+    }
+
+    if (request.ParentCommentId.HasValue)
+    {
+      return targetCount <= 1;
+    }
+
+    return targetCount == 1;
   }
 }
 

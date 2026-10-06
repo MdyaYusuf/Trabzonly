@@ -8,6 +8,16 @@ export const CommentReaction = {
 
 export type CommentSort = 'liked' | 'newest'
 
+export type GetRecentCommentsQuery = {
+  count?: number
+  postId?: string
+  playerId?: number
+  squadId?: string
+  lastDate?: string
+  lastId?: string
+  sort?: CommentSort
+}
+
 export interface CommentResponseDto {
   id: string
   content: string

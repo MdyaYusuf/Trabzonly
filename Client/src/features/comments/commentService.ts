@@ -12,7 +12,7 @@ import type {
   CreateCommentRequest,
   UpdateCommentRequest,
   CommentReactionResponseDto,
-  CommentSort,
+  GetRecentCommentsQuery,
 } from './commentTypes'
 
 const API_URL = '/comments'
@@ -28,32 +28,30 @@ const getAll = async (
 }
 
 const getRecent = async (
-  count: number = 10,
-  postId?: string,
-  playerId?: number,
-  lastDate?: string,
-  lastId?: string,
-  sort: CommentSort = 'newest',
-  squadId?: string,
+  query: GetRecentCommentsQuery = {},
 ): Promise<ApiResponse<CursorPagedResponse<CommentResponseDto>>> => {
   const queryParams = new URLSearchParams()
-  queryParams.append('count', count.toString())
-  queryParams.append('sort', sort)
+  queryParams.append('count', (query.count ?? 10).toString())
+  queryParams.append('sort', query.sort ?? 'newest')
 
-  if (postId) {
-    queryParams.append('postId', postId)
+  if (query.postId) {
+    queryParams.append('postId', query.postId)
   }
-  if (playerId != null) {
-    queryParams.append('playerId', playerId.toString())
+
+  if (query.playerId != null) {
+    queryParams.append('playerId', query.playerId.toString())
   }
-  if (squadId) {
-    queryParams.append('squadId', squadId)
+
+  if (query.squadId) {
+    queryParams.append('squadId', query.squadId)
   }
-  if (lastDate) {
-    queryParams.append('lastDate', lastDate)
+
+  if (query.lastDate) {
+    queryParams.append('lastDate', query.lastDate)
   }
-  if (lastId) {
-    queryParams.append('lastId', lastId)
+
+  if (query.lastId) {
+    queryParams.append('lastId', query.lastId)
   }
 
   const qs = queryParams.toString() ? `?${queryParams.toString()}` : ''
