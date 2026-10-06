@@ -12,6 +12,7 @@ public sealed record CommentResponseDto(
   string? AuthorDisplayTag,
   Guid? PostId,
   int? PlayerId,
+  Guid? SquadId,
   Guid? ParentCommentId,
   DateTime CreatedDate,
   CommentReactionType? CurrentUserReaction = null);
@@ -32,6 +33,7 @@ public sealed record CreateCommentRequest(
   string Content,
   Guid? PostId,
   int? PlayerId,
+  Guid? SquadId,
   Guid? ParentCommentId);
 
 public sealed record UpdateCommentRequest(

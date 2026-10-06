@@ -56,6 +56,7 @@ export interface SquadSlotRequest {
 export interface CreateSquadRequest {
   title: string;
   formation: string;
+  notes: string;
   slots: SquadSlotRequest[];
 }
 

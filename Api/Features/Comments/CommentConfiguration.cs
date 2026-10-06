@@ -50,6 +50,11 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
       .HasForeignKey(c => c.PlayerId)
       .OnDelete(DeleteBehavior.Cascade);
 
+    builder.HasOne(c => c.Squad)
+      .WithMany(s => s.Comments)
+      .HasForeignKey(c => c.SquadId)
+      .OnDelete(DeleteBehavior.Cascade);
+
     builder.HasOne(c => c.ParentComment)
       .WithMany(c => c.Replies)
       .HasForeignKey(c => c.ParentCommentId)

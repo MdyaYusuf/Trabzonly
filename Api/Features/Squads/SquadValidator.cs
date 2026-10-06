@@ -14,6 +14,9 @@ public class CreateSquadRequestValidator : AbstractValidator<CreateSquadRequest>
       .NotEmpty().WithMessage("Diziliş boş olamaz.")
       .MaximumLength(50).WithMessage("Diziliş en fazla 50 karakter olabilir.");
 
+    RuleFor(s => s.Notes)
+      .MaximumLength(2000).WithMessage("Notlar en fazla 2000 karakter olabilir.");
+
     RuleFor(s => s.Slots)
       .NotNull().WithMessage("Kadro mevkileri zorunludur.")
       .Must(slots => slots.Count == 11).WithMessage("Kadro tam olarak 11 oyuncudan oluşmalıdır.");
@@ -36,6 +39,9 @@ public class UpdateSquadRequestValidator : AbstractValidator<UpdateSquadRequest>
     RuleFor(s => s.Formation)
       .NotEmpty().WithMessage("Diziliş boş olamaz.")
       .MaximumLength(50).WithMessage("Diziliş en fazla 50 karakter olabilir.");
+
+    RuleFor(s => s.Notes)
+      .MaximumLength(2000).WithMessage("Notlar en fazla 2000 karakter olabilir.");
 
     RuleFor(s => s.Slots)
       .NotNull().WithMessage("Kadro mevkileri zorunludur.")

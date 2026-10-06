@@ -30,6 +30,7 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
     [FromQuery] int count = 10,
     [FromQuery] Guid? postId = null,
     [FromQuery] int? playerId = null,
+    [FromQuery] Guid? squadId = null,
     [FromQuery] string sort = "newest",
     [FromQuery] DateTime? lastDate = null,
     [FromQuery] Guid? lastId = null,
@@ -51,6 +52,15 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
     {
       int resolvedPlayerId = playerId.Value;
       filter = c => c.PlayerId == resolvedPlayerId && c.ParentCommentId == null;
+      include = query => query
+        .Include(c => c.User)
+        .Include(c => c.Replies)
+        .ThenInclude(r => r.User);
+    }
+    else if (squadId.HasValue)
+    {
+      Guid resolvedSquadId = squadId.Value;
+      filter = c => c.SquadId == resolvedSquadId && c.ParentCommentId == null;
       include = query => query
         .Include(c => c.User)
         .Include(c => c.Replies)

@@ -31,12 +31,25 @@ public class SquadConfiguration : IEntityTypeConfiguration<Squad>
       .HasMaxLength(50)
       .IsRequired();
 
+    builder.Property(s => s.Notes)
+      .HasMaxLength(2000)
+      .IsRequired()
+      .HasDefaultValue(string.Empty);
+
     builder.Property(s => s.AverageRating)
       .HasPrecision(4, 2)
       .HasDefaultValue(0m)
       .IsRequired();
 
     builder.Property(s => s.RatingCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
+    builder.Property(s => s.ViewCount)
+      .HasDefaultValue(0)
+      .IsRequired();
+
+    builder.Property(s => s.CommentCount)
       .HasDefaultValue(0)
       .IsRequired();
 

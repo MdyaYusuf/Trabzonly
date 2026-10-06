@@ -3,6 +3,7 @@ using Api.Core.Exceptions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
 using Api.Features.Posts;
+using Api.Features.Squads;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ public class CommentService(
   ICommentRepository _commentRepository,
   ICommentReactionRepository _commentReactionRepository,
   IPostRepository _postRepository,
+  ISquadRepository _squadRepository,
   CommentMapper _mapper,
   CommentBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
@@ -175,6 +177,7 @@ public class CommentService(
 
       comment.PostId ??= parent.PostId;
       comment.PlayerId ??= parent.PlayerId;
+      comment.SquadId ??= parent.SquadId;
     }
 
     await _commentRepository.AddAsync(comment, cancellationToken);
@@ -182,6 +185,11 @@ public class CommentService(
     if (comment.PostId.HasValue)
     {
       await AdjustPostCommentCountAsync(comment.PostId.Value, delta: 1, cancellationToken);
+    }
+
+    if (comment.SquadId.HasValue)
+    {
+      await AdjustSquadCommentCountAsync(comment.SquadId.Value, delta: 1, cancellationToken);
     }
 
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -240,6 +248,11 @@ public class CommentService(
     if (comment.PostId.HasValue)
     {
       await AdjustPostCommentCountAsync(comment.PostId.Value, delta: -1, cancellationToken);
+    }
+
+    if (comment.SquadId.HasValue)
+    {
+      await AdjustSquadCommentCountAsync(comment.SquadId.Value, delta: -1, cancellationToken);
     }
 
     _commentRepository.Delete(comment);
@@ -411,5 +424,24 @@ public class CommentService(
 
     post.CommentCount = Math.Max(0, post.CommentCount + delta);
     _postRepository.Update(post);
+  }
+
+  private async Task AdjustSquadCommentCountAsync(
+    Guid squadId,
+    int delta,
+    CancellationToken cancellationToken)
+  {
+    Squad? squad = await _squadRepository.GetByIdAsync(
+      squadId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    if (squad == null)
+    {
+      throw new NotFoundException($"{squadId} numaralı kadro bulunamadı.");
+    }
+
+    squad.CommentCount = Math.Max(0, squad.CommentCount + delta);
+    _squadRepository.Update(squad);
   }
 }

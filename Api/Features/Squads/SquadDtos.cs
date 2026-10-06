@@ -52,12 +52,14 @@ public sealed record SquadSlotRequest(
 public sealed record CreateSquadRequest(
   string Title,
   string Formation,
+  string Notes,
   List<SquadSlotRequest> Slots);
 
 public sealed record UpdateSquadRequest(
   Guid Id,
   string Title,
   string Formation,
+  string Notes,
   List<SquadSlotRequest> Slots);
 
 public sealed record RateSquadRequest(decimal Score);

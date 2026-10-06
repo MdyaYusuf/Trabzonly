@@ -19,6 +19,7 @@ export interface CommentResponseDto {
   authorDisplayTag?: string | null
   postId?: string
   playerId?: number
+  squadId?: string
   parentCommentId?: string
   createdDate: string
   currentUserReaction?: CommentReactionType | null
@@ -42,6 +43,7 @@ export interface CreateCommentRequest {
   content: string
   postId?: string
   playerId?: number
+  squadId?: string
   parentCommentId?: string
 }
 

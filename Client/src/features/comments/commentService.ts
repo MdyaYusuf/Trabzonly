@@ -34,6 +34,7 @@ const getRecent = async (
   lastDate?: string,
   lastId?: string,
   sort: CommentSort = 'newest',
+  squadId?: string,
 ): Promise<ApiResponse<CursorPagedResponse<CommentResponseDto>>> => {
   const queryParams = new URLSearchParams()
   queryParams.append('count', count.toString())
@@ -44,6 +45,9 @@ const getRecent = async (
   }
   if (playerId != null) {
     queryParams.append('playerId', playerId.toString())
+  }
+  if (squadId) {
+    queryParams.append('squadId', squadId)
   }
   if (lastDate) {
     queryParams.append('lastDate', lastDate)

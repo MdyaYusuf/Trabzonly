@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Api.Core.Entities;
 using Api.Features.Players;
 using Api.Features.Posts;
+using Api.Features.Squads;
 using Api.Features.Users;
 
 namespace Api.Features.Comments;
@@ -26,6 +27,8 @@ public class Comment : Entity<Guid>
   public virtual Post? Post { get; set; }
   public int? PlayerId { get; set; }
   public virtual Player? Player { get; set; }
+  public Guid? SquadId { get; set; }
+  public virtual Squad? Squad { get; set; }
   public Guid? ParentCommentId { get; set; }
   public virtual Comment? ParentComment { get; set; }
   public virtual ICollection<Comment> Replies { get; set; } = new List<Comment>();
