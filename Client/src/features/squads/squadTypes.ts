@@ -1,69 +1,88 @@
 // Responses
 export interface SquadSlotResponseDto {
-  id: string;
-  slotKey: string;
-  sortOrder: number;
-  playerId: number;
-  playerName: string;
-  playerImageUrl?: string;
-  positionAbbreviation: string;
+  id: string
+  slotKey: string
+  sortOrder: number
+  playerId: number
+  playerName: string
+  playerImageUrl?: string
+  positionAbbreviation: string
+  playerShirtNumber?: number | null
 }
 
 export interface SquadResponseDto {
-  id: string;
-  title: string;
-  formation: string;
-  userId: string;
-  authorUsername: string;
-  averageRating: number;
-  ratingCount: number;
-  createdDate: string;
-  slots: SquadSlotResponseDto[];
-  currentUserScore?: number | null;
+  id: string
+  title: string
+  formation: string
+  notes: string
+  userId: string
+  authorUsername: string
+  authorDisplayTag?: string | null
+  averageRating: number
+  ratingCount: number
+  viewCount: number
+  commentCount: number
+  createdDate: string
+  slots: SquadSlotResponseDto[]
+  currentUserScore?: number | null
 }
 
 export interface CreatedSquadResponseDto {
-  id: string;
-  title: string;
-  formation: string;
+  id: string
+  title: string
+  formation: string
 }
 
 export interface SquadPreviewDto {
-  id: string;
-  title: string;
-  formation: string;
-  userId: string;
-  authorUsername: string;
-  averageRating: number;
-  ratingCount: number;
-  createdDate: string;
+  id: string
+  title: string
+  formation: string
+  notes: string
+  userId: string
+  authorUsername: string
+  authorDisplayTag?: string | null
+  averageRating: number
+  ratingCount: number
+  viewCount: number
+  commentCount: number
+  createdDate: string
+  slots: SquadSlotResponseDto[]
 }
 
 export interface SquadRatingResponseDto {
-  squadId: string;
-  score: number;
-  averageRating: number;
-  ratingCount: number;
+  squadId: string
+  score: number
+  averageRating: number
+  ratingCount: number
 }
 
 // Requests
 export interface SquadSlotRequest {
-  slotKey: string;
-  sortOrder: number;
-  playerId: number;
+  slotKey: string
+  sortOrder: number
+  playerId: number
 }
 
 export interface CreateSquadRequest {
-  title: string;
-  formation: string;
-  notes: string;
-  slots: SquadSlotRequest[];
+  title: string
+  formation: string
+  notes: string
+  slots: SquadSlotRequest[]
 }
 
 export interface UpdateSquadRequest extends CreateSquadRequest {
-  id: string;
+  id: string
 }
 
 export interface RateSquadRequest {
-  score: number;
+  score: number
+}
+
+export type SquadListSort = 'newest' | 'topRated'
+
+export type SquadListQuery = {
+  pageNumber: number
+  pageSize: number
+  sort?: SquadListSort
+  search?: string
 }

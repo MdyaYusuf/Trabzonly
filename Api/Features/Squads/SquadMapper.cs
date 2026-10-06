@@ -9,6 +9,7 @@ public partial class SquadMapper
   public partial void UpdateEntityFromRequest(UpdateSquadRequest request, Squad entity);
 
   [MapProperty("User.Username", "AuthorUsername")]
+  [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
   [MapperIgnoreTarget(nameof(SquadResponseDto.CurrentUserScore))]
   [MapperIgnoreTarget(nameof(SquadResponseDto.Slots))]
   public partial SquadResponseDto EntityToResponseDto(Squad entity);
@@ -16,13 +17,14 @@ public partial class SquadMapper
   public partial CreatedSquadResponseDto EntityToCreatedResponseDto(Squad entity);
 
   [MapProperty("User.Username", "AuthorUsername")]
+  [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
+  [MapperIgnoreTarget(nameof(SquadPreviewDto.Slots))]
   public partial SquadPreviewDto EntityToPreviewDto(Squad entity);
-
-  public partial List<SquadPreviewDto> EntityToPreviewDtoList(List<Squad> entities);
 
   [MapProperty("Player.Name", "PlayerName")]
   [MapProperty("Player.ImageUrl", "PlayerImageUrl")]
   [MapProperty("Player.Position.Abbreviation", "PositionAbbreviation")]
+  [MapProperty("Player.ShirtNumber", "PlayerShirtNumber")]
   public partial SquadSlotResponseDto SlotToResponseDto(SquadSlot slot);
 
   public partial List<SquadSlotResponseDto> SlotToResponseDtoList(List<SquadSlot> slots);
@@ -40,6 +42,25 @@ public partial class SquadMapper
       Slots = SlotToResponseDtoList(orderedSlots),
       CurrentUserScore = currentUserScore
     };
+  }
+
+  public SquadPreviewDto EntityToPreviewDtoWithSlots(Squad entity)
+  {
+    var dto = EntityToPreviewDto(entity);
+    var orderedSlots = entity.Slots
+      .OrderBy(s => s.SortOrder)
+      .ThenBy(s => s.SlotKey)
+      .ToList();
+
+    return dto with
+    {
+      Slots = SlotToResponseDtoList(orderedSlots)
+    };
+  }
+
+  public List<SquadPreviewDto> EntityToPreviewDtoList(List<Squad> entities)
+  {
+    return entities.Select(EntityToPreviewDtoWithSlots).ToList();
   }
 
   public List<SquadResponseDto> EntityToResponseDtoListWithSlots(List<Squad> entities)

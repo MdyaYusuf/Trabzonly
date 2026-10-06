@@ -18,7 +18,11 @@ public class SquadService(
   IValidator<RateSquadRequest> _rateValidator) : ISquadService
 {
   private static readonly Func<IQueryable<Squad>, IQueryable<Squad>> DefaultPreviewInclude =
-    query => query.Include(s => s.User);
+    query => query
+      .Include(s => s.User)
+      .Include(s => s.Slots)
+        .ThenInclude(slot => slot.Player)
+          .ThenInclude(player => player.Position);
 
   private static readonly Func<IQueryable<Squad>, IQueryable<Squad>> DefaultDetailInclude =
     query => query
@@ -69,8 +73,12 @@ public class SquadService(
     Squad squad = await _businessRules.GetSquadIfExistAsync(
       id,
       include: include ?? DefaultDetailInclude,
-      enableTracking,
+      enableTracking: true,
       cancellationToken);
+
+    squad.ViewCount++;
+    _squadRepository.Update(squad);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
 
     decimal? currentUserScore = null;
 

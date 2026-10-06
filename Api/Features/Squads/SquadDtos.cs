@@ -8,16 +8,21 @@ public sealed record SquadSlotResponseDto(
   int PlayerId,
   string PlayerName,
   string? PlayerImageUrl,
-  string PositionAbbreviation);
+  string PositionAbbreviation,
+  int? PlayerShirtNumber);
 
 public sealed record SquadResponseDto(
   Guid Id,
   string Title,
   string Formation,
+  string Notes,
   Guid UserId,
   string AuthorUsername,
+  string? AuthorDisplayTag,
   decimal AverageRating,
   int RatingCount,
+  int ViewCount,
+  int CommentCount,
   DateTime CreatedDate,
   List<SquadSlotResponseDto> Slots,
   decimal? CurrentUserScore = null);
@@ -31,11 +36,16 @@ public sealed record SquadPreviewDto(
   Guid Id,
   string Title,
   string Formation,
+  string Notes,
   Guid UserId,
   string AuthorUsername,
+  string? AuthorDisplayTag,
   decimal AverageRating,
   int RatingCount,
-  DateTime CreatedDate);
+  int ViewCount,
+  int CommentCount,
+  DateTime CreatedDate,
+  List<SquadSlotResponseDto> Slots);
 
 public sealed record SquadRatingResponseDto(
   Guid SquadId,

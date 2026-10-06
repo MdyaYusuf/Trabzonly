@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Api.Core.Controllers;
 using Api.Core.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +13,43 @@ public class SquadsController(ISquadService _squadService) : CustomBaseControlle
   [HttpGet]
   public async Task<IActionResult> GetAll(
     [FromQuery] PaginationRequest pagination,
+    [FromQuery] string? search = null,
+    [FromQuery] string sort = "newest",
     CancellationToken cancellationToken = default)
   {
+    string? searchTerm = string.IsNullOrWhiteSpace(search)
+      ? null
+      : search.Trim().ToLowerInvariant();
+
+    Expression<Func<Squad, bool>>? filter = null;
+
+    if (searchTerm != null)
+    {
+      filter = squad =>
+        squad.Title.ToLower().Contains(searchTerm) ||
+        squad.User.Username.ToLower().Contains(searchTerm);
+    }
+
+    Func<IQueryable<Squad>, IOrderedQueryable<Squad>> orderBy;
+
+    if (string.Equals(sort, "topRated", StringComparison.OrdinalIgnoreCase))
+    {
+      orderBy = query => query
+        .OrderByDescending(squad => squad.AverageRating)
+        .ThenByDescending(squad => squad.RatingCount)
+        .ThenByDescending(squad => squad.CreatedDate)
+        .ThenByDescending(squad => squad.Id);
+    }
+    else
+    {
+      orderBy = query => query
+        .OrderByDescending(squad => squad.CreatedDate)
+        .ThenByDescending(squad => squad.Id);
+    }
+
     var result = await _squadService.GetAllAsync(
+      filter: filter,
+      orderBy: orderBy,
       pageNumber: pagination.PageNumber,
       pageSize: pagination.PageSize,
       cancellationToken: cancellationToken);
