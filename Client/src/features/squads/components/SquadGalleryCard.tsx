@@ -10,35 +10,39 @@ type SquadGalleryCardProps = {
 }
 
 function RatingStars({ rating }: { rating: number }) {
-  const icons: string[] = []
-
-  for (let i = 1; i <= 5; i += 1) {
-    if (rating >= i) {
-      icons.push('star')
-    } else if (rating >= i - 0.5) {
-      icons.push('star_half')
-    } else {
-      icons.push('star')
-    }
-  }
-
   return (
-    <div className="flex items-center text-[#D39D3F]">
-      {icons.map((icon, index) => {
-        const filled = rating >= index + 0.5
+    <div className="flex items-center gap-0.5" aria-label={`${rating.toFixed(1)} / 5`}>
+      {Array.from({ length: 5 }, (_, index) => {
+        const starValue = index + 1
+        const fill: 'full' | 'half' | 'empty' =
+          rating >= starValue ? 'full' : rating >= starValue - 0.5 ? 'half' : 'empty'
+        const gradientId = `squad-star-half-${index}`
 
         return (
-          <span
-            key={`${icon}-${index}`}
-            className="material-symbols-outlined text-[16px]"
-            style={
-              filled
-                ? { fontVariationSettings: "'FILL' 1" }
-                : { fontVariationSettings: "'FILL' 0", opacity: 0.35 }
-            }
+          <svg
+            key={index}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            className="shrink-0"
+            aria-hidden="true"
           >
-            {icon}
-          </span>
+            {fill === 'half' ? (
+              <defs>
+                <linearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="50%" stopColor="#D39D3F" />
+                  <stop offset="50%" stopColor="#D39D3F" stopOpacity="0.28" />
+                </linearGradient>
+              </defs>
+            ) : null}
+            <path
+              d="M12 2.5l2.74 6.16 6.76.62-5.1 4.5 1.5 6.72L12 16.9l-6 3.6 1.5-6.72-5.1-4.5 6.76-.62L12 2.5z"
+              fill={
+                fill === 'full' ? '#D39D3F' : fill === 'half' ? `url(#${gradientId})` : '#D39D3F'
+              }
+              fillOpacity={fill === 'empty' ? 0.28 : 1}
+            />
+          </svg>
         )
       })}
     </div>
@@ -47,6 +51,7 @@ function RatingStars({ rating }: { rating: number }) {
 
 export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardProps) {
   const [isSharing, setIsSharing] = useState(false)
+  const detailPath = `/kadrolar/${squad.id}`
   const authorLabel = squad.authorUsername.startsWith('@')
     ? squad.authorUsername
     : `@${squad.authorUsername}`
@@ -57,7 +62,7 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
     }
 
     setIsSharing(true)
-    const shareUrl = `${window.location.origin}/kadrolar/${squad.id}`
+    const shareUrl = `${window.location.origin}${detailPath}`
 
     try {
       await navigator.clipboard.writeText(shareUrl)
@@ -70,11 +75,12 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
   }
 
   return (
-    <article
+    <Link
+      to={detailPath}
       className={
         listMode
-          ? 'group flex flex-col bg-surface-container-lowest shadow-sm transition-shadow hover:shadow-md md:flex-row'
-          : 'group flex flex-col bg-surface-container-lowest shadow-sm transition-shadow hover:shadow-md'
+          ? 'group relative flex cursor-pointer flex-col bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md md:flex-row'
+          : 'group relative flex cursor-pointer flex-col bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md'
       }
     >
       <div className={listMode ? 'md:w-[320px] md:shrink-0' : undefined}>
@@ -134,26 +140,25 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
             </span>
           </div>
           <div className="flex items-center gap-space-xs">
+            <span className="font-label inline-flex h-8 items-center bg-primary px-space-md text-label-md leading-none tracking-wider text-on-primary uppercase transition-colors group-hover:bg-primary-container">
+              İncele & Puanla
+            </span>
             <button
               type="button"
               title="Bağlantıyı Kopyala"
               disabled={isSharing}
-              onClick={() => {
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
                 void handleShare()
               }}
-              className="cursor-pointer p-1.5 text-on-surface-variant transition-colors hover:text-secondary disabled:cursor-default"
+              className="inline-flex h-8 w-8 cursor-pointer items-center justify-center text-on-surface-variant transition-colors hover:text-secondary disabled:cursor-default"
             >
-              <span className="material-symbols-outlined text-[18px]">share</span>
+              <span className="material-symbols-outlined text-[20px] leading-none">share</span>
             </button>
-            <Link
-              to={`/kadrolar/${squad.id}`}
-              className="font-label bg-primary px-space-sm py-1 text-[11px] tracking-wider text-on-primary uppercase transition-colors hover:bg-primary-container"
-            >
-              İncele & Puanla
-            </Link>
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   )
 }

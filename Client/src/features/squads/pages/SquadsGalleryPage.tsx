@@ -83,52 +83,58 @@ export function SquadsGalleryPage() {
       <SquadsGalleryBreadcrumb />
       <SquadsGalleryHero />
 
-      <SquadsGalleryFilters
-        sortTab={sortTab}
-        viewMode={viewMode}
-        search={search}
-        visibleCount={squads.length}
-        totalCount={totalCount}
-        onSortTabChange={(tab) => {
-          setSortTab(tab)
-          resetPage()
-        }}
-        onViewModeChange={setViewMode}
-        onSearchChange={(value) => {
-          setSearch(value)
-          resetPage()
-        }}
-      />
-
       <section className="mx-auto w-full max-w-[1360px] px-4 pb-space-xl sm:px-6 lg:px-12">
-        {isLoading ? (
-          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-            Kadrolar yükleniyor...
-          </p>
-        ) : squads.length === 0 ? (
-          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-            Bu filtrelere uygun kadro bulunamadı.
-          </p>
-        ) : (
-          <div
-            className={
-              viewMode === 'list'
-                ? 'flex flex-col gap-gutter'
-                : 'grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3'
-            }
-          >
-            {squads.map((squad) => (
-              <SquadGalleryCard key={squad.id} squad={squad} listMode={viewMode === 'list'} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
+          <div className="flex flex-col lg:col-span-9">
+            {isLoading ? (
+              <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                Kadrolar yükleniyor...
+              </p>
+            ) : squads.length === 0 ? (
+              <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                Bu filtrelere uygun kadro bulunamadı.
+              </p>
+            ) : (
+              <div
+                className={
+                  viewMode === 'list'
+                    ? 'flex flex-col gap-gutter'
+                    : 'grid grid-cols-1 gap-gutter md:grid-cols-2'
+                }
+              >
+                {squads.map((squad) => (
+                  <SquadGalleryCard key={squad.id} squad={squad} listMode={viewMode === 'list'} />
+                ))}
+              </div>
+            )}
 
-        <SquadsGalleryPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalCount={totalCount}
-          onPageChange={setPage}
-        />
+            <SquadsGalleryPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalCount={totalCount}
+              onPageChange={setPage}
+            />
+          </div>
+
+          <div className="lg:col-span-3">
+            <SquadsGalleryFilters
+              sortTab={sortTab}
+              viewMode={viewMode}
+              search={search}
+              visibleCount={squads.length}
+              totalCount={totalCount}
+              onSortTabChange={(tab) => {
+                setSortTab(tab)
+                resetPage()
+              }}
+              onViewModeChange={setViewMode}
+              onSearchChange={(value) => {
+                setSearch(value)
+                resetPage()
+              }}
+            />
+          </div>
+        </div>
       </section>
 
       <SquadsGalleryCta />

@@ -23,10 +23,31 @@ export function SquadsGalleryFilters({
   onSearchChange,
 }: SquadsGalleryFiltersProps) {
   return (
-    <section className="mx-auto w-full max-w-[1360px] px-4 pb-space-lg sm:px-6 lg:px-12">
-      <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-space-md">
-          <div className="flex flex-wrap items-center gap-space-xs bg-surface-container-low p-1">
+    <aside className="flex flex-col gap-space-md lg:sticky lg:top-24">
+      <div className="flex min-h-[22rem] flex-col gap-space-lg bg-surface-container-lowest p-space-lg shadow-sm">
+        <div>
+          <span className="font-kicker mb-space-sm block text-kicker font-bold tracking-widest text-on-surface-variant uppercase">
+            Ara
+          </span>
+          <label className="relative block min-w-0 w-full">
+            <span className="material-symbols-outlined pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-outline">
+              search
+            </span>
+            <input
+              className="h-12 w-full border border-outline-variant/40 bg-surface-container-low pr-space-md pl-10 font-label text-label-md font-semibold tracking-normal text-on-surface normal-case transition-colors placeholder:text-outline focus:border-primary focus:bg-surface-container-lowest focus:outline-none"
+              placeholder="Kadro veya yazar…"
+              type="search"
+              value={search}
+              onChange={(event) => onSearchChange(event.target.value)}
+            />
+          </label>
+        </div>
+
+        <div>
+          <span className="font-kicker mb-space-sm block text-kicker font-bold tracking-widest text-on-surface-variant uppercase">
+            Sıralama
+          </span>
+          <div className="flex flex-col gap-1.5 bg-surface-container-low p-1.5">
             {sortTabs.map((tab) => {
               const isActive = sortTab === tab.id
 
@@ -37,8 +58,8 @@ export function SquadsGalleryFilters({
                   onClick={() => onSortTabChange(tab.id)}
                   className={
                     isActive
-                      ? 'font-label flex cursor-pointer items-center gap-1 bg-primary-container px-space-md py-space-xs text-label-md tracking-wider text-on-primary uppercase transition-colors'
-                      : 'font-label flex cursor-pointer items-center gap-1 px-space-md py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase transition-colors hover:text-on-surface'
+                      ? 'font-label w-full cursor-pointer bg-primary-container px-space-sm py-space-sm text-left text-label-md tracking-wider text-on-primary uppercase transition-colors'
+                      : 'font-label w-full cursor-pointer bg-surface-container-lowest px-space-sm py-space-sm text-left text-label-md tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-highest hover:text-on-surface'
                   }
                 >
                   {tab.label}
@@ -46,55 +67,48 @@ export function SquadsGalleryFilters({
               )
             })}
           </div>
+        </div>
 
-          <div className="flex items-center gap-space-md">
-            <span className="font-body text-body-sm text-on-surface-variant">
-              Gösterilen:{' '}
-              <strong className="text-on-surface">{visibleCount} Kadro</strong> /{' '}
-              {totalCount.toLocaleString('tr-TR')}
-            </span>
-            <div className="flex items-center bg-surface-container-low p-1">
-              <button
-                type="button"
-                title="Grid Görünümü"
-                onClick={() => onViewModeChange('grid')}
-                className={
-                  viewMode === 'grid'
-                    ? 'cursor-pointer bg-surface-container-lowest p-1.5 text-primary shadow-xs'
-                    : 'cursor-pointer p-1.5 text-on-surface-variant transition-colors hover:text-primary'
-                }
-              >
-                <span className="material-symbols-outlined text-[18px]">grid_view</span>
-              </button>
-              <button
-                type="button"
-                title="Kompakt Liste"
-                onClick={() => onViewModeChange('list')}
-                className={
-                  viewMode === 'list'
-                    ? 'cursor-pointer bg-surface-container-lowest p-1.5 text-primary shadow-xs'
-                    : 'cursor-pointer p-1.5 text-on-surface-variant transition-colors hover:text-primary'
-                }
-              >
-                <span className="material-symbols-outlined text-[18px]">view_agenda</span>
-              </button>
-            </div>
+        <div>
+          <span className="font-kicker mb-space-sm block text-kicker font-bold tracking-widest text-on-surface-variant uppercase">
+            Görünüm
+          </span>
+          <div className="flex items-center gap-1.5 bg-surface-container-low p-1.5">
+            <button
+              type="button"
+              title="Grid Görünümü"
+              onClick={() => onViewModeChange('grid')}
+              className={
+                viewMode === 'grid'
+                  ? 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 bg-surface-container-lowest py-space-sm text-primary shadow-xs'
+                  : 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 py-space-sm text-on-surface-variant transition-colors hover:text-primary'
+              }
+            >
+              <span className="material-symbols-outlined text-[20px]">grid_view</span>
+              <span className="font-label text-label-md uppercase">Grid</span>
+            </button>
+            <button
+              type="button"
+              title="Kompakt Liste"
+              onClick={() => onViewModeChange('list')}
+              className={
+                viewMode === 'list'
+                  ? 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 bg-surface-container-lowest py-space-sm text-primary shadow-xs'
+                  : 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 py-space-sm text-on-surface-variant transition-colors hover:text-primary'
+              }
+            >
+              <span className="material-symbols-outlined text-[20px]">view_agenda</span>
+              <span className="font-label text-label-md uppercase">Liste</span>
+            </button>
           </div>
         </div>
 
-        <div className="relative w-full">
-          <span className="material-symbols-outlined pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[20px] text-outline">
-            search
-          </span>
-          <input
-            className="font-body w-full bg-surface-container-lowest py-2.5 pr-4 pl-10 text-body-md text-on-surface transition-colors placeholder:text-outline focus:bg-surface-container-low focus:outline-none"
-            placeholder="Kadro adı veya yazar ara..."
-            type="search"
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-          />
-        </div>
+        <p className="font-body mt-auto border-t border-outline-variant/30 pt-space-md text-body-sm text-on-surface-variant">
+          Gösterilen:{' '}
+          <strong className="text-on-surface">{visibleCount} Kadro</strong> /{' '}
+          {totalCount.toLocaleString('tr-TR')}
+        </p>
       </div>
-    </section>
+    </aside>
   )
 }

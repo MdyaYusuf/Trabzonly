@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { SquadCreateIcon } from './SquadCreateIcon'
 
 export function SquadsGalleryCta() {
   return (
@@ -45,8 +46,8 @@ export function SquadsGalleryCta() {
             to="/kadrolar/olustur"
             className="font-headline flex items-center justify-center gap-space-sm bg-secondary-container px-space-xl py-space-md text-headline-sm font-extrabold tracking-wider text-on-secondary-container uppercase shadow-md transition-all hover:bg-surface-container-lowest"
           >
-            <span className="material-symbols-outlined text-[24px]">sports</span>
-            <span>+ ŞİMDİ KADRONU KUR</span>
+            <SquadCreateIcon size={24} />
+            <span>ŞİMDİ KADRONU KUR</span>
           </Link>
         </div>
       </div>
