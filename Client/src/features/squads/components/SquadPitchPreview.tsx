@@ -2,69 +2,11 @@ import type { PitchPlayer } from '../utils/squadsGalleryTypes'
 
 type SquadPitchPreviewProps = {
   formationLabel: string
-  badge?: string
-  badgeTone?: 'trend' | 'gold' | 'target' | 'derby' | 'classic'
-  pitchTags: [string, string]
   columns: PitchPlayer[][]
 }
 
-function badgeClasses(tone?: SquadPitchPreviewProps['badgeTone']) {
-  if (tone === 'trend') {
-    return 'bg-[#1f1b17]/80 text-[#f7bd5b]'
-  }
-
-  if (tone === 'gold') {
-    return 'bg-[#1f1b17]/80 text-[#f7bd5b]'
-  }
-
-  if (tone === 'target') {
-    return 'bg-secondary text-on-secondary'
-  }
-
-  if (tone === 'derby') {
-    return 'bg-error text-on-error'
-  }
-
-  if (tone === 'classic') {
-    return 'bg-surface-container-highest text-on-surface'
-  }
-
-  return 'bg-[#1f1b17]/80 text-white'
-}
-
-function badgeIcon(tone?: SquadPitchPreviewProps['badgeTone']) {
-  if (tone === 'trend') {
-    return 'local_fire_department'
-  }
-
-  if (tone === 'gold') {
-    return 'star'
-  }
-
-  if (tone === 'target') {
-    return 'gps_fixed'
-  }
-
-  if (tone === 'derby') {
-    return 'bolt'
-  }
-
-  if (tone === 'classic') {
-    return 'history_edu'
-  }
-
-  return null
-}
-
-export function SquadPitchPreview({
-  formationLabel,
-  badge,
-  badgeTone,
-  pitchTags,
-  columns,
-}: SquadPitchPreviewProps) {
+export function SquadPitchPreview({ formationLabel, columns }: SquadPitchPreviewProps) {
   const colCount = Math.max(columns.length, 1)
-  const icon = badgeIcon(badgeTone)
 
   return (
     <div className="relative flex h-60 flex-col justify-between overflow-hidden bg-[#163828] p-3">
@@ -88,18 +30,10 @@ export function SquadPitchPreview({
         <rect fill="none" height="70" stroke="#FFFFFF" strokeWidth="1.2" width="22" x="363" y="85" />
       </svg>
 
-      <div className="relative z-10 flex items-center justify-between gap-2">
+      <div className="relative z-10 flex items-center gap-2">
         <span className="font-kicker bg-primary px-2 py-0.5 text-kicker font-bold tracking-wider text-on-primary uppercase">
           {formationLabel}
         </span>
-        {badge ? (
-          <span
-            className={`font-kicker flex items-center gap-1 px-2 py-0.5 text-kicker font-bold uppercase ${badgeClasses(badgeTone)}`}
-          >
-            {icon ? <span className="material-symbols-outlined text-[13px]">{icon}</span> : null}
-            {badge}
-          </span>
-        ) : null}
       </div>
 
       <div
@@ -120,9 +54,7 @@ export function SquadPitchPreview({
             >
               {column.map((player) => {
                 const isBordo = player.tone === 'bordo'
-                const sizeClass = isEdge
-                  ? 'h-5 w-5 text-[9px]'
-                  : 'h-4 w-4 text-[8px]'
+                const sizeClass = isEdge ? 'h-5 w-5 text-[9px]' : 'h-4 w-4 text-[8px]'
 
                 return (
                   <div key={`${player.number}-${player.name}`} className="flex flex-col items-center">
@@ -148,11 +80,6 @@ export function SquadPitchPreview({
             </div>
           )
         })}
-      </div>
-
-      <div className="font-kicker relative z-10 flex items-center justify-between text-[10px] text-white/80">
-        <span>{pitchTags[0]}</span>
-        <span>{pitchTags[1]}</span>
       </div>
     </div>
   )

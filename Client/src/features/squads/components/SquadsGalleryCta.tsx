@@ -12,37 +12,30 @@ export function SquadsGalleryCta() {
         <div className="max-w-3xl">
           <div className="mb-space-xs flex flex-wrap items-center gap-space-xs">
             <span className="font-kicker bg-secondary px-2 py-0.5 text-kicker font-bold tracking-wider text-white uppercase">
-              HAFTANIN TAKTİK MEYDAN OKUMASI
-            </span>
-            <span className="font-kicker text-kicker font-bold tracking-wider text-tertiary-fixed uppercase">
-              PAPARA PARK DERBİSİ
+              TOPLULUK TAKTİĞİ
             </span>
           </div>
           <h2 className="font-headline mb-space-sm text-headline-md font-bold tracking-tight text-white uppercase lg:text-headline-lg">
-            Derbi İçin Kendi 11&apos;ini Kur, Aklını Ortaya Koy!
+            Kendi 11&apos;ini Kur, Toplulukla Paylaş!
           </h2>
           <p className="font-body text-body-md text-white/90">
-            Hafta sonu oynanacak kritik derbi için kadronu oluştur, taktik varyasyonunu toplulukla
-            paylaş. En çok oylanan ilk 3 kadro arasına gir,{' '}
-            <strong className="font-bold text-tertiary-fixed">&quot;Trabzonly Usta Taktikçi&quot;</strong>{' '}
-            profil rozetini ve haftanın maç analiz bülteninde başyazar unvanını kazan!
+            Dizilişini oluştur, notlarını yaz ve kadronu taraftarlarla paylaş. Puan al, tartışmaya
+            katıl ve Bordo-Mavi aklın bir parçası ol.
           </p>
           <div className="font-body mt-space-md flex flex-wrap items-center gap-space-lg text-[13px] text-white/80">
             <span className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[18px] text-[#D39D3F]">
-                military_tech
-              </span>
-              Özel Profil Rozeti
-            </span>
-            <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[18px] text-secondary-container">
-                verified
+                groups
               </span>
-              Manşet Analiz Yazarlığı
+              Toplulukla paylaş
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[18px] text-tertiary-fixed">forum</span>
-              Tribün Lideri Tartışma Odası
+              <span className="material-symbols-outlined text-[18px] text-tertiary-fixed">star</span>
+              Puanla ve keşfet
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[18px] text-white">forum</span>
+              Tartışmaya katıl
             </span>
           </div>
         </div>

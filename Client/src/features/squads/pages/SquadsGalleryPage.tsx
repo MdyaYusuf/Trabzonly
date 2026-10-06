@@ -1,73 +1,82 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SquadGalleryCard } from '../components/SquadGalleryCard'
 import { SquadsGalleryBreadcrumb } from '../components/SquadsGalleryBreadcrumb'
 import { SquadsGalleryCta } from '../components/SquadsGalleryCta'
 import { SquadsGalleryFilters } from '../components/SquadsGalleryFilters'
 import { SquadsGalleryHero } from '../components/SquadsGalleryHero'
 import { SquadsGalleryPagination } from '../components/SquadsGalleryPagination'
+import squadService from '../squadService'
+import { mapSquadPreviewToGalleryCard } from '../utils/mapSquadToGalleryCard'
 import {
   PAGE_SIZE,
-  placeholderSquads,
-} from '../utils/squadsGalleryPlaceholders'
-import type {
-  FormationFilter,
-  GallerySortTab,
-  GalleryViewMode,
-  MatchFilter,
+  type GallerySortTab,
+  type GalleryViewMode,
+  type SquadGalleryCardData,
 } from '../utils/squadsGalleryTypes'
 
 export function SquadsGalleryPage() {
   const [sortTab, setSortTab] = useState<GallerySortTab>('newest')
-  const [formationFilter, setFormationFilter] = useState<FormationFilter>('all')
-  const [matchFilter, setMatchFilter] = useState<MatchFilter>('all')
   const [viewMode, setViewMode] = useState<GalleryViewMode>('grid')
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [squads, setSquads] = useState<SquadGalleryCardData[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filteredSquads = useMemo(() => {
-    let result = [...placeholderSquads]
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search)
+    }, 300)
 
-    if (sortTab === 'week11') {
-      result = result.filter((squad) => squad.isWeekEleven)
-    } else if (sortTab === 'derby') {
-      result = result.filter((squad) => squad.isDerby)
+    return () => {
+      window.clearTimeout(timer)
     }
+  }, [search])
 
-    if (formationFilter !== 'all') {
-      result = result.filter((squad) => squad.formation === formationFilter)
-    }
+  useEffect(() => {
+    let cancelled = false
 
-    const query = search.trim().toLowerCase()
+    async function loadSquads() {
+      setIsLoading(true)
 
-    if (query) {
-      result = result.filter(
-        (squad) =>
-          squad.title.toLowerCase().includes(query) ||
-          squad.excerpt.toLowerCase().includes(query) ||
-          squad.authorUsername.toLowerCase().includes(query) ||
-          squad.formationLabel.toLowerCase().includes(query),
-      )
-    }
+      const result = await squadService.getAll({
+        pageNumber: page,
+        pageSize: PAGE_SIZE,
+        sort: sortTab,
+        search: debouncedSearch,
+      })
 
-    result.sort((a, b) => {
-      if (sortTab === 'topRated' || sortTab === 'week11') {
-        return b.rating - a.rating
+      if (cancelled) {
+        return
       }
 
-      return Number(a.id) - Number(b.id)
-    })
+      if (result.success && result.data) {
+        setSquads(result.data.items.map(mapSquadPreviewToGalleryCard))
+        setTotalCount(result.data.totalCount)
+        setTotalPages(Math.max(1, Math.ceil(result.data.totalCount / PAGE_SIZE)))
+      } else {
+        setSquads([])
+        setTotalCount(0)
+        setTotalPages(1)
+      }
 
-    return result
-  }, [formationFilter, search, sortTab])
+      setIsLoading(false)
+    }
 
-  const totalPages = Math.max(1, Math.ceil(filteredSquads.length / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pageStart = (currentPage - 1) * PAGE_SIZE
-  const pageSquads = filteredSquads.slice(pageStart, pageStart + PAGE_SIZE)
+    void loadSquads()
+
+    return () => {
+      cancelled = true
+    }
+  }, [debouncedSearch, page, sortTab])
 
   function resetPage() {
     setPage(1)
   }
+
+  const currentPage = Math.min(page, totalPages)
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
@@ -76,21 +85,12 @@ export function SquadsGalleryPage() {
 
       <SquadsGalleryFilters
         sortTab={sortTab}
-        formationFilter={formationFilter}
-        matchFilter={matchFilter}
         viewMode={viewMode}
         search={search}
-        visibleCount={filteredSquads.length}
+        visibleCount={squads.length}
+        totalCount={totalCount}
         onSortTabChange={(tab) => {
           setSortTab(tab)
-          resetPage()
-        }}
-        onFormationFilterChange={(value) => {
-          setFormationFilter(value)
-          resetPage()
-        }}
-        onMatchFilterChange={(value) => {
-          setMatchFilter(value)
           resetPage()
         }}
         onViewModeChange={setViewMode}
@@ -101,7 +101,11 @@ export function SquadsGalleryPage() {
       />
 
       <section className="mx-auto w-full max-w-[1360px] px-4 pb-space-xl sm:px-6 lg:px-12">
-        {pageSquads.length === 0 ? (
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            Kadrolar yükleniyor...
+          </p>
+        ) : squads.length === 0 ? (
           <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
             Bu filtrelere uygun kadro bulunamadı.
           </p>
@@ -113,7 +117,7 @@ export function SquadsGalleryPage() {
                 : 'grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3'
             }
           >
-            {pageSquads.map((squad) => (
+            {squads.map((squad) => (
               <SquadGalleryCard key={squad.id} squad={squad} listMode={viewMode === 'list'} />
             ))}
           </div>
@@ -122,7 +126,7 @@ export function SquadsGalleryPage() {
         <SquadsGalleryPagination
           currentPage={currentPage}
           totalPages={totalPages}
-          totalCount={filteredSquads.length}
+          totalCount={totalCount}
           onPageChange={setPage}
         />
       </section>

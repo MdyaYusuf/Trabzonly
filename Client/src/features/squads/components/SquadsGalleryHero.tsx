@@ -1,7 +1,46 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { galleryStats } from '../utils/squadsGalleryPlaceholders'
+import { metricsService } from '@/features/metrics/metricsService'
+import squadService from '../squadService'
 
 export function SquadsGalleryHero() {
+  const [totalSquads, setTotalSquads] = useState<number | null>(null)
+  const [topSquadTitle, setTopSquadTitle] = useState<string | null>(null)
+  const [topSquadRating, setTopSquadRating] = useState<number | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadHeroStats() {
+      const [metricsResult, topRatedResult] = await Promise.all([
+        metricsService.getShellMetrics(),
+        squadService.getTopRated(1),
+      ])
+
+      if (cancelled) {
+        return
+      }
+
+      if (metricsResult.success && metricsResult.data) {
+        setTotalSquads(metricsResult.data.totalSquadCount)
+      }
+
+      if (topRatedResult.success && topRatedResult.data && topRatedResult.data.length > 0) {
+        setTopSquadTitle(topRatedResult.data[0].title)
+        setTopSquadRating(topRatedResult.data[0].averageRating)
+      } else {
+        setTopSquadTitle(null)
+        setTopSquadRating(null)
+      }
+    }
+
+    void loadHeroStats()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <section className="mx-auto w-full max-w-[1360px] px-4 pb-space-lg sm:px-6 lg:px-12">
       <div className="relative overflow-hidden bg-surface-container-lowest p-space-lg shadow-sm sm:p-space-xl">
@@ -39,86 +78,30 @@ export function SquadsGalleryHero() {
           </div>
         </div>
 
-        <div className="mt-space-xl grid grid-cols-2 gap-space-md bg-surface-container-low p-space-md md:grid-cols-4">
+        <div className="mt-space-xl grid grid-cols-1 gap-space-md bg-surface-container-low p-space-md sm:grid-cols-2">
           <div className="flex flex-col bg-surface-container-lowest p-space-sm">
             <span className="font-kicker text-kicker text-on-surface-variant uppercase">
               TOPLAM KADRO
             </span>
             <span className="font-stat mt-space-xs text-stat-counter font-extrabold text-primary">
-              {galleryStats.totalSquads}
+              {totalSquads == null ? '—' : totalSquads.toLocaleString('tr-TR')}
             </span>
             <span className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-              {galleryStats.totalCaption}
+              Topluluk arşivi
             </span>
           </div>
 
           <div className="flex flex-col bg-surface-container-lowest p-space-sm">
             <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-              HAFTANIN EN POPÜLERİ
+              EN YÜKSEK PUANLI
             </span>
             <span className="font-headline mt-space-xs line-clamp-1 text-headline-sm font-bold text-secondary">
-              {galleryStats.popularTitle}
+              {topSquadTitle ?? 'Henüz kadro yok'}
             </span>
             <span className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-              {galleryStats.popularCaption}
-            </span>
-          </div>
-
-          <div className="flex flex-col bg-surface-container-lowest p-space-sm">
-            <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-              ORTALAMA TOPLULUK PUANI
-            </span>
-            <div className="mt-space-xs flex items-baseline gap-space-xs">
-              <span className="font-stat text-stat-counter font-extrabold text-on-surface">
-                {galleryStats.avgRating}
-              </span>
-              <span className="font-headline text-headline-sm text-on-surface-variant">
-                {galleryStats.avgCaption}
-              </span>
-            </div>
-            <div className="mt-space-xs flex items-center gap-1 text-[#D39D3F]">
-              <span
-                className="material-symbols-outlined text-[16px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-              <span
-                className="material-symbols-outlined text-[16px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-              <span
-                className="material-symbols-outlined text-[16px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-              <span
-                className="material-symbols-outlined text-[16px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-              <span
-                className="material-symbols-outlined text-[16px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star_half
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col bg-surface-container-lowest p-space-sm">
-            <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-              AKTİF TAKTİK TARTIŞMASI
-            </span>
-            <span className="font-stat mt-space-xs text-stat-counter font-extrabold text-primary-container">
-              {galleryStats.discussions}
-            </span>
-            <span className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-              {galleryStats.discussionsCaption}
+              {topSquadRating == null
+                ? 'Puanlı kadro bekleniyor'
+                : `${topSquadRating.toFixed(1)} / 5.0 ortalama`}
             </span>
           </div>
         </div>

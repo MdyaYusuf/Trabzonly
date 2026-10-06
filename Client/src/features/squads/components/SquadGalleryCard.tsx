@@ -1,26 +1,12 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import type { SquadGalleryCardData } from '../utils/squadsGalleryTypes'
 import { SquadPitchPreview } from './SquadPitchPreview'
 
 type SquadGalleryCardProps = {
   squad: SquadGalleryCardData
   listMode?: boolean
-}
-
-function avatarToneClass(tone: SquadGalleryCardData['authorAvatarTone']) {
-  if (tone === 'secondary') {
-    return 'bg-secondary text-on-secondary'
-  }
-
-  if (tone === 'primary-container') {
-    return 'bg-primary-container text-on-primary'
-  }
-
-  if (tone === 'surface') {
-    return 'bg-surface-container-highest text-on-surface'
-  }
-
-  return 'bg-primary text-on-primary'
 }
 
 function RatingStars({ rating }: { rating: number }) {
@@ -60,6 +46,29 @@ function RatingStars({ rating }: { rating: number }) {
 }
 
 export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardProps) {
+  const [isSharing, setIsSharing] = useState(false)
+  const authorLabel = squad.authorUsername.startsWith('@')
+    ? squad.authorUsername
+    : `@${squad.authorUsername}`
+
+  async function handleShare() {
+    if (isSharing) {
+      return
+    }
+
+    setIsSharing(true)
+    const shareUrl = `${window.location.origin}/kadrolar/${squad.id}`
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success('Bağlantı panoya kopyalandı.')
+    } catch {
+      toast.error('Bağlantı kopyalanamadı.')
+    } finally {
+      setIsSharing(false)
+    }
+  }
+
   return (
     <article
       className={
@@ -69,38 +78,19 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
       }
     >
       <div className={listMode ? 'md:w-[320px] md:shrink-0' : undefined}>
-        <SquadPitchPreview
-          formationLabel={squad.formationLabel}
-          badge={squad.badge}
-          badgeTone={squad.badgeTone}
-          pitchTags={squad.pitchTags}
-          columns={squad.columns}
-        />
+        <SquadPitchPreview formationLabel={squad.formationLabel} columns={squad.columns} />
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-space-md">
         <div className="flex flex-col">
           <div className="mb-space-xs flex items-center justify-between gap-space-xs">
             <div className="flex min-w-0 items-center gap-space-xs">
-              <div
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${avatarToneClass(squad.authorAvatarTone)}`}
-              >
-                {squad.authorInitials}
-              </div>
               <span className="font-label truncate text-label-md font-bold text-on-surface">
-                {squad.authorUsername}
+                {authorLabel}
               </span>
-              {squad.authorVerified ? (
-                <span
-                  className="material-symbols-outlined shrink-0 text-[16px] text-secondary"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  verified
-                </span>
-              ) : null}
-              {squad.authorBadge ? (
+              {squad.authorDisplayTag ? (
                 <span className="font-kicker hidden bg-secondary-fixed px-1.5 text-[10px] font-bold text-on-secondary-fixed uppercase sm:inline">
-                  {squad.authorBadge}
+                  {squad.authorDisplayTag}
                 </span>
               ) : null}
             </div>
@@ -115,15 +105,21 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
 
           <div className="mb-space-sm flex items-center gap-space-xs">
             <RatingStars rating={squad.rating} />
-            <span className="font-label text-label-md font-bold text-on-surface">{squad.rating}</span>
+            <span className="font-label text-label-md font-bold text-on-surface">
+              {squad.rating.toFixed(1)}
+            </span>
             <span className="font-body text-body-sm text-on-surface-variant">
               ({squad.ratingCount} oy)
             </span>
           </div>
 
-          <p className="font-body mb-space-md line-clamp-2 text-body-sm text-on-surface-variant">
-            {squad.excerpt}
-          </p>
+          {squad.excerpt ? (
+            <p className="font-body mb-space-md line-clamp-2 text-body-sm text-on-surface-variant">
+              {squad.excerpt}
+            </p>
+          ) : (
+            <div className="mb-space-md" />
+          )}
         </div>
 
         <div className="-mx-space-md -mb-space-md flex items-center justify-between bg-surface-container-low px-space-md py-space-sm pt-space-sm">
@@ -134,23 +130,20 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
             </span>
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-[15px]">visibility</span>
-              {squad.viewsLabel}
+              {squad.viewCount.toLocaleString('tr-TR')}
             </span>
           </div>
           <div className="flex items-center gap-space-xs">
             <button
               type="button"
-              title="Beğen"
-              className="p-1.5 text-on-surface-variant transition-colors hover:text-primary"
+              title="Bağlantıyı Kopyala"
+              disabled={isSharing}
+              onClick={() => {
+                void handleShare()
+              }}
+              className="cursor-pointer p-1.5 text-on-surface-variant transition-colors hover:text-secondary disabled:cursor-default"
             >
-              <span className="material-symbols-outlined text-[18px]">thumb_up</span>
-            </button>
-            <button
-              type="button"
-              title="Taktik Tahtasında Klonla"
-              className="p-1.5 text-on-surface-variant transition-colors hover:text-secondary"
-            >
-              <span className="material-symbols-outlined text-[18px]">content_copy</span>
+              <span className="material-symbols-outlined text-[18px]">share</span>
             </button>
             <Link
               to={`/kadrolar/${squad.id}`}
