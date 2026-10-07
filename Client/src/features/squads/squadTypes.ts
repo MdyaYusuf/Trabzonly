@@ -8,6 +8,8 @@ export interface SquadSlotResponseDto {
   playerImageUrl?: string
   positionAbbreviation: string
   playerShirtNumber?: number | null
+  age: number
+  marketValue?: number | null
 }
 
 export interface SquadResponseDto {
@@ -15,6 +17,12 @@ export interface SquadResponseDto {
   title: string
   formation: string
   notes: string
+  attackStyle: string
+  defenseLine: string
+  tempo: string
+  captainPlayerId: number
+  cornerTakerPlayerId: number
+  freeKickTakerPlayerId: number
   userId: string
   authorUsername: string
   authorDisplayTag?: string | null
@@ -25,6 +33,7 @@ export interface SquadResponseDto {
   createdDate: string
   slots: SquadSlotResponseDto[]
   currentUserScore?: number | null
+  isAuthorFollowedByCurrentUser?: boolean
 }
 
 export interface CreatedSquadResponseDto {
@@ -38,6 +47,12 @@ export interface SquadPreviewDto {
   title: string
   formation: string
   notes: string
+  attackStyle: string
+  defenseLine: string
+  tempo: string
+  captainPlayerId: number
+  cornerTakerPlayerId: number
+  freeKickTakerPlayerId: number
   userId: string
   authorUsername: string
   authorDisplayTag?: string | null
@@ -67,6 +82,12 @@ export interface CreateSquadRequest {
   title: string
   formation: string
   notes: string
+  attackStyle: string
+  defenseLine: string
+  tempo: string
+  captainPlayerId: number
+  cornerTakerPlayerId: number
+  freeKickTakerPlayerId: number
   slots: SquadSlotRequest[]
 }
 

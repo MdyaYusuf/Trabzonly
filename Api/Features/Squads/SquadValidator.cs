@@ -12,14 +12,42 @@ public class CreateSquadRequestValidator : AbstractValidator<CreateSquadRequest>
 
     RuleFor(s => s.Formation)
       .NotEmpty().WithMessage("Diziliş boş olamaz.")
-      .MaximumLength(50).WithMessage("Diziliş en fazla 50 karakter olabilir.");
+      .MaximumLength(50).WithMessage("Diziliş en fazla 50 karakter olabilir.")
+      .Must(formation => SquadTactics.FormationStarterSlotKeys.ContainsKey(formation))
+      .WithMessage("Geçersiz diziliş.");
 
     RuleFor(s => s.Notes)
-      .MaximumLength(2000).WithMessage("Notlar en fazla 2000 karakter olabilir.");
+      .MaximumLength(SquadTactics.NotesMaxLength)
+      .WithMessage($"Notlar en fazla {SquadTactics.NotesMaxLength} karakter olabilir.");
+
+    RuleFor(s => s.AttackStyle)
+      .NotEmpty().WithMessage("Hücum anlayışı zorunludur.")
+      .Must(value => SquadTactics.AttackStyles.Contains(value))
+      .WithMessage("Geçersiz hücum anlayışı.");
+
+    RuleFor(s => s.DefenseLine)
+      .NotEmpty().WithMessage("Savunma çizgisi zorunludur.")
+      .Must(value => SquadTactics.DefenseLines.Contains(value))
+      .WithMessage("Geçersiz savunma çizgisi.");
+
+    RuleFor(s => s.Tempo)
+      .NotEmpty().WithMessage("Tempo zorunludur.")
+      .Must(value => SquadTactics.Tempos.Contains(value))
+      .WithMessage("Geçersiz tempo.");
+
+    RuleFor(s => s.CaptainPlayerId)
+      .GreaterThan(0).WithMessage("Kaptan seçimi zorunludur.");
+
+    RuleFor(s => s.CornerTakerPlayerId)
+      .GreaterThan(0).WithMessage("Korner sorumlusu seçimi zorunludur.");
+
+    RuleFor(s => s.FreeKickTakerPlayerId)
+      .GreaterThan(0).WithMessage("Serbest vuruş sorumlusu seçimi zorunludur.");
 
     RuleFor(s => s.Slots)
       .NotNull().WithMessage("Kadro mevkileri zorunludur.")
-      .Must(slots => slots.Count == 11).WithMessage("Kadro tam olarak 11 oyuncudan oluşmalıdır.");
+      .Must(slots => slots.Count == SquadTactics.TotalSlotCount)
+      .WithMessage($"Kadro tam olarak {SquadTactics.TotalSlotCount} oyuncudan oluşmalıdır (11 ilk 11 + 10 yedek).");
 
     RuleForEach(s => s.Slots).SetValidator(new SquadSlotRequestValidator());
   }
@@ -38,14 +66,42 @@ public class UpdateSquadRequestValidator : AbstractValidator<UpdateSquadRequest>
 
     RuleFor(s => s.Formation)
       .NotEmpty().WithMessage("Diziliş boş olamaz.")
-      .MaximumLength(50).WithMessage("Diziliş en fazla 50 karakter olabilir.");
+      .MaximumLength(50).WithMessage("Diziliş en fazla 50 karakter olabilir.")
+      .Must(formation => SquadTactics.FormationStarterSlotKeys.ContainsKey(formation))
+      .WithMessage("Geçersiz diziliş.");
 
     RuleFor(s => s.Notes)
-      .MaximumLength(2000).WithMessage("Notlar en fazla 2000 karakter olabilir.");
+      .MaximumLength(SquadTactics.NotesMaxLength)
+      .WithMessage($"Notlar en fazla {SquadTactics.NotesMaxLength} karakter olabilir.");
+
+    RuleFor(s => s.AttackStyle)
+      .NotEmpty().WithMessage("Hücum anlayışı zorunludur.")
+      .Must(value => SquadTactics.AttackStyles.Contains(value))
+      .WithMessage("Geçersiz hücum anlayışı.");
+
+    RuleFor(s => s.DefenseLine)
+      .NotEmpty().WithMessage("Savunma çizgisi zorunludur.")
+      .Must(value => SquadTactics.DefenseLines.Contains(value))
+      .WithMessage("Geçersiz savunma çizgisi.");
+
+    RuleFor(s => s.Tempo)
+      .NotEmpty().WithMessage("Tempo zorunludur.")
+      .Must(value => SquadTactics.Tempos.Contains(value))
+      .WithMessage("Geçersiz tempo.");
+
+    RuleFor(s => s.CaptainPlayerId)
+      .GreaterThan(0).WithMessage("Kaptan seçimi zorunludur.");
+
+    RuleFor(s => s.CornerTakerPlayerId)
+      .GreaterThan(0).WithMessage("Korner sorumlusu seçimi zorunludur.");
+
+    RuleFor(s => s.FreeKickTakerPlayerId)
+      .GreaterThan(0).WithMessage("Serbest vuruş sorumlusu seçimi zorunludur.");
 
     RuleFor(s => s.Slots)
       .NotNull().WithMessage("Kadro mevkileri zorunludur.")
-      .Must(slots => slots.Count == 11).WithMessage("Kadro tam olarak 11 oyuncudan oluşmalıdır.");
+      .Must(slots => slots.Count == SquadTactics.TotalSlotCount)
+      .WithMessage($"Kadro tam olarak {SquadTactics.TotalSlotCount} oyuncudan oluşmalıdır (11 ilk 11 + 10 yedek).");
 
     RuleForEach(s => s.Slots).SetValidator(new SquadSlotRequestValidator());
   }
@@ -63,7 +119,7 @@ public class SquadSlotRequestValidator : AbstractValidator<SquadSlotRequest>
       .GreaterThanOrEqualTo(0).WithMessage("Sıralama değeri 0 veya daha büyük olmalıdır.");
 
     RuleFor(s => s.PlayerId)
-      .NotEmpty().WithMessage("Oyuncu seçimi zorunludur.");
+      .GreaterThan(0).WithMessage("Oyuncu seçimi zorunludur.");
   }
 }
 

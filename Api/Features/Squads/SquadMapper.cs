@@ -11,6 +11,7 @@ public partial class SquadMapper
   [MapProperty("User.Username", "AuthorUsername")]
   [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
   [MapperIgnoreTarget(nameof(SquadResponseDto.CurrentUserScore))]
+  [MapperIgnoreTarget(nameof(SquadResponseDto.IsAuthorFollowedByCurrentUser))]
   [MapperIgnoreTarget(nameof(SquadResponseDto.Slots))]
   public partial SquadResponseDto EntityToResponseDto(Squad entity);
 
@@ -25,11 +26,16 @@ public partial class SquadMapper
   [MapProperty("Player.ImageUrl", "PlayerImageUrl")]
   [MapProperty("Player.Position.Abbreviation", "PositionAbbreviation")]
   [MapProperty("Player.ShirtNumber", "PlayerShirtNumber")]
+  [MapProperty("Player.Age", "Age")]
+  [MapProperty("Player.MarketValue", "MarketValue")]
   public partial SquadSlotResponseDto SlotToResponseDto(SquadSlot slot);
 
   public partial List<SquadSlotResponseDto> SlotToResponseDtoList(List<SquadSlot> slots);
 
-  public SquadResponseDto EntityToResponseDtoWithSlots(Squad entity, decimal? currentUserScore = null)
+  public SquadResponseDto EntityToResponseDtoWithSlots(
+    Squad entity,
+    decimal? currentUserScore = null,
+    bool isAuthorFollowedByCurrentUser = false)
   {
     var dto = EntityToResponseDto(entity);
     var orderedSlots = entity.Slots
@@ -40,7 +46,8 @@ public partial class SquadMapper
     return dto with
     {
       Slots = SlotToResponseDtoList(orderedSlots),
-      CurrentUserScore = currentUserScore
+      CurrentUserScore = currentUserScore,
+      IsAuthorFollowedByCurrentUser = isAuthorFollowedByCurrentUser
     };
   }
 

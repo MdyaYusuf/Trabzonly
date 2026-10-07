@@ -34,11 +34,17 @@ public class SquadBusinessRules(
     }
   }
 
-  public void SlotsMustBeValid(IReadOnlyList<SquadSlotRequest> slots)
+  public void SlotsMustBeValid(string formation, IReadOnlyList<SquadSlotRequest> slots)
   {
-    if (slots.Count != 11)
+    if (slots.Count != SquadTactics.TotalSlotCount)
     {
-      throw new BusinessException("Kadro tam olarak 11 oyuncudan oluşmalıdır.");
+      throw new BusinessException(
+        $"Kadro tam olarak {SquadTactics.TotalSlotCount} oyuncudan oluşmalıdır (11 ilk 11 + 10 yedek).");
+    }
+
+    if (!SquadTactics.FormationStarterSlotKeys.TryGetValue(formation, out string[]? expectedStarterKeys))
+    {
+      throw new BusinessException("Geçersiz diziliş.");
     }
 
     bool hasDuplicateSlotKeys = slots
@@ -57,6 +63,77 @@ public class SquadBusinessRules(
     if (hasDuplicatePlayers)
     {
       throw new BusinessException("Aynı oyuncu kadroda birden fazla kez yer alamaz.");
+    }
+
+    List<SquadSlotRequest> starterSlots = slots
+      .Where(s => !SquadTactics.IsBenchSlotKey(s.SlotKey))
+      .ToList();
+
+    List<SquadSlotRequest> benchSlots = slots
+      .Where(s => SquadTactics.IsBenchSlotKey(s.SlotKey))
+      .ToList();
+
+    if (starterSlots.Count != SquadTactics.StarterSlotCount)
+    {
+      throw new BusinessException("İlk 11 tam olarak 11 oyuncudan oluşmalıdır.");
+    }
+
+    if (benchSlots.Count != SquadTactics.BenchSlotCount)
+    {
+      throw new BusinessException("Yedek kulübesi tam olarak 10 oyuncudan oluşmalıdır.");
+    }
+
+    HashSet<string> starterKeys = starterSlots
+      .Select(s => s.SlotKey.ToUpperInvariant())
+      .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    HashSet<string> expectedKeys = expectedStarterKeys
+      .Select(key => key.ToUpperInvariant())
+      .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    if (!starterKeys.SetEquals(expectedKeys))
+    {
+      throw new BusinessException("İlk 11 mevki anahtarları seçilen dizilişle uyuşmuyor.");
+    }
+
+    HashSet<string> benchKeys = benchSlots
+      .Select(s => s.SlotKey.ToUpperInvariant())
+      .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    HashSet<string> expectedBenchKeys = SquadTactics.BenchSlotKeys
+      .Select(key => key.ToUpperInvariant())
+      .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    if (!benchKeys.SetEquals(expectedBenchKeys))
+    {
+      throw new BusinessException("Yedek kulübesi mevki anahtarları BENCH_1 ile BENCH_10 arasında olmalıdır.");
+    }
+  }
+
+  public void SetPiecePlayersMustBeStarters(
+    IReadOnlyList<SquadSlotRequest> slots,
+    int captainPlayerId,
+    int cornerTakerPlayerId,
+    int freeKickTakerPlayerId)
+  {
+    HashSet<int> starterPlayerIds = slots
+      .Where(s => !SquadTactics.IsBenchSlotKey(s.SlotKey))
+      .Select(s => s.PlayerId)
+      .ToHashSet();
+
+    if (!starterPlayerIds.Contains(captainPlayerId))
+    {
+      throw new BusinessException("Kaptan ilk 11 içinden seçilmelidir.");
+    }
+
+    if (!starterPlayerIds.Contains(cornerTakerPlayerId))
+    {
+      throw new BusinessException("Korner sorumlusu ilk 11 içinden seçilmelidir.");
+    }
+
+    if (!starterPlayerIds.Contains(freeKickTakerPlayerId))
+    {
+      throw new BusinessException("Serbest vuruş sorumlusu ilk 11 içinden seçilmelidir.");
     }
   }
 

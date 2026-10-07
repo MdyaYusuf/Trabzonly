@@ -32,9 +32,30 @@ public class SquadConfiguration : IEntityTypeConfiguration<Squad>
       .IsRequired();
 
     builder.Property(s => s.Notes)
-      .HasMaxLength(2000)
+      .HasMaxLength(SquadTactics.NotesMaxLength)
       .IsRequired()
       .HasDefaultValue(string.Empty);
+
+    builder.Property(s => s.AttackStyle)
+      .HasMaxLength(20)
+      .IsRequired();
+
+    builder.Property(s => s.DefenseLine)
+      .HasMaxLength(20)
+      .IsRequired();
+
+    builder.Property(s => s.Tempo)
+      .HasMaxLength(20)
+      .IsRequired();
+
+    builder.Property(s => s.CaptainPlayerId)
+      .IsRequired();
+
+    builder.Property(s => s.CornerTakerPlayerId)
+      .IsRequired();
+
+    builder.Property(s => s.FreeKickTakerPlayerId)
+      .IsRequired();
 
     builder.Property(s => s.AverageRating)
       .HasPrecision(4, 2)
@@ -56,6 +77,21 @@ public class SquadConfiguration : IEntityTypeConfiguration<Squad>
     builder.HasOne(s => s.User)
       .WithMany(u => u.Squads)
       .HasForeignKey(s => s.UserId)
+      .OnDelete(DeleteBehavior.Restrict);
+
+    builder.HasOne(s => s.CaptainPlayer)
+      .WithMany()
+      .HasForeignKey(s => s.CaptainPlayerId)
+      .OnDelete(DeleteBehavior.Restrict);
+
+    builder.HasOne(s => s.CornerTakerPlayer)
+      .WithMany()
+      .HasForeignKey(s => s.CornerTakerPlayerId)
+      .OnDelete(DeleteBehavior.Restrict);
+
+    builder.HasOne(s => s.FreeKickTakerPlayer)
+      .WithMany()
+      .HasForeignKey(s => s.FreeKickTakerPlayerId)
       .OnDelete(DeleteBehavior.Restrict);
   }
 }

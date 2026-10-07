@@ -9,13 +9,21 @@ public sealed record SquadSlotResponseDto(
   string PlayerName,
   string? PlayerImageUrl,
   string PositionAbbreviation,
-  int? PlayerShirtNumber);
+  int? PlayerShirtNumber,
+  int Age,
+  decimal? MarketValue);
 
 public sealed record SquadResponseDto(
   Guid Id,
   string Title,
   string Formation,
   string Notes,
+  string AttackStyle,
+  string DefenseLine,
+  string Tempo,
+  int CaptainPlayerId,
+  int CornerTakerPlayerId,
+  int FreeKickTakerPlayerId,
   Guid UserId,
   string AuthorUsername,
   string? AuthorDisplayTag,
@@ -25,7 +33,8 @@ public sealed record SquadResponseDto(
   int CommentCount,
   DateTime CreatedDate,
   List<SquadSlotResponseDto> Slots,
-  decimal? CurrentUserScore = null);
+  decimal? CurrentUserScore = null,
+  bool IsAuthorFollowedByCurrentUser = false);
 
 public sealed record CreatedSquadResponseDto(
   Guid Id,
@@ -37,6 +46,12 @@ public sealed record SquadPreviewDto(
   string Title,
   string Formation,
   string Notes,
+  string AttackStyle,
+  string DefenseLine,
+  string Tempo,
+  int CaptainPlayerId,
+  int CornerTakerPlayerId,
+  int FreeKickTakerPlayerId,
   Guid UserId,
   string AuthorUsername,
   string? AuthorDisplayTag,
@@ -63,6 +78,12 @@ public sealed record CreateSquadRequest(
   string Title,
   string Formation,
   string Notes,
+  string AttackStyle,
+  string DefenseLine,
+  string Tempo,
+  int CaptainPlayerId,
+  int CornerTakerPlayerId,
+  int FreeKickTakerPlayerId,
   List<SquadSlotRequest> Slots);
 
 public sealed record UpdateSquadRequest(
@@ -70,6 +91,12 @@ public sealed record UpdateSquadRequest(
   string Title,
   string Formation,
   string Notes,
+  string AttackStyle,
+  string DefenseLine,
+  string Tempo,
+  int CaptainPlayerId,
+  int CornerTakerPlayerId,
+  int FreeKickTakerPlayerId,
   List<SquadSlotRequest> Slots);
 
 public sealed record RateSquadRequest(decimal Score);

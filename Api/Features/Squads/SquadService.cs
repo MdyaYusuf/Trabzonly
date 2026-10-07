@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
+using Api.Features.Users;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ public class SquadService(
   ISquadRepository _squadRepository,
   ISquadSlotRepository _squadSlotRepository,
   ISquadRatingRepository _squadRatingRepository,
+  IUserFollowRepository _userFollowRepository,
   SquadMapper _mapper,
   SquadBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
@@ -81,6 +83,7 @@ public class SquadService(
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
     decimal? currentUserScore = null;
+    bool isAuthorFollowedByCurrentUser = false;
 
     if (currentUserId.HasValue)
     {
@@ -90,9 +93,16 @@ public class SquadService(
         cancellationToken: cancellationToken);
 
       currentUserScore = rating?.Score;
+
+      isAuthorFollowedByCurrentUser = await _userFollowRepository.AnyAsync(
+        follow => follow.FollowerId == currentUserId.Value && follow.FollowingId == squad.UserId,
+        cancellationToken);
     }
 
-    SquadResponseDto response = _mapper.EntityToResponseDtoWithSlots(squad, currentUserScore);
+    SquadResponseDto response = _mapper.EntityToResponseDtoWithSlots(
+      squad,
+      currentUserScore,
+      isAuthorFollowedByCurrentUser);
 
     return new ReturnModel<SquadResponseDto>()
     {
@@ -206,7 +216,12 @@ public class SquadService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    _businessRules.SlotsMustBeValid(request.Slots);
+    _businessRules.SlotsMustBeValid(request.Formation, request.Slots);
+    _businessRules.SetPiecePlayersMustBeStarters(
+      request.Slots,
+      request.CaptainPlayerId,
+      request.CornerTakerPlayerId,
+      request.FreeKickTakerPlayerId);
     await _businessRules.PlayersMustExistAndBeActiveAsync(request.Slots, cancellationToken);
 
     Squad squad = _mapper.CreateToEntity(request);
@@ -240,7 +255,12 @@ public class SquadService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    _businessRules.SlotsMustBeValid(request.Slots);
+    _businessRules.SlotsMustBeValid(request.Formation, request.Slots);
+    _businessRules.SetPiecePlayersMustBeStarters(
+      request.Slots,
+      request.CaptainPlayerId,
+      request.CornerTakerPlayerId,
+      request.FreeKickTakerPlayerId);
     await _businessRules.PlayersMustExistAndBeActiveAsync(request.Slots, cancellationToken);
 
     Squad squad = await _businessRules.GetSquadIfExistAsync(
