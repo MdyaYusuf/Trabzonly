@@ -1,7 +1,7 @@
-import type { SquadDetailProfile } from '../utils/squadDetailTypes'
+import type { SquadDetailViewModel } from '../utils/squadDetailTypes'
 
 type SquadDetailSidebarProps = {
-  squad: SquadDetailProfile
+  squad: SquadDetailViewModel
 }
 
 export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
@@ -13,9 +13,6 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
             <span className="material-symbols-outlined text-[20px]">tune</span>
             Taktik Talimatlar
           </h2>
-          <span className="font-kicker text-kicker font-bold text-secondary uppercase">
-            HÜCUM PLANI
-          </span>
         </div>
         <div className="flex flex-col gap-space-sm">
           {squad.instructions.map((item) => (
@@ -26,14 +23,7 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
               <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
                 {item.title}
               </span>
-              <p
-                className={`font-headline text-sm font-bold ${
-                  item.headlineTone === 'primary' ? 'text-primary' : 'text-on-surface'
-                }`}
-              >
-                {item.headline}
-              </p>
-              <p className="font-body mt-0.5 text-body-sm text-on-surface-variant">{item.body}</p>
+              <p className="font-headline text-sm font-bold text-on-surface">{item.value}</p>
             </div>
           ))}
         </div>
@@ -66,52 +56,31 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
             </span>
           </div>
         </div>
-        <div className="flex items-center justify-between bg-surface-container p-space-sm">
-          <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-[20px] text-primary">gavel</span>
-            <div className="flex flex-col">
-              <span className="font-label text-label-md font-bold text-on-surface">
-                TFF Yabancı Kuralı Uyumu
-              </span>
-              <span className="font-body text-xs text-on-surface-variant">
-                {squad.foreignRuleDetail}
-              </span>
-            </div>
-          </div>
-          <span className="font-kicker bg-surface-container-lowest px-2 py-1 text-kicker font-bold text-primary uppercase">
-            {squad.foreignRuleLabel}
-          </span>
-        </div>
       </div>
 
-      <div className="relative flex flex-col gap-space-sm overflow-hidden bg-primary p-space-md text-on-primary shadow-sm">
-        <div className="pointer-events-none absolute -right-4 -bottom-4 select-none text-on-primary/5">
-          <span className="material-symbols-outlined text-[140px]">sports_soccer</span>
+      {squad.notes.trim() ? (
+        <div className="relative flex flex-col gap-space-sm overflow-hidden bg-primary p-space-md text-on-primary shadow-sm">
+          <div className="pointer-events-none absolute -right-4 -bottom-4 select-none text-on-primary/5">
+            <span className="material-symbols-outlined text-[140px]">sports_soccer</span>
+          </div>
+          <div className="z-10 flex items-center gap-space-xs">
+            <span className="material-symbols-outlined text-[20px] text-tertiary-fixed-dim">
+              format_quote
+            </span>
+            <span className="font-kicker text-kicker font-bold tracking-widest text-tertiary-fixed-dim uppercase">
+              YAZARIN TAKTİK NOTU
+            </span>
+          </div>
+          <p className="font-body z-10 text-body-md leading-relaxed text-on-primary/90 italic">
+            &ldquo;{squad.notes.trim()}&rdquo;
+          </p>
+          <div className="z-10 border-t border-on-primary/10 pt-space-xs">
+            <span className="font-label text-label-md font-bold text-tertiary-fixed">
+              {squad.authorNoteCredit}
+            </span>
+          </div>
         </div>
-        <div className="z-10 flex items-center gap-space-xs">
-          <span className="material-symbols-outlined text-[20px] text-tertiary-fixed-dim">
-            format_quote
-          </span>
-          <span className="font-kicker text-kicker font-bold tracking-widest text-tertiary-fixed-dim uppercase">
-            YAZARIN TAKTİK NOTU
-          </span>
-        </div>
-        <p className="font-body z-10 text-body-md leading-relaxed text-on-primary/90 italic">
-          &ldquo;{squad.authorNote}&rdquo;
-        </p>
-        <div className="z-10 flex items-center justify-between border-t border-on-primary/10 pt-space-xs">
-          <span className="font-label text-label-md font-bold text-tertiary-fixed">
-            {squad.authorNoteCredit}
-          </span>
-          <button
-            type="button"
-            className="flex items-center gap-1 text-xs font-bold text-on-primary uppercase transition-colors hover:text-tertiary-fixed-dim"
-          >
-            <span>Tam Analizi Oku</span>
-            <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-          </button>
-        </div>
-      </div>
+      ) : null}
     </aside>
   )
 }

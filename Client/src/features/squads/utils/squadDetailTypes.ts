@@ -1,82 +1,74 @@
-export type PitchOverlayMode = 'none' | 'heatmap' | 'press'
+import type { FormationTacticalArrow } from './squadBuilderTypes'
 
 export type SquadPitchPlayer = {
   id: string
+  playerId: number
   shortName: string
   fullName: string
   number: string
   positionLabel: string
-  roleLabel: string
   left: string
-  top?: string
-  bottom?: string
-  centerX?: boolean
-  ringTone: 'primary' | 'primary-container' | 'secondary' | 'surface' | 'secondary-container'
-  numberTone: 'primary' | 'secondary' | 'tertiary'
-  roleTone: 'primary' | 'secondary' | 'primary-container' | 'surface' | 'on-surface'
-  positionTone: 'primary' | 'secondary' | 'tertiary'
-  isCaptain?: boolean
+  top: string
+  isCaptain: boolean
   avatarInitials: string
   avatarGradient: string
 }
 
 export type SquadBenchPlayer = {
+  playerId: number
   number: string
   position: string
   name: string
-  role: string
-  roleTone: 'primary' | 'secondary' | 'tertiary' | 'muted' | 'bold-primary'
 }
 
-export type SquadInstruction = {
+export type SquadInstructionRow = {
   title: string
-  headline: string
-  body: string
-  headlineTone?: 'primary' | 'default'
+  value: string
 }
 
-export type SquadDetailComment = {
-  id: string
-  initials: string
-  displayName: string
-  badge?: string
-  badgeTone?: 'surface' | 'secondary'
-  avatarTone: 'primary' | 'secondary' | 'primary-container'
-  timeLabel: string
-  body: string
-  upvotes: number
-  downvotes: number
-  replyCount: number
-}
-
-export type SquadDetailProfile = {
+export type SquadDetailViewModel = {
   id: string
   title: string
-  formationBadge: string
-  venueBadge: string
-  verifiedBadge: string
-  authorInitials: string
+  formation: string
+  notes: string
+  userId: string
   authorUsername: string
-  authorBadge: string
+  authorDisplayTag?: string | null
+  authorInitials: string
   publishedLabel: string
-  locationLabel: string
   rating: number
   ratingCount: number
-  approvalPercent: string
   commentCount: number
-  viewsLabel: string
-  tacticFitPercent: string
+  viewCount: number
+  currentUserScore?: number | null
+  isAuthorFollowedByCurrentUser: boolean
+  attackStyle: string
+  defenseLine: string
+  tempo: string
+  captainPlayerId: number
+  cornerTakerName: string
+  freeKickTakerName: string
   pitchPlayers: SquadPitchPlayer[]
-  benchPlanLabel: string
   benchPlayers: SquadBenchPlayer[]
-  instructions: SquadInstruction[]
+  tacticalArrows: FormationTacticalArrow[]
+  instructions: SquadInstructionRow[]
   avgAge: string
   avgAgeCaption: string
   totalValue: string
   totalValueCaption: string
-  foreignRuleLabel: string
-  foreignRuleDetail: string
-  authorNote: string
   authorNoteCredit: string
-  comments: SquadDetailComment[]
+}
+
+export const ratingScores = ['1.0', '2.0', '3.0', '3.5', '4.0', '4.5', '5.0'] as const
+
+export type RatingScore = (typeof ratingScores)[number]
+
+export const ratingFeedbackMap: Record<RatingScore, string> = {
+  '1.0': 'Zayıf Taktik (Geliştirilmeli)',
+  '2.0': 'Eksik Dizilim (Savunma Zafiyeti Var)',
+  '3.0': 'Orta Seviye Plan',
+  '3.5': 'İyi Kurgulanmış Kadro',
+  '4.0': 'Çok Başarılı Taktik',
+  '4.5': 'Harika Taktik!',
+  '5.0': 'Kusursuz Karadeniz Fırtınası!',
 }

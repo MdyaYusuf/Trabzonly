@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom'
-import type { SquadDetailProfile } from '../utils/squadDetailTypes'
 
 type SquadDetailBreadcrumbProps = {
-  squad: SquadDetailProfile
+  title: string
 }
 
-export function SquadDetailBreadcrumb({ squad }: SquadDetailBreadcrumbProps) {
+export function SquadDetailBreadcrumb({ title }: SquadDetailBreadcrumbProps) {
   return (
     <div className="w-full bg-surface-container-low px-4 py-space-sm sm:px-6 lg:px-12">
       <div className="mx-auto flex max-w-[1360px] items-center justify-between gap-space-md">
@@ -22,11 +21,11 @@ export function SquadDetailBreadcrumb({ squad }: SquadDetailBreadcrumbProps) {
             Kadrolar & Taktik Galerisi
           </Link>
           <span className="font-stat text-[10px] text-outline-variant">&gt;</span>
-          <span className="max-w-md truncate font-bold text-primary">{squad.title}</span>
+          <span className="max-w-md truncate font-bold text-primary">{title}</span>
         </nav>
         <div className="font-kicker hidden items-center gap-space-sm text-kicker tracking-wider text-on-surface-variant uppercase md:flex">
           <span className="inline-block h-2 w-2 rounded-full bg-secondary" />
-          <span>SÜPER LİG 2024/25 ANALİZ ARŞİVİ</span>
+          <span>Süper Lig Analiz Arşivi</span>
         </div>
       </div>
     </div>

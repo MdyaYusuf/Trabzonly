@@ -1,20 +1,74 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAppSelector } from '@/core/store/hooks'
+import squadService from '../squadService'
 import {
   ratingFeedbackMap,
   ratingScores,
-} from '../utils/squadDetailPlaceholders'
+  type RatingScore,
+} from '../utils/squadDetailTypes'
 
 type SquadDetailRatingBarProps = {
-  initialScore?: (typeof ratingScores)[number]
+  squadId: string
+  authorUserId: string
+  currentUserScore?: number | null
+  onRated?: (averageRating: number, ratingCount: number, score: number) => void
 }
 
-export function SquadDetailRatingBar({ initialScore = '4.5' }: SquadDetailRatingBarProps) {
-  const [selectedScore, setSelectedScore] = useState<(typeof ratingScores)[number]>(initialScore)
+function toRatingScore(value: number | null | undefined): RatingScore {
+  if (value == null) {
+    return '4.5'
+  }
+
+  const formatted = value.toFixed(1) as RatingScore
+
+  if (ratingScores.includes(formatted)) {
+    return formatted
+  }
+
+  return '4.5'
+}
+
+export function SquadDetailRatingBar({
+  squadId,
+  authorUserId,
+  currentUserScore,
+  onRated,
+}: SquadDetailRatingBarProps) {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const currentUserId = useAppSelector((state) => state.auth.user?.id)
+  const isOwner = currentUserId != null && currentUserId === authorUserId
+
+  const [selectedScore, setSelectedScore] = useState<RatingScore>(
+    toRatingScore(currentUserScore),
+  )
+  const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    setSelectedScore(toRatingScore(currentUserScore))
+  }, [currentUserScore])
 
   const phrase = ratingFeedbackMap[selectedScore]
 
-  function handleSave() {
+  async function handleSave() {
+    if (!isAuthenticated || isOwner || isSaving) {
+      return
+    }
+
+    setIsSaving(true)
+
+    const result = await squadService.rate(squadId, {
+      score: Number(selectedScore),
+    })
+
+    setIsSaving(false)
+
+    if (!result.success || !result.data) {
+      return
+    }
+
+    onRated?.(result.data.averageRating, result.data.ratingCount, result.data.score)
     setSaved(true)
     window.setTimeout(() => {
       setSaved(false)
@@ -40,13 +94,14 @@ export function SquadDetailRatingBar({ initialScore = '4.5' }: SquadDetailRating
                 <button
                   key={score}
                   type="button"
+                  disabled={isOwner || !isAuthenticated}
                   onClick={() => {
                     setSelectedScore(score)
                   }}
                   className={
                     isActive
-                      ? 'font-label bg-primary px-2 py-1 text-label-md font-bold text-on-primary shadow-sm transition-all'
-                      : 'font-label px-2 py-1 text-label-md font-bold text-on-surface-variant transition-all hover:bg-surface-container-high'
+                      ? 'font-label bg-primary px-2 py-1 text-label-md font-bold text-on-primary shadow-sm transition-all disabled:opacity-60'
+                      : 'font-label px-2 py-1 text-label-md font-bold text-on-surface-variant transition-all hover:bg-surface-container-high disabled:opacity-60'
                   }
                 >
                   {isActive ? `${score} ★` : score}
@@ -62,17 +117,29 @@ export function SquadDetailRatingBar({ initialScore = '4.5' }: SquadDetailRating
                 {selectedScore} ★ (&quot;{phrase}&quot;)
               </strong>
             </span>
-            <button
-              type="button"
-              onClick={handleSave}
-              className={
-                saved
-                  ? 'font-label bg-secondary px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-secondary uppercase shadow-sm transition-colors'
-                  : 'font-label bg-primary-container px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors hover:bg-primary'
-              }
-            >
-              {saved ? 'KAYDEDİLDİ ✓' : 'PUANI KAYDET'}
-            </button>
+            {!isAuthenticated ? (
+              <Link
+                to="/login"
+                className="font-label bg-primary-container px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors hover:bg-primary"
+              >
+                GİRİŞ YAP
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled={isOwner || isSaving}
+                onClick={() => {
+                  void handleSave()
+                }}
+                className={
+                  saved
+                    ? 'font-label bg-secondary px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-secondary uppercase shadow-sm transition-colors'
+                    : 'font-label bg-primary-container px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors hover:bg-primary disabled:opacity-50'
+                }
+              >
+                {saved ? 'KAYDEDİLDİ ✓' : isSaving ? 'KAYDEDİLİYOR…' : 'PUANI KAYDET'}
+              </button>
+            )}
           </div>
         </div>
 
