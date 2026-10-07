@@ -59,18 +59,23 @@ function resolveFormationId(formation: string): BuilderFormationId | null {
   return match.id
 }
 
+function isBenchSlotKey(slotKey: string): boolean {
+  return slotKey.toUpperCase().startsWith('BENCH_')
+}
+
 function mapSlotsToPitchColumns(
   formation: string,
   slots: SquadSlotResponseDto[],
 ): PitchPlayer[][] {
+  const starterSlots = slots.filter((slot) => !isBenchSlotKey(slot.slotKey))
   const formationId = resolveFormationId(formation)
   const slotByKey = new Map(
-    slots.map((slot) => [slot.slotKey.toUpperCase(), slot] as const),
+    starterSlots.map((slot) => [slot.slotKey.toUpperCase(), slot] as const),
   )
 
   if (!formationId) {
     return [
-      slots.map((slot, index) => ({
+      starterSlots.map((slot, index) => ({
         number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
         name: shortPlayerName(slot.playerName),
         tone: index % 2 === 0 ? 'bordo' : 'mavi',
