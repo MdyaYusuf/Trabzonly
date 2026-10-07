@@ -5,35 +5,40 @@ import { formationConfigs } from '../utils/squadBuilderPlaceholders'
 type SquadBuilderToolbarProps = {
   title: string
   formationId: BuilderFormationId
-  filled: number
+  starterFilled: number
+  benchFilled: number
   foreign: number
   domestic: number
   avgAge: string
   totalValue: string
+  canPublish: boolean
+  isPublishing: boolean
   onTitleChange: (value: string) => void
   onFormationChange: (id: BuilderFormationId) => void
   onClear: () => void
   onSaveDraft: () => void
-  onPreview: () => void
   onPublish: () => void
 }
 
 export function SquadBuilderToolbar({
   title,
   formationId,
-  filled,
+  starterFilled,
+  benchFilled,
   foreign,
   domestic,
   avgAge,
   totalValue,
+  canPublish,
+  isPublishing,
   onTitleChange,
   onFormationChange,
   onClear,
   onSaveDraft,
-  onPreview,
   onPublish,
 }: SquadBuilderToolbarProps) {
-  const isComplete = filled >= 11
+  const startersComplete = starterFilled >= 11
+  const rosterComplete = startersComplete && benchFilled >= 10
 
   return (
     <section className="w-full bg-surface py-space-md">
@@ -54,12 +59,12 @@ export function SquadBuilderToolbar({
           <div className="flex flex-wrap items-center gap-space-md">
             <div className="flex items-center gap-space-xs bg-primary-container/10 px-space-md py-1">
               <span
-                className={`h-2 w-2 rounded-full ${isComplete ? 'bg-[#2e7d32]' : 'bg-tertiary-fixed-dim'}`}
+                className={`h-2 w-2 rounded-full ${rosterComplete ? 'bg-[#2e7d32]' : 'bg-tertiary-fixed-dim'}`}
               />
               <span className="font-headline text-[13px] font-bold tracking-wide text-primary">
-                {filled} / 11 OYUNCU YERLEŞTİRİLDİ
+                {starterFilled}/11 İlk 11 · {benchFilled}/10 Yedek
               </span>
-              {isComplete ? (
+              {rosterComplete ? (
                 <span className="font-kicker bg-[#2e7d32] px-1.5 py-0.5 text-kicker font-bold text-white uppercase">
                   Kadro Tamamlandı ✓
                 </span>
@@ -107,21 +112,18 @@ export function SquadBuilderToolbar({
             </button>
             <button
               type="button"
-              onClick={onPreview}
-              className="font-label flex items-center gap-1.5 bg-secondary-container px-space-md py-space-xs text-label-md tracking-wider text-on-secondary-container uppercase transition-all hover:bg-secondary hover:text-on-secondary"
-            >
-              <span className="material-symbols-outlined text-[18px]">share</span>
-              Önizle & Paylaş
-            </button>
-            <button
-              type="button"
               onClick={onPublish}
-              className="font-headline flex items-center gap-2 bg-primary-container px-space-lg py-space-xs text-label-md tracking-wider text-on-primary uppercase shadow-sm transition-all hover:bg-primary"
+              disabled={!canPublish || isPublishing}
+              className={
+                canPublish && !isPublishing
+                  ? 'font-headline flex items-center gap-2 bg-primary-container px-space-lg py-space-xs text-label-md tracking-wider text-on-primary uppercase shadow-sm transition-all hover:bg-primary'
+                  : 'font-headline flex cursor-not-allowed items-center gap-2 bg-surface-container-highest px-space-lg py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase opacity-70'
+              }
             >
               <span className="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">
                 military_tech
               </span>
-              KAYDET & YAYINLA
+              {isPublishing ? 'YAYINLANIYOR…' : 'KAYDET & YAYINLA'}
             </button>
           </div>
         </div>

@@ -1,16 +1,18 @@
 import type {
+  AssignmentSlotId,
   BuilderPlayer,
   BuilderPosGroup,
-  BuilderSlotId,
 } from '../utils/squadBuilderTypes'
+import { isBenchSlotId } from '../utils/squadBuilderPlaceholders'
 
 type SquadBuilderPlayerPoolProps = {
   players: BuilderPlayer[]
-  assignments: Partial<Record<BuilderSlotId, string>>
+  assignments: Partial<Record<AssignmentSlotId, string>>
   search: string
   posFilter: BuilderPosGroup
-  filled: number
-  selectedSlotId: BuilderSlotId | null
+  starterFilled: number
+  benchFilled: number
+  selectedSlotId: AssignmentSlotId | null
   onSearchChange: (value: string) => void
   onPosFilterChange: (value: BuilderPosGroup) => void
   onAssign: (playerId: string) => void
@@ -25,7 +27,7 @@ const posTabs: { id: BuilderPosGroup; label: string }[] = [
 ]
 
 function slotLabelForPlayer(
-  assignments: Partial<Record<BuilderSlotId, string>>,
+  assignments: Partial<Record<AssignmentSlotId, string>>,
   playerId: string,
 ): string | null {
   const entry = Object.entries(assignments).find(([, id]) => id === playerId)
@@ -42,13 +44,16 @@ export function SquadBuilderPlayerPool({
   assignments,
   search,
   posFilter,
-  filled,
+  starterFilled,
+  benchFilled,
   selectedSlotId,
   onSearchChange,
   onPosFilterChange,
   onAssign,
 }: SquadBuilderPlayerPoolProps) {
-  const isComplete = filled >= 11
+  const startersComplete = starterFilled >= 11
+  const benchComplete = benchFilled >= 10
+  const isComplete = startersComplete && benchComplete
 
   const filtered = players.filter((player) => {
     if (posFilter !== 'ALL' && player.posGroup !== posFilter) {
@@ -91,7 +96,7 @@ export function SquadBuilderPlayerPool({
           </span>
           <input
             className="font-body w-full bg-surface-container py-2 pr-space-md pl-10 text-body-sm text-on-surface placeholder-on-surface-variant/60 focus:ring-1 focus:ring-primary focus:outline-none"
-            placeholder="Oyuncu adı veya forma no ara (Örn: Draguş, 70, Nwakaeme)..."
+            placeholder="Oyuncu adı veya forma no ara…"
             type="search"
             value={search}
             onChange={(event) => {
@@ -136,22 +141,25 @@ export function SquadBuilderPlayerPool({
           <p className="font-body text-[12px] leading-tight text-on-secondary-fixed">
             {isComplete ? (
               <>
-                İlk 11 tamamlandı!{' '}
-                <strong className="font-bold text-[#2e7d32]">11/11 Oyuncu</strong> yerleştirildi.
-                Taktik direktiflerini düzenleyip yayınlayabilirsiniz.
+                Kadro hazır:{' '}
+                <strong className="font-bold text-[#2e7d32]">11 ilk 11 + 10 yedek</strong>.
+                Taktikleri kontrol edip yayınlayın.
               </>
             ) : selectedSlotId ? (
               <>
-                Seçili slot: <strong className="font-bold text-primary">{selectedSlotId}</strong>.
-                Havuzdan oyuncu seçerek yerleştirin.
+                Seçili slot:{' '}
+                <strong className="font-bold text-primary">
+                  {isBenchSlotId(selectedSlotId)
+                    ? `Yedek ${selectedSlotId.replace('BENCH_', '')}`
+                    : selectedSlotId}
+                </strong>
+                . Havuzdan oyuncu seçin.
               </>
             ) : (
               <>
-                Yerleştirilen:{' '}
-                <strong className="font-bold text-primary">
-                  {filled}/11 Oyuncu
-                </strong>
-                . Boş bir slot seçin veya doğrudan oyuncu ekleyin.
+                İlk 11: <strong className="font-bold text-primary">{starterFilled}/11</strong>
+                {' · '}
+                Yedek: <strong className="font-bold text-primary">{benchFilled}/10</strong>
               </>
             )}
           </p>
@@ -163,7 +171,11 @@ export function SquadBuilderPlayerPool({
           const assignedSlot = slotLabelForPlayer(assignments, player.id)
           const isAssigned = Boolean(assignedSlot)
 
-          if (isAssigned) {
+          if (isAssigned && assignedSlot) {
+            const locationLabel = isBenchSlotId(assignedSlot)
+              ? `Yedek (${assignedSlot.replace('BENCH_', 'Y')})`
+              : `Sahada (${assignedSlot})`
+
             return (
               <div
                 key={player.id}
@@ -185,7 +197,7 @@ export function SquadBuilderPlayerPool({
                       </span>
                     </div>
                     <span className="font-body text-[12px] text-on-surface-variant">
-                      Sahada ({assignedSlot} Pozisyonunda)
+                      {locationLabel}
                     </span>
                   </div>
                 </div>
@@ -219,13 +231,7 @@ export function SquadBuilderPlayerPool({
                       #{player.number}
                     </span>
                     {player.badge ? (
-                      <span
-                        className={
-                          player.badgeTone === 'wizard'
-                            ? 'font-kicker bg-tertiary-fixed px-1 text-[9px] font-bold text-on-tertiary-fixed'
-                            : 'font-kicker bg-surface-container px-1 text-[9px] font-bold text-on-surface-variant'
-                        }
-                      >
+                      <span className="font-kicker bg-surface-container px-1 text-[9px] font-bold text-on-surface-variant">
                         {player.badge}
                       </span>
                     ) : null}
@@ -240,14 +246,10 @@ export function SquadBuilderPlayerPool({
                 onClick={() => {
                   onAssign(player.id)
                 }}
-                className={
-                  player.badgeTone === 'wizard'
-                    ? 'font-kicker flex shrink-0 items-center gap-1 bg-secondary px-3 py-1.5 text-kicker font-bold text-on-secondary uppercase shadow-sm transition-all hover:bg-secondary-container hover:text-on-secondary-container'
-                    : 'font-kicker flex shrink-0 items-center gap-1 bg-surface-container px-3 py-1.5 text-kicker font-bold text-on-surface uppercase transition-all hover:bg-secondary hover:text-on-secondary'
-                }
+                className="font-kicker flex shrink-0 items-center gap-1 bg-surface-container px-3 py-1.5 text-kicker font-bold text-on-surface uppercase transition-all hover:bg-secondary hover:text-on-secondary"
               >
                 <span className="material-symbols-outlined text-[15px]">add_circle</span>
-                {player.badgeTone === 'wizard' ? 'SLOTA EKLE' : 'SEÇ'}
+                SEÇ
               </button>
             </div>
           )

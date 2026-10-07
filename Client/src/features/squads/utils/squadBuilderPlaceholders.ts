@@ -1,32 +1,39 @@
 import type {
+  AttackStyleOption,
+  BenchSlotId,
   BuilderFormationId,
   BuilderPlayer,
   BuilderSlotId,
+  DefenseLineOption,
   FormationConfig,
+  TempoOption,
 } from './squadBuilderTypes'
+
+export const NOTES_MAX_LENGTH = 400
 
 export const defaultTitle = 'Akyazı Şok Presi: Karadeniz Fırtınası 4-2-3-1'
 
 export const defaultNotes =
-  "Akyazı'da ilk 20 dakika yoğun ön alan şok presiyle rakip stoperleri hataya zorluyoruz. Mendy ve Lundstram tandeminde biri mutlaka süpürücü olarak yay çevresini kapatacak. Sol kanat (LW) içe kat ettiğinde Eren Elmalı çizgiyi boydan boya kullanacak. Simon Banza ceza sahasında stoperleri yıpratırken Cham ikinci toplara şut arayacak."
+  'İlk 20 dakika yüksek ön alan presi. Pivot süpürücü kalır, 10 numara ikinci toplara iner. Santrfor stoperleri yıpratır.'
 
-export const pressOptions = [
-  'Yüksek Şok Pres (Akyazı Baskısı)',
-  'Dengeli 2. Bölge Presi',
-  'Kompakt Derin Savunma Bloğu',
-] as const
+export const attackStyleOptions: AttackStyleOption[] = ['Baskılı', 'Dengeli', 'Kontra']
 
-export const defenseLineOptions = [
-  'Orta Saha İlerisi (Ofsayt Tuzağı)',
-  'Normal Hat (Standart Derinlik)',
-  'Ceza Sahası Önü (Düşük Risk)',
-] as const
+export const defenseLineOptions: DefenseLineOption[] = ['Yüksek', 'Dengeli', 'Derin']
 
-export const attackWidthOptions = [
-  'Geniş Alan (Çizgi Bekleri)',
-  'Merkezden Kısa Pas Kombinasyonu',
-  'Doğrudan Kanat Geçişleri',
-] as const
+export const tempoOptions: TempoOption[] = ['Yüksek', 'Normal', 'Düşük']
+
+export const BENCH_SLOT_IDS: BenchSlotId[] = [
+  'BENCH_1',
+  'BENCH_2',
+  'BENCH_3',
+  'BENCH_4',
+  'BENCH_5',
+  'BENCH_6',
+  'BENCH_7',
+  'BENCH_8',
+  'BENCH_9',
+  'BENCH_10',
+]
 
 export const formationConfigs: FormationConfig[] = [
   {
@@ -430,20 +437,6 @@ export const builderPlayers: BuilderPlayer[] = [
   },
 ]
 
-export const defaultAssignments: Partial<Record<BuilderSlotId, string>> = {
-  ST: 'banza',
-  LW: 'dragus',
-  CAM: 'cham',
-  RW: 'visca',
-  LDM: 'lundstram',
-  RDM: 'mendy',
-  LB: 'elmali',
-  LCB: 'batagov',
-  RCB: 'savic',
-  RB: 'malheiro',
-  GK: 'cakir',
-}
-
 export function getFormationConfig(id: BuilderFormationId): FormationConfig {
   const found = formationConfigs.find((item) => item.id === id)
 
@@ -454,30 +447,42 @@ export function getFormationConfig(id: BuilderFormationId): FormationConfig {
   return found
 }
 
-export function getPlayerById(id: string): BuilderPlayer | undefined {
-  return builderPlayers.find((player) => player.id === id)
-}
-
 export function slotIdsForFormation(id: BuilderFormationId): BuilderSlotId[] {
   return getFormationConfig(id).rows.flatMap((row) => row.map((slot) => slot.id))
 }
 
-export function computeSquadStats(assignments: Partial<Record<BuilderSlotId, string>>) {
-  const players = Object.values(assignments)
-    .filter((id): id is string => Boolean(id))
-    .map((id) => getPlayerById(id))
+export function isBenchSlotId(slotId: string): slotId is BenchSlotId {
+  return BENCH_SLOT_IDS.includes(slotId as BenchSlotId)
+}
+
+export function computeSquadStats(
+  starterAssignments: Partial<Record<BuilderSlotId, string>>,
+  benchAssignments: Partial<Record<BenchSlotId, string>>,
+  playersById: Map<string, BuilderPlayer>,
+) {
+  const starterIds = Object.values(starterAssignments).filter((id): id is string => Boolean(id))
+  const benchIds = Object.values(benchAssignments).filter((id): id is string => Boolean(id))
+
+  const starters = starterIds
+    .map((id) => playersById.get(id))
     .filter((player): player is BuilderPlayer => Boolean(player))
 
-  const foreign = players.filter((player) => !player.isDomestic).length
-  const domestic = players.filter((player) => player.isDomestic).length
+  const allPlayers = [...starterIds, ...benchIds]
+    .map((id) => playersById.get(id))
+    .filter((player): player is BuilderPlayer => Boolean(player))
+
+  const foreign = starters.filter((player) => !player.isDomestic).length
+  const domestic = starters.filter((player) => player.isDomestic).length
   const avgAge =
-    players.length === 0
+    starters.length === 0
       ? 0
-      : players.reduce((sum, player) => sum + player.age, 0) / players.length
-  const totalValue = players.reduce((sum, player) => sum + player.marketValueM, 0)
+      : starters.reduce((sum, player) => sum + player.age, 0) / starters.length
+  const totalValue = allPlayers.reduce((sum, player) => sum + player.marketValueM, 0)
 
   return {
-    filled: players.length,
+    starterFilled: starters.length,
+    benchFilled: benchIds.length,
+    filled: starters.length,
     foreign,
     domestic,
     avgAge: avgAge.toFixed(1),

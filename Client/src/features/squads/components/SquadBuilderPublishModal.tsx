@@ -2,7 +2,9 @@ type SquadBuilderPublishModalProps = {
   open: boolean
   title: string
   formationLabel: string
-  filled: number
+  squadId: string | null
+  starterFilled: number
+  benchFilled: number
   onClose: () => void
 }
 
@@ -10,14 +12,19 @@ export function SquadBuilderPublishModal({
   open,
   title,
   formationLabel,
-  filled,
+  squadId,
+  starterFilled,
+  benchFilled,
   onClose,
 }: SquadBuilderPublishModalProps) {
   if (!open) {
     return null
   }
 
-  const shareUrl = 'https://trabzonly.com/kadrolar/akyazi-sok-presi-banza-cham-2024'
+  const shareUrl =
+    squadId != null
+      ? `${window.location.origin}/kadrolar/${squadId}`
+      : `${window.location.origin}/kadrolar`
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/80 p-4 backdrop-blur-sm">
@@ -39,7 +46,7 @@ export function SquadBuilderPublishModal({
               Kadro Başarıyla Kaydedildi!
             </h3>
             <p className="font-body text-body-sm text-on-surface-variant">
-              Kadro topluluk akışında 1. sıraya yerleşti.
+              Kadronuz galeride yayınlandı.
             </p>
           </div>
         </div>
@@ -50,12 +57,12 @@ export function SquadBuilderPublishModal({
               TRABZONLY TAKTİK TAHTASI
             </span>
             <span className="font-kicker text-kicker font-bold text-tertiary-fixed-dim uppercase">
-              {formationLabel} SİSTEMİ
+              {formationLabel}
             </span>
           </div>
           <h4 className="font-headline text-headline-sm font-bold text-on-primary">{title}</h4>
           <p className="font-body text-[12px] text-on-primary/80">
-            Kadro Tamamlandı: {filled} / 11 Oyuncu Sahada • TFF Yabancı Kuralına Uygun
+            İlk 11: {starterFilled}/11 · Yedek: {benchFilled}/10
           </p>
         </div>
 

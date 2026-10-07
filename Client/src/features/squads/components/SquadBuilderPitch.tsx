@@ -4,11 +4,11 @@ import type {
   FormationConfig,
   FormationSlot,
 } from '../utils/squadBuilderTypes'
-import { getPlayerById } from '../utils/squadBuilderPlaceholders'
 
 type SquadBuilderPitchProps = {
   formation: FormationConfig
   assignments: Partial<Record<BuilderSlotId, string>>
+  playersById: Map<string, BuilderPlayer>
   selectedSlotId: BuilderSlotId | null
   onSelectSlot: (slotId: BuilderSlotId) => void
   onClearSlot: (slotId: BuilderSlotId) => void
@@ -152,6 +152,7 @@ function rowGridClass(count: number) {
 export function SquadBuilderPitch({
   formation,
   assignments,
+  playersById,
   selectedSlotId,
   onSelectSlot,
   onClearSlot,
@@ -258,7 +259,7 @@ export function SquadBuilderPitch({
             >
               {row.map((slot) => {
                 const playerId = assignments[slot.id]
-                const player = playerId ? getPlayerById(playerId) : undefined
+                const player = playerId ? playersById.get(playerId) : undefined
 
                 return (
                   <div key={slot.id} className="flex justify-center">

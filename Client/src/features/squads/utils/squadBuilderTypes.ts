@@ -29,6 +29,20 @@ export type BuilderSlotId =
   | 'ST'
   | 'ST2'
 
+export type BenchSlotId =
+  | 'BENCH_1'
+  | 'BENCH_2'
+  | 'BENCH_3'
+  | 'BENCH_4'
+  | 'BENCH_5'
+  | 'BENCH_6'
+  | 'BENCH_7'
+  | 'BENCH_8'
+  | 'BENCH_9'
+  | 'BENCH_10'
+
+export type AssignmentSlotId = BuilderSlotId | BenchSlotId
+
 export type BuilderPlayer = {
   id: string
   name: string
@@ -57,3 +71,7 @@ export type FormationConfig = {
   lineLabel: string
   rows: FormationSlot[][]
 }
+
+export type AttackStyleOption = 'Baskılı' | 'Dengeli' | 'Kontra'
+export type DefenseLineOption = 'Yüksek' | 'Dengeli' | 'Derin'
+export type TempoOption = 'Yüksek' | 'Normal' | 'Düşük'
