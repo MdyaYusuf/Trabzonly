@@ -99,6 +99,34 @@ export function SquadBuilderPage() {
     [starterPlayers],
   )
 
+  const assignedPlayerIds = useMemo(() => {
+    const ids = new Set<string>()
+
+    for (const playerId of Object.values(allAssignments)) {
+      if (playerId) {
+        ids.add(playerId)
+      }
+    }
+
+    return ids
+  }, [allAssignments])
+
+  function findSlotForPlayer(playerId: string): AssignmentSlotId | null {
+    for (const [slotId, assignedId] of Object.entries(starterAssignments)) {
+      if (assignedId === playerId) {
+        return slotId as BuilderSlotId
+      }
+    }
+
+    for (const [slotId, assignedId] of Object.entries(benchAssignments)) {
+      if (assignedId === playerId) {
+        return slotId as BenchSlotId
+      }
+    }
+
+    return null
+  }
+
   useEffect(() => {
     if (!starterPlayerIds.has(captainPlayerId)) {
       setCaptainPlayerId('')
@@ -200,12 +228,75 @@ export function SquadBuilderPage() {
     }
   }
 
-  function handleSelectStarterSlot(slotId: BuilderSlotId) {
+  function handleSelectBenchSlot(slotId: BenchSlotId) {
     setSelectedSlotId((prev) => (prev === slotId ? null : slotId))
   }
 
-  function handleSelectBenchSlot(slotId: BenchSlotId) {
-    setSelectedSlotId((prev) => (prev === slotId ? null : slotId))
+  function handleAssignToStarterSlot(slotId: BuilderSlotId, playerId: string) {
+    if (assignedPlayerIds.has(playerId)) {
+      return
+    }
+
+    setStarterAssignments((prev) => ({
+      ...prev,
+      [slotId]: playerId,
+    }))
+  }
+
+  function handleDropOnStarterSlot(
+    targetSlotId: BuilderSlotId,
+    playerId: string,
+    sourceSlotId?: string,
+  ) {
+    const source =
+      (sourceSlotId as AssignmentSlotId | undefined) ?? findSlotForPlayer(playerId)
+
+    if (source === targetSlotId) {
+      return
+    }
+
+    const targetPlayerId = starterAssignments[targetSlotId]
+
+    if (source && !isBenchSlotId(source)) {
+      setStarterAssignments((prev) => {
+        const next = { ...prev }
+        const currentTarget = next[targetSlotId]
+
+        if (currentTarget) {
+          next[source] = currentTarget
+        } else {
+          delete next[source]
+        }
+
+        next[targetSlotId] = playerId
+        return next
+      })
+      return
+    }
+
+    if (source && isBenchSlotId(source)) {
+      setStarterAssignments((prev) => ({
+        ...prev,
+        [targetSlotId]: playerId,
+      }))
+      setBenchAssignments((prev) => {
+        const next = { ...prev }
+
+        if (targetPlayerId) {
+          next[source] = targetPlayerId
+        } else {
+          delete next[source]
+        }
+
+        return next
+      })
+      return
+    }
+
+    setStarterAssignments((prev) => ({
+      ...prev,
+      [targetSlotId]: playerId,
+    }))
   }
 
   function handleAssign(playerId: string) {
@@ -353,11 +444,11 @@ export function SquadBuilderPage() {
             <SquadBuilderPitch
               formation={formation}
               assignments={starterAssignments}
+              players={players}
               playersById={playersById}
-              selectedSlotId={
-                selectedSlotId && !isBenchSlotId(selectedSlotId) ? selectedSlotId : null
-              }
-              onSelectSlot={handleSelectStarterSlot}
+              assignedPlayerIds={assignedPlayerIds}
+              onAssignToSlot={handleAssignToStarterSlot}
+              onDropPlayer={handleDropOnStarterSlot}
               onClearSlot={handleClearStarterSlot}
             />
 

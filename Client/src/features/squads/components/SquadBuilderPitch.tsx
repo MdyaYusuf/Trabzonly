@@ -1,82 +1,245 @@
+import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import type {
   BuilderPlayer,
   BuilderSlotId,
   FormationConfig,
   FormationSlot,
 } from '../utils/squadBuilderTypes'
+import {
+  posGroupForSlot,
+  readSquadPlayerDragData,
+  setSquadPlayerDragData,
+} from '../utils/squadBuilderDnD'
 
 type SquadBuilderPitchProps = {
   formation: FormationConfig
   assignments: Partial<Record<BuilderSlotId, string>>
+  players: BuilderPlayer[]
   playersById: Map<string, BuilderPlayer>
-  selectedSlotId: BuilderSlotId | null
-  onSelectSlot: (slotId: BuilderSlotId) => void
+  assignedPlayerIds: Set<string>
+  onAssignToSlot: (slotId: BuilderSlotId, playerId: string) => void
+  onDropPlayer: (targetSlotId: BuilderSlotId, playerId: string, sourceSlotId?: string) => void
   onClearSlot: (slotId: BuilderSlotId) => void
+}
+
+function SlotPlayerPicker({
+  slot,
+  candidates,
+  onPick,
+  onClose,
+}: {
+  slot: FormationSlot
+  candidates: BuilderPlayer[]
+  onPick: (playerId: string) => void
+  onClose: () => void
+}) {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase()
+
+    if (!query) {
+      return candidates
+    }
+
+    return candidates.filter((player) => {
+      return (
+        player.name.toLowerCase().includes(query) ||
+        player.shortName.toLowerCase().includes(query) ||
+        player.number.includes(query)
+      )
+    })
+  }, [candidates, search])
+
+  return (
+    <div
+      ref={rootRef}
+      className="absolute top-full left-1/2 z-40 mt-2 w-56 -translate-x-1/2 bg-surface-container-lowest p-2 shadow-xl ring-1 ring-outline-variant/40"
+      role="dialog"
+      aria-label={`${slot.label} oyuncu seç`}
+    >
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="font-kicker text-[10px] font-bold tracking-widest text-primary uppercase">
+          {slot.label} · Seç
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex h-6 w-6 items-center justify-center text-on-surface-variant hover:text-primary"
+          aria-label="Kapat"
+        >
+          <span className="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+      <label className="relative mb-2 block">
+        <span className="material-symbols-outlined pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-[16px] text-on-surface-variant">
+          search
+        </span>
+        <input
+          autoFocus
+          type="search"
+          value={search}
+          onChange={(event) => {
+            setSearch(event.target.value)
+          }}
+          placeholder="İsim veya no…"
+          className="font-body w-full bg-surface-container py-1.5 pr-2 pl-8 text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+      </label>
+      <div className="flex max-h-48 flex-col gap-1 overflow-y-auto">
+        {filtered.map((player) => (
+          <button
+            key={player.id}
+            type="button"
+            onClick={() => {
+              onPick(player.id)
+            }}
+            className="flex items-center gap-2 bg-surface-container-low px-2 py-1.5 text-left transition-colors hover:bg-surface-container"
+          >
+            <div
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${player.avatarGradient}`}
+            >
+              {player.initials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="font-headline block truncate text-[12px] font-bold text-on-surface">
+                {player.name}
+              </span>
+              <span className="font-kicker text-[9px] text-on-surface-variant uppercase">
+                #{player.number} · {player.roleHint}
+              </span>
+            </div>
+          </button>
+        ))}
+        {filtered.length === 0 ? (
+          <p className="font-body px-1 py-2 text-center text-[11px] text-on-surface-variant">
+            Uygun oyuncu yok.
+          </p>
+        ) : null}
+      </div>
+    </div>
+  )
 }
 
 function SlotCard({
   slot,
   player,
-  isSelected,
-  isGk,
-  onSelect,
+  candidates,
+  isPickerOpen,
+  isDropTarget,
+  onOpenPicker,
+  onClosePicker,
+  onPick,
   onClear,
+  onDragOverSlot,
+  onDragLeaveSlot,
+  onDropOnSlot,
 }: {
   slot: FormationSlot
   player?: BuilderPlayer
-  isSelected: boolean
-  isGk: boolean
-  onSelect: () => void
+  candidates: BuilderPlayer[]
+  isPickerOpen: boolean
+  isDropTarget: boolean
+  onOpenPicker: () => void
+  onClosePicker: () => void
+  onPick: (playerId: string) => void
   onClear: () => void
+  onDragOverSlot: (event: DragEvent) => void
+  onDragLeaveSlot: () => void
+  onDropOnSlot: (event: DragEvent) => void
 }) {
+  const isGk = slot.id === 'GK'
+
   if (!player) {
     return (
-      <button
-        type="button"
-        onClick={onSelect}
-        className={`group relative flex flex-col items-center transition-transform hover:scale-105 ${
-          isSelected ? 'scale-105' : ''
-        }`}
+      <div
+        className="relative flex flex-col items-center"
+        onDragOver={onDragOverSlot}
+        onDragLeave={onDragLeaveSlot}
+        onDrop={onDropOnSlot}
       >
-        <div
-          className={`flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed shadow-lg ${
-            isSelected
-              ? 'border-secondary-container bg-secondary-container/30'
-              : 'border-white/50 bg-black/20'
+        <button
+          type="button"
+          onClick={onOpenPicker}
+          className={`group flex flex-col items-center transition-transform hover:scale-105 ${
+            isDropTarget ? 'scale-105' : ''
           }`}
         >
-          <span className="material-symbols-outlined text-[28px] text-white/70">add</span>
-        </div>
-        <div className="mt-1 bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
-          <span className="font-headline block text-[12px] font-bold text-primary">{slot.label}</span>
-          <span className="font-kicker block text-[9px] font-bold text-on-surface-variant uppercase">
-            Boş Slot
-          </span>
-        </div>
-      </button>
+          <div
+            className={`flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed shadow-lg ${
+              isDropTarget || isPickerOpen
+                ? 'border-secondary-container bg-secondary-container/30'
+                : 'border-white/50 bg-black/20'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[28px] text-white/70">add</span>
+          </div>
+          <div className="mt-1 bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
+            <span className="font-headline block text-[12px] font-bold text-primary">
+              {slot.label}
+            </span>
+            <span className="font-kicker block text-[9px] font-bold text-on-surface-variant uppercase">
+              Boş Slot
+            </span>
+          </div>
+        </button>
+        {isPickerOpen ? (
+          <SlotPlayerPicker
+            slot={slot}
+            candidates={candidates}
+            onPick={onPick}
+            onClose={onClosePicker}
+          />
+        ) : null}
+      </div>
     )
   }
 
   return (
     <div
-      className={`group relative flex cursor-pointer flex-col items-center transition-transform hover:scale-105 ${
-        isSelected ? 'scale-105' : ''
+      className={`group relative flex flex-col items-center transition-transform hover:scale-105 ${
+        isDropTarget ? 'scale-105' : ''
       }`}
-      onClick={onSelect}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          onSelect()
-        }
+      draggable
+      onDragStart={(event) => {
+        setSquadPlayerDragData(event.dataTransfer, {
+          playerId: player.id,
+          sourceSlotId: slot.id,
+        })
       }}
-      role="button"
-      tabIndex={0}
+      onDragOver={onDragOverSlot}
+      onDragLeave={onDragLeaveSlot}
+      onDrop={onDropOnSlot}
     >
       <div
-        className={`relative h-16 w-16 rounded-full p-1 shadow-lg ring-2 ${
+        className={`relative h-16 w-16 cursor-grab rounded-full p-1 shadow-lg ring-2 active:cursor-grabbing ${
           isGk
             ? 'bg-tertiary ring-tertiary-fixed group-hover:ring-white'
             : 'bg-primary-container ring-white/60 group-hover:ring-secondary-container'
-        } ${isSelected ? 'ring-secondary-container' : ''}`}
+        } ${isDropTarget ? 'ring-secondary-container' : ''}`}
       >
         <div
           className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold text-white ${player.avatarGradient}`}
@@ -145,11 +308,39 @@ function rowGridClass(count: number) {
 export function SquadBuilderPitch({
   formation,
   assignments,
+  players,
   playersById,
-  selectedSlotId,
-  onSelectSlot,
+  assignedPlayerIds,
+  onAssignToSlot,
+  onDropPlayer,
   onClearSlot,
 }: SquadBuilderPitchProps) {
+  const [openPickerSlotId, setOpenPickerSlotId] = useState<BuilderSlotId | null>(null)
+  const [dropTargetSlotId, setDropTargetSlotId] = useState<BuilderSlotId | null>(null)
+
+  useEffect(() => {
+    setOpenPickerSlotId(null)
+    setDropTargetSlotId(null)
+  }, [formation.id])
+
+  const candidatesBySlot = useMemo(() => {
+    const map = new Map<BuilderSlotId, BuilderPlayer[]>()
+
+    for (const row of formation.rows) {
+      for (const slot of row) {
+        const group = posGroupForSlot(slot.id)
+        map.set(
+          slot.id,
+          players.filter(
+            (player) => player.posGroup === group && !assignedPlayerIds.has(player.id),
+          ),
+        )
+      }
+    }
+
+    return map
+  }, [assignedPlayerIds, formation.rows, players])
+
   return (
     <div className="relative w-full select-none overflow-hidden bg-[#1e4a2c] shadow-xl">
       <div className="absolute inset-0 bg-gradient-to-b from-[#183c24] via-[#1f4e2d] to-[#153520] opacity-95" />
@@ -181,56 +372,6 @@ export function SquadBuilderPitch({
         <path d="M 696 916 A 20 20 0 0 0 676 936" />
       </svg>
 
-      <svg
-        className="pointer-events-none absolute inset-0 z-10 h-full w-full"
-        viewBox="0 0 720 960"
-        aria-hidden="true"
-      >
-        <line
-          stroke="#75B7E5"
-          strokeDasharray="6,4"
-          strokeOpacity="0.7"
-          strokeWidth="2.5"
-          x1="260"
-          x2="360"
-          y1="590"
-          y2="430"
-        />
-        <line
-          stroke="#75B7E5"
-          strokeDasharray="6,4"
-          strokeOpacity="0.8"
-          strokeWidth="2.5"
-          x1="360"
-          x2="360"
-          y1="410"
-          y2="190"
-        />
-        <path
-          d="M 600 710 Q 640 540 590 390"
-          fill="none"
-          stroke="#D39D3F"
-          strokeDasharray="4,4"
-          strokeOpacity="0.85"
-          strokeWidth="2.5"
-        />
-        <polygon fill="#D39D3F" points="590,380 584,394 596,392" />
-        <path
-          d="M 140 370 Q 210 320 290 200"
-          fill="none"
-          stroke="#ffdad6"
-          strokeDasharray="3,3"
-          strokeOpacity="0.6"
-          strokeWidth="2"
-        />
-      </svg>
-
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
-        <span className="font-headline text-[64px] font-extrabold tracking-widest text-white uppercase sm:text-[96px]">
-          TRABZON
-        </span>
-      </div>
-
       <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 sm:left-6">
         <span className="font-kicker bg-primary/90 px-2.5 py-1 text-[10px] font-bold tracking-widest text-on-primary uppercase">
           PAPARA PARK • AKYAZI
@@ -259,13 +400,42 @@ export function SquadBuilderPitch({
                     <SlotCard
                       slot={slot}
                       player={player}
-                      isSelected={selectedSlotId === slot.id}
-                      isGk={slot.id === 'GK'}
-                      onSelect={() => {
-                        onSelectSlot(slot.id)
+                      candidates={candidatesBySlot.get(slot.id) ?? []}
+                      isPickerOpen={openPickerSlotId === slot.id}
+                      isDropTarget={dropTargetSlotId === slot.id}
+                      onOpenPicker={() => {
+                        setOpenPickerSlotId(slot.id)
+                      }}
+                      onClosePicker={() => {
+                        setOpenPickerSlotId(null)
+                      }}
+                      onPick={(pickedId) => {
+                        onAssignToSlot(slot.id, pickedId)
+                        setOpenPickerSlotId(null)
                       }}
                       onClear={() => {
                         onClearSlot(slot.id)
+                      }}
+                      onDragOverSlot={(event) => {
+                        event.preventDefault()
+                        event.dataTransfer.dropEffect = 'move'
+                        setDropTargetSlotId(slot.id)
+                      }}
+                      onDragLeaveSlot={() => {
+                        setDropTargetSlotId((current) =>
+                          current === slot.id ? null : current,
+                        )
+                      }}
+                      onDropOnSlot={(event) => {
+                        event.preventDefault()
+                        setDropTargetSlotId(null)
+                        const payload = readSquadPlayerDragData(event.dataTransfer)
+
+                        if (!payload) {
+                          return
+                        }
+
+                        onDropPlayer(slot.id, payload.playerId, payload.sourceSlotId)
                       }}
                     />
                   </div>
