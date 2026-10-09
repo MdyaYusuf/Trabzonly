@@ -11,11 +11,6 @@ import type {
 
 export const NOTES_MAX_LENGTH = 400
 
-export const defaultTitle = 'Akyazı Şok Presi: Karadeniz Fırtınası 4-2-3-1'
-
-export const defaultNotes =
-  'İlk 20 dakika yüksek ön alan presi. Pivot süpürücü kalır, 10 numara ikinci toplara iner. Santrfor stoperleri yıpratır.'
-
 export const attackStyleOptions: AttackStyleOption[] = ['Baskılı', 'Dengeli', 'Kontra']
 
 export const defenseLineOptions: DefenseLineOption[] = ['Yüksek', 'Dengeli', 'Derin']

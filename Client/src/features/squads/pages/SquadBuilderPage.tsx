@@ -17,8 +17,6 @@ import {
   NOTES_MAX_LENGTH,
   attackStyleOptions,
   computeSquadStats,
-  defaultNotes,
-  defaultTitle,
   defenseLineOptions,
   getFormationConfig,
   isBenchSlotId,
@@ -41,7 +39,7 @@ export function SquadBuilderPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAppSelector((state) => state.auth)
 
-  const [title, setTitle] = useState(defaultTitle)
+  const [title, setTitle] = useState('')
   const [formationId, setFormationId] = useState<BuilderFormationId>('4-2-3-1')
   const [starterAssignments, setStarterAssignments] = useState<
     Partial<Record<BuilderSlotId, string>>
@@ -58,13 +56,13 @@ export function SquadBuilderPage() {
   const [captainPlayerId, setCaptainPlayerId] = useState('')
   const [cornerTakerPlayerId, setCornerTakerPlayerId] = useState('')
   const [freeKickTakerPlayerId, setFreeKickTakerPlayerId] = useState('')
-  const [notes, setNotes] = useState(defaultNotes)
+  const [notes, setNotes] = useState('')
   const [players, setPlayers] = useState<BuilderPlayer[]>([])
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [publishedSquadId, setPublishedSquadId] = useState<string | null>(null)
   const [isPublishing, setIsPublishing] = useState(false)
-  const [draftToast, setDraftToast] = useState<string | null>(null)
+  const [feedbackToast, setFeedbackToast] = useState<string | null>(null)
 
   const formation = getFormationConfig(formationId)
   const playersById = useMemo(() => {
@@ -148,9 +146,9 @@ export function SquadBuilderPage() {
   }, [])
 
   function showToast(message: string) {
-    setDraftToast(message)
+    setFeedbackToast(message)
     window.setTimeout(() => {
-      setDraftToast(null)
+      setFeedbackToast(null)
     }, 2200)
   }
 
@@ -297,7 +295,7 @@ export function SquadBuilderPage() {
     }))
 
     const request: CreateSquadRequest = {
-      title: title.trim() || defaultTitle,
+      title: title.trim(),
       formation: formationId,
       notes: notes.trim(),
       attackStyle,
@@ -329,8 +327,6 @@ export function SquadBuilderPage() {
       <SquadBuilderToolbar
         title={title}
         formationId={formationId}
-        starterFilled={stats.starterFilled}
-        benchFilled={stats.benchFilled}
         avgAge={stats.avgAge}
         totalValue={stats.totalValue}
         canPublish={canPublish}
@@ -338,18 +334,15 @@ export function SquadBuilderPage() {
         onTitleChange={setTitle}
         onFormationChange={handleFormationChange}
         onClear={handleClear}
-        onSaveDraft={() => {
-          showToast('Taslak kaydı yakında aktif.')
-        }}
         onPublish={() => {
           void handlePublish()
         }}
       />
 
-      {draftToast ? (
+      {feedbackToast ? (
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="mb-space-sm bg-secondary-container px-space-md py-space-sm text-on-secondary-container shadow-sm">
-            <span className="font-label text-label-md">{draftToast}</span>
+            <span className="font-label text-label-md">{feedbackToast}</span>
           </div>
         </div>
       ) : null}
@@ -421,7 +414,7 @@ export function SquadBuilderPage() {
 
       <SquadBuilderPublishModal
         open={modalOpen}
-        title={title || defaultTitle}
+        title={title.trim()}
         formationLabel={formationId}
         squadId={publishedSquadId}
         starterFilled={stats.starterFilled}

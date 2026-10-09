@@ -5,8 +5,6 @@ import { formationConfigs } from '../utils/squadBuilderPlaceholders'
 type SquadBuilderToolbarProps = {
   title: string
   formationId: BuilderFormationId
-  starterFilled: number
-  benchFilled: number
   avgAge: string
   totalValue: string
   canPublish: boolean
@@ -14,15 +12,12 @@ type SquadBuilderToolbarProps = {
   onTitleChange: (value: string) => void
   onFormationChange: (id: BuilderFormationId) => void
   onClear: () => void
-  onSaveDraft: () => void
   onPublish: () => void
 }
 
 export function SquadBuilderToolbar({
   title,
   formationId,
-  starterFilled,
-  benchFilled,
   avgAge,
   totalValue,
   canPublish,
@@ -30,51 +25,21 @@ export function SquadBuilderToolbar({
   onTitleChange,
   onFormationChange,
   onClear,
-  onSaveDraft,
   onPublish,
 }: SquadBuilderToolbarProps) {
-  const startersComplete = starterFilled >= 11
-  const rosterComplete = startersComplete && benchFilled >= 10
-
   return (
     <section className="w-full bg-surface py-space-md">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-md px-4 sm:px-6 lg:px-12">
-        <div className="flex flex-col justify-between gap-space-sm sm:flex-row sm:items-center">
-          <div className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant">
-            <Link to="/" className="transition-colors hover:text-primary">
-              Ana Sayfa
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <Link to="/kadrolar" className="transition-colors hover:text-primary">
-              Kadrolar
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="font-bold text-primary">Kadro Oluştur & Taktik Tahtası</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-space-md">
-            <div className="flex items-center gap-space-xs bg-primary-container/10 px-space-md py-1">
-              <span
-                className={`h-2 w-2 rounded-full ${rosterComplete ? 'bg-[#2e7d32]' : 'bg-tertiary-fixed-dim'}`}
-              />
-              <span className="font-headline text-[13px] font-bold tracking-wide text-primary">
-                {starterFilled}/11 İlk 11 · {benchFilled}/10 Yedek
-              </span>
-              {rosterComplete ? (
-                <span className="font-kicker bg-[#2e7d32] px-1.5 py-0.5 text-kicker font-bold text-white uppercase">
-                  Kadro Tamamlandı ✓
-                </span>
-              ) : null}
-            </div>
-            <div className="font-body hidden items-center gap-1.5 text-[12px] text-on-surface-variant xl:flex">
-              <span className="material-symbols-outlined text-[16px] text-secondary">
-                verified_user
-              </span>
-              <span>
-                Çift Oyuncu Engelleme: <strong>Aktif</strong>
-              </span>
-            </div>
-          </div>
+        <div className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant">
+          <Link to="/" className="transition-colors hover:text-primary">
+            Ana Sayfa
+          </Link>
+          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+          <Link to="/kadrolar" className="transition-colors hover:text-primary">
+            Kadrolar
+          </Link>
+          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+          <span className="font-bold text-primary">Kadro Oluştur & Taktik Tahtası</span>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-space-md lg:flex-nowrap">
@@ -98,13 +63,6 @@ export function SquadBuilderToolbar({
             >
               <span className="material-symbols-outlined text-[18px]">restart_alt</span>
               Temizle
-            </button>
-            <button
-              type="button"
-              onClick={onSaveDraft}
-              className="font-label bg-surface-container px-space-md py-space-xs text-label-md tracking-wider text-on-surface uppercase transition-colors hover:bg-surface-container-high"
-            >
-              Taslak Sakla
             </button>
             <button
               type="button"
