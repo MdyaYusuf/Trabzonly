@@ -4,6 +4,7 @@ import type {
   BuilderPosGroup,
 } from '../utils/squadBuilderTypes'
 import { isBenchSlotId } from '../utils/squadBuilderPlaceholders'
+import { setSquadPlayerDragData } from '../utils/squadBuilderDnD'
 
 type SquadBuilderPlayerPoolProps = {
   players: BuilderPlayer[]
@@ -12,18 +13,17 @@ type SquadBuilderPlayerPoolProps = {
   posFilter: BuilderPosGroup
   starterFilled: number
   benchFilled: number
-  selectedSlotId: AssignmentSlotId | null
   onSearchChange: (value: string) => void
   onPosFilterChange: (value: BuilderPosGroup) => void
   onAssign: (playerId: string) => void
 }
 
 const posTabs: { id: BuilderPosGroup; label: string }[] = [
-  { id: 'ALL', label: 'TÜMÜ' },
-  { id: 'FW', label: 'FORVET' },
-  { id: 'MF', label: 'ORTA SAHA' },
-  { id: 'DF', label: 'DEFANS' },
-  { id: 'GK', label: 'KALECİ' },
+  { id: 'ALL', label: 'Tümü' },
+  { id: 'GK', label: 'Kaleci' },
+  { id: 'DF', label: 'Defans' },
+  { id: 'MF', label: 'Orta Saha' },
+  { id: 'FW', label: 'Forvet' },
 ]
 
 function slotLabelForPlayer(
@@ -46,7 +46,6 @@ export function SquadBuilderPlayerPool({
   posFilter,
   starterFilled,
   benchFilled,
-  selectedSlotId,
   onSearchChange,
   onPosFilterChange,
   onAssign,
@@ -127,40 +126,23 @@ export function SquadBuilderPlayerPool({
             )
           })}
         </div>
-      </div>
 
-      <div className="flex items-center justify-between bg-secondary-fixed/50 p-space-sm">
-        <div className="flex items-center gap-2">
+        <div className="mt-1 flex items-center gap-2 bg-secondary-fixed/50 px-space-sm py-space-xs">
           <span
-            className={`material-symbols-outlined text-[20px] ${
+            className={`material-symbols-outlined text-[18px] ${
               isComplete ? 'text-[#2e7d32]' : 'text-secondary'
             }`}
           >
-            {isComplete ? 'check_circle' : selectedSlotId ? 'ads_click' : 'info'}
+            {isComplete ? 'check_circle' : 'info'}
           </span>
           <p className="font-body text-[12px] leading-tight text-on-secondary-fixed">
+            İlk 11: <strong className="font-bold text-primary">{starterFilled}/11</strong>
+            {' · '}
+            Yedek: <strong className="font-bold text-primary">{benchFilled}/10</strong>
             {isComplete ? (
-              <>
-                Kadro hazır:{' '}
-                <strong className="font-bold text-[#2e7d32]">11 ilk 11 + 10 yedek</strong>.
-                Taktikleri kontrol edip yayınlayın.
-              </>
-            ) : selectedSlotId ? (
-              <>
-                Seçili slot:{' '}
-                <strong className="font-bold text-primary">
-                  {isBenchSlotId(selectedSlotId)
-                    ? `Yedek ${selectedSlotId.replace('BENCH_', '')}`
-                    : selectedSlotId}
-                </strong>
-                . Havuzdan oyuncu seçin.
-              </>
+              <span className="text-on-secondary-fixed"> — Kadro hazır</span>
             ) : (
-              <>
-                İlk 11: <strong className="font-bold text-primary">{starterFilled}/11</strong>
-                {' · '}
-                Yedek: <strong className="font-bold text-primary">{benchFilled}/10</strong>
-              </>
+              <span className="text-on-surface-variant"> — Sürükleyin veya SEÇ</span>
             )}
           </p>
         </div>
@@ -214,7 +196,11 @@ export function SquadBuilderPlayerPool({
           return (
             <div
               key={player.id}
-              className="group flex items-center justify-between bg-surface-container-low p-2.5 transition-colors hover:bg-surface-container"
+              draggable
+              onDragStart={(event) => {
+                setSquadPlayerDragData(event.dataTransfer, { playerId: player.id })
+              }}
+              className="group flex cursor-grab items-center justify-between bg-surface-container-low p-2.5 transition-colors hover:bg-surface-container active:cursor-grabbing"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <div

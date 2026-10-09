@@ -47,7 +47,6 @@ export function SquadBuilderPage() {
   const [benchAssignments, setBenchAssignments] = useState<Partial<Record<BenchSlotId, string>>>(
     {},
   )
-  const [selectedSlotId, setSelectedSlotId] = useState<AssignmentSlotId | null>(null)
   const [search, setSearch] = useState('')
   const [posFilter, setPosFilter] = useState<BuilderPosGroup>('ALL')
   const [attackStyle, setAttackStyle] = useState<AttackStyleOption>(attackStyleOptions[0])
@@ -192,7 +191,6 @@ export function SquadBuilderPage() {
 
     setFormationId(nextId)
     setStarterAssignments(kept)
-    setSelectedSlotId(null)
   }
 
   function handleClear() {
@@ -201,7 +199,6 @@ export function SquadBuilderPage() {
     setCaptainPlayerId('')
     setCornerTakerPlayerId('')
     setFreeKickTakerPlayerId('')
-    setSelectedSlotId(null)
   }
 
   function handleClearStarterSlot(slotId: BuilderSlotId) {
@@ -210,10 +207,6 @@ export function SquadBuilderPage() {
       delete next[slotId]
       return next
     })
-
-    if (selectedSlotId === slotId) {
-      setSelectedSlotId(null)
-    }
   }
 
   function handleClearBenchSlot(slotId: BenchSlotId) {
@@ -222,14 +215,6 @@ export function SquadBuilderPage() {
       delete next[slotId]
       return next
     })
-
-    if (selectedSlotId === slotId) {
-      setSelectedSlotId(null)
-    }
-  }
-
-  function handleSelectBenchSlot(slotId: BenchSlotId) {
-    setSelectedSlotId((prev) => (prev === slotId ? null : slotId))
   }
 
   function handleAssignToStarterSlot(slotId: BuilderSlotId, playerId: string) {
@@ -299,28 +284,64 @@ export function SquadBuilderPage() {
     }))
   }
 
-  function handleAssign(playerId: string) {
-    const alreadyAssigned = Object.values(allAssignments).includes(playerId)
+  function handleDropOnBenchSlot(
+    targetSlotId: BenchSlotId,
+    playerId: string,
+    sourceSlotId?: string,
+  ) {
+    const source =
+      (sourceSlotId as AssignmentSlotId | undefined) ?? findSlotForPlayer(playerId)
 
-    if (alreadyAssigned) {
+    if (source === targetSlotId) {
       return
     }
 
-    if (selectedSlotId && isBenchSlotId(selectedSlotId)) {
+    const targetPlayerId = benchAssignments[targetSlotId]
+
+    if (source && isBenchSlotId(source)) {
+      setBenchAssignments((prev) => {
+        const next = { ...prev }
+        const currentTarget = next[targetSlotId]
+
+        if (currentTarget) {
+          next[source] = currentTarget
+        } else {
+          delete next[source]
+        }
+
+        next[targetSlotId] = playerId
+        return next
+      })
+      return
+    }
+
+    if (source && !isBenchSlotId(source)) {
       setBenchAssignments((prev) => ({
         ...prev,
-        [selectedSlotId]: playerId,
+        [targetSlotId]: playerId,
       }))
-      setSelectedSlotId(null)
+      setStarterAssignments((prev) => {
+        const next = { ...prev }
+
+        if (targetPlayerId) {
+          next[source] = targetPlayerId
+        } else {
+          delete next[source]
+        }
+
+        return next
+      })
       return
     }
 
-    if (selectedSlotId && !isBenchSlotId(selectedSlotId)) {
-      setStarterAssignments((prev) => ({
-        ...prev,
-        [selectedSlotId]: playerId,
-      }))
-      setSelectedSlotId(null)
+    setBenchAssignments((prev) => ({
+      ...prev,
+      [targetSlotId]: playerId,
+    }))
+  }
+
+  function handleAssign(playerId: string) {
+    if (assignedPlayerIds.has(playerId)) {
       return
     }
 
@@ -471,11 +492,8 @@ export function SquadBuilderPage() {
             <SquadBuilderBench
               assignments={benchAssignments}
               playersById={playersById}
-              selectedSlotId={
-                selectedSlotId && isBenchSlotId(selectedSlotId) ? selectedSlotId : null
-              }
-              onSelectSlot={handleSelectBenchSlot}
               onClearSlot={handleClearBenchSlot}
+              onDropPlayer={handleDropOnBenchSlot}
             />
           </div>
 
@@ -492,7 +510,6 @@ export function SquadBuilderPage() {
                 posFilter={posFilter}
                 starterFilled={stats.starterFilled}
                 benchFilled={stats.benchFilled}
-                selectedSlotId={selectedSlotId}
                 onSearchChange={setSearch}
                 onPosFilterChange={setPosFilter}
                 onAssign={handleAssign}
