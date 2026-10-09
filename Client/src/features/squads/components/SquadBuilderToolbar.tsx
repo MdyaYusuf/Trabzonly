@@ -7,8 +7,6 @@ type SquadBuilderToolbarProps = {
   formationId: BuilderFormationId
   starterFilled: number
   benchFilled: number
-  foreign: number
-  domestic: number
   avgAge: string
   totalValue: string
   canPublish: boolean
@@ -25,8 +23,6 @@ export function SquadBuilderToolbar({
   formationId,
   starterFilled,
   benchFilled,
-  foreign,
-  domestic,
   avgAge,
   totalValue,
   canPublish,
@@ -156,15 +152,6 @@ export function SquadBuilderToolbar({
           </div>
 
           <div className="flex flex-wrap items-center gap-space-sm">
-            <div className="font-label flex items-center gap-1.5 bg-surface-container px-3 py-1 text-[12px] text-on-surface">
-              <span className="material-symbols-outlined text-[16px] text-[#2e7d32]">
-                check_circle
-              </span>
-              <span className="font-bold">TFF Yabancı:</span>
-              <span>
-                {foreign} Yabancı / {domestic} Yerli
-              </span>
-            </div>
             <div className="font-label flex items-center gap-1.5 bg-surface-container px-3 py-1 text-[12px] text-on-surface">
               <span className="material-symbols-outlined text-[16px] text-secondary">analytics</span>
               <span className="font-bold">Ortalama Yaş:</span>

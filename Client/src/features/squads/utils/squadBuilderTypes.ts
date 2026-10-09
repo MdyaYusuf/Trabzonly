@@ -51,10 +51,7 @@ export type BuilderPlayer = {
   posGroup: Exclude<BuilderPosGroup, 'ALL'>
   roleHint: string
   age: number
-  isDomestic: boolean
   marketValueM: number
-  badge?: string
-  badgeTone?: 'wizard' | 'domestic'
   avatarGradient: string
   initials: string
 }

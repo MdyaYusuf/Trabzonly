@@ -57,7 +57,6 @@ export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): Playe
     number: player.shirtNumber ?? 0,
     name: player.name,
     nationality: player.nationality.toUpperCase(),
-    isDomestic: player.isDomestic,
     positionGroup,
     positionCode: player.positionAbbreviation || '—',
     positionLabel: player.positionName.toUpperCase(),

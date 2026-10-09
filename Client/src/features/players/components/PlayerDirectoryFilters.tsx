@@ -1,5 +1,4 @@
 import {
-  type NationFilter,
   type PositionGroup,
   type SortOption,
 } from '../utils/playerDirectoryTypes'
@@ -8,11 +7,9 @@ type PlayerDirectoryFiltersProps = {
   positionFilter: PositionGroup
   search: string
   sort: SortOption
-  nationFilter: NationFilter
   onPositionFilterChange: (next: PositionGroup) => void
   onSearchChange: (value: string) => void
   onSortChange: (value: SortOption) => void
-  onNationFilterChange: (value: NationFilter) => void
 }
 
 const POSITION_PILLS: { key: PositionGroup; label: string }[] = [
@@ -30,11 +27,9 @@ export function PlayerDirectoryFilters({
   positionFilter,
   search,
   sort,
-  nationFilter,
   onPositionFilterChange,
   onSearchChange,
   onSortChange,
-  onNationFilterChange,
 }: PlayerDirectoryFiltersProps) {
   return (
     <section className="sticky top-16 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur-sm sm:top-20">
@@ -68,7 +63,7 @@ export function PlayerDirectoryFilters({
           })}
         </div>
 
-        <div className="grid grid-cols-1 gap-space-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
+        <div className="grid grid-cols-1 gap-space-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto]">
           <label className="relative min-w-0">
             <span className="material-symbols-outlined pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-outline">
               search
@@ -97,24 +92,6 @@ export function PlayerDirectoryFilters({
               <option value="rating-desc">Reyting: Yüksek</option>
               <option value="number-asc">Forma Numarası</option>
               <option value="apps-desc">En Çok Maç</option>
-            </select>
-            <span className="material-symbols-outlined pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-outline">
-              expand_more
-            </span>
-          </div>
-
-          <div className="relative min-w-0 sm:col-span-2 lg:col-span-1 lg:min-w-[12rem]">
-            <select
-              className={`${controlClass} w-full cursor-pointer appearance-none px-space-md pr-9`}
-              value={nationFilter}
-              aria-label="Uyruk filtresi"
-              onChange={(event) => {
-                onNationFilterChange(event.target.value as NationFilter)
-              }}
-            >
-              <option value="all">Uyruk: Tümü</option>
-              <option value="domestic">Yerli Oyuncular</option>
-              <option value="foreign">Yabancı Oyuncular</option>
             </select>
             <span className="material-symbols-outlined pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-outline">
               expand_more

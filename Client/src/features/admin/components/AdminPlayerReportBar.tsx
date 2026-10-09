@@ -19,10 +19,6 @@ export function AdminPlayerReportBar({ report }: AdminPlayerReportBarProps) {
           Piyasa Değer Toplamı:{' '}
           <strong className="text-tertiary-fixed-dim">{report.marketValueTotal}</strong>
         </span>
-        <span className="text-on-primary/40">|</span>
-        <span>
-          Yabancı Kontenjanı: <strong>{report.foreignQuota}</strong>
-        </span>
       </div>
     </section>
   )

@@ -29,7 +29,6 @@ export interface PlayerResponseDto {
   averageRating: number
   ratingCount: number
   isActive: boolean
-  isDomestic: boolean
   isCaptain: boolean
   positionId: number
   positionName: string
@@ -83,7 +82,6 @@ export interface PlayerListQuery {
   pageSize?: number
   search?: string
   positionGroup?: PlayerPositionGroup
-  isDomestic?: boolean
   sort?: PlayerSortOption
 }
 
@@ -100,7 +98,6 @@ export interface CreatePlayerRequest {
   description?: string
   shirtNumber?: number | null
   positionId: number
-  isDomestic: boolean
   isCaptain: boolean
   imageFile?: File | null
 }

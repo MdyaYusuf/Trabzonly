@@ -1,6 +1,5 @@
 export type PositionGroup = 'all' | 'gk' | 'def' | 'mid' | 'fwd'
 export type SortOption = 'value-desc' | 'rating-desc' | 'number-asc' | 'apps-desc'
-export type NationFilter = 'all' | 'domestic' | 'foreign'
 
 export type PlayerCardStat = {
   label: string
@@ -12,7 +11,6 @@ export type PlayerCardData = {
   number: number
   name: string
   nationality: string
-  isDomestic: boolean
   positionGroup: PositionGroup
   positionCode: string
   positionLabel: string

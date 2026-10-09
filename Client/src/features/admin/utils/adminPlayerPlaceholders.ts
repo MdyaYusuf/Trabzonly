@@ -9,7 +9,6 @@ export const adminPlayerReportStrip: AdminPlayerReportStrip = {
   kicker: 'A TAKIM RAPORU',
   message: '2024/25 Süper Lig Lisans Listesi Güncellendi (TFF Tescilli 28 Oyuncu)',
   marketValueTotal: '€94.30M',
-  foreignQuota: '12 / 14',
 }
 
 export const adminPlayerListStats: AdminPlayerListStats = {

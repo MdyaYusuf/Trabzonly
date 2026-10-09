@@ -193,12 +193,6 @@ export function PlayerDetailHero({
                   <span className="font-label text-label-md font-semibold tracking-wider text-on-primary/90 uppercase">
                     {player.nationality}
                   </span>
-                  {player.isDomestic ? (
-                    <>
-                      <span className="h-1 w-1 rounded-full bg-secondary-container" />
-                      <span className="font-label text-label-md text-secondary-fixed-dim">Yerli</span>
-                    </>
-                  ) : null}
                 </div>
                 <h1 className="-ml-1 font-display text-display-xl-mobile leading-none font-black tracking-tight text-on-primary uppercase sm:text-display-xl">
                   {player.name}

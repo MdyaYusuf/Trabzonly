@@ -192,8 +192,6 @@ export function computeSquadStats(
     .map((id) => playersById.get(id))
     .filter((player): player is BuilderPlayer => Boolean(player))
 
-  const foreign = starters.filter((player) => !player.isDomestic).length
-  const domestic = starters.filter((player) => player.isDomestic).length
   const avgAge =
     starters.length === 0
       ? 0
@@ -204,8 +202,6 @@ export function computeSquadStats(
     starterFilled: starters.length,
     benchFilled: benchIds.length,
     filled: starters.length,
-    foreign,
-    domestic,
     avgAge: avgAge.toFixed(1),
     totalValue: `${totalValue.toFixed(1)}M €`,
   }

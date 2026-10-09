@@ -32,7 +32,6 @@ public sealed record PlayerResponseDto(
   decimal AverageRating,
   int RatingCount,
   bool IsActive,
-  bool IsDomestic,
   bool IsCaptain,
   int PositionId,
   string PositionName,
@@ -86,7 +85,6 @@ public sealed record CreatePlayerRequest(
   string? Description,
   int? ShirtNumber,
   int PositionId,
-  bool IsDomestic,
   bool IsCaptain,
   IFormFile? ImageFile);
 
@@ -103,7 +101,6 @@ public sealed record UpdatePlayerRequest(
   string? Description,
   int? ShirtNumber,
   int PositionId,
-  bool IsDomestic,
   bool IsCaptain,
   IFormFile? ImageFile,
   bool IsActive);
@@ -113,7 +110,6 @@ public sealed record RatePlayerRequest(decimal Score);
 public sealed record PlayerListQueryRequest(
   string? Search = null,
   string? PositionGroup = null,
-  bool? IsDomestic = null,
   string? Sort = null,
   int PageNumber = 1,
   int PageSize = 12);

@@ -92,11 +92,6 @@ function SlotCard({
         >
           #{player.number}
         </span>
-        {isGk ? (
-          <span className="font-kicker absolute -bottom-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full bg-tertiary-fixed text-[10px] font-bold text-on-tertiary-fixed shadow ring-1 ring-white">
-            C
-          </span>
-        ) : null}
       </div>
       <div className="mt-1 bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
         <span className="font-headline block text-[12px] leading-tight font-bold text-primary">
@@ -108,8 +103,6 @@ function SlotCard({
           }`}
         >
           {slot.label} • {slot.roleLabel}
-          {player.isDomestic && slot.id === 'LB' ? ' (TR)' : ''}
-          {isGk ? ' (TR)' : ''}
         </span>
       </div>
       <div className="absolute -top-2 -left-2 hidden items-center gap-1 group-hover:flex">

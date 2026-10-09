@@ -11,7 +11,6 @@ import {
 } from '../utils/mapPlayerToCardData'
 import {
   PAGE_SIZE,
-  type NationFilter,
   type PlayerCardData,
   type PositionGroup,
   type SortOption,
@@ -22,7 +21,6 @@ export function PlayerDirectoryPage() {
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [sort, setSort] = useState<SortOption>('value-desc')
-  const [nationFilter, setNationFilter] = useState<NationFilter>('all')
   const [page, setPage] = useState(1)
   const [players, setPlayers] = useState<PlayerCardData[]>([])
   const [totalCount, setTotalCount] = useState(0)
@@ -87,15 +85,11 @@ export function PlayerDirectoryPage() {
     async function loadPlayers() {
       setIsLoading(true)
 
-      const isDomestic =
-        nationFilter === 'domestic' ? true : nationFilter === 'foreign' ? false : undefined
-
       const result = await playerService.getAll({
         pageNumber: page,
         pageSize: PAGE_SIZE,
         search: debouncedSearch || undefined,
         positionGroup: positionFilter,
-        isDomestic,
         sort,
       })
 
@@ -125,7 +119,7 @@ export function PlayerDirectoryPage() {
     return () => {
       cancelled = true
     }
-  }, [debouncedSearch, nationFilter, page, positionFilter, sort])
+  }, [debouncedSearch, page, positionFilter, sort])
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
@@ -152,7 +146,6 @@ export function PlayerDirectoryPage() {
         positionFilter={positionFilter}
         search={search}
         sort={sort}
-        nationFilter={nationFilter}
         onPositionFilterChange={setFilter}
         onSearchChange={(value) => {
           setSearch(value)
@@ -160,10 +153,6 @@ export function PlayerDirectoryPage() {
         }}
         onSortChange={(value) => {
           setSort(value)
-          setPage(1)
-        }}
-        onNationFilterChange={(value) => {
-          setNationFilter(value)
           setPage(1)
         }}
       />

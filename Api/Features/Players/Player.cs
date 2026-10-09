@@ -34,7 +34,6 @@ public class Player : Entity<int>
   public decimal AverageRating { get; set; }
   public int RatingCount { get; set; }
   public bool IsActive { get; set; } = true;
-  public bool IsDomestic { get; set; }
   public bool IsCaptain { get; set; }
 
   [NotMapped]

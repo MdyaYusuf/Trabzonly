@@ -82,10 +82,7 @@ export function mapPlayerToBuilderPlayer(player: PlayerResponseDto): BuilderPlay
     posGroup: posGroupFromAbbreviation(player.positionAbbreviation),
     roleHint: `${player.positionName} • ${player.nationality}`,
     age: player.age,
-    isDomestic: player.isDomestic,
     marketValueM,
-    badge: player.isDomestic ? 'YERLİ (TR)' : undefined,
-    badgeTone: player.isDomestic ? 'domestic' : undefined,
     avatarGradient: GRADIENTS[player.id % GRADIENTS.length],
     initials: initialsFromName(player.name),
   }

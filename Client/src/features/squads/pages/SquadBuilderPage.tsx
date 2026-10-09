@@ -331,8 +331,6 @@ export function SquadBuilderPage() {
         formationId={formationId}
         starterFilled={stats.starterFilled}
         benchFilled={stats.benchFilled}
-        foreign={stats.foreign}
-        domestic={stats.domestic}
         avgAge={stats.avgAge}
         totalValue={stats.totalValue}
         canPublish={canPublish}

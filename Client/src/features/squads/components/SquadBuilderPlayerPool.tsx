@@ -230,11 +230,6 @@ export function SquadBuilderPlayerPool({
                     <span className="font-kicker bg-primary/10 px-1.5 text-[10px] font-bold text-primary">
                       #{player.number}
                     </span>
-                    {player.badge ? (
-                      <span className="font-kicker bg-surface-container px-1 text-[9px] font-bold text-on-surface-variant">
-                        {player.badge}
-                      </span>
-                    ) : null}
                   </div>
                   <span className="font-body text-[12px] text-on-surface-variant">
                     {player.roleHint}

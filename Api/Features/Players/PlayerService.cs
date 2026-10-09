@@ -435,15 +435,13 @@ public class PlayerService(
   {
     string? search = query.Search?.Trim();
     string[]? abbreviations = PlayerPositionGroups.GetAbbreviations(query.PositionGroup);
-    bool? isDomestic = query.IsDomestic;
 
     return player =>
       player.IsActive &&
       (string.IsNullOrEmpty(search) ||
         player.Name.Contains(search) ||
         (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&
-      (abbreviations == null || abbreviations.Contains(player.Position.Abbreviation)) &&
-      (!isDomestic.HasValue || player.IsDomestic == isDomestic.Value);
+      (abbreviations == null || abbreviations.Contains(player.Position.Abbreviation));
   }
 
   private static Func<IQueryable<Player>, IOrderedQueryable<Player>> BuildListOrderBy(

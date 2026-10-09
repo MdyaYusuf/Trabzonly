@@ -52,10 +52,6 @@ const getAll = async (
     queryParams.set('positionGroup', query.positionGroup)
   }
 
-  if (query.isDomestic !== undefined) {
-    queryParams.set('isDomestic', String(query.isDomestic))
-  }
-
   if (query.sort) {
     queryParams.set('sort', query.sort)
   }

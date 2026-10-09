@@ -50,7 +50,6 @@ export type AdminPlayerReportStrip = {
   kicker: string
   message: string
   marketValueTotal: string
-  foreignQuota: string
 }
 
 export type AdminPlayerFormDraft = {
