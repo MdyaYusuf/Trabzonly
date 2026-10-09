@@ -1,5 +1,3 @@
-import type { FormationTacticalArrow } from './squadBuilderTypes'
-
 export type SquadPitchPlayer = {
   id: string
   playerId: number
@@ -50,7 +48,6 @@ export type SquadDetailViewModel = {
   freeKickTakerName: string
   pitchPlayers: SquadPitchPlayer[]
   benchPlayers: SquadBenchPlayer[]
-  tacticalArrows: FormationTacticalArrow[]
   instructions: SquadInstructionRow[]
   avgAge: string
   avgAgeCaption: string

@@ -118,7 +118,6 @@ export function SquadDetailPage() {
             <SquadDetailPitch
               players={squad.pitchPlayers}
               benchPlayers={squad.benchPlayers}
-              tacticalArrows={squad.tacticalArrows}
             />
             <SquadDetailSidebar squad={squad} />
           </div>

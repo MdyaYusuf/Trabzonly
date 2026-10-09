@@ -1,11 +1,9 @@
 import type { CSSProperties } from 'react'
-import type { FormationTacticalArrow } from '../utils/squadBuilderTypes'
 import type { SquadBenchPlayer, SquadPitchPlayer } from '../utils/squadDetailTypes'
 
 type SquadDetailPitchProps = {
   players: SquadPitchPlayer[]
   benchPlayers: SquadBenchPlayer[]
-  tacticalArrows: FormationTacticalArrow[]
 }
 
 function PitchPlayerMarker({ player }: { player: SquadPitchPlayer }) {
@@ -50,7 +48,6 @@ function PitchPlayerMarker({ player }: { player: SquadPitchPlayer }) {
 export function SquadDetailPitch({
   players,
   benchPlayers,
-  tacticalArrows,
 }: SquadDetailPitchProps) {
   return (
     <div className="flex flex-col gap-space-md lg:col-span-8">
@@ -99,39 +96,6 @@ export function SquadDetailPitch({
           <path d="M 30 950 A 20 20 0 0 1 50 970" />
           <path d="M 750 970 A 20 20 0 0 1 770 950" />
         </svg>
-
-        {tacticalArrows.length > 0 ? (
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full opacity-60"
-            viewBox="0 0 800 1000"
-            aria-hidden="true"
-          >
-            <defs>
-              <marker
-                id="tactical-arrow"
-                markerHeight="6"
-                markerWidth="6"
-                orient="auto-start-reverse"
-                refX="5"
-                refY="5"
-                viewBox="0 0 10 10"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#8ccefd" />
-              </marker>
-            </defs>
-            {tacticalArrows.map((arrow, index) => (
-              <path
-                key={`arrow-${index}`}
-                d={arrow.d}
-                fill="none"
-                markerEnd="url(#tactical-arrow)"
-                stroke={arrow.stroke}
-                strokeDasharray="6,4"
-                strokeWidth="2.5"
-              />
-            ))}
-          </svg>
-        ) : null}
 
         {players.map((player) => (
           <PitchPlayerMarker key={player.id} player={player} />

@@ -171,8 +171,6 @@ function mapBenchPlayers(slots: SquadSlotResponseDto[]): SquadBenchPlayer[] {
 export function mapSquadToDetailView(squad: SquadResponseDto): SquadDetailViewModel {
   const slots = squad.slots ?? []
   const starters = slots.filter((slot) => !isBenchSlot(slot.slotKey))
-  const formationId = resolveFormationId(squad.formation)
-  const config = getFormationConfig(formationId)
 
   const avgAge =
     starters.length === 0
@@ -214,7 +212,6 @@ export function mapSquadToDetailView(squad: SquadResponseDto): SquadDetailViewMo
     freeKickTakerName: findPlayerName(slots, squad.freeKickTakerPlayerId),
     pitchPlayers: mapStartersToPitchPlayers(squad.formation, slots, squad.captainPlayerId),
     benchPlayers: mapBenchPlayers(slots),
-    tacticalArrows: config.tacticalArrows,
     instructions: [
       { title: 'Hücum Anlayışı', value: squad.attackStyle },
       { title: 'Savunma Çizgisi', value: squad.defenseLine },

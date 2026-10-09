@@ -65,17 +65,11 @@ export type FormationSlot = {
   roleLabel: string
 }
 
-export type FormationTacticalArrow = {
-  d: string
-  stroke: string
-}
-
 export type FormationConfig = {
   id: BuilderFormationId
   label: string
   lineLabel: string
   rows: FormationSlot[][]
-  tacticalArrows: FormationTacticalArrow[]
 }
 
 export type AttackStyleOption = 'Baskılı' | 'Dengeli' | 'Kontra'

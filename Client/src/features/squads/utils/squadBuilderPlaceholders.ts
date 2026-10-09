@@ -59,11 +59,6 @@ export const formationConfigs: FormationConfig[] = [
       ],
       [{ id: 'GK', label: 'GK', roleLabel: 'Kaptan' }],
     ],
-    tacticalArrows: [
-      { d: 'M 280 270 Q 320 200 370 150', stroke: '#8ccefd' },
-      { d: 'M 430 350 Q 520 320 590 260', stroke: '#f7bd5b' },
-      { d: 'M 520 520 Q 560 420 620 300', stroke: '#8ccefd' },
-    ],
   },
   {
     id: '4-3-3',
@@ -87,11 +82,6 @@ export const formationConfigs: FormationConfig[] = [
         { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
       ],
       [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-    ],
-    tacticalArrows: [
-      { d: 'M 160 420 Q 180 280 200 160', stroke: '#8ccefd' },
-      { d: 'M 400 380 Q 400 260 400 140', stroke: '#f7bd5b' },
-      { d: 'M 640 420 Q 620 280 600 160', stroke: '#8ccefd' },
     ],
   },
   {
@@ -117,11 +107,6 @@ export const formationConfigs: FormationConfig[] = [
       ],
       [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
-    tacticalArrows: [
-      { d: 'M 120 480 L 180 220', stroke: '#8ccefd' },
-      { d: 'M 680 480 L 620 220', stroke: '#8ccefd' },
-      { d: 'M 400 400 Q 400 280 340 180', stroke: '#f7bd5b' },
-    ],
   },
   {
     id: '4-4-2',
@@ -146,11 +131,6 @@ export const formationConfigs: FormationConfig[] = [
       ],
       [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
-    tacticalArrows: [
-      { d: 'M 140 360 Q 220 240 300 160', stroke: '#8ccefd' },
-      { d: 'M 660 360 Q 580 240 500 160', stroke: '#8ccefd' },
-      { d: 'M 340 320 Q 400 240 460 160', stroke: '#f7bd5b' },
-    ],
   },
   {
     id: '3-4-1-2',
@@ -174,11 +154,6 @@ export const formationConfigs: FormationConfig[] = [
         { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
       ],
       [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-    ],
-    tacticalArrows: [
-      { d: 'M 400 340 Q 320 240 280 150', stroke: '#f7bd5b' },
-      { d: 'M 400 340 Q 480 240 520 150', stroke: '#f7bd5b' },
-      { d: 'M 120 460 L 200 300', stroke: '#8ccefd' },
     ],
   },
 ]
