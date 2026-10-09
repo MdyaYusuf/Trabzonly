@@ -462,17 +462,6 @@ export function SquadBuilderPage() {
       <section className="mx-auto w-full max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
         <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
           <div className="flex flex-col gap-space-md lg:col-span-7">
-            <SquadBuilderPitch
-              formation={formation}
-              assignments={starterAssignments}
-              players={players}
-              playersById={playersById}
-              assignedPlayerIds={assignedPlayerIds}
-              onAssignToSlot={handleAssignToStarterSlot}
-              onDropPlayer={handleDropOnStarterSlot}
-              onClearSlot={handleClearStarterSlot}
-            />
-
             <SquadBuilderTactics
               attackStyle={attackStyle}
               defenseLine={defenseLine}
@@ -489,12 +478,18 @@ export function SquadBuilderPage() {
               onFreeKickTakerChange={setFreeKickTakerPlayerId}
             />
 
-            <SquadBuilderBench
-              assignments={benchAssignments}
+            <SquadBuilderPitch
+              formation={formation}
+              assignments={starterAssignments}
+              players={players}
               playersById={playersById}
-              onClearSlot={handleClearBenchSlot}
-              onDropPlayer={handleDropOnBenchSlot}
+              assignedPlayerIds={assignedPlayerIds}
+              onAssignToSlot={handleAssignToStarterSlot}
+              onDropPlayer={handleDropOnStarterSlot}
+              onClearSlot={handleClearStarterSlot}
             />
+
+            <SquadBuilderNotes notes={notes} onNotesChange={setNotes} />
           </div>
 
           <div className="flex flex-col gap-space-lg lg:col-span-5">
@@ -515,7 +510,13 @@ export function SquadBuilderPage() {
                 onAssign={handleAssign}
               />
             )}
-            <SquadBuilderNotes notes={notes} onNotesChange={setNotes} />
+
+            <SquadBuilderBench
+              assignments={benchAssignments}
+              playersById={playersById}
+              onClearSlot={handleClearBenchSlot}
+              onDropPlayer={handleDropOnBenchSlot}
+            />
           </div>
         </div>
       </section>
