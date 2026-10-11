@@ -72,26 +72,38 @@ export function SquadBuilderBench({
                 key={slotId}
                 draggable
                 onDragStart={(event) => {
-                  setSquadPlayerDragData(event.dataTransfer, {
-                    playerId: player.id,
-                    sourceSlotId: slotId,
-                  })
+                  setSquadPlayerDragData(
+                    event.dataTransfer,
+                    {
+                      playerId: player.id,
+                      sourceSlotId: slotId,
+                    },
+                    player.initials,
+                  )
                 }}
                 {...dropHandlers}
                 className={
                   isDropTarget
-                    ? 'relative flex cursor-grab flex-col items-center gap-0.5 bg-primary-container/15 p-2 ring-2 ring-primary active:cursor-grabbing'
-                    : 'relative flex cursor-grab flex-col items-center gap-0.5 bg-surface-container-low p-2 active:cursor-grabbing'
+                    ? 'group relative flex h-full min-h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary bg-primary-container/20 p-2 shadow-sm ring-2 ring-primary active:cursor-grabbing'
+                    : 'group relative flex h-full min-h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary/40 bg-primary-container/10 p-2 shadow-sm active:cursor-grabbing'
                 }
               >
-                <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
+                <span className="font-kicker text-[10px] font-bold text-primary uppercase">
                   Y{index + 1}
                 </span>
-                <span className="font-headline text-center text-xs font-bold text-on-surface">
+                <div
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${player.avatarGradient}`}
+                >
+                  {player.initials}
+                </div>
+                <span
+                  className="font-headline w-full truncate text-center text-xs font-bold text-primary"
+                  title={player.shortName}
+                >
                   {player.shortName}
                 </span>
-                <span className="font-kicker text-[10px] text-on-surface-variant">
-                  #{player.number} {player.posGroup}
+                <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
+                  #{player.number} · {player.posGroup}
                 </span>
                 <button
                   type="button"
@@ -99,9 +111,9 @@ export function SquadBuilderBench({
                   onClick={() => {
                     onClearSlot(slotId)
                   }}
-                  className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center bg-surface-container-highest text-on-surface-variant transition-colors hover:bg-error hover:text-on-error"
+                  className="absolute top-0.5 right-0.5 hidden h-5 w-5 items-center justify-center rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
                 >
-                  <span className="material-symbols-outlined text-[14px]">close</span>
+                  <span className="material-symbols-outlined text-[12px] leading-none">close</span>
                 </button>
               </div>
             )
@@ -113,15 +125,15 @@ export function SquadBuilderBench({
               {...dropHandlers}
               className={
                 isDropTarget
-                  ? 'flex flex-col items-center justify-center gap-0.5 border border-dashed border-primary bg-primary-container/10 p-2 ring-2 ring-primary'
-                  : 'flex flex-col items-center justify-center gap-0.5 border border-dashed border-outline-variant/50 bg-surface-container-low p-2 transition-colors'
+                  ? 'flex h-full min-h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-primary bg-transparent p-2 ring-2 ring-primary'
+                  : 'flex h-full min-h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-outline-variant/40 bg-transparent p-2 opacity-70 transition-colors'
               }
             >
-              <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
+              <span className="font-kicker text-[10px] font-bold text-on-surface-variant/80 uppercase">
                 Y{index + 1}
               </span>
               <span className="material-symbols-outlined text-[18px] text-outline">person_add</span>
-              <span className="font-label text-[10px] text-on-surface-variant uppercase">Boş</span>
+              <span className="font-label text-[10px] text-on-surface-variant/80 uppercase">Boş</span>
             </div>
           )
         })}

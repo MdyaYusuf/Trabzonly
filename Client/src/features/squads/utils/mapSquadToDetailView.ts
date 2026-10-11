@@ -55,6 +55,20 @@ function initialsFromUsername(username: string): string {
   return cleaned.slice(0, 2).toUpperCase()
 }
 
+function initialsFromPlayerName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+
+  if (parts.length === 0) {
+    return '?'
+  }
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase()
+  }
+
+  return `${parts[0][0] ?? ''}${parts[parts.length - 1][0] ?? ''}`.toUpperCase()
+}
+
 function shortPlayerName(fullName: string): string {
   const trimmed = fullName.trim()
 
@@ -120,34 +134,28 @@ function mapStartersToPitchPlayers(
       .map((slot) => [slot.slotKey.toUpperCase(), slot] as const),
   )
 
-  const rowCount = Math.max(config.rows.length, 1)
   const players: SquadPitchPlayer[] = []
 
-  config.rows.forEach((row, rowIndex) => {
-    const topPercent =
-      rowCount === 1 ? 50 : 8 + (rowIndex / (rowCount - 1)) * 80
-
-    row.forEach((slotDef, slotIndex) => {
+  config.rows.forEach((row) => {
+    row.forEach((slotDef) => {
       const slot = slotByKey.get(slotDef.id.toUpperCase())
 
       if (!slot) {
         return
       }
 
-      const leftPercent =
-        row.length === 1 ? 50 : ((slotIndex + 1) / (row.length + 1)) * 100
-
       players.push({
         id: slot.slotKey,
+        slotId: slotDef.id,
         playerId: slot.playerId,
         shortName: shortPlayerName(slot.playerName),
         fullName: slot.playerName,
         number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
         positionLabel: slotDef.label,
-        left: `${leftPercent}%`,
-        top: `${topPercent}%`,
+        roleLabel: slotDef.roleLabel,
         isCaptain: slot.playerId === captainPlayerId,
-        avatarInitials: initialsFromUsername(slot.playerName),
+        isGk: slotDef.id === 'GK',
+        avatarInitials: initialsFromPlayerName(slot.playerName),
         avatarGradient: GRADIENTS[slot.playerId % GRADIENTS.length],
       })
     })
@@ -216,9 +224,10 @@ export function mapSquadToDetailView(squad: SquadResponseDto): SquadDetailViewMo
       { title: 'Hücum Anlayışı', value: squad.attackStyle },
       { title: 'Savunma Çizgisi', value: squad.defenseLine },
       { title: 'Tempo', value: squad.tempo },
+      { title: 'Kaptan', value: findPlayerName(slots, squad.captainPlayerId) },
       {
         title: 'Duran Top Sorumluları',
-        value: `Korner: ${findPlayerName(slots, squad.cornerTakerPlayerId)} · Serbest Vuruş: ${findPlayerName(slots, squad.freeKickTakerPlayerId)}`,
+        value: `${findPlayerName(slots, squad.cornerTakerPlayerId)}|${findPlayerName(slots, squad.freeKickTakerPlayerId)}`,
       },
     ],
     avgAge: avgAge > 0 ? avgAge.toFixed(1) : '—',

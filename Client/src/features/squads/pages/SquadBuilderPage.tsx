@@ -7,6 +7,8 @@ import { SquadBuilderNotes } from '../components/SquadBuilderNotes'
 import { SquadBuilderPitch } from '../components/SquadBuilderPitch'
 import { SquadBuilderPlayerPool } from '../components/SquadBuilderPlayerPool'
 import { SquadBuilderPublishModal } from '../components/SquadBuilderPublishModal'
+import { SquadBuilderSidebarActions } from '../components/SquadBuilderSidebarActions'
+import { SquadBuilderSidebarStats } from '../components/SquadBuilderSidebarStats'
 import { SquadBuilderTactics } from '../components/SquadBuilderTactics'
 import { SquadBuilderToolbar } from '../components/SquadBuilderToolbar'
 import squadService from '../squadService'
@@ -439,8 +441,6 @@ export function SquadBuilderPage() {
       <SquadBuilderToolbar
         title={title}
         formationId={formationId}
-        avgAge={stats.avgAge}
-        totalValue={stats.totalValue}
         canPublish={canPublish}
         isPublishing={isPublishing}
         onTitleChange={setTitle}
@@ -460,8 +460,8 @@ export function SquadBuilderPage() {
       ) : null}
 
       <section className="mx-auto w-full max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
-        <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
-          <div className="flex flex-col gap-space-md lg:col-span-7">
+        <div className="flex flex-col gap-gutter lg:flex-row lg:items-stretch">
+          <div className="flex min-w-0 flex-col gap-space-md lg:w-7/12 lg:shrink-0">
             <SquadBuilderTactics
               attackStyle={attackStyle}
               defenseLine={defenseLine}
@@ -484,6 +484,7 @@ export function SquadBuilderPage() {
               players={players}
               playersById={playersById}
               assignedPlayerIds={assignedPlayerIds}
+              captainPlayerId={captainPlayerId}
               onAssignToSlot={handleAssignToStarterSlot}
               onDropPlayer={handleDropOnStarterSlot}
               onClearSlot={handleClearStarterSlot}
@@ -492,7 +493,7 @@ export function SquadBuilderPage() {
             <SquadBuilderNotes notes={notes} onNotesChange={setNotes} />
           </div>
 
-          <div className="flex flex-col gap-space-lg lg:col-span-5">
+          <div className="flex min-w-0 flex-1 flex-col gap-space-lg">
             {isLoadingPlayers ? (
               <p className="font-body bg-surface-container-lowest p-space-md text-body-md text-on-surface-variant shadow-sm">
                 Oyuncu havuzu yükleniyor…
@@ -517,6 +518,22 @@ export function SquadBuilderPage() {
               onClearSlot={handleClearBenchSlot}
               onDropPlayer={handleDropOnBenchSlot}
             />
+
+            <SquadBuilderSidebarStats
+              avgAge={stats.avgAge}
+              totalValue={stats.totalValue}
+            />
+
+            <div className="mt-auto w-full pt-space-md">
+              <SquadBuilderSidebarActions
+                canPublish={canPublish}
+                isPublishing={isPublishing}
+                onClear={handleClear}
+                onPublish={() => {
+                  void handlePublish()
+                }}
+              />
+            </div>
           </div>
         </div>
       </section>

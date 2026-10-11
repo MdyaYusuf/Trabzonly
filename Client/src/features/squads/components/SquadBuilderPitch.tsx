@@ -10,6 +10,7 @@ import {
   readSquadPlayerDragData,
   setSquadPlayerDragData,
 } from '../utils/squadBuilderDnD'
+import { CaptainArmband } from './CaptainArmband'
 
 type SquadBuilderPitchProps = {
   formation: FormationConfig
@@ -17,6 +18,7 @@ type SquadBuilderPitchProps = {
   players: BuilderPlayer[]
   playersById: Map<string, BuilderPlayer>
   assignedPlayerIds: Set<string>
+  captainPlayerId: string
   onAssignToSlot: (slotId: BuilderSlotId, playerId: string) => void
   onDropPlayer: (targetSlotId: BuilderSlotId, playerId: string, sourceSlotId?: string) => void
   onClearSlot: (slotId: BuilderSlotId) => void
@@ -25,11 +27,13 @@ type SquadBuilderPitchProps = {
 function SlotPlayerPicker({
   slot,
   candidates,
+  openUpward,
   onPick,
   onClose,
 }: {
   slot: FormationSlot
   candidates: BuilderPlayer[]
+  openUpward: boolean
   onPick: (playerId: string) => void
   onClose: () => void
 }) {
@@ -77,7 +81,11 @@ function SlotPlayerPicker({
   return (
     <div
       ref={rootRef}
-      className="absolute top-full left-1/2 z-40 mt-2 w-56 -translate-x-1/2 bg-surface-container-lowest p-2 shadow-xl ring-1 ring-outline-variant/40"
+      className={
+        openUpward
+          ? 'absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 bg-surface-container-lowest p-2 shadow-xl ring-1 ring-outline-variant/40'
+          : 'absolute top-full left-1/2 z-50 mt-2 w-56 -translate-x-1/2 bg-surface-container-lowest p-2 shadow-xl ring-1 ring-outline-variant/40'
+      }
       role="dialog"
       aria-label={`${slot.label} oyuncu seç`}
     >
@@ -109,7 +117,7 @@ function SlotPlayerPicker({
           className="font-body w-full bg-surface-container py-1.5 pr-2 pl-8 text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </label>
-      <div className="flex max-h-48 flex-col gap-1 overflow-y-auto">
+      <div className="flex max-h-56 flex-col gap-1 overflow-y-auto">
         {filtered.map((player) => (
           <button
             key={player.id}
@@ -124,11 +132,14 @@ function SlotPlayerPicker({
             >
               {player.initials}
             </div>
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 overflow-hidden">
               <span className="font-headline block truncate text-[12px] font-bold text-on-surface">
                 {player.name}
               </span>
-              <span className="font-kicker text-[9px] text-on-surface-variant uppercase">
+              <span
+                className="font-kicker block truncate text-[9px] text-on-surface-variant uppercase"
+                title={`#${player.number} · ${player.roleHint}`}
+              >
                 #{player.number} · {player.roleHint}
               </span>
             </div>
@@ -150,6 +161,8 @@ function SlotCard({
   candidates,
   isPickerOpen,
   isDropTarget,
+  openPickerUpward,
+  isCaptain,
   onOpenPicker,
   onClosePicker,
   onPick,
@@ -163,6 +176,8 @@ function SlotCard({
   candidates: BuilderPlayer[]
   isPickerOpen: boolean
   isDropTarget: boolean
+  openPickerUpward: boolean
+  isCaptain: boolean
   onOpenPicker: () => void
   onClosePicker: () => void
   onPick: (playerId: string) => void
@@ -176,7 +191,7 @@ function SlotCard({
   if (!player) {
     return (
       <div
-        className="relative flex flex-col items-center"
+        className="relative z-10 flex flex-col items-center"
         onDragOver={onDragOverSlot}
         onDragLeave={onDragLeaveSlot}
         onDrop={onDropOnSlot}
@@ -210,6 +225,7 @@ function SlotCard({
           <SlotPlayerPicker
             slot={slot}
             candidates={candidates}
+            openUpward={openPickerUpward}
             onPick={onPick}
             onClose={onClosePicker}
           />
@@ -225,10 +241,14 @@ function SlotCard({
       }`}
       draggable
       onDragStart={(event) => {
-        setSquadPlayerDragData(event.dataTransfer, {
-          playerId: player.id,
-          sourceSlotId: slot.id,
-        })
+        setSquadPlayerDragData(
+          event.dataTransfer,
+          {
+            playerId: player.id,
+            sourceSlotId: slot.id,
+          },
+          player.initials,
+        )
       }}
       onDragOver={onDragOverSlot}
       onDragLeave={onDragLeaveSlot}
@@ -247,7 +267,7 @@ function SlotCard({
           {player.initials}
         </div>
         <span
-          className={`font-kicker absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold shadow ${
+          className={`font-kicker absolute -top-1 -left-1 flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold shadow ${
             isGk
               ? 'bg-tertiary-container text-on-tertiary-container'
               : 'bg-primary text-on-primary'
@@ -255,6 +275,18 @@ function SlotCard({
         >
           #{player.number}
         </span>
+        {isCaptain ? <CaptainArmband side="right" className="group-hover:hidden" /> : null}
+        <button
+          type="button"
+          title="Pozisyonu Boşalt"
+          onClick={(event) => {
+            event.stopPropagation()
+            onClear()
+          }}
+          className="absolute -top-1 -right-1 hidden h-6 w-6 items-center justify-center rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
+        >
+          <span className="material-symbols-outlined text-[14px]">close</span>
+        </button>
       </div>
       <div className="mt-1 bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
         <span className="font-headline block text-[12px] leading-tight font-bold text-primary">
@@ -267,19 +299,6 @@ function SlotCard({
         >
           {slot.label} • {slot.roleLabel}
         </span>
-      </div>
-      <div className="absolute -top-2 -left-2 hidden items-center gap-1 group-hover:flex">
-        <button
-          type="button"
-          title="Pozisyonu Boşalt"
-          onClick={(event) => {
-            event.stopPropagation()
-            onClear()
-          }}
-          className="flex h-5 w-5 items-center justify-center rounded-full bg-error text-on-error shadow hover:opacity-90"
-        >
-          <span className="material-symbols-outlined text-[13px]">close</span>
-        </button>
       </div>
     </div>
   )
@@ -311,6 +330,7 @@ export function SquadBuilderPitch({
   players,
   playersById,
   assignedPlayerIds,
+  captainPlayerId,
   onAssignToSlot,
   onDropPlayer,
   onClearSlot,
@@ -341,68 +361,86 @@ export function SquadBuilderPitch({
     return map
   }, [assignedPlayerIds, formation.rows, players])
 
-  return (
-    <div className="relative w-full select-none overflow-hidden bg-[#1e4a2c] shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#183c24] via-[#1f4e2d] to-[#153520] opacity-95" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03)_50%,transparent_50%)] bg-[length:100%_48px]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(117,183,229,0.12)_0%,transparent_70%)]" />
+  const upwardPickerFromRow = Math.max(0, formation.rows.length - 2)
 
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full stroke-white/40 fill-none"
-        preserveAspectRatio="none"
-        strokeWidth="2"
-        viewBox="0 0 720 960"
-        aria-hidden="true"
-      >
-        <rect height="912" width="672" x="24" y="24" />
-        <line x1="24" x2="696" y1="480" y2="480" />
-        <circle cx="360" cy="480" r="72" />
-        <circle cx="360" cy="480" fill="white" fillOpacity="0.6" r="4" />
-        <rect height="150" width="360" x="180" y="24" />
-        <rect height="56" width="180" x="270" y="24" />
-        <circle cx="360" cy="115" fill="white" fillOpacity="0.6" r="3" />
-        <path d="M 300 174 A 60 60 0 0 0 420 174" />
-        <rect height="150" width="360" x="180" y="786" />
-        <rect height="56" width="180" x="270" y="880" />
-        <circle cx="360" cy="845" fill="white" fillOpacity="0.6" r="3" />
-        <path d="M 300 786 A 60 60 0 0 1 420 786" />
-        <path d="M 24 44 A 20 20 0 0 0 44 24" />
-        <path d="M 696 44 A 20 20 0 0 1 676 24" />
-        <path d="M 24 916 A 20 20 0 0 1 44 936" />
-        <path d="M 696 916 A 20 20 0 0 0 676 936" />
-      </svg>
+  return (
+    <div className="relative h-full min-h-[600px] w-full flex-1 select-none overflow-visible bg-[#1e4a2c] shadow-xl sm:min-h-[660px] md:min-h-[700px]">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#183c24] via-[#1f4e2d] to-[#153520] opacity-95" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03)_50%,transparent_50%)] bg-[length:100%_48px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(117,183,229,0.12)_0%,transparent_70%)]" />
+
+        <svg
+          className="absolute inset-0 h-full w-full stroke-white/40 fill-none"
+          preserveAspectRatio="none"
+          strokeWidth="2"
+          viewBox="0 0 720 960"
+          aria-hidden="true"
+        >
+          <rect height="912" width="672" x="24" y="24" />
+          <line x1="24" x2="696" y1="480" y2="480" />
+          <circle cx="360" cy="480" r="72" />
+          <circle cx="360" cy="480" fill="white" fillOpacity="0.6" r="4" />
+          <rect height="150" width="360" x="180" y="24" />
+          <rect height="56" width="180" x="270" y="24" />
+          <circle cx="360" cy="115" fill="white" fillOpacity="0.6" r="3" />
+          <path d="M 300 174 A 60 60 0 0 0 420 174" />
+          <rect height="150" width="360" x="180" y="786" />
+          <rect height="56" width="180" x="270" y="880" />
+          <circle cx="360" cy="845" fill="white" fillOpacity="0.6" r="3" />
+          <path d="M 300 786 A 60 60 0 0 1 420 786" />
+          <path d="M 24 44 A 20 20 0 0 0 44 24" />
+          <path d="M 696 44 A 20 20 0 0 1 676 24" />
+          <path d="M 24 916 A 20 20 0 0 1 44 936" />
+          <path d="M 696 916 A 20 20 0 0 0 676 936" />
+        </svg>
+      </div>
 
       <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 sm:left-6">
         <span className="font-kicker bg-primary/90 px-2.5 py-1 text-[10px] font-bold tracking-widest text-on-primary uppercase">
-          PAPARA PARK • AKYAZI
+          TRABZONSPOR
         </span>
         <span className="font-label bg-secondary-container/90 px-2 py-0.5 text-[10px] font-bold text-on-secondary-container uppercase">
           {formation.lineLabel}
         </span>
       </div>
 
-      <div className="relative z-20 flex h-[640px] w-full flex-col justify-between p-3 sm:h-[720px] sm:p-4 md:h-[760px]">
+      <div className="relative z-20 flex h-full min-h-[600px] w-full flex-col justify-between overflow-visible p-3 sm:min-h-[660px] sm:p-4 md:min-h-[700px]">
         {formation.rows.map((row, rowIndex) => {
           const isFirst = rowIndex === 0
           const isLast = rowIndex === formation.rows.length - 1
+          const openPickerUpward = rowIndex >= upwardPickerFromRow
 
           return (
             <div
               key={`row-${rowIndex}`}
-              className={`${rowGridClass(row.length)} ${isFirst ? 'pt-6 sm:pt-8' : ''} ${isLast ? 'pb-2' : ''}`}
+              className={`${rowGridClass(row.length)} ${isFirst ? 'pt-6 sm:pt-8' : ''} ${isLast ? 'pb-2' : ''} ${
+                openPickerSlotId && row.some((slot) => slot.id === openPickerSlotId)
+                  ? 'relative z-40'
+                  : 'relative z-20'
+              }`}
             >
               {row.map((slot) => {
                 const playerId = assignments[slot.id]
                 const player = playerId ? playersById.get(playerId) : undefined
 
                 return (
-                  <div key={slot.id} className="flex justify-center">
+                  <div
+                    key={slot.id}
+                    className={
+                      openPickerSlotId === slot.id
+                        ? 'relative z-50 flex justify-center'
+                        : 'relative z-10 flex justify-center'
+                    }
+                  >
                     <SlotCard
                       slot={slot}
                       player={player}
                       candidates={candidatesBySlot.get(slot.id) ?? []}
                       isPickerOpen={openPickerSlotId === slot.id}
                       isDropTarget={dropTargetSlotId === slot.id}
+                      openPickerUpward={openPickerUpward}
+                      isCaptain={Boolean(playerId && playerId === captainPlayerId)}
                       onOpenPicker={() => {
                         setOpenPickerSlotId(slot.id)
                       }}

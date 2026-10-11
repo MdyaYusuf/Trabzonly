@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAppSelector } from '@/core/store/hooks'
 import squadService from '../squadService'
 import {
-  ratingFeedbackMap,
   ratingScores,
   type RatingScore,
 } from '../utils/squadDetailTypes'
@@ -11,9 +11,13 @@ import {
 type SquadDetailRatingBarProps = {
   squadId: string
   authorUserId: string
+  averageRating: number
+  ratingCount: number
   currentUserScore?: number | null
   onRated?: (averageRating: number, ratingCount: number, score: number) => void
 }
+
+const STAR_COLOR = '#D39D3F'
 
 function toRatingScore(value: number | null | undefined): RatingScore {
   if (value == null) {
@@ -29,15 +33,139 @@ function toRatingScore(value: number | null | undefined): RatingScore {
   return '4.5'
 }
 
+function snapToRatingScore(raw: number): RatingScore {
+  let best: RatingScore = ratingScores[0]
+  let bestDist = Number.POSITIVE_INFINITY
+
+  for (const score of ratingScores) {
+    const dist = Math.abs(Number(score) - raw)
+
+    if (dist < bestDist) {
+      bestDist = dist
+      best = score
+    }
+  }
+
+  return best
+}
+
+function scoreFromPointer(starIndex: number, isLeftHalf: boolean): RatingScore {
+  const raw = isLeftHalf ? starIndex + 0.5 : starIndex + 1
+  return snapToRatingScore(raw)
+}
+
+function InteractiveRatingStars({
+  value,
+  disabled,
+  onChange,
+}: {
+  value: number
+  disabled: boolean
+  onChange: (score: RatingScore) => void
+}) {
+  const reactId = useId().replace(/:/g, '')
+  const [hoverValue, setHoverValue] = useState<number | null>(null)
+  const displayValue = hoverValue ?? value
+
+  return (
+    <div
+      className={
+        disabled
+          ? 'flex items-center gap-1 opacity-60'
+          : 'flex items-center gap-1'
+      }
+      role="radiogroup"
+      aria-label="Puan seçimi"
+      onMouseLeave={() => {
+        setHoverValue(null)
+      }}
+    >
+      {Array.from({ length: 5 }, (_, index) => {
+        const starValue = index + 1
+        const fill: 'full' | 'half' | 'empty' =
+          displayValue >= starValue
+            ? 'full'
+            : displayValue >= starValue - 0.5
+              ? 'half'
+              : 'empty'
+        const gradientId = `${reactId}-star-half-${index}`
+
+        return (
+          <span key={index} className="relative inline-flex h-8 w-8">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              className="pointer-events-none absolute inset-0"
+              aria-hidden="true"
+            >
+              {fill === 'half' ? (
+                <defs>
+                  <linearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="50%" stopColor={STAR_COLOR} />
+                    <stop offset="50%" stopColor={STAR_COLOR} stopOpacity="0.22" />
+                  </linearGradient>
+                </defs>
+              ) : null}
+              <path
+                d="M12 2.5l2.74 6.16 6.76.62-5.1 4.5 1.5 6.72L12 16.9l-6 3.6 1.5-6.72-5.1-4.5 6.76-.62L12 2.5z"
+                fill={
+                  fill === 'full'
+                    ? STAR_COLOR
+                    : fill === 'half'
+                      ? `url(#${gradientId})`
+                      : STAR_COLOR
+                }
+                fillOpacity={fill === 'empty' ? 0.22 : 1}
+              />
+            </svg>
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label={`${scoreFromPointer(index, true)} yıldız`}
+              className="absolute top-0 left-0 h-full w-1/2 cursor-pointer disabled:cursor-not-allowed"
+              onMouseEnter={() => {
+                if (!disabled) {
+                  setHoverValue(Number(scoreFromPointer(index, true)))
+                }
+              }}
+              onClick={() => {
+                onChange(scoreFromPointer(index, true))
+              }}
+            />
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label={`${scoreFromPointer(index, false)} yıldız`}
+              className="absolute top-0 right-0 h-full w-1/2 cursor-pointer disabled:cursor-not-allowed"
+              onMouseEnter={() => {
+                if (!disabled) {
+                  setHoverValue(Number(scoreFromPointer(index, false)))
+                }
+              }}
+              onClick={() => {
+                onChange(scoreFromPointer(index, false))
+              }}
+            />
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
 export function SquadDetailRatingBar({
   squadId,
   authorUserId,
+  averageRating,
+  ratingCount,
   currentUserScore,
   onRated,
 }: SquadDetailRatingBarProps) {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const currentUserId = useAppSelector((state) => state.auth.user?.id)
   const isOwner = currentUserId != null && currentUserId === authorUserId
+  const canRate = isAuthenticated && !isOwner
 
   const [selectedScore, setSelectedScore] = useState<RatingScore>(
     toRatingScore(currentUserScore),
@@ -49,22 +177,38 @@ export function SquadDetailRatingBar({
     setSelectedScore(toRatingScore(currentUserScore))
   }, [currentUserScore])
 
-  const phrase = ratingFeedbackMap[selectedScore]
-
-  async function handleSave() {
-    if (!isAuthenticated || isOwner || isSaving) {
+  async function handleRate(score: RatingScore) {
+    if (isSaving) {
       return
     }
 
+    if (!isAuthenticated) {
+      toast.info('Puan vermek için giriş yapmalısınız.')
+      return
+    }
+
+    if (isOwner) {
+      toast.warning('Kendi taktiğinizi oylayamazsınız.')
+      return
+    }
+
+    if (currentUserScore != null && Number(score) === Number(currentUserScore.toFixed(1))) {
+      setSelectedScore(score)
+      return
+    }
+
+    setSelectedScore(score)
     setIsSaving(true)
+    setSaved(false)
 
     const result = await squadService.rate(squadId, {
-      score: Number(selectedScore),
+      score: Number(score),
     })
 
     setIsSaving(false)
 
     if (!result.success || !result.data) {
+      setSelectedScore(toRatingScore(currentUserScore))
       return
     }
 
@@ -76,79 +220,79 @@ export function SquadDetailRatingBar({
   }
 
   return (
-    <section className="w-full bg-surface-container py-space-md">
-      <div className="mx-auto flex max-w-[1360px] flex-col justify-between gap-space-md px-4 sm:px-6 xl:flex-row xl:items-center lg:px-12">
-        <div className="flex flex-1 flex-col gap-space-md sm:flex-row sm:items-center">
-          <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-[22px] text-primary">how_to_vote</span>
-            <span className="font-headline text-headline-sm font-bold text-primary uppercase">
-              Bu Kadroyu ve Taktik Planı Puanla:
-            </span>
-          </div>
+    <section className="w-full bg-surface-container-low py-space-md">
+      <div className="mx-auto flex max-w-[1360px] flex-col gap-space-sm px-4 sm:px-6 lg:px-12">
+        <div className="flex flex-col gap-space-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-space-md">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px] text-primary">stars</span>
+              <span className="font-headline text-[15px] font-bold tracking-tight text-primary uppercase">
+                Bu Kadroyu Puanla
+              </span>
+            </div>
 
-          <div className="flex items-center gap-1 bg-surface-container-lowest p-1.5 shadow-sm">
-            {ratingScores.map((score) => {
-              const isActive = selectedScore === score
+            <InteractiveRatingStars
+              value={Number(selectedScore)}
+              disabled={isSaving}
+              onChange={(score) => {
+                void handleRate(score)
+              }}
+            />
 
-              return (
-                <button
-                  key={score}
-                  type="button"
-                  disabled={isOwner || !isAuthenticated}
-                  onClick={() => {
-                    setSelectedScore(score)
-                  }}
-                  className={
-                    isActive
-                      ? 'font-label bg-primary px-2 py-1 text-label-md font-bold text-on-primary shadow-sm transition-all disabled:opacity-60'
-                      : 'font-label px-2 py-1 text-label-md font-bold text-on-surface-variant transition-all hover:bg-surface-container-high disabled:opacity-60'
-                  }
-                >
-                  {isActive ? `${score} ★` : score}
-                </button>
-              )
-            })}
+            <div className="flex flex-wrap items-end gap-space-md">
+              <div className="flex flex-col gap-0.5">
+                <span className="font-kicker text-[10px] tracking-wider text-on-surface-variant uppercase">
+                  Senin puanın
+                </span>
+                <span className="font-headline text-[18px] leading-none font-bold tabular-nums text-primary">
+                  {canRate || currentUserScore != null ? selectedScore : '—'}
+                </span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="font-kicker text-[10px] tracking-wider text-on-surface-variant uppercase">
+                  Ortalama
+                </span>
+                <span className="font-headline text-[18px] leading-none font-bold tabular-nums text-on-surface">
+                  {ratingCount > 0 ? averageRating.toFixed(1) : '—'}
+                  <span className="font-body ml-1 text-[11px] font-normal text-on-surface-variant">
+                    ({ratingCount} oy)
+                  </span>
+                </span>
+              </div>
+              {isSaving ? (
+                <span className="font-body text-[11px] text-on-surface-variant">Kaydediliyor…</span>
+              ) : null}
+              {saved ? (
+                <span className="font-body text-[11px] font-bold text-secondary">Kaydedildi</span>
+              ) : null}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-space-sm">
-            <span className="font-body text-body-sm text-on-surface-variant">
-              Seçilen:{' '}
-              <strong className="font-bold text-primary">
-                {selectedScore} ★ (&quot;{phrase}&quot;)
-              </strong>
-            </span>
+            <a
+              href="#yorumlar"
+              onClick={(event) => {
+                event.preventDefault()
+                document.getElementById('yorumlar')?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                })
+              }}
+              className="font-label inline-flex items-center gap-1.5 bg-surface-container-highest px-space-md py-2 text-label-md font-bold tracking-wider text-on-surface uppercase transition-colors hover:bg-primary hover:text-on-primary"
+            >
+              <span className="material-symbols-outlined text-[18px]">chat</span>
+              Yorum Yap
+            </a>
             {!isAuthenticated ? (
               <Link
                 to="/login"
-                className="font-label bg-primary-container px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors hover:bg-primary"
+                className="font-label inline-flex items-center gap-1.5 bg-primary px-space-md py-2 text-label-md font-bold tracking-wider text-on-primary uppercase transition-colors hover:bg-primary-container"
               >
-                GİRİŞ YAP
+                <span className="material-symbols-outlined text-[18px]">login</span>
+                Giriş Yap
               </Link>
-            ) : (
-              <button
-                type="button"
-                disabled={isOwner || isSaving}
-                onClick={() => {
-                  void handleSave()
-                }}
-                className={
-                  saved
-                    ? 'font-label bg-secondary px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-secondary uppercase shadow-sm transition-colors'
-                    : 'font-label bg-primary-container px-space-md py-1.5 text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors hover:bg-primary disabled:opacity-50'
-                }
-              >
-                {saved ? 'KAYDEDİLDİ ✓' : isSaving ? 'KAYDEDİLİYOR…' : 'PUANI KAYDET'}
-              </button>
-            )}
+            ) : null}
           </div>
-        </div>
-
-        <div className="font-body flex items-center gap-2 bg-surface-container-lowest px-space-md py-2 text-body-sm text-on-surface-variant shadow-sm">
-          <span className="material-symbols-outlined text-[18px] text-outline">lock</span>
-          <span>
-            <strong className="font-semibold text-on-surface">Kadro Sahibi Koruması:</strong> Kendi
-            taktiğinizi oylayamazsınız.
-          </span>
         </div>
       </div>
     </section>

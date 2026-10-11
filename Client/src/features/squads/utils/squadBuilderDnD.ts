@@ -10,10 +10,46 @@ export type SquadPlayerDragPayload = {
 export function setSquadPlayerDragData(
   dataTransfer: DataTransfer,
   payload: SquadPlayerDragPayload,
+  initials?: string,
 ): void {
   dataTransfer.setData(SQUAD_PLAYER_DND_TYPE, JSON.stringify(payload))
   dataTransfer.setData('text/plain', payload.playerId)
   dataTransfer.effectAllowed = 'move'
+
+  if (initials) {
+    setSquadAvatarDragImage(dataTransfer, initials)
+  }
+}
+
+export function setSquadAvatarDragImage(
+  dataTransfer: DataTransfer,
+  initials: string,
+): void {
+  const ghost = document.createElement('div')
+  ghost.textContent = initials.slice(0, 2).toUpperCase()
+  ghost.setAttribute('aria-hidden', 'true')
+  Object.assign(ghost.style, {
+    position: 'fixed',
+    top: '-200px',
+    left: '-200px',
+    width: '48px',
+    height: '48px',
+    borderRadius: '9999px',
+    background: '#5a0e27',
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    font: '700 13px/1 "Segoe UI", system-ui, sans-serif',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+    pointerEvents: 'none',
+    zIndex: '9999',
+  })
+  document.body.appendChild(ghost)
+  dataTransfer.setDragImage(ghost, 24, 24)
+  window.setTimeout(() => {
+    ghost.remove()
+  }, 0)
 }
 
 export function readSquadPlayerDragData(

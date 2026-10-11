@@ -5,8 +5,6 @@ import { formationConfigs } from '../utils/squadBuilderPlaceholders'
 type SquadBuilderToolbarProps = {
   title: string
   formationId: BuilderFormationId
-  avgAge: string
-  totalValue: string
   canPublish: boolean
   isPublishing: boolean
   onTitleChange: (value: string) => void
@@ -18,8 +16,6 @@ type SquadBuilderToolbarProps = {
 export function SquadBuilderToolbar({
   title,
   formationId,
-  avgAge,
-  totalValue,
   canPublish,
   isPublishing,
   onTitleChange,
@@ -82,47 +78,30 @@ export function SquadBuilderToolbar({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-space-sm">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="font-kicker pr-2 text-kicker font-bold text-on-surface-variant uppercase">
-              DİZİLİŞ:
-            </span>
-            {formationConfigs.map((formation) => {
-              const isActive = formation.id === formationId
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-kicker shrink-0 pr-2 text-kicker font-bold text-on-surface-variant uppercase">
+            DİZİLİŞ:
+          </span>
+          {formationConfigs.map((formation) => {
+            const isActive = formation.id === formationId
 
-              return (
-                <button
-                  key={formation.id}
-                  type="button"
-                  onClick={() => {
-                    onFormationChange(formation.id)
-                  }}
-                  className={
-                    isActive
-                      ? 'font-label bg-primary px-3 py-1 text-label-md text-on-primary uppercase shadow-sm transition-all'
-                      : 'font-label bg-surface-container px-3 py-1 text-label-md text-on-surface uppercase transition-all hover:bg-primary hover:text-on-primary'
-                  }
-                >
-                  {formation.label}
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-space-sm">
-            <div className="font-label flex items-center gap-1.5 bg-surface-container px-3 py-1 text-[12px] text-on-surface">
-              <span className="material-symbols-outlined text-[16px] text-secondary">analytics</span>
-              <span className="font-bold">Ortalama Yaş:</span>
-              <span>{avgAge}</span>
-            </div>
-            <div className="font-label flex items-center gap-1.5 bg-surface-container px-3 py-1 text-[12px] text-on-surface">
-              <span className="material-symbols-outlined text-[16px] text-tertiary-container">
-                payments
-              </span>
-              <span className="font-bold">Piyasa Değeri:</span>
-              <span>{totalValue}</span>
-            </div>
-          </div>
+            return (
+              <button
+                key={formation.id}
+                type="button"
+                onClick={() => {
+                  onFormationChange(formation.id)
+                }}
+                className={
+                  isActive
+                    ? 'font-label bg-primary px-3 py-1 text-label-md text-on-primary uppercase shadow-sm transition-all'
+                    : 'font-label bg-surface-container px-3 py-1 text-label-md text-on-surface uppercase transition-all hover:bg-primary hover:text-on-primary'
+                }
+              >
+                {formation.label}
+              </button>
+            )
+          })}
         </div>
       </div>
     </section>

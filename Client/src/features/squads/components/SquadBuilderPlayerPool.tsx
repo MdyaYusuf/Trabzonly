@@ -142,13 +142,13 @@ export function SquadBuilderPlayerPool({
             {isComplete ? (
               <span className="text-on-secondary-fixed"> — Kadro hazır</span>
             ) : (
-              <span className="text-on-surface-variant"> — Sürükleyin veya SEÇ</span>
+              <span className="text-on-surface-variant"> — Sürükle veya seç</span>
             )}
           </p>
         </div>
       </div>
 
-      <div className="flex max-h-[380px] flex-col gap-2 overflow-y-auto pr-1">
+      <div className="flex max-h-[300px] flex-col gap-2 overflow-y-auto pr-1">
         {filtered.map((player) => {
           const assignedSlot = slotLabelForPlayer(assignments, player.id)
           const isAssigned = Boolean(assignedSlot)
@@ -198,7 +198,11 @@ export function SquadBuilderPlayerPool({
               key={player.id}
               draggable
               onDragStart={(event) => {
-                setSquadPlayerDragData(event.dataTransfer, { playerId: player.id })
+                setSquadPlayerDragData(
+                  event.dataTransfer,
+                  { playerId: player.id },
+                  player.initials,
+                )
               }}
               className="group flex cursor-grab items-center justify-between bg-surface-container-low p-2.5 transition-colors hover:bg-surface-container active:cursor-grabbing"
             >

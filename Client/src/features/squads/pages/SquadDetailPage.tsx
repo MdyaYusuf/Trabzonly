@@ -97,6 +97,8 @@ export function SquadDetailPage() {
       <SquadDetailRatingBar
         squadId={squad.id}
         authorUserId={squad.userId}
+        averageRating={squad.rating}
+        ratingCount={squad.ratingCount}
         currentUserScore={squad.currentUserScore}
         onRated={(averageRating, ratingCount, score) => {
           setSquad((current) =>
@@ -116,6 +118,7 @@ export function SquadDetailPage() {
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
             <SquadDetailPitch
+              formation={squad.formation}
               players={squad.pitchPlayers}
               benchPlayers={squad.benchPlayers}
             />

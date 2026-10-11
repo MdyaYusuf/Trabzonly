@@ -1,13 +1,14 @@
 export type SquadPitchPlayer = {
   id: string
+  slotId: string
   playerId: number
   shortName: string
   fullName: string
   number: string
   positionLabel: string
-  left: string
-  top: string
+  roleLabel: string
   isCaptain: boolean
+  isGk: boolean
   avatarInitials: string
   avatarGradient: string
 }
