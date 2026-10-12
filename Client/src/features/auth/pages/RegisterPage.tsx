@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthCard, AuthPageShell } from '@/features/auth/components/AuthPageShell'
 import { authService } from '@/features/auth/authService'
+import { DEFAULT_USER_DISPLAY_TAG } from '@/features/users/utils/userDisplayTags'
 
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -189,6 +190,12 @@ export function RegisterPage() {
               </div>
             </div>
           </div>
+
+          <p className="font-body text-body-sm text-on-surface-variant">
+            Varsayılan olarak görünen etiketiniz{' '}
+            <span className="font-bold text-on-surface">{DEFAULT_USER_DISPLAY_TAG}</span>{' '}
+            olacaktır. Profil sayfanızdan değiştirebilirsiniz.
+          </p>
 
           <div className="flex items-start gap-2 pt-1">
             <input

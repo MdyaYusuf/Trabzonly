@@ -87,6 +87,7 @@ public class AuthenticationService(
     User createdUser = _mapper.CreateToEntity(request);
     createdUser.Email = email;
     createdUser.RoleId = 2;
+    createdUser.DisplayTag = UserDisplayTags.Default;
 
     HashingHelper.CreatePasswordHash(request.Password, out string hash, out string key);
     createdUser.PasswordHash = hash;

@@ -50,7 +50,7 @@ export type FeedPostCard = {
   isAuthorFollowedByCurrentUser: boolean
 }
 
-export const PAGE_SIZE = 10
+export const PAGE_SIZE = 5
 
 export const sortOptions: { value: FeedSortOption; label: string }[] = [
   { value: 'newest', label: 'En Yeniler' },

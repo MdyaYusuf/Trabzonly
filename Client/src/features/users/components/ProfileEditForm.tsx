@@ -6,7 +6,10 @@ import {
   defaultProfileSettings,
   tribuneOptions,
 } from '../utils/profileSettingsPlaceholders'
-import { USER_DISPLAY_TAGS } from '../utils/userDisplayTags'
+import {
+  DEFAULT_USER_DISPLAY_TAG,
+  USER_DISPLAY_TAGS,
+} from '../utils/userDisplayTags'
 
 type ProfileEditFormProps = {
   onSaved: () => void
@@ -27,7 +30,9 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
   const authUser = useAppSelector((state) => state.auth.user)
   const [username, setUsername] = useState(authUser?.username ?? '')
   const [bio, setBio] = useState(authUser?.bio ?? '')
-  const [displayTag, setDisplayTag] = useState(authUser?.displayTag ?? '')
+  const [displayTag, setDisplayTag] = useState(
+    authUser?.displayTag ?? DEFAULT_USER_DISPLAY_TAG,
+  )
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -51,7 +56,7 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
       if (result.success && result.data) {
         setUsername(result.data.username)
         setBio(result.data.bio ?? '')
-        setDisplayTag(result.data.displayTag ?? '')
+        setDisplayTag(result.data.displayTag ?? DEFAULT_USER_DISPLAY_TAG)
         dispatch(setCredentials(result.data))
       }
 
@@ -68,7 +73,7 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
   function handleReset() {
     setUsername(authUser?.username ?? '')
     setBio(authUser?.bio ?? '')
-    setDisplayTag(authUser?.displayTag ?? '')
+    setDisplayTag(authUser?.displayTag ?? DEFAULT_USER_DISPLAY_TAG)
     setImageFile(null)
     setTribune(defaultProfileSettings.tribune)
     setCity(defaultProfileSettings.city)
@@ -88,7 +93,7 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
     const result = await userService.updateProfile({
       username: username.trim(),
       bio: bio.trim().length > 0 ? bio.trim() : null,
-      displayTag: displayTag.trim().length > 0 ? displayTag.trim() : null,
+      displayTag: displayTag.trim() || DEFAULT_USER_DISPLAY_TAG,
       imageFile,
     })
 
@@ -103,7 +108,7 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
       dispatch(setCredentials(me.data))
       setUsername(me.data.username)
       setBio(me.data.bio ?? '')
-      setDisplayTag(me.data.displayTag ?? '')
+      setDisplayTag(me.data.displayTag ?? DEFAULT_USER_DISPLAY_TAG)
     }
 
     setImageFile(null)
@@ -221,7 +226,6 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
               }}
               className="font-body w-full bg-surface-container-lowest px-space-md py-space-xs text-body-md text-on-surface shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
             >
-              <option value="">Etiket seçilmedi</option>
               {USER_DISPLAY_TAGS.map((tag) => (
                 <option key={tag} value={tag}>
                   {tag}
