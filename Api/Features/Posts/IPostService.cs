@@ -36,6 +36,10 @@ public interface IPostService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<PostPreviewDto>>> GetMostEngagedPostsAsync(
+    int count,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CursorPagedResponse<PostResponseDto>>> GetRecentPostsAsync(
     int count,
     DateTime? lastDateCursor = null,

@@ -91,6 +91,18 @@ public class PostsController(IPostService _postService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [HttpGet("most-engaged/{count:int}")]
+  public async Task<IActionResult> GetMostEngagedPosts(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _postService.GetMostEngagedPostsAsync(
+      count: count,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("recent/{count:int}")]
   public async Task<IActionResult> GetRecentPosts(
     int count,

@@ -383,6 +383,42 @@ public class PostService(
     };
   }
 
+  public async Task<ReturnModel<List<PostPreviewDto>>> GetMostEngagedPostsAsync(
+    int count,
+    CancellationToken cancellationToken = default)
+  {
+    int take = count < 1 ? 1 : count;
+
+    List<PostPreviewDto> response = await _postRepository.Query(enableTracking: false)
+      .Where(p => p.IsActive)
+      .OrderByDescending(p => p.LikeCount + p.CommentCount)
+      .ThenByDescending(p => p.CreatedDate)
+      .ThenByDescending(p => p.Id)
+      .Take(take)
+      .Select(p => new PostPreviewDto
+      {
+        Id = p.Id,
+        Title = p.Title,
+        Description = p.Description,
+        ImageUrl = p.ImageUrl,
+        AuthorUsername = p.User.Username,
+        CategoryName = p.Category.Name,
+        CreatedDate = p.CreatedDate,
+        LikeCount = p.LikeCount,
+        DislikeCount = p.DislikeCount,
+        CommentCount = p.CommentCount
+      })
+      .ToListAsync(cancellationToken);
+
+    return new ReturnModel<List<PostPreviewDto>>()
+    {
+      Success = true,
+      Message = "En çok etkileşim alan postlar başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<CursorPagedResponse<PostResponseDto>>> GetRecentPostsAsync(
     int count,
     DateTime? lastDateCursor = null,

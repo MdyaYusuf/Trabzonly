@@ -22,8 +22,6 @@ export function PostDetailBreadcrumb({ post }: PostDetailBreadcrumbProps) {
             Gönderiler
           </Link>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="text-on-surface-variant">{post.categoryName}</span>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="line-clamp-1 font-bold text-primary">{post.title}</span>
         </nav>
       </div>

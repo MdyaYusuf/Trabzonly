@@ -2,6 +2,7 @@ import { apiClient } from '../../core/api/apiClient';
 import type { ApiResponse, NoData, PagedResponse, CursorPagedResponse } from '../../core/types/ApiResponse';
 import type {
   PostResponseDto,
+  PostPreviewDto,
   CreatedPostResponseDto,
   CreatePostRequest,
   UpdatePostRequest,
@@ -77,6 +78,10 @@ const getTopCommented = async (count: number): Promise<ApiResponse<PostResponseD
   return await apiClient<PostResponseDto[]>(`${API_URL}/top-commented/${count}`);
 };
 
+const getMostEngaged = async (count: number): Promise<ApiResponse<PostPreviewDto[]>> => {
+  return await apiClient<PostPreviewDto[]>(`${API_URL}/most-engaged/${count}`);
+};
+
 const getRecent = async (
   count: number,
   lastDate?: string,
@@ -129,6 +134,17 @@ const dislike = async (id: string): Promise<ApiResponse<PostReactionResponseDto>
   });
 };
 
-const postService = { getAll, getById, getTopCommented, getRecent, add, update, remove, like, dislike };
+const postService = {
+  getAll,
+  getById,
+  getTopCommented,
+  getMostEngaged,
+  getRecent,
+  add,
+  update,
+  remove,
+  like,
+  dislike,
+};
 
 export default postService;
