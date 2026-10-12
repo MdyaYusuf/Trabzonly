@@ -1,40 +1,53 @@
 import { Link } from 'react-router-dom'
+import { SquadCreateIcon } from '../../squads/components/SquadCreateIcon'
 
 export function PlayerDirectoryCta() {
   return (
-    <section className="w-full bg-primary-container py-space-lg text-on-primary">
-      <div className="mx-auto flex max-w-[1360px] flex-col items-center justify-between gap-space-lg px-4 sm:px-6 lg:flex-row lg:px-12">
-        <div className="flex flex-col items-center gap-space-md text-center sm:flex-row sm:text-left">
-          <div className="flex h-14 w-14 items-center justify-center bg-surface-container-lowest/10 p-2">
-            <div className="flex h-10 w-10 flex-col items-center justify-center bg-primary text-tertiary-fixed-dim">
-              <span className="text-lg leading-none">★</span>
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-kicker text-kicker font-bold tracking-widest text-secondary-container uppercase">
-              TARAFTAR PUANLAMASI
+    <section className="relative w-full overflow-hidden bg-primary-container py-space-xl">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06]">
+        <div className="absolute top-1/2 left-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[48px] border-white" />
+        <div className="absolute top-1/2 left-1/2 h-[180px] w-[180px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[8px] border-white" />
+      </div>
+
+      <div className="relative z-10 mx-auto flex max-w-[1360px] flex-col items-start justify-between gap-space-xl px-4 sm:px-6 lg:flex-row lg:items-center lg:px-12">
+        <div className="max-w-3xl">
+          <div className="mb-space-xs flex flex-wrap items-center gap-space-xs">
+            <span className="font-kicker bg-secondary px-2 py-0.5 text-kicker font-bold tracking-wider text-white uppercase">
+              TOPLULUK TAKTİĞİ
             </span>
-            <h3 className="font-headline text-headline-md font-bold tracking-tight uppercase">
-              OYUNCULARA TARAFTAR PUANI VER
-            </h3>
-            <p className="font-body text-body-sm leading-normal text-primary-fixed">
-              Bordo-Mavili renklere gönül veren taraftarların oluşturduğu haftalık ortalama oyuncu
-              reytingine kendi analizini kat.
-            </p>
+          </div>
+          <h2 className="font-headline mb-space-sm text-headline-md font-bold tracking-tight text-white uppercase lg:text-headline-lg">
+            Favori Oyuncularınla Kendi 11&apos;ini Kur!
+          </h2>
+          <p className="font-body text-body-md text-white/90">
+            Bu kadrodan seçtiğin isimlerle dizilişini oluştur, notlarını yaz ve taraftarlarla
+            paylaş. Puan al, tartışmaya katıl ve Bordo-Mavi aklın bir parçası ol.
+          </p>
+          <div className="font-body mt-space-md flex flex-wrap items-center gap-space-lg text-[13px] text-white/80">
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[18px] text-secondary-container">
+                groups
+              </span>
+              Toplulukla paylaş
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[18px] text-tertiary-fixed">star</span>
+              Puanla ve keşfet
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[18px] text-white">forum</span>
+              Tartışmaya katıl
+            </span>
           </div>
         </div>
-        <div className="flex shrink-0 flex-col items-stretch gap-space-sm sm:flex-row sm:items-center">
-          <Link
-            to="#kadro-listesi"
-            className="bg-secondary-container px-space-lg py-3 text-center font-headline text-label-md font-bold tracking-wider text-on-secondary-container uppercase shadow-sm transition-colors hover:bg-surface-container-lowest"
-          >
-            Oyuncuları Puanla
-          </Link>
+
+        <div className="relative z-10 w-full shrink-0 lg:w-auto">
           <Link
             to="/kadrolar/olustur"
-            className="bg-transparent px-space-md py-3 text-center font-headline text-label-md font-bold tracking-wider text-on-primary uppercase transition-colors hover:bg-white/10"
+            className="font-headline flex items-center justify-center gap-space-sm bg-secondary-container px-space-xl py-space-md text-headline-sm font-extrabold tracking-wider text-on-secondary-container uppercase shadow-md transition-all hover:bg-surface-container-lowest"
           >
-            Kadronu Kur
+            <SquadCreateIcon size={24} />
+            <span>ŞİMDİ KADRONU KUR</span>
           </Link>
         </div>
       </div>

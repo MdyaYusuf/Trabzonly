@@ -61,6 +61,31 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
       .ToListAsync(cancellationToken);
   }
 
+  public async Task<List<Player>> GetMostEngagedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<Player> query = Query(enableTracking, withDeleted);
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    int take = count < 1 ? 1 : count;
+
+    return await query
+      .Where(p => p.IsActive)
+      .OrderByDescending(p => p.RatingCount + p.Comments.Count)
+      .ThenByDescending(p => p.RatingCount)
+      .ThenByDescending(p => p.Id)
+      .Take(take)
+      .ToListAsync(cancellationToken);
+  }
+
   public async Task<List<Player>> GetTopRatedPlayersAsync(
     int count,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,

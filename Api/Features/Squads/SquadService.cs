@@ -38,7 +38,7 @@ public class SquadService(
     Func<IQueryable<Squad>, IQueryable<Squad>>? include = null,
     Func<IQueryable<Squad>, IOrderedQueryable<Squad>>? orderBy = null,
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 6,
     bool enableTracking = false,
     bool withDeleted = false,
     CancellationToken cancellationToken = default)

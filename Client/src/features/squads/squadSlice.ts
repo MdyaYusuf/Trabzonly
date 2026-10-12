@@ -24,7 +24,7 @@ const initialState: SquadState = {
   userSquads: [],
   totalCount: 0,
   pageNumber: 1,
-  pageSize: 10,
+  pageSize: 6,
   nextCursorDate: null,
   nextCursorId: null,
   hasNextPage: false,

@@ -1,30 +1,71 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SquadCreateIcon } from '@/features/squads/components/SquadCreateIcon'
+import playerService from '../playerService'
 import { formatMarketValue } from '../utils/formatMarketValue'
-import type { PlayerCardData } from '../utils/playerDirectoryTypes'
 
-type PlayerDirectoryHeroProps = {
-  totalSquadValue: number
-  activePlayerCount: number
-  seasonLabel?: string | null
-  topValued?: PlayerCardData | null
-  mostCommented?: PlayerCardData | null
-}
+export function PlayerDirectoryHero() {
+  const [seasonLabel, setSeasonLabel] = useState<string | null>(null)
+  const [totalSquadValue, setTotalSquadValue] = useState<number | null>(null)
+  const [topPlayerId, setTopPlayerId] = useState<number | null>(null)
+  const [topPlayerName, setTopPlayerName] = useState<string | null>(null)
+  const [topPlayerEngagement, setTopPlayerEngagement] = useState<number | null>(null)
 
-export function PlayerDirectoryHero({
-  totalSquadValue,
-  activePlayerCount,
-  seasonLabel,
-  topValued,
-  mostCommented,
-}: PlayerDirectoryHeroProps) {
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadHeroStats() {
+      const [overviewResult, mostEngagedResult] = await Promise.all([
+        playerService.getRosterOverview(),
+        playerService.getMostEngaged(1),
+      ])
+
+      if (cancelled) {
+        return
+      }
+
+      if (overviewResult.success && overviewResult.data) {
+        setTotalSquadValue(overviewResult.data.totalMarketValue)
+        setSeasonLabel(overviewResult.data.currentSeasonName ?? null)
+      }
+
+      if (
+        mostEngagedResult.success &&
+        mostEngagedResult.data &&
+        mostEngagedResult.data.length > 0
+      ) {
+        const topPlayer = mostEngagedResult.data[0]
+        setTopPlayerId(topPlayer.id)
+        setTopPlayerName(topPlayer.name)
+        setTopPlayerEngagement(topPlayer.ratingCount + topPlayer.commentCount)
+      } else {
+        setTopPlayerId(null)
+        setTopPlayerName(null)
+        setTopPlayerEngagement(null)
+      }
+    }
+
+    void loadHeroStats()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
-    <section className="w-full bg-surface-container-low">
-      <div className="mx-auto max-w-[1360px] px-4 pt-space-lg pb-space-md sm:px-6 lg:px-12">
-        <div className="flex flex-col justify-between gap-space-lg pb-space-lg lg:flex-row lg:items-end">
-          <div className="flex max-w-2xl flex-col gap-space-xs">
-            <div className="flex flex-wrap items-center gap-space-xs">
-              <span className="h-2 w-2 bg-secondary-container" />
-              <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
+    <section className="mx-auto w-full max-w-[1360px] px-4 pb-space-md sm:px-6 lg:px-12">
+      <div className="relative overflow-hidden bg-surface-container-lowest p-space-md shadow-sm sm:p-space-lg">
+        <div className="pointer-events-none absolute -right-10 -bottom-12 select-none text-primary opacity-[0.03]">
+          <span className="font-display text-[100px] leading-none font-extrabold tracking-tighter sm:text-[160px]">
+            1967
+          </span>
+        </div>
+
+        <div className="relative z-10 flex flex-col gap-space-md lg:flex-row lg:items-stretch lg:justify-between lg:gap-space-xl">
+          <div className="flex min-w-0 flex-1 flex-col justify-center">
+            <div className="mb-space-xs flex flex-wrap items-center gap-space-xs">
+              <span className="inline-block h-2.5 w-2.5 bg-primary-container" />
+              <span className="font-kicker text-kicker font-bold tracking-widest text-primary-container uppercase">
                 {seasonLabel?.trim() || 'GÜNCEL SEZON'}
               </span>
               <span className="text-label-md text-outline-variant">•</span>
@@ -32,158 +73,69 @@ export function PlayerDirectoryHero({
                 A TAKIM RAPORU
               </span>
             </div>
-            <h1 className="font-display text-headline-lg leading-none font-black tracking-tight text-primary uppercase lg:text-display-xl">
-              A TAKIM VE OYUNCU REHBERİ
+            <h1 className="font-display text-headline-lg leading-[1.05] font-extrabold tracking-tight text-primary uppercase lg:text-display-xl">
+              TRABZONSPOR KADROSU
             </h1>
-            <p className="font-body mt-space-xs text-body-md leading-relaxed text-on-surface-variant lg:text-body-lg">
+            <p className="font-body mt-space-sm max-w-2xl text-body-md text-on-surface-variant">
               Bordo-Mavi fırtınanın güncel kadrosu, taraftar reytingleri, piyasa değerleri ve detaylı
               istatistik analizleri. Bağımsız tribün gözüyle oyuncu değerlendirme merkezi.
             </p>
           </div>
 
-          <div className="flex flex-col items-stretch gap-space-md bg-surface-container-lowest p-space-sm shadow-sm sm:flex-row sm:items-center">
-            <div className="flex items-center gap-space-sm px-space-md py-space-xs">
-              <span className="material-symbols-outlined text-headline-md text-secondary">shield</span>
-              <div className="flex flex-col">
-                <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                  KADRO DEĞERİ
+          <div className="flex w-full shrink-0 flex-col gap-space-sm lg:w-[28rem]">
+            <div className="grid grid-cols-2 items-stretch gap-space-sm">
+              <div className="flex h-36 min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md">
+                <span className="font-kicker text-kicker font-bold whitespace-nowrap text-on-surface-variant uppercase">
+                  Kadro Değeri
                 </span>
-                <span className="font-headline text-headline-sm font-bold text-primary">
-                  {formatMarketValue(totalSquadValue)}
+                <span className="font-stat mt-1.5 text-headline-sm font-extrabold whitespace-nowrap text-primary sm:text-headline-md">
+                  {totalSquadValue == null ? '—' : formatMarketValue(totalSquadValue)}
                 </span>
-              </div>
-            </div>
-            <div className="hidden h-10 w-px bg-surface-container-highest sm:block" />
-            <div className="flex items-center gap-space-sm px-space-md py-space-xs">
-              <span className="material-symbols-outlined text-headline-md text-tertiary-fixed-dim">
-                groups
-              </span>
-              <div className="flex flex-col">
-                <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                  AKTİF FUTBOLCU
-                </span>
-                <span className="font-headline text-headline-sm font-bold text-primary">
-                  {activePlayerCount} OYUNCU
+                <span className="font-body mt-1 text-body-sm text-on-surface-variant">
+                  Toplam Piyasa Değeri
                 </span>
               </div>
+
+              {topPlayerId != null ? (
+                <Link
+                  to={`/oyuncular/${topPlayerId}`}
+                  className="flex h-36 min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md transition-colors hover:bg-surface-container-high"
+                >
+                  <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
+                    En Çok Etkileşim Alan
+                  </span>
+                  <span className="font-headline mt-1.5 line-clamp-2 text-body-sm font-bold text-secondary">
+                    {topPlayerName}
+                  </span>
+                  <span className="font-body mt-1 text-body-sm text-on-surface-variant">
+                    {topPlayerEngagement == null
+                      ? 'Etkileşim bekleniyor'
+                      : `${topPlayerEngagement.toLocaleString('tr-TR')} etkileşim`}
+                  </span>
+                </Link>
+              ) : (
+                <div className="flex h-36 min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md">
+                  <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
+                    En Çok Etkileşim Alan
+                  </span>
+                  <span className="font-headline mt-1.5 line-clamp-2 text-body-sm font-bold text-secondary">
+                    {topPlayerName ?? 'Henüz oyuncu yok'}
+                  </span>
+                  <span className="font-body mt-1 text-body-sm text-on-surface-variant">
+                    Etkileşim bekleniyor
+                  </span>
+                </div>
+              )}
             </div>
+
+            <Link
+              to="/kadrolar/olustur"
+              className="font-label flex w-full items-center justify-center gap-space-sm bg-primary-container px-space-lg py-space-sm text-label-md tracking-wider text-on-primary uppercase shadow-md transition-all duration-150 hover:bg-primary"
+            >
+              <SquadCreateIcon size={20} />
+              <span>+ Kadro Oluştur</span>
+            </Link>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-gutter pt-space-sm md:grid-cols-12">
-          {topValued ? (
-            <Link
-              to={`/oyuncular/${topValued.id}`}
-              className="group relative flex flex-col items-stretch justify-between overflow-hidden bg-surface-container-lowest shadow-sm sm:flex-row md:col-span-6"
-            >
-              <div className="z-10 flex flex-1 flex-col justify-between p-space-lg">
-                <div className="flex flex-col gap-space-xs">
-                  <span className="w-fit bg-primary-container px-space-xs py-0.5 font-kicker text-kicker font-bold tracking-widest text-on-primary uppercase">
-                    EN DEĞERLİ
-                  </span>
-                  <span className="font-kicker text-kicker font-bold text-secondary uppercase">
-                    {topValued.positionLabel} • #{topValued.number || '—'}
-                  </span>
-                  <h3 className="font-headline mt-1 text-headline-md font-bold tracking-tight text-primary uppercase transition-colors group-hover:text-secondary">
-                    {topValued.name}
-                  </h3>
-                  <p className="font-body line-clamp-2 text-body-sm text-on-surface-variant">
-                    {topValued.description?.trim() ||
-                      `${topValued.nationality} ${topValued.positionLabel.toLowerCase()}, A Takım kadrosunda.`}
-                  </p>
-                </div>
-                <div className="mt-space-md flex items-end gap-space-lg bg-surface-container-low px-space-md py-space-xs pt-space-sm">
-                  <div>
-                    <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
-                      Piyasa Değeri
-                    </span>
-                    <span className="font-headline text-headline-md font-extrabold text-primary">
-                      {formatMarketValue(topValued.marketValue)}
-                    </span>
-                  </div>
-                  <div className="h-8 w-px bg-surface-container-highest" />
-                  <div>
-                    <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
-                      Sezon
-                    </span>
-                    <span className="font-headline text-headline-sm font-bold text-secondary">
-                      {topValued.goals ?? 0} Gol • {topValued.assists ?? 0} Asist
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`relative h-48 w-full shrink-0 overflow-hidden bg-gradient-to-br ${topValued.tone} sm:h-auto sm:w-48`}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-5xl font-extrabold text-white/20">
-                    #{topValued.number || '—'}
-                  </span>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent sm:bg-gradient-to-r" />
-              </div>
-            </Link>
-          ) : null}
-
-          {mostCommented ? (
-            <Link
-              to={`/oyuncular/${mostCommented.id}`}
-              className="group relative flex flex-col items-stretch justify-between overflow-hidden bg-surface-container-lowest shadow-sm sm:flex-row md:col-span-6"
-            >
-              <div className="z-10 flex flex-1 flex-col justify-between p-space-lg">
-                <div className="flex flex-col gap-space-xs">
-                  <span className="w-fit bg-secondary px-space-xs py-0.5 font-kicker text-kicker font-bold tracking-widest text-on-secondary uppercase">
-                    EN ÇOK YORUMLANAN
-                  </span>
-                  <span className="font-kicker text-kicker font-bold text-primary uppercase">
-                    {mostCommented.positionLabel} • #{mostCommented.number || '—'}
-                  </span>
-                  <h3 className="font-headline mt-1 text-headline-md font-bold tracking-tight text-primary uppercase transition-colors group-hover:text-secondary">
-                    {mostCommented.name}
-                  </h3>
-                  <p className="font-body line-clamp-2 text-body-sm text-on-surface-variant">
-                    {mostCommented.description?.trim() ||
-                      'Tribünde en çok konuşulan A Takım oyuncularından.'}
-                  </p>
-                </div>
-                <div className="mt-space-md flex items-end gap-space-lg bg-surface-container-low px-space-md py-space-xs pt-space-sm">
-                  <div>
-                    <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
-                      Taraftar Puanı
-                    </span>
-                    <span className="font-headline flex items-center gap-1 text-headline-md font-extrabold text-tertiary-container">
-                      <span
-                        className="material-symbols-outlined text-headline-sm text-tertiary-fixed-dim"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        star
-                      </span>{' '}
-                      {mostCommented.rating.toFixed(1)}
-                    </span>
-                  </div>
-                  <div className="h-8 w-px bg-surface-container-highest" />
-                  <div>
-                    <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
-                      Tribün Güncesi
-                    </span>
-                    <span className="font-headline text-headline-sm font-bold text-primary">
-                      {mostCommented.commentCount.toLocaleString('tr-TR')} Yorum
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`relative h-48 w-full shrink-0 overflow-hidden bg-gradient-to-br ${mostCommented.tone} sm:h-auto sm:w-48`}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-5xl font-extrabold text-white/20">
-                    #{mostCommented.number || '—'}
-                  </span>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent sm:bg-gradient-to-r" />
-              </div>
-            </Link>
-          ) : null}
         </div>
       </div>
     </section>

@@ -10,7 +10,7 @@ export function PublicMemberProfileBreadcrumb({ profile }: PublicMemberProfileBr
   return (
     <div className="flex flex-wrap items-center justify-between gap-space-sm">
       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-space-md">
-        <PageBackButton to="/" label="Ana sayfaya dön" />
+        <PageBackButton to="/" label="Geri dön" preferHistory />
         <nav
           aria-label="Breadcrumb"
           className="font-label flex min-w-0 flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"

@@ -25,12 +25,7 @@ export function PlayerDirectoryPage() {
   const [page, setPage] = useState(1)
   const [players, setPlayers] = useState<PlayerCardData[]>([])
   const [totalCount, setTotalCount] = useState(0)
-  const [totalSquadValue, setTotalSquadValue] = useState(0)
-  const [activePlayerCount, setActivePlayerCount] = useState(0)
   const [lastUpdatedLabel, setLastUpdatedLabel] = useState('—')
-  const [seasonLabel, setSeasonLabel] = useState<string | null>(null)
-  const [topValued, setTopValued] = useState<PlayerCardData | null>(null)
-  const [mostCommented, setMostCommented] = useState<PlayerCardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -46,34 +41,19 @@ export function PlayerDirectoryPage() {
   useEffect(() => {
     let cancelled = false
 
-    async function loadSummaryAndHero() {
-      const [summaryResult, topValuedResult, mostCommentedResult] = await Promise.all([
-        playerService.getRosterOverview(),
-        playerService.getTopValued(1),
-        playerService.getMostCommented(1),
-      ])
+    async function loadOverview() {
+      const summaryResult = await playerService.getRosterOverview()
 
       if (cancelled) {
         return
       }
 
       if (summaryResult.success && summaryResult.data) {
-        setTotalSquadValue(summaryResult.data.totalMarketValue)
-        setActivePlayerCount(summaryResult.data.activePlayerCount)
         setLastUpdatedLabel(formatLastUpdated(summaryResult.data.lastUpdated))
-        setSeasonLabel(summaryResult.data.currentSeasonName ?? null)
-      }
-
-      if (topValuedResult.success && topValuedResult.data?.items?.[0]) {
-        setTopValued(mapPlayerToCardData(topValuedResult.data.items[0], 0))
-      }
-
-      if (mostCommentedResult.success && mostCommentedResult.data?.[0]) {
-        setMostCommented(mapPlayerToCardData(mostCommentedResult.data[0], 1))
       }
     }
 
-    void loadSummaryAndHero()
+    void loadOverview()
 
     return () => {
       cancelled = true
@@ -136,13 +116,7 @@ export function PlayerDirectoryPage() {
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
       <PlayerDirectoryBreadcrumb />
-      <PlayerDirectoryHero
-        totalSquadValue={totalSquadValue}
-        activePlayerCount={activePlayerCount}
-        seasonLabel={seasonLabel}
-        topValued={topValued}
-        mostCommented={mostCommented}
-      />
+      <PlayerDirectoryHero />
 
       <PlayerDirectoryFilters
         positionFilter={positionFilter}
@@ -167,9 +141,14 @@ export function PlayerDirectoryPage() {
               <h2 className="font-headline text-headline-md font-bold tracking-tight text-primary uppercase">
                 KADRO LİSTESİ
               </h2>
-              <span className="bg-surface-container-highest px-space-xs py-0.5 font-kicker text-kicker font-bold text-on-surface">
-                {totalCount} FUTBOLCU GÖSTERİLİYOR
-              </span>
+              <div className="flex items-center gap-space-xs bg-surface-container-highest px-space-sm py-0.5">
+                <span className="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">
+                  groups
+                </span>
+                <span className="font-kicker text-kicker font-bold text-on-surface uppercase">
+                  {totalCount} OYUNCU
+                </span>
+              </div>
             </div>
             <div className="font-label flex items-center gap-space-xs text-label-md text-on-surface-variant">
               <span className="material-symbols-outlined text-body-md text-secondary">sync</span>

@@ -74,7 +74,7 @@ export function SquadsGalleryHero() {
 
           <div className="flex w-full shrink-0 flex-col gap-space-sm lg:w-[28rem]">
             <div className="grid grid-cols-4 gap-space-sm">
-              <div className="col-span-1 flex flex-col justify-center bg-surface-container-low px-space-sm py-space-md sm:px-space-md">
+              <div className="col-span-1 flex h-36 flex-col justify-center bg-surface-container-low px-space-sm py-space-md sm:px-space-md">
                 <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
                   Toplam Kadro
                 </span>
@@ -89,7 +89,7 @@ export function SquadsGalleryHero() {
               {topSquadId ? (
                 <Link
                   to={`/kadrolar/${topSquadId}`}
-                  className="col-span-3 flex min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md transition-colors hover:bg-surface-container-high"
+                  className="col-span-3 flex h-36 min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md transition-colors hover:bg-surface-container-high"
                 >
                   <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
                     En Yüksek Puanlı
@@ -104,7 +104,7 @@ export function SquadsGalleryHero() {
                   </span>
                 </Link>
               ) : (
-                <div className="col-span-3 flex min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md">
+                <div className="col-span-3 flex h-36 min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md">
                   <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
                     En Yüksek Puanlı
                   </span>

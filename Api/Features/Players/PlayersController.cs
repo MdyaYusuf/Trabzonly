@@ -68,6 +68,18 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
+  [HttpGet("most-engaged/{count:int}")]
+  public async Task<IActionResult> GetMostEngagedPlayers(
+    int count,
+    CancellationToken cancellationToken)
+  {
+    var result = await _playerService.GetMostEngagedPlayersAsync(
+      count: count,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("top-rated/{count:int}")]
   public async Task<IActionResult> GetTopRatedPlayers(
     int count,

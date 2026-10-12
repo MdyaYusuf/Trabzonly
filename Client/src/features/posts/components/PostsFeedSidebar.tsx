@@ -94,17 +94,12 @@ export function PostsFeedSidebar() {
       </div>
 
       <div className="bg-surface-container-lowest p-space-md shadow-sm">
-        <div className="mb-space-sm flex items-center justify-between gap-space-xs">
-          <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-lg text-tertiary-fixed-dim">
-              hotel_class
-            </span>
-            <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
-              Öne Çıkan Yazarlar
-            </span>
-          </div>
-          <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-            Lider Tablosu
+        <div className="mb-space-sm flex items-center gap-space-xs">
+          <span className="material-symbols-outlined text-lg text-tertiary-fixed-dim">
+            hotel_class
+          </span>
+          <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
+            Öne Çıkan Yazarlar
           </span>
         </div>
 
@@ -121,45 +116,47 @@ export function PostsFeedSidebar() {
               const avatarTone = AVATAR_TONES[index % AVATAR_TONES.length]
 
               return (
-                <div
+                <Link
                   key={contributor.id}
-                  className="flex items-center justify-between gap-space-sm bg-surface-container p-space-xs"
+                  to={`/uyeler/${contributor.username}`}
+                  className="flex items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
                 >
-                  <div className="flex min-w-0 items-center gap-space-sm">
-                    <span
-                      className={[
-                        'font-headline shrink-0 text-label-md font-bold',
-                        rank === 1 ? 'text-tertiary-fixed-dim' : 'text-on-surface-variant',
-                      ].join(' ')}
-                    >
-                      #{rank}
-                    </span>
-                    <div
-                      className={[
-                        'flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden font-headline text-kicker font-bold',
-                        avatarTone,
-                      ].join(' ')}
-                    >
-                      {contributor.profileImageUrl ? (
-                        <img
-                          src={contributor.profileImageUrl}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        initialsFromUsername(contributor.username)
-                      )}
-                    </div>
-                    <div className="flex min-w-0 flex-col">
-                      <span className="font-label truncate text-label-md font-bold text-on-surface">
-                        @{contributor.username}
-                      </span>
-                      <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                        {contributor.postCount} gönderi · {contributor.totalLikeCount} beğeni
-                      </span>
-                    </div>
+                  <span
+                    className={[
+                      'font-headline shrink-0 text-label-md font-bold',
+                      rank === 1 ? 'text-tertiary-fixed-dim' : 'text-on-surface-variant',
+                    ].join(' ')}
+                  >
+                    #{rank}
+                  </span>
+                  <div
+                    className={[
+                      'flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden font-headline text-kicker font-bold',
+                      avatarTone,
+                    ].join(' ')}
+                  >
+                    {contributor.profileImageUrl ? (
+                      <img
+                        src={contributor.profileImageUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initialsFromUsername(contributor.username)
+                    )}
                   </div>
-                </div>
+                  <div className="flex min-w-0 flex-col gap-0.5">
+                    <span className="font-label truncate text-label-md font-bold text-secondary">
+                      @{contributor.username}
+                    </span>
+                    <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+                      {contributor.postCount} gönderi
+                    </span>
+                    <span className="font-body text-body-sm text-on-surface-variant">
+                      {contributor.totalLikeCount} beğeni
+                    </span>
+                  </div>
+                </Link>
               )
             })}
           </div>

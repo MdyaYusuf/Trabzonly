@@ -1,7 +1,6 @@
 export const PAGE_SIZE = 6
 
 export type GallerySortTab = 'newest' | 'topRated'
-export type GalleryViewMode = 'grid' | 'list'
 
 export type PitchPlayerTone = 'bordo' | 'mavi'
 

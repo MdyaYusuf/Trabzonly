@@ -5,18 +5,17 @@ import { SquadsGalleryCta } from '../components/SquadsGalleryCta'
 import { SquadsGalleryFilters } from '../components/SquadsGalleryFilters'
 import { SquadsGalleryHero } from '../components/SquadsGalleryHero'
 import { SquadsGalleryPagination } from '../components/SquadsGalleryPagination'
+import { SquadsGallerySidebar } from '../components/SquadsGallerySidebar'
 import squadService from '../squadService'
 import { mapSquadPreviewToGalleryCard } from '../utils/mapSquadToGalleryCard'
 import {
   PAGE_SIZE,
   type GallerySortTab,
-  type GalleryViewMode,
   type SquadGalleryCardData,
 } from '../utils/squadsGalleryTypes'
 
 export function SquadsGalleryPage() {
   const [sortTab, setSortTab] = useState<GallerySortTab>('newest')
-  const [viewMode, setViewMode] = useState<GalleryViewMode>('grid')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -83,59 +82,51 @@ export function SquadsGalleryPage() {
       <SquadsGalleryBreadcrumb />
       <SquadsGalleryHero />
 
-      <section className="mx-auto w-full max-w-[1360px] px-4 pb-space-xl sm:px-6 lg:px-12">
-        <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
-          <div className="flex flex-col lg:col-span-9">
-            {isLoading ? (
-              <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-                Kadrolar yükleniyor...
-              </p>
-            ) : squads.length === 0 ? (
-              <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-                Bu filtrelere uygun kadro bulunamadı.
-              </p>
-            ) : (
-              <div
-                className={
-                  viewMode === 'list'
-                    ? 'flex flex-col gap-gutter'
-                    : 'grid grid-cols-1 gap-gutter md:grid-cols-2'
-                }
-              >
-                {squads.map((squad) => (
-                  <SquadGalleryCard key={squad.id} squad={squad} listMode={viewMode === 'list'} />
-                ))}
-              </div>
-            )}
+      <SquadsGalleryFilters
+        sortTab={sortTab}
+        search={search}
+        onSortTabChange={(tab) => {
+          setSortTab(tab)
+          resetPage()
+        }}
+        onSearchChange={(value) => {
+          setSearch(value)
+          resetPage()
+        }}
+      />
 
-            <SquadsGalleryPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalCount={totalCount}
-              onPageChange={setPage}
-            />
-          </div>
+      <div className="w-full bg-background py-space-xl">
+        <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
+          <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
+            <div className="flex flex-col gap-space-lg lg:col-span-8">
+              {isLoading ? (
+                <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                  Kadrolar yükleniyor...
+                </p>
+              ) : squads.length === 0 ? (
+                <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                  Bu filtrelere uygun kadro bulunamadı.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+                  {squads.map((squad) => (
+                    <SquadGalleryCard key={squad.id} squad={squad} />
+                  ))}
+                </div>
+              )}
 
-          <div className="lg:col-span-3">
-            <SquadsGalleryFilters
-              sortTab={sortTab}
-              viewMode={viewMode}
-              search={search}
-              visibleCount={squads.length}
-              totalCount={totalCount}
-              onSortTabChange={(tab) => {
-                setSortTab(tab)
-                resetPage()
-              }}
-              onViewModeChange={setViewMode}
-              onSearchChange={(value) => {
-                setSearch(value)
-                resetPage()
-              }}
-            />
+              <SquadsGalleryPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={totalCount}
+                onPageChange={setPage}
+              />
+            </div>
+
+            <SquadsGallerySidebar />
           </div>
         </div>
-      </section>
+      </div>
 
       <SquadsGalleryCta />
     </main>

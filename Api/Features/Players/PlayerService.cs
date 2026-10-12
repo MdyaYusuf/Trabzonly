@@ -197,6 +197,30 @@ public class PlayerService(
     };
   }
 
+  public async Task<ReturnModel<List<PlayerResponseDto>>> GetMostEngagedPlayersAsync(
+    int count,
+    CancellationToken cancellationToken = default)
+  {
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+
+    List<Player> players = await _playerRepository.GetMostEngagedPlayersAsync(
+      count,
+      include: BuildDefaultInclude(currentSeasonId),
+      enableTracking: false,
+      withDeleted: false,
+      cancellationToken: cancellationToken);
+
+    List<PlayerResponseDto> response = await MapPlayersAsync(players, cancellationToken);
+
+    return new ReturnModel<List<PlayerResponseDto>>()
+    {
+      Success = true,
+      Message = "En çok etkileşim alan oyuncular başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<List<PlayerResponseDto>>> GetTopRatedPlayersAsync(
     int count,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,

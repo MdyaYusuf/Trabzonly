@@ -95,6 +95,12 @@ const getMostCommented = async (
   return await apiClient<PlayerResponseDto[]>(`${API_URL}/most-commented/${count}`)
 }
 
+const getMostEngaged = async (
+  count: number,
+): Promise<ApiResponse<PlayerResponseDto[]>> => {
+  return await apiClient<PlayerResponseDto[]>(`${API_URL}/most-engaged/${count}`)
+}
+
 const getTopRated = async (count: number): Promise<ApiResponse<PlayerResponseDto[]>> => {
   return await apiClient<PlayerResponseDto[]>(`${API_URL}/top-rated/${count}`)
 }
@@ -139,6 +145,7 @@ const playerService = {
   getById,
   getTopValued,
   getMostCommented,
+  getMostEngaged,
   getTopRated,
   add,
   update,

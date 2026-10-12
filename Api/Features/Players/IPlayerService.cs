@@ -45,6 +45,10 @@ public interface IPlayerService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<PlayerResponseDto>>> GetMostEngagedPlayersAsync(
+    int count,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<List<PlayerResponseDto>>> GetTopRatedPlayersAsync(
     int count,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,

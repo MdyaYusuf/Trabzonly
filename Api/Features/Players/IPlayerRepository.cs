@@ -20,6 +20,13 @@ public interface IPlayerRepository : IRepository<Player, int>
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<List<Player>> GetMostEngagedPlayersAsync(
+    int count,
+    Func<IQueryable<Player>, IQueryable<Player>>? include = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default);
+
   Task<List<Player>> GetTopRatedPlayersAsync(
     int count,
     Func<IQueryable<Player>, IQueryable<Player>>? include = null,
