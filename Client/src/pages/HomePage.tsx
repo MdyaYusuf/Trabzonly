@@ -11,7 +11,7 @@ import type { SquadPreviewDto } from '../features/squads/squadTypes'
 import userService from '../features/users/userService'
 import type { UserPreviewDto } from '../features/users/userTypes'
 
-const HERO_BG = '/assets/background.jpeg'
+const HERO_BG = '/assets/backgrounds/home-page.jpeg'
 
 const PLAYER_TONES = [
   'from-[#5A0E27] to-[#1A040B]',

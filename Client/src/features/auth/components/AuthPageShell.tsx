@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { metricsService } from '@/features/metrics/metricsService'
 import type { ShellMetricsDto } from '@/features/metrics/metricsTypes'
 
-const HERO_BG = '/assets/background.jpeg'
+const HERO_BG = '/assets/backgrounds/home-page.jpeg'
 
 type ShellStat = {
   kicker: string

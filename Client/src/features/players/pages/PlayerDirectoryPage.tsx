@@ -5,6 +5,7 @@ import { PlayerDirectoryCta } from '../components/PlayerDirectoryCta'
 import { PlayerDirectoryFilters } from '../components/PlayerDirectoryFilters'
 import { PlayerDirectoryHero } from '../components/PlayerDirectoryHero'
 import { PlayerDirectoryPagination } from '../components/PlayerDirectoryPagination'
+import { PlayerDirectorySidebar } from '../components/PlayerDirectorySidebar'
 import playerService from '../playerService'
 import {
   formatLastUpdated,
@@ -135,51 +136,57 @@ export function PlayerDirectoryPage() {
 
       <section id="kadro-listesi" className="w-full bg-background py-space-xl">
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
-          <div className="mb-space-lg flex flex-col items-start justify-between gap-space-sm pb-space-md sm:flex-row sm:items-center">
-            <div className="flex flex-wrap items-center gap-space-sm">
-              <span className="inline-block h-3 w-3 bg-primary" />
-              <h2 className="font-headline text-headline-md font-bold tracking-tight text-primary uppercase">
-                KADRO LİSTESİ
-              </h2>
-              <div className="flex items-center gap-space-xs bg-surface-container-highest px-space-sm py-0.5">
-                <span className="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">
-                  groups
-                </span>
-                <span className="font-kicker text-kicker font-bold text-on-surface uppercase">
-                  {totalCount} OYUNCU
-                </span>
+          <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
+            <div className="flex flex-col gap-space-lg lg:col-span-8">
+              <div className="flex flex-col items-start justify-between gap-space-sm pb-space-md sm:flex-row sm:items-center">
+                <div className="flex flex-wrap items-center gap-space-sm">
+                  <span className="inline-block h-3 w-3 bg-primary" />
+                  <h2 className="font-headline text-headline-md font-bold tracking-tight text-primary uppercase">
+                    KADRO LİSTESİ
+                  </h2>
+                  <div className="flex items-center gap-space-xs bg-surface-container-highest px-space-sm py-0.5">
+                    <span className="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">
+                      groups
+                    </span>
+                    <span className="font-kicker text-kicker font-bold text-on-surface uppercase">
+                      {totalCount} OYUNCU
+                    </span>
+                  </div>
+                </div>
+                <div className="font-label flex items-center gap-space-xs text-label-md text-on-surface-variant">
+                  <span className="material-symbols-outlined text-body-md text-secondary">sync</span>
+                  <span>Son Güncelleme: {lastUpdatedLabel}</span>
+                </div>
               </div>
+
+              {isLoading ? (
+                <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                  Oyuncular yükleniyor...
+                </p>
+              ) : players.length === 0 ? (
+                <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                  Bu filtrelere uygun oyuncu bulunamadı.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+                  {players.map((player) => (
+                    <PlayerCard key={player.id} player={player} />
+                  ))}
+                </div>
+              )}
+
+              <PlayerDirectoryPagination
+                filteredCount={totalCount}
+                rangeStart={rangeStart}
+                rangeEnd={rangeEnd}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setPage}
+              />
             </div>
-            <div className="font-label flex items-center gap-space-xs text-label-md text-on-surface-variant">
-              <span className="material-symbols-outlined text-body-md text-secondary">sync</span>
-              <span>Son Güncelleme: {lastUpdatedLabel}</span>
-            </div>
+
+            <PlayerDirectorySidebar />
           </div>
-
-          {isLoading ? (
-            <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-              Oyuncular yükleniyor...
-            </p>
-          ) : players.length === 0 ? (
-            <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-              Bu filtrelere uygun oyuncu bulunamadı.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {players.map((player) => (
-                <PlayerCard key={player.id} player={player} />
-              ))}
-            </div>
-          )}
-
-          <PlayerDirectoryPagination
-            filteredCount={totalCount}
-            rangeStart={rangeStart}
-            rangeEnd={rangeEnd}
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={setPage}
-          />
         </div>
       </section>
 

@@ -42,7 +42,7 @@ const getAll = async (
   const queryParams = new URLSearchParams()
 
   queryParams.set('pageNumber', String(query.pageNumber ?? 1))
-  queryParams.set('pageSize', String(query.pageSize ?? 12))
+  queryParams.set('pageSize', String(query.pageSize ?? 6))
 
   if (query.search?.trim()) {
     queryParams.set('search', query.search.trim())

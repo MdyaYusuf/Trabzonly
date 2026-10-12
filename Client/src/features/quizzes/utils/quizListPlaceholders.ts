@@ -51,7 +51,6 @@ export const featuredQuiz: QuizFeatured = {
   rating: 4.9,
   ratingCount: 2840,
   friendsLabel: '12 arkadaşın çözdü',
-  imageUrl: '/assets/posts/post-related-crowd.png',
 }
 
 export const placeholderQuizzes: QuizListCard[] = [

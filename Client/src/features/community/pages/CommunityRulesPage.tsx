@@ -6,7 +6,7 @@ import {
   type CommunityRuleSection,
 } from '@/features/community/utils/communityRulesContent'
 
-const HERO_BG = '/assets/background.jpeg'
+const HERO_BG = '/assets/backgrounds/home-page.jpeg'
 
 function RuleArticle({ section }: { section: CommunityRuleSection }) {
   const listClassName = section.fullWidth

@@ -63,7 +63,7 @@ export function PostDetailSidebar({
 
   return (
     <aside className="flex flex-col gap-space-lg lg:col-span-4">
-      <div className="bg-surface-container-lowest p-space-md shadow-sm">
+      <div className="flex flex-col bg-surface-container-lowest p-space-md shadow-sm">
         <div className="mb-space-sm flex items-center gap-space-xs">
           <span className="material-symbols-outlined text-lg text-secondary">shield</span>
           <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
@@ -89,8 +89,9 @@ export function PostDetailSidebar({
         </ul>
         <Link
           to="/topluluk-kurallari"
-          className="font-label mt-space-md inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
+          className="font-label mt-space-md ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
         >
+          <span className="material-symbols-outlined text-base">menu_book</span>
           <span>Tüm topluluk kuralları</span>
           <span className="material-symbols-outlined text-base">arrow_forward</span>
         </Link>

@@ -1,4 +1,5 @@
 import type { PlayerResponseDto } from '../playerTypes'
+import { getNationalityFlagUrl } from './nationalityFlag'
 import type { PlayerCardData, PlayerCardStat, PositionGroup } from './playerDirectoryTypes'
 
 const CARD_TONES = [
@@ -68,6 +69,7 @@ export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): Playe
     badge: player.isCaptain ? { label: 'KAPTAN', tone: 'bordo' } : undefined,
     stats: buildCardStats(player),
     tone: CARD_TONES[index % CARD_TONES.length],
+    flagUrl: getNationalityFlagUrl(player.nationality),
     commentCount: player.commentCount,
     description: player.description,
     goals: player.currentSeasonStats?.goals,

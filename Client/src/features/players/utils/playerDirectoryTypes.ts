@@ -22,10 +22,11 @@ export type PlayerCardData = {
   badge?: { label: string; tone: 'bordo' | 'mavi' | 'neutral' }
   stats: PlayerCardStat[]
   tone: string
+  flagUrl?: string | null
   commentCount: number
   description?: string | null
   goals?: number
   assists?: number
 }
 
-export const PAGE_SIZE = 12
+export const PAGE_SIZE = 6
