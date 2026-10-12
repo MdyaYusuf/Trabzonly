@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
 import { quizListStats } from '../utils/quizListPlaceholders'
 
 export function QuizListHero() {
@@ -9,9 +9,7 @@ export function QuizListHero() {
           aria-label="Breadcrumb"
           className="font-label flex items-center gap-space-xs text-label-md text-on-surface-variant"
         >
-          <Link to="/" className="transition-colors hover:text-primary">
-            Ana Sayfa
-          </Link>
+          <PageBreadcrumbHome />
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="font-bold text-primary">Quizler</span>
         </nav>

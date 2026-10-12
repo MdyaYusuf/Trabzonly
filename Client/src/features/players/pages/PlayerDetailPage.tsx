@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { PlayerCommentsSection } from '../components/PlayerCommentsSection'
+import { PlayerDetailBreadcrumb } from '../components/PlayerDetailBreadcrumb'
 import { PlayerDetailHero } from '../components/PlayerDetailHero'
 import { PlayerDetailSidebar } from '../components/PlayerDetailSidebar'
 import { PlayerInjurySection } from '../components/PlayerInjurySection'
@@ -114,11 +115,12 @@ export function PlayerDetailPage() {
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-      <PlayerDetailHero
-        player={player}
+      <PlayerDetailBreadcrumb
+        playerName={player.name}
         seasonLabel={player.currentSeasonStats?.seasonName}
-        onRate={handleRate}
+        currentTeam={player.currentTeam}
       />
+      <PlayerDetailHero player={player} onRate={handleRate} />
 
       <div className="mx-auto w-full max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
         <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">

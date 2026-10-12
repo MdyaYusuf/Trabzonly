@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { formatMarketValue } from '../utils/formatMarketValue'
 import type { PlayerResponseDto } from '../playerTypes'
 
@@ -53,15 +52,10 @@ function formatVoteCount(count: number) {
 
 type PlayerDetailHeroProps = {
   player: PlayerResponseDto
-  seasonLabel?: string | null
   onRate: (score: number) => Promise<boolean>
 }
 
-export function PlayerDetailHero({
-  player,
-  seasonLabel,
-  onRate,
-}: PlayerDetailHeroProps) {
+export function PlayerDetailHero({ player, onRate }: PlayerDetailHeroProps) {
   const [isRatingOpen, setIsRatingOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const tone = CARD_TONES[player.name.length % CARD_TONES.length]
@@ -84,30 +78,6 @@ export function PlayerDetailHero({
 
   return (
     <>
-      <div className="border-b border-border-subtle bg-surface-container-low">
-        <div className="mx-auto flex max-w-[1360px] flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-12">
-          <Link
-            to="/oyuncular"
-            className="font-label inline-flex items-center gap-1 text-label-md font-bold tracking-wider text-primary uppercase transition-colors hover:text-secondary"
-          >
-            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-            Tüm Kadroya Dön
-          </Link>
-          <div className="font-kicker flex flex-wrap items-center gap-space-sm text-kicker tracking-wider text-on-surface-variant uppercase">
-            <span>
-              SEZON:{' '}
-              <strong className="text-primary">
-                {seasonLabel?.trim() || player.currentSeasonStats?.seasonName || '—'}
-              </strong>
-            </span>
-            <span className="text-outline-variant">•</span>
-            <span>
-              TAKIM: <strong className="text-primary">{player.currentTeam}</strong>
-            </span>
-          </div>
-        </div>
-      </div>
-
       <section className="relative w-full overflow-hidden bg-primary text-on-primary">
         <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary-container to-primary opacity-95" />
         <div className="pointer-events-none absolute -right-20 -bottom-32 h-[550px] w-[550px] rounded-full bg-secondary-container opacity-10 blur-3xl" />

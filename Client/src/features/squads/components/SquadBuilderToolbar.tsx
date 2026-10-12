@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { PageBackButton } from '@/core/components/PageBackButton'
+import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
 import type { BuilderFormationId } from '../utils/squadBuilderTypes'
 import { formationConfigs } from '../utils/squadBuilderPlaceholders'
 
@@ -26,16 +28,20 @@ export function SquadBuilderToolbar({
   return (
     <section className="w-full bg-surface py-space-md">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-md px-4 sm:px-6 lg:px-12">
-        <div className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant">
-          <Link to="/" className="transition-colors hover:text-primary">
-            Ana Sayfa
-          </Link>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <Link to="/kadrolar" className="transition-colors hover:text-primary">
-            Kadrolar
-          </Link>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="font-bold text-primary">Kadro Oluştur & Taktik Tahtası</span>
+        <div className="flex flex-wrap items-center gap-space-md">
+          <PageBackButton to="/kadrolar" label="Kadrolar listesine dön" />
+          <nav
+            aria-label="Breadcrumb"
+            className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
+          >
+            <PageBreadcrumbHome />
+            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+            <Link to="/kadrolar" className="transition-colors hover:text-primary">
+              Kadrolar
+            </Link>
+            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span className="font-bold text-primary">Kadro Oluştur & Taktik Tahtası</span>
+          </nav>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-space-md lg:flex-nowrap">

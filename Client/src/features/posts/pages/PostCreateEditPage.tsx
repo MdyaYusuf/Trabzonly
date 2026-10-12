@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import categoryService from '../../categories/categoryService'
 import type { CategoryResponseDto } from '../../categories/categoryTypes'
+import { PostEditorBreadcrumb } from '../components/PostEditorBreadcrumb'
 import { PostEditorForm } from '../components/PostEditorForm'
 import { PostEditorSidebar } from '../components/PostEditorSidebar'
 import postService from '../postService'
@@ -224,23 +225,7 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-      <div className="w-full bg-surface-container-low">
-        <div className="mx-auto flex max-w-[1360px] items-center justify-between px-4 py-space-sm sm:px-6 lg:px-12">
-          <div className="flex items-center gap-space-xs text-on-surface-variant">
-            <Link
-              to="/gonderiler"
-              className="font-label flex items-center gap-1 text-label-md font-bold text-primary transition-colors hover:text-primary"
-            >
-              <span className="material-symbols-outlined text-sm">arrow_back</span>
-              <span>Gönderilere Dön</span>
-            </Link>
-            <span className="text-outline-variant">/</span>
-            <span className="font-label text-label-md text-on-surface-variant">
-              {mode === 'edit' ? 'Gönderiyi Düzenle' : 'Yeni Gönderi Oluştur'}
-            </span>
-          </div>
-        </div>
-      </div>
+      <PostEditorBreadcrumb mode={mode} />
 
       <div className="w-full bg-surface-container-lowest">
         <div className="mx-auto max-w-[1360px] px-4 py-space-lg sm:px-6 lg:px-12">

@@ -1,5 +1,7 @@
 import { useRef } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import { PageBackButton } from '@/core/components/PageBackButton'
+import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
 import { QuizResultActions } from '../components/QuizResultActions'
 import { QuizResultAnalysis } from '../components/QuizResultAnalysis'
 import { QuizResultHero } from '../components/QuizResultHero'
@@ -23,27 +25,28 @@ export function QuizResultPage() {
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
       <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
         <div className="flex flex-wrap items-center justify-between gap-space-sm">
-          <nav
-            aria-label="Breadcrumb"
-            className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
-          >
-            <Link to="/" className="transition-colors hover:text-primary">
-              Ana Sayfa
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <Link to="/quizler" className="transition-colors hover:text-primary">
-              Quizler
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <Link
-              to={`/quizler/${result.quizId}`}
-              className="transition-colors hover:text-primary"
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-space-md">
+            <PageBackButton to="/quizler" label="Quiz listesine dön" />
+            <nav
+              aria-label="Breadcrumb"
+              className="font-label flex min-w-0 flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
             >
-              {result.breadcrumbTitle}
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="font-bold text-primary">Sonuç Özeti</span>
-          </nav>
+              <PageBreadcrumbHome />
+              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+              <Link to="/quizler" className="transition-colors hover:text-primary">
+                Quizler
+              </Link>
+              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+              <Link
+                to={`/quizler/${result.quizId}`}
+                className="transition-colors hover:text-primary"
+              >
+                {result.breadcrumbTitle}
+              </Link>
+              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span className="font-bold text-primary">Sonuç Özeti</span>
+            </nav>
+          </div>
           <span className="font-kicker flex items-center gap-1 bg-surface-container px-space-md py-1 text-kicker text-primary uppercase">
             <span className="h-2 w-2 rounded-full bg-secondary-container" />
             {result.statusLabel}

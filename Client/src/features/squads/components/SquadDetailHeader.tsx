@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { PageBackButton } from '@/core/components/PageBackButton'
 import { useAppSelector } from '@/core/store/hooks'
 import userService from '@/features/users/userService'
 import type { SquadDetailViewModel } from '../utils/squadDetailTypes'
@@ -118,21 +117,18 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
       <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
         <div className="flex flex-col justify-between gap-space-lg lg:flex-row lg:items-start">
           <div className="flex flex-1 flex-col gap-space-md">
-            <div className="flex flex-wrap items-center gap-space-md">
-              <PageBackButton to="/kadrolar" label="Kadrolar listesine dön" />
-              <div className="flex flex-wrap items-center gap-space-sm">
-                <span className="font-kicker flex items-center gap-1 bg-primary-container px-space-sm py-1 text-kicker tracking-widest text-on-primary uppercase">
-                  <span className="h-1.5 w-1.5 rounded-full bg-tertiary-fixed-dim" />
-                  {squad.formation}
-                </span>
-                <span className="font-label bg-secondary-container px-space-sm py-1 text-label-md font-bold text-on-secondary-container">
-                  Taraftar Analizi
-                </span>
-                <span className="font-kicker flex items-center gap-1 bg-surface-container-high px-space-sm py-1 text-kicker font-semibold text-on-surface-variant uppercase">
-                  <span className="material-symbols-outlined text-[14px]">groups</span>
-                  Topluluk Kadrosu
-                </span>
-              </div>
+            <div className="flex flex-wrap items-center gap-space-sm">
+              <span className="font-kicker flex items-center gap-1 bg-primary-container px-space-sm py-1 text-kicker tracking-widest text-on-primary uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-tertiary-fixed-dim" />
+                {squad.formation}
+              </span>
+              <span className="font-label bg-secondary-container px-space-sm py-1 text-label-md font-bold text-on-secondary-container">
+                Taraftar Analizi
+              </span>
+              <span className="font-kicker flex items-center gap-1 bg-surface-container-high px-space-sm py-1 text-kicker font-semibold text-on-surface-variant uppercase">
+                <span className="material-symbols-outlined text-[14px]">groups</span>
+                Topluluk Kadrosu
+              </span>
             </div>
 
             <h1 className="font-display max-w-4xl text-headline-lg leading-none font-extrabold tracking-tight text-primary uppercase lg:text-display-xl">

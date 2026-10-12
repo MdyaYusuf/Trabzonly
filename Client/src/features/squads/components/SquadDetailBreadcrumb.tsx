@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { PageBackButton } from '@/core/components/PageBackButton'
+import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
 
 type SquadDetailBreadcrumbProps = {
   title: string
@@ -6,27 +8,21 @@ type SquadDetailBreadcrumbProps = {
 
 export function SquadDetailBreadcrumb({ title }: SquadDetailBreadcrumbProps) {
   return (
-    <div className="w-full bg-surface-container-low px-4 py-space-sm sm:px-6 lg:px-12">
-      <div className="mx-auto flex max-w-[1360px] items-center justify-between gap-space-md">
+    <div className="w-full bg-surface-container-low">
+      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-space-md px-4 py-space-sm sm:px-6 lg:px-12">
+        <PageBackButton to="/kadrolar" label="Kadrolar listesine dön" />
         <nav
           aria-label="Breadcrumb"
-          className="font-label flex min-w-0 items-center gap-space-xs text-label-md text-on-surface-variant"
+          className="font-label flex min-w-0 flex-1 flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
         >
-          <Link to="/" className="flex items-center gap-1 transition-colors hover:text-primary">
-            <span className="material-symbols-outlined text-[16px]">home</span>
-            <span>Ana Sayfa</span>
-          </Link>
-          <span className="font-stat text-[10px] text-outline-variant">&gt;</span>
+          <PageBreadcrumbHome />
+          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <Link to="/kadrolar" className="transition-colors hover:text-primary">
-            Kadrolar & Taktik Galerisi
+            Kadrolar
           </Link>
-          <span className="font-stat text-[10px] text-outline-variant">&gt;</span>
+          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="max-w-md truncate font-bold text-primary">{title}</span>
         </nav>
-        <div className="font-kicker hidden items-center gap-space-sm text-kicker tracking-wider text-on-surface-variant uppercase md:flex">
-          <span className="inline-block h-2 w-2 rounded-full bg-secondary" />
-          <span>Süper Lig Analiz Arşivi</span>
-        </div>
       </div>
     </div>
   )

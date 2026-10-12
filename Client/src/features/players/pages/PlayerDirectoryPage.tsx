@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { PlayerCard } from '../components/PlayerCard'
+import { PlayerDirectoryBreadcrumb } from '../components/PlayerDirectoryBreadcrumb'
 import { PlayerDirectoryCta } from '../components/PlayerDirectoryCta'
 import { PlayerDirectoryFilters } from '../components/PlayerDirectoryFilters'
 import { PlayerDirectoryHero } from '../components/PlayerDirectoryHero'
@@ -134,6 +135,7 @@ export function PlayerDirectoryPage() {
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
+      <PlayerDirectoryBreadcrumb />
       <PlayerDirectoryHero
         totalSquadValue={totalSquadValue}
         activePlayerCount={activePlayerCount}

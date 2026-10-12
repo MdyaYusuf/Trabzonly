@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import categoryService from '../../categories/categoryService'
 import type { CategoryResponseDto } from '../../categories/categoryTypes'
 import { PostCard } from '../components/PostCard'
+import { PostsFeedBreadcrumb } from '../components/PostsFeedBreadcrumb'
 import { PostsFeedFilters } from '../components/PostsFeedFilters'
 import { PostsFeedHero } from '../components/PostsFeedHero'
 import { PostsFeedPagination } from '../components/PostsFeedPagination'
@@ -101,6 +102,7 @@ export function PostsFeedPage() {
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
+      <PostsFeedBreadcrumb />
       <PostsFeedHero />
 
       <PostsFeedFilters
