@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, ScrollRestoration } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAppDispatch } from './core/store/hooks'
@@ -34,6 +34,7 @@ function App() {
 
   return (
     <>
+      <ScrollRestoration />
       <Outlet />
       <ToastContainer position="bottom-right" />
     </>

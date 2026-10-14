@@ -131,7 +131,7 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
               </span>
             </div>
 
-            <h1 className="font-display max-w-4xl text-headline-lg leading-none font-extrabold tracking-tight text-primary uppercase lg:text-display-xl">
+            <h1 className="font-display max-w-4xl text-headline-lg leading-[1.05] font-extrabold tracking-tight text-primary uppercase">
               {squad.title}
             </h1>
 

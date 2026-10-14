@@ -41,7 +41,7 @@ function DetailSlotCard({
   if (!player) {
     return (
       <div className="relative flex flex-col items-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-dashed border-white/50 bg-black/20 shadow-lg">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-white/50 bg-black/20 shadow-lg">
           <span className="material-symbols-outlined text-[24px] text-white/70">person</span>
         </div>
         <div className="mt-1 bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
@@ -59,7 +59,7 @@ function DetailSlotCard({
   return (
     <div className="group relative flex flex-col items-center transition-transform hover:scale-105">
       <div
-        className={`relative h-14 w-14 rounded-full p-0.5 shadow-lg ring-2 ${
+        className={`relative h-12 w-12 rounded-full p-0.5 shadow-lg ring-2 ${
           isGk
             ? 'bg-tertiary ring-tertiary-fixed group-hover:ring-white'
             : 'bg-primary-container ring-white/60 group-hover:ring-secondary-container'

@@ -204,7 +204,7 @@ function SlotCard({
           }`}
         >
           <div
-            className={`flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed shadow-lg ${
+            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-dashed shadow-lg ${
               isDropTarget || isPickerOpen
                 ? 'border-secondary-container bg-secondary-container/30'
                 : 'border-white/50 bg-black/20'
@@ -255,7 +255,7 @@ function SlotCard({
       onDrop={onDropOnSlot}
     >
       <div
-        className={`relative h-16 w-16 cursor-grab rounded-full p-1 shadow-lg ring-2 active:cursor-grabbing ${
+        className={`relative h-14 w-14 cursor-grab rounded-full p-1 shadow-lg ring-2 active:cursor-grabbing ${
           isGk
             ? 'bg-tertiary ring-tertiary-fixed group-hover:ring-white'
             : 'bg-primary-container ring-white/60 group-hover:ring-secondary-container'
@@ -364,7 +364,7 @@ export function SquadBuilderPitch({
   const upwardPickerFromRow = Math.max(0, formation.rows.length - 2)
 
   return (
-    <div className="relative h-full min-h-[600px] w-full flex-1 select-none overflow-visible bg-[#1e4a2c] shadow-xl sm:min-h-[660px] md:min-h-[700px]">
+    <div className="relative min-h-[600px] w-full select-none overflow-visible bg-[#1e4a2c] shadow-xl sm:min-h-[660px] md:min-h-[700px]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#183c24] via-[#1f4e2d] to-[#153520] opacity-95" />
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03)_50%,transparent_50%)] bg-[length:100%_48px]" />
@@ -405,7 +405,7 @@ export function SquadBuilderPitch({
         </span>
       </div>
 
-      <div className="relative z-20 flex h-full min-h-[600px] w-full flex-col justify-between overflow-visible p-3 sm:min-h-[660px] sm:p-4 md:min-h-[700px]">
+      <div className="relative z-20 flex min-h-[600px] w-full flex-col justify-between overflow-visible p-3 sm:min-h-[660px] sm:p-4 md:min-h-[700px]">
         {formation.rows.map((row, rowIndex) => {
           const isFirst = rowIndex === 0
           const isLast = rowIndex === formation.rows.length - 1

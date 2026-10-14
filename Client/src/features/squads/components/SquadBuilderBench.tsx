@@ -84,8 +84,8 @@ export function SquadBuilderBench({
                 {...dropHandlers}
                 className={
                   isDropTarget
-                    ? 'group relative flex h-full min-h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary bg-primary-container/20 p-2 shadow-sm ring-2 ring-primary active:cursor-grabbing'
-                    : 'group relative flex h-full min-h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary/40 bg-primary-container/10 p-2 shadow-sm active:cursor-grabbing'
+                    ? 'group relative flex h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary bg-primary-container/20 p-2 shadow-sm ring-2 ring-primary active:cursor-grabbing'
+                    : 'group relative flex h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary/40 bg-primary-container/10 p-2 shadow-sm active:cursor-grabbing'
                 }
               >
                 <span className="font-kicker text-[10px] font-bold text-primary uppercase">
@@ -125,8 +125,8 @@ export function SquadBuilderBench({
               {...dropHandlers}
               className={
                 isDropTarget
-                  ? 'flex h-full min-h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-primary bg-transparent p-2 ring-2 ring-primary'
-                  : 'flex h-full min-h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-outline-variant/40 bg-transparent p-2 opacity-70 transition-colors'
+                  ? 'flex h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-primary bg-transparent p-2 ring-2 ring-primary'
+                  : 'flex h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-outline-variant/40 bg-transparent p-2 opacity-70 transition-colors'
               }
             >
               <span className="font-kicker text-[10px] font-bold text-on-surface-variant/80 uppercase">

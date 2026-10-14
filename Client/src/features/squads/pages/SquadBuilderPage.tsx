@@ -460,7 +460,7 @@ export function SquadBuilderPage() {
       ) : null}
 
       <section className="mx-auto w-full max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
-        <div className="flex flex-col gap-gutter lg:flex-row lg:items-stretch">
+        <div className="flex flex-col gap-gutter lg:flex-row lg:items-start">
           <div className="flex min-w-0 flex-col gap-space-md lg:w-7/12 lg:shrink-0">
             <SquadBuilderTactics
               attackStyle={attackStyle}

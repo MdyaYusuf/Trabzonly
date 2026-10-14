@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { PlayerCommentsSection } from '../components/PlayerCommentsSection'
 import { PlayerDetailBreadcrumb } from '../components/PlayerDetailBreadcrumb'
 import { PlayerDetailHero } from '../components/PlayerDetailHero'
+import { PlayerDetailRatingBar } from '../components/PlayerDetailRatingBar'
 import { PlayerDetailSidebar } from '../components/PlayerDetailSidebar'
 import { PlayerInjurySection } from '../components/PlayerInjurySection'
 import { PlayerSeasonStatsSection } from '../components/PlayerSeasonStatsSection'
@@ -54,35 +55,6 @@ export function PlayerDetailPage() {
     }
   }, [playerId])
 
-  async function handleRate(score: number) {
-    if (!player) {
-      return false
-    }
-
-    const result = await playerService.rate(player.id, { score })
-
-    if (!result.success || !result.data) {
-      return false
-    }
-
-    const data = result.data
-
-    setPlayer((current) => {
-      if (!current) {
-        return current
-      }
-
-      return {
-        ...current,
-        averageRating: data.averageRating,
-        ratingCount: data.ratingCount,
-        currentUserScore: data.score,
-      }
-    })
-
-    return true
-  }
-
   if (isLoading) {
     return (
       <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
@@ -120,7 +92,27 @@ export function PlayerDetailPage() {
         seasonLabel={player.currentSeasonStats?.seasonName}
         currentTeam={player.currentTeam}
       />
-      <PlayerDetailHero player={player} onRate={handleRate} />
+      <PlayerDetailHero player={player} />
+      <PlayerDetailRatingBar
+        playerId={player.id}
+        averageRating={player.averageRating}
+        ratingCount={player.ratingCount}
+        currentUserScore={player.currentUserScore}
+        onRated={(averageRating, ratingCount, score) => {
+          setPlayer((current) => {
+            if (!current) {
+              return current
+            }
+
+            return {
+              ...current,
+              averageRating,
+              ratingCount,
+              currentUserScore: score,
+            }
+          })
+        }}
+      />
 
       <div className="mx-auto w-full max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
         <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">

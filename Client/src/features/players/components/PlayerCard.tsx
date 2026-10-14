@@ -33,7 +33,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
     >
       <div
         className={[
-          'relative h-40 w-full shrink-0 overflow-hidden',
+          'relative h-48 w-full shrink-0 overflow-hidden',
           showFlag ? 'bg-surface-container' : `bg-gradient-to-br ${player.tone}`,
         ].join(' ')}
       >

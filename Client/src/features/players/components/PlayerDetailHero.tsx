@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { formatMarketValue } from '../utils/formatMarketValue'
+import { getNationalityFlagUrl } from '../utils/nationalityFlag'
 import type { PlayerResponseDto } from '../playerTypes'
 
 const CARD_TONES = [
@@ -52,29 +53,17 @@ function formatVoteCount(count: number) {
 
 type PlayerDetailHeroProps = {
   player: PlayerResponseDto
-  onRate: (score: number) => Promise<boolean>
 }
 
-export function PlayerDetailHero({ player, onRate }: PlayerDetailHeroProps) {
-  const [isRatingOpen, setIsRatingOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
+  const [flagFailed, setFlagFailed] = useState(false)
   const tone = CARD_TONES[player.name.length % CARD_TONES.length]
-  const shirtNumber = player.shirtNumber ?? '—'
-  const positionLabel = `${player.positionName.toUpperCase()} / NO: ${shirtNumber}`
-
-  async function handleScoreSelect(score: number) {
-    if (isSubmitting) {
-      return
-    }
-
-    setIsSubmitting(true)
-    const ok = await onRate(score)
-    setIsSubmitting(false)
-
-    if (ok) {
-      setIsRatingOpen(false)
-    }
-  }
+  const shirtLabel =
+    player.shirtNumber != null && player.shirtNumber > 0 ? `#${player.shirtNumber}` : '—'
+  const positionLabel = `${player.positionName.toUpperCase()} / NO: ${player.shirtNumber != null && player.shirtNumber > 0 ? player.shirtNumber : '—'
+    }`
+  const flagUrl = getNationalityFlagUrl(player.nationality)
+  const showFlag = !player.imageUrl && Boolean(flagUrl) && !flagFailed
 
   return (
     <>
@@ -84,28 +73,38 @@ export function PlayerDetailHero({ player, onRate }: PlayerDetailHeroProps) {
         <div className="pointer-events-none absolute top-1/4 left-1/4 h-[350px] w-[350px] rounded-full bg-secondary opacity-15 blur-2xl" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] opacity-5 [background-size:24px_24px]" />
 
-        <div className="relative z-10 mx-auto max-w-[1360px] px-4 pt-space-lg pb-space-xl sm:px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1360px] px-4 pt-space-md pb-space-lg sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 items-end gap-gutter lg:grid-cols-12">
             <div className="relative flex flex-col justify-end lg:col-span-4">
               <div
-                className={`relative flex aspect-[4/5] max-h-[480px] w-full items-end justify-center overflow-hidden bg-gradient-to-br shadow-2xl ${tone}`}
+                className={[
+                  'relative flex aspect-[4/5] max-h-[360px] w-full items-end justify-center overflow-hidden shadow-2xl',
+                  player.imageUrl || showFlag
+                    ? 'bg-surface-container'
+                    : `bg-gradient-to-br ${tone}`,
+                ].join(' ')}
               >
-                <span className="absolute top-space-md left-space-md font-display text-display-xl leading-none font-extrabold text-on-primary/20 select-none">
-                  {shirtNumber}
-                </span>
                 {player.imageUrl ? (
                   <img
                     src={player.imageUrl}
                     alt={player.name}
                     className="absolute inset-0 h-full w-full object-cover object-top"
                   />
+                ) : showFlag && flagUrl ? (
+                  <img
+                    src={flagUrl}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    onError={() => {
+                      setFlagFailed(true)
+                    }}
+                  />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-display text-6xl font-extrabold text-white/15">
-                      #{shirtNumber}
-                    </span>
-                  </div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(255,255,255,0.16),transparent_42%)]" />
                 )}
+                <span className="absolute top-space-sm left-space-sm z-[1] font-display text-5xl leading-none font-extrabold text-white/25 select-none sm:text-6xl">
+                  {shirtLabel}
+                </span>
                 <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent" />
                 <div className="absolute right-space-md bottom-space-md left-space-md flex items-center justify-between bg-primary/90 px-space-sm py-space-xs backdrop-blur-md">
                   <span className="font-kicker text-kicker tracking-widest text-secondary-container uppercase">
@@ -124,141 +123,96 @@ export function PlayerDetailHero({ player, onRate }: PlayerDetailHeroProps) {
               </div>
             </div>
 
-            <div className="flex h-full flex-col justify-between pt-space-md lg:col-span-8">
-              <div className="flex flex-wrap items-center justify-between gap-space-md pb-space-md">
-                <div className="flex flex-wrap items-center gap-space-xs">
-                  <span className="bg-secondary px-space-sm py-space-xs font-kicker text-kicker font-bold tracking-wider text-on-secondary uppercase">
-                    {positionLabel}
-                  </span>
-                  {player.isCaptain ? (
-                    <span className="flex items-center gap-1 bg-tertiary-container px-space-sm py-space-xs font-kicker text-kicker font-bold text-tertiary-fixed-dim uppercase">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-tertiary-fixed-dim" />
-                      KAPTAN
+            <div className="flex h-full flex-col justify-between gap-space-sm pt-space-sm lg:col-span-8">
+              <div className="flex flex-col gap-space-sm">
+                <div className="flex flex-wrap items-center justify-between gap-space-sm">
+                  <div className="flex flex-wrap items-center gap-space-xs">
+                    <span className="bg-secondary px-space-sm py-space-xs font-kicker text-kicker font-bold tracking-wider text-on-secondary uppercase">
+                      {positionLabel}
                     </span>
-                  ) : null}
-                </div>
-                <div className="flex items-center gap-space-xs bg-primary-container px-space-md py-space-xs shadow-md">
-                  <span
-                    className="material-symbols-outlined text-[20px] text-tertiary-fixed-dim"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    star
-                  </span>
-                  <div className="flex flex-col">
-                    <div className="flex items-baseline gap-1">
-                      <span className="font-headline text-headline-sm font-bold text-tertiary-fixed-dim">
-                        {player.averageRating.toFixed(1)}
+                    {player.isCaptain ? (
+                      <span className="flex items-center gap-1 bg-tertiary-container px-space-sm py-space-xs font-kicker text-kicker font-bold text-tertiary-fixed-dim uppercase">
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-tertiary-fixed-dim" />
+                        KAPTAN
                       </span>
-                      <span className="font-kicker text-kicker text-on-primary/60">/ 10</span>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-space-xs bg-primary-container px-space-md py-space-xs shadow-md">
+                    <span
+                      className="material-symbols-outlined text-[20px] text-tertiary-fixed-dim"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      star
+                    </span>
+                    <div className="flex flex-col">
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-headline text-headline-sm font-bold text-tertiary-fixed-dim">
+                          {player.averageRating.toFixed(1)}
+                        </span>
+                        <span className="font-kicker text-kicker text-on-primary/60">/ 10</span>
+                      </div>
+                      <span className="font-kicker text-[9px] tracking-wider text-on-primary/80 uppercase">
+                        {formatVoteCount(player.ratingCount)} Taraftar Oyu
+                      </span>
                     </div>
-                    <span className="font-kicker text-[9px] tracking-wider text-on-primary/80 uppercase">
-                      {formatVoteCount(player.ratingCount)} Taraftar Oyu
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-1 flex flex-wrap items-center gap-space-sm">
+                    <span className="font-label text-label-md font-semibold tracking-wider text-on-primary/90 uppercase">
+                      {player.nationality}
+                    </span>
+                  </div>
+                  <h1 className="-ml-1 font-display text-display-xl-mobile leading-none font-black tracking-tight text-on-primary uppercase sm:text-display-xl">
+                    {player.name}
+                  </h1>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-stretch gap-space-sm bg-primary-container/80 p-space-sm sm:p-space-md">
+                <div className="grid min-w-0 flex-1 grid-cols-2 gap-space-sm sm:grid-cols-3">
+                  <div>
+                    <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
+                      Piyasa Değeri
+                    </span>
+                    <span className="font-headline text-headline-md font-bold text-tertiary-fixed-dim">
+                      {player.marketValue != null ? formatMarketValue(player.marketValue) : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
+                      Yaş / Doğum
+                    </span>
+                    <span className="font-headline text-headline-md font-bold text-on-primary">
+                      {player.age} Yaş
+                    </span>
+                    <span className="font-body block text-[11px] text-on-primary/60">
+                      {formatBirthDate(player.dateOfBirth)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
+                      Boy / Ayak
+                    </span>
+                    <span className="font-headline text-headline-md font-bold text-on-primary">
+                      {formatHeight(player.height)}
+                    </span>
+                    <span className="font-body block text-[11px] font-semibold text-secondary-container">
+                      {formatFoot(player.preferredFoot)}
                     </span>
                   </div>
                 </div>
-              </div>
-
-              <div className="my-space-sm">
-                <div className="mb-space-xs flex flex-wrap items-center gap-space-sm">
-                  <span className="font-label text-label-md font-semibold tracking-wider text-on-primary/90 uppercase">
-                    {player.nationality}
-                  </span>
-                </div>
-                <h1 className="-ml-1 font-display text-display-xl-mobile leading-none font-black tracking-tight text-on-primary uppercase sm:text-display-xl">
-                  {player.name}
-                </h1>
-              </div>
-
-              <div className="my-space-md grid grid-cols-2 gap-space-sm bg-primary-container/80 p-space-md sm:grid-cols-3">
-                <div>
-                  <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
-                    Piyasa Değeri
-                  </span>
-                  <span className="font-headline text-headline-md font-bold text-tertiary-fixed-dim">
-                    {player.marketValue != null ? formatMarketValue(player.marketValue) : '—'}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
-                    Yaş / Doğum
-                  </span>
-                  <span className="font-headline text-headline-md font-bold text-on-primary">
-                    {player.age} Yaş
-                  </span>
-                  <span className="font-body block text-[11px] text-on-primary/60">
-                    {formatBirthDate(player.dateOfBirth)}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
-                    Boy / Ayak
-                  </span>
-                  <span className="font-headline text-headline-md font-bold text-on-primary">
-                    {formatHeight(player.height)}
-                  </span>
-                  <span className="font-body block text-[11px] font-semibold text-secondary-container">
-                    {formatFoot(player.preferredFoot)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-space-md pt-space-xs">
-                <div className="flex flex-col gap-space-sm">
-                  <div className="flex flex-wrap items-center gap-space-sm">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsRatingOpen((open) => !open)
-                      }}
-                      className="font-label flex cursor-pointer items-center gap-2 bg-secondary-container px-space-lg py-space-sm text-label-md font-bold tracking-wider text-on-secondary-container uppercase shadow-md transition-all hover:bg-surface-container-lowest"
-                    >
-                      <span
-                        className="material-symbols-outlined text-[18px]"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        star
-                      </span>
-                      {player.currentUserScore != null
-                        ? `Puanın: ${player.currentUserScore.toFixed(1)}`
-                        : 'Oyuncuyu Puanla'}
-                    </button>
-                    <button
-                      type="button"
-                      title="Profili Paylaş"
-                      onClick={() => {
-                        void navigator.clipboard?.writeText(window.location.href)
-                      }}
-                      className="flex cursor-pointer items-center justify-center bg-surface-container-highest/20 p-space-sm text-on-primary transition-colors hover:bg-surface-container-highest/40"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">share</span>
-                    </button>
-                  </div>
-                  {isRatingOpen ? (
-                    <div className="flex flex-wrap items-center gap-1">
-                      {Array.from({ length: 10 }, (_, index) => {
-                        const score = index + 1
-
-                        return (
-                          <button
-                            key={score}
-                            type="button"
-                            disabled={isSubmitting}
-                            onClick={() => {
-                              void handleScoreSelect(score)
-                            }}
-                            className={`font-label h-9 w-9 text-label-md font-bold transition-colors ${
-                              player.currentUserScore === score
-                                ? 'bg-secondary-container text-on-secondary-container'
-                                : 'bg-surface-container-highest/20 text-on-primary hover:bg-surface-container-highest/40'
-                            }`}
-                          >
-                            {score}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  ) : null}
-                </div>
+                <button
+                  type="button"
+                  title="Profili Paylaş"
+                  onClick={() => {
+                    void navigator.clipboard?.writeText(window.location.href)
+                  }}
+                  className="flex shrink-0 cursor-pointer items-center justify-center self-center bg-surface-container-highest/20 px-space-sm py-space-sm text-on-primary transition-colors hover:bg-surface-container-highest/40"
+                >
+                  <span className="material-symbols-outlined text-[20px]">share</span>
+                </button>
               </div>
             </div>
           </div>

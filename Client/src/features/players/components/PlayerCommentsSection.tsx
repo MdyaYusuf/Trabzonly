@@ -263,7 +263,10 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
   const displayInitials = initialsFromUsername(displayUsername)
 
   return (
-    <section className="flex flex-col gap-space-lg bg-surface-container-lowest p-space-lg shadow-sm">
+    <section
+      id="yorumlar"
+      className="flex flex-col gap-space-lg bg-surface-container-lowest p-space-lg shadow-sm"
+    >
       <div className="flex flex-wrap items-center justify-between gap-space-sm pb-space-xs">
         <div>
           <span className="font-kicker mb-1 block text-kicker font-bold tracking-widest text-secondary uppercase">
