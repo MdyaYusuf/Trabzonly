@@ -1,6 +1,4 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { toast } from 'react-toastify'
 import type { SquadGalleryCardData } from '../utils/squadsGalleryTypes'
 import { SquadPitchPreview } from './SquadPitchPreview'
 
@@ -50,29 +48,10 @@ function RatingStars({ rating }: { rating: number }) {
 }
 
 export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardProps) {
-  const [isSharing, setIsSharing] = useState(false)
   const detailPath = `/kadrolar/${squad.id}`
   const authorLabel = squad.authorUsername.startsWith('@')
     ? squad.authorUsername
     : `@${squad.authorUsername}`
-
-  async function handleShare() {
-    if (isSharing) {
-      return
-    }
-
-    setIsSharing(true)
-    const shareUrl = `${window.location.origin}${detailPath}`
-
-    try {
-      await navigator.clipboard.writeText(shareUrl)
-      toast.success('Bağlantı panoya kopyalandı.')
-    } catch {
-      toast.error('Bağlantı kopyalanamadı.')
-    } finally {
-      setIsSharing(false)
-    }
-  }
 
   return (
     <Link
@@ -105,7 +84,7 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
             </span>
           </div>
 
-          <h2 className="font-headline mb-space-xs text-headline-sm leading-snug font-bold text-on-surface transition-colors group-hover:text-primary">
+          <h2 className="font-headline mb-space-xs line-clamp-2 text-headline-sm leading-snug font-bold text-primary transition-colors group-hover:text-secondary">
             {squad.title}
           </h2>
 
@@ -119,13 +98,9 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
             </span>
           </div>
 
-          {squad.excerpt ? (
-            <p className="font-body mb-space-md line-clamp-2 text-body-sm text-on-surface-variant">
-              {squad.excerpt}
-            </p>
-          ) : (
-            <div className="mb-space-md" />
-          )}
+          <p className="font-body mb-space-md line-clamp-2 min-h-[2.5rem] text-body-sm text-on-surface-variant">
+            {squad.excerpt}
+          </p>
         </div>
 
         <div className="-mx-space-md -mb-space-md flex items-center justify-between bg-surface-container-low px-space-md py-space-sm pt-space-sm">
@@ -139,24 +114,14 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
               {squad.viewCount.toLocaleString('tr-TR')}
             </span>
           </div>
-          <div className="flex items-center gap-space-xs">
-            <span className="font-label inline-flex h-8 items-center bg-primary px-space-md text-label-md leading-none tracking-wider text-on-primary uppercase transition-colors group-hover:bg-primary-container">
-              İncele & Puanla
+          <span
+            aria-hidden="true"
+            className="flex h-9 w-9 shrink-0 items-center justify-center border border-primary/35 text-primary transition-all duration-200 group-hover:border-secondary group-hover:bg-secondary group-hover:text-on-secondary"
+          >
+            <span className="material-symbols-outlined text-[20px] transition-transform duration-200 group-hover:translate-x-0.5">
+              arrow_forward
             </span>
-            <button
-              type="button"
-              title="Bağlantıyı Kopyala"
-              disabled={isSharing}
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                void handleShare()
-              }}
-              className="inline-flex h-8 w-8 cursor-pointer items-center justify-center text-on-surface-variant transition-colors hover:text-secondary disabled:cursor-default"
-            >
-              <span className="material-symbols-outlined text-[20px] leading-none">share</span>
-            </button>
-          </div>
+          </span>
         </div>
       </div>
     </Link>

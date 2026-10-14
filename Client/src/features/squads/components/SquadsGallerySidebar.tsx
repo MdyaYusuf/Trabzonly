@@ -131,12 +131,13 @@ export function SquadsGallerySidebar() {
                   className="flex items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
                 >
                   <span
+                    aria-label={`${rank}. sıra`}
                     className={[
-                      'font-headline shrink-0 text-label-md font-bold',
-                      rank === 1 ? 'text-tertiary-fixed-dim' : 'text-on-surface-variant',
+                      'font-headline w-8 shrink-0 text-center text-[22px] leading-none font-bold tabular-nums',
+                      rank === 1 ? 'text-primary' : 'text-on-surface-variant/45',
                     ].join(' ')}
                   >
-                    #{rank}
+                    {rank}
                   </span>
                   <div
                     className={[

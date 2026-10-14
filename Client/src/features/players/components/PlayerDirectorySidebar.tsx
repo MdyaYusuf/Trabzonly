@@ -28,26 +28,23 @@ const ratingTips = [
   },
 ] as const
 
-function shirtOrInitials(player: PlayerResponseDto): string {
-  if (player.shirtNumber != null) {
-    return String(player.shirtNumber)
-  }
-
-  const cleaned = player.name.trim()
+function initialsFromName(name: string): string {
+  const cleaned = name.trim()
 
   if (cleaned.length === 0) {
     return '?'
   }
 
   const parts = cleaned.split(/\s+/).filter(Boolean)
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase()
+  }
+
   const first = parts[0]
   const last = parts[parts.length - 1]
 
-  if (parts.length >= 2 && first && last) {
-    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
-  }
-
-  return cleaned.slice(0, 2).toUpperCase()
+  return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
 }
 
 export function PlayerDirectorySidebar() {
@@ -115,12 +112,13 @@ export function PlayerDirectorySidebar() {
                   className="flex items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
                 >
                   <span
+                    aria-label={`${rank}. sıra`}
                     className={[
-                      'font-headline shrink-0 text-label-md font-bold',
-                      rank === 1 ? 'text-tertiary-fixed-dim' : 'text-on-surface-variant',
+                      'font-headline w-8 shrink-0 text-center text-[22px] leading-none font-bold tabular-nums',
+                      rank === 1 ? 'text-primary' : 'text-on-surface-variant/45',
                     ].join(' ')}
                   >
-                    #{rank}
+                    {rank}
                   </span>
                   <div
                     className={[
@@ -135,7 +133,7 @@ export function PlayerDirectorySidebar() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      shirtOrInitials(player)
+                      initialsFromName(player.name)
                     )}
                   </div>
                   <div className="flex min-w-0 flex-col gap-0.5">
@@ -144,11 +142,11 @@ export function PlayerDirectorySidebar() {
                     </span>
                     <span className="font-kicker text-kicker text-on-surface-variant uppercase">
                       {player.positionAbbreviation}
-                      {player.shirtNumber != null ? ` · #${player.shirtNumber}` : ''}
+                      {player.shirtNumber != null ? ` #${player.shirtNumber}` : ''}
                     </span>
                     <span className="font-body text-body-sm text-on-surface-variant">
                       {player.ratingCount > 0
-                        ? `${player.averageRating.toFixed(1)} / 5.0 ortalama`
+                        ? `${player.averageRating.toFixed(1)} / 10.0 ortalama`
                         : 'Henüz puan yok'}
                     </span>
                   </div>

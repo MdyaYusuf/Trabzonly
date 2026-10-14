@@ -39,9 +39,9 @@ type PlayerDetailRatingBarProps = {
   onRated?: (averageRating: number, ratingCount: number, score: number) => void
 }
 
-function toRatingScore(value: number | null | undefined): RatingScore {
+function toRatingScore(value: number | null | undefined): RatingScore | null {
   if (value == null) {
-    return '7.5'
+    return null
   }
 
   return snapToRatingScore(value)
@@ -173,7 +173,7 @@ export function PlayerDetailRatingBar({
 }: PlayerDetailRatingBarProps) {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
 
-  const [selectedScore, setSelectedScore] = useState<RatingScore>(
+  const [selectedScore, setSelectedScore] = useState<RatingScore | null>(
     toRatingScore(currentUserScore),
   )
   const [isSaving, setIsSaving] = useState(false)
@@ -225,8 +225,7 @@ export function PlayerDetailRatingBar({
     }, 2000)
   }
 
-  const displayYourScore =
-    isAuthenticated || currentUserScore != null ? selectedScore : '—'
+  const displayYourScore = selectedScore ?? '—'
 
   return (
     <section className="w-full bg-surface-container-low py-space-md">
@@ -241,7 +240,7 @@ export function PlayerDetailRatingBar({
             </div>
 
             <InteractiveRatingStars
-              value={Number(selectedScore)}
+              value={selectedScore != null ? Number(selectedScore) : 0}
               disabled={isSaving}
               onChange={(score) => {
                 void handleRate(score)

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import type { PollResponseDto } from '../pollTypes'
 
 type PollCardProps = {
@@ -58,8 +59,13 @@ export function PollCard({
             <button
               key={option.id}
               type="button"
-              disabled={!isAuthenticated || isVoting}
+              disabled={isVoting}
               onClick={() => {
+                if (!isAuthenticated) {
+                  toast.info('Oy vermek için giriş yapmalısınız.')
+                  return
+                }
+
                 onVote(option.id)
               }}
               className="flex cursor-pointer flex-col gap-1 bg-surface-container p-space-sm transition-colors hover:bg-surface-container-high disabled:cursor-default disabled:hover:bg-surface-container"

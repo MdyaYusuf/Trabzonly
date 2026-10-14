@@ -78,7 +78,7 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
             <div className="relative flex flex-col justify-end lg:col-span-4">
               <div
                 className={[
-                  'relative flex aspect-[4/5] max-h-[360px] w-full items-end justify-center overflow-hidden shadow-2xl',
+                  'relative flex aspect-[4/5] max-h-[320px] w-full items-end justify-center overflow-hidden shadow-2xl',
                   player.imageUrl || showFlag
                     ? 'bg-surface-container'
                     : `bg-gradient-to-br ${tone}`,
