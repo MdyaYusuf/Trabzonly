@@ -40,7 +40,7 @@ export function setSquadAvatarDragImage(
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    font: '700 13px/1 "Segoe UI", system-ui, sans-serif',
+    font: '700 13px/1 "Lexend Deca", sans-serif',
     boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
     pointerEvents: 'none',
     zIndex: '9999',

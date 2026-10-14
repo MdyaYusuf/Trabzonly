@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useAppSelector } from '@/core/store/hooks'
+import { authService } from '@/features/auth/authService'
 import { PlayerCommentsSection } from '../components/PlayerCommentsSection'
 import { PlayerDetailBreadcrumb } from '../components/PlayerDetailBreadcrumb'
 import { PlayerDetailHero } from '../components/PlayerDetailHero'
@@ -12,6 +14,8 @@ import type { PlayerResponseDto } from '../playerTypes'
 
 export function PlayerDetailPage() {
   const { playerId } = useParams<{ playerId: string }>()
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const userId = useAppSelector((state) => state.auth.user?.id)
   const [player, setPlayer] = useState<PlayerResponseDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -30,6 +34,12 @@ export function PlayerDetailPage() {
 
       setIsLoading(true)
       setNotFound(false)
+
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
 
       const result = await playerService.getById(parsedId)
 
@@ -53,7 +63,7 @@ export function PlayerDetailPage() {
     return () => {
       cancelled = true
     }
-  }, [playerId])
+  }, [playerId, isAuthenticated, userId])
 
   if (isLoading) {
     return (

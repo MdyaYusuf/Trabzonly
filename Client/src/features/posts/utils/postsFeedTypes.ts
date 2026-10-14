@@ -1,3 +1,5 @@
+import type { PostReactionType } from '../postTypes'
+
 export type FeedSortOption = 'newest' | 'popular' | 'discussed'
 
 export type CategoryBadgeTone = 'primary' | 'primary-container' | 'secondary'
@@ -48,6 +50,7 @@ export type FeedPostCard = {
   topComment?: FeedPostTopComment | null
   authorUserId: string
   isAuthorFollowedByCurrentUser: boolean
+  currentReaction?: PostReactionType | null
 }
 
 export const PAGE_SIZE = 5

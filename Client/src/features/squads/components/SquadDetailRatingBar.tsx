@@ -175,6 +175,12 @@ export function SquadDetailRatingBar({
 
   useEffect(() => {
     setSelectedScore(toRatingScore(currentUserScore))
+  }, [squadId])
+
+  useEffect(() => {
+    if (currentUserScore != null) {
+      setSelectedScore(toRatingScore(currentUserScore))
+    }
   }, [currentUserScore])
 
   async function handleRate(score: RatingScore) {

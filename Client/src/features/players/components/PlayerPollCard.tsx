@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAppSelector } from '@/core/store/hooks'
+import { authService } from '@/features/auth/authService'
 import { PollCard } from '../../polls/components/PollCard'
 import pollService from '../../polls/pollService'
 import type { PollResponseDto } from '../../polls/pollTypes'
@@ -9,7 +10,7 @@ type PlayerPollCardProps = {
 }
 
 export function PlayerPollCard({ playerId }: PlayerPollCardProps) {
-  const { isAuthenticated } = useAppSelector((state) => state.auth)
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth)
   const [poll, setPoll] = useState<PollResponseDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isVoting, setIsVoting] = useState(false)
@@ -19,6 +20,12 @@ export function PlayerPollCard({ playerId }: PlayerPollCardProps) {
 
     async function loadPoll() {
       setIsLoading(true)
+
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
 
       const result = await pollService.getActiveByPlayer(playerId)
 
@@ -40,7 +47,7 @@ export function PlayerPollCard({ playerId }: PlayerPollCardProps) {
     return () => {
       cancelled = true
     }
-  }, [playerId])
+  }, [playerId, isAuthenticated, user?.id])
 
   async function handleVote(optionId: number) {
     if (!poll || !isAuthenticated || isVoting) {

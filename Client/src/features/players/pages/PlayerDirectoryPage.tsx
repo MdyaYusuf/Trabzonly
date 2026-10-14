@@ -144,8 +144,8 @@ export function PlayerDirectoryPage() {
                   <h2 className="font-headline text-headline-md font-bold tracking-tight text-primary uppercase">
                     KADRO LİSTESİ
                   </h2>
-                  <div className="flex items-center gap-space-xs bg-surface-container-highest px-space-sm py-0.5">
-                    <span className="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">
+                  <div className="flex items-center gap-space-sm bg-surface-container-highest px-space-sm py-0.5">
+                    <span className="material-symbols-outlined text-[18px] text-secondary">
                       groups
                     </span>
                     <span className="font-kicker text-kicker font-bold text-on-surface uppercase">

@@ -181,7 +181,18 @@ export function PlayerDetailRatingBar({
 
   useEffect(() => {
     setSelectedScore(toRatingScore(currentUserScore))
-  }, [currentUserScore])
+  }, [playerId])
+
+  useEffect(() => {
+    if (currentUserScore != null) {
+      setSelectedScore(toRatingScore(currentUserScore))
+      return
+    }
+
+    if (!isAuthenticated) {
+      setSelectedScore(null)
+    }
+  }, [currentUserScore, isAuthenticated])
 
   async function handleRate(score: RatingScore) {
     if (isSaving) {

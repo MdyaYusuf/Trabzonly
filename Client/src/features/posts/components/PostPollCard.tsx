@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAppSelector } from '../../../core/store/hooks'
+import { authService } from '../../auth/authService'
 import { PollCard } from '../../polls/components/PollCard'
 import pollService from '../../polls/pollService'
 import type { PollResponseDto } from '../../polls/pollTypes'
@@ -10,6 +11,7 @@ type PostPollCardProps = {
 
 export function PostPollCard({ postId }: PostPollCardProps) {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const userId = useAppSelector((state) => state.auth.user?.id)
   const [poll, setPoll] = useState<PollResponseDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isVoting, setIsVoting] = useState(false)
@@ -19,6 +21,12 @@ export function PostPollCard({ postId }: PostPollCardProps) {
 
     async function loadPoll() {
       setIsLoading(true)
+
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
 
       const result = await pollService.getActiveByPost(postId)
 
@@ -40,7 +48,7 @@ export function PostPollCard({ postId }: PostPollCardProps) {
     return () => {
       cancelled = true
     }
-  }, [postId])
+  }, [postId, isAuthenticated, userId])
 
   async function handleVote(optionId: number) {
     if (!poll || !isAuthenticated || isVoting) {

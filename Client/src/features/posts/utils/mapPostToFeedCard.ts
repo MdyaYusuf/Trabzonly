@@ -116,5 +116,6 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
       : null,
     authorUserId: post.userId,
     isAuthorFollowedByCurrentUser: post.isAuthorFollowedByCurrentUser ?? false,
+    currentReaction: post.currentReaction ?? null,
   }
 }

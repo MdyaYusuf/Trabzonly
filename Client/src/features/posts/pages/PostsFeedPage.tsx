@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { useAppSelector } from '@/core/store/hooks'
+import { authService } from '@/features/auth/authService'
 import categoryService from '../../categories/categoryService'
 import type { CategoryResponseDto } from '../../categories/categoryTypes'
 import { PostCard } from '../components/PostCard'
@@ -13,6 +15,8 @@ import { mapPostToFeedCard } from '../utils/mapPostToFeedCard'
 import { PAGE_SIZE, type FeedPostCard, type FeedSortOption } from '../utils/postsFeedTypes'
 
 export function PostsFeedPage() {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const userId = useAppSelector((state) => state.auth.user?.id)
   const [categories, setCategories] = useState<CategoryResponseDto[]>([])
   const [categoryId, setCategoryId] = useState<number | 'all'>('all')
   const [search, setSearch] = useState('')
@@ -62,6 +66,12 @@ export function PostsFeedPage() {
     async function loadPosts() {
       setIsLoading(true)
 
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
+
       const result = await postService.getAll({
         pageNumber: page,
         pageSize: PAGE_SIZE,
@@ -92,7 +102,7 @@ export function PostsFeedPage() {
     return () => {
       cancelled = true
     }
-  }, [categoryId, debouncedSearch, sort, page])
+  }, [categoryId, debouncedSearch, sort, page, isAuthenticated, userId])
 
   const rangeStart = totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
   const rangeEnd = Math.min(page * PAGE_SIZE, totalCount)
@@ -128,7 +138,7 @@ export function PostsFeedPage() {
       <div className="w-full bg-background py-space-xl">
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
-            <div className="flex flex-col gap-space-lg lg:col-span-8">
+            <div className="flex flex-col gap-space-md lg:col-span-8">
               {isLoading ? (
                 <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
                   Gönderiler yükleniyor...
@@ -138,7 +148,11 @@ export function PostsFeedPage() {
                   Bu filtrelere uygun gönderi bulunamadı.
                 </p>
               ) : (
-                posts.map((post) => <PostCard key={post.id} post={post} />)
+                <div className="flex flex-col">
+                  {posts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))}
+                </div>
               )}
 
               <PostsFeedPagination

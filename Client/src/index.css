@@ -73,12 +73,12 @@
   --color-border-subtle: #e5e0dc;
 
   /* —— Typography —— */
-  --font-display: "Montserrat", sans-serif;
-  --font-body: "Arimo", sans-serif;
-  --font-headline: "Montserrat", sans-serif;
-  --font-kicker: "Montserrat", sans-serif;
-  --font-label: "Arimo", sans-serif;
-  --font-stat: "Montserrat", sans-serif;
+  --font-display: "Lexend Deca", sans-serif;
+  --font-body: "Lexend Deca", sans-serif;
+  --font-headline: "Lexend Deca", sans-serif;
+  --font-kicker: "Lexend Deca", sans-serif;
+  --font-label: "Lexend Deca", sans-serif;
+  --font-stat: "Lexend Deca", sans-serif;
 
   --text-display-xl: 64px;
   --text-display-xl--line-height: 68px;

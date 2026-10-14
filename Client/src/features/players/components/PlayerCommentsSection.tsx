@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { authService } from '@/features/auth/authService'
 import { Link } from 'react-router-dom'
 import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
@@ -136,6 +137,12 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
     async function run() {
       setIsLoading(true)
 
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
+
       const result = await commentService.getRecent({
         count: PAGE_COUNT,
         playerId,
@@ -164,7 +171,7 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
     return () => {
       cancelled = true
     }
-  }, [playerId, commentSort])
+  }, [playerId, commentSort, isAuthenticated, user?.id])
 
   const rootComments = comments.filter((comment) => !comment.parentCommentId)
   const repliesByParent = comments.reduce<Record<string, CommentResponseDto[]>>((acc, comment) => {

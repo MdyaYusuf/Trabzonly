@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
+import { authService } from '../../auth/authService'
 import commentService from '../../comments/commentService'
 import {
   CommentReaction,
@@ -143,6 +144,12 @@ export function PostCommentsSection({
     async function run() {
       setIsLoading(true)
 
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
+
       const result = await commentService.getRecent({
         count: PAGE_COUNT,
         postId,
@@ -171,7 +178,7 @@ export function PostCommentsSection({
     return () => {
       cancelled = true
     }
-  }, [postId, commentSort])
+  }, [postId, commentSort, isAuthenticated, user?.id])
 
   const rootComments = comments.filter((comment) => !comment.parentCommentId)
   const repliesByParent = comments.reduce<Record<string, CommentResponseDto[]>>((acc, comment) => {

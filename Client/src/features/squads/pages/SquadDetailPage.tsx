@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useAppSelector } from '@/core/store/hooks'
+import { authService } from '@/features/auth/authService'
 import { SquadCommentsSection } from '../components/SquadCommentsSection'
 import { SquadDetailBreadcrumb } from '../components/SquadDetailBreadcrumb'
 import { SquadDetailHeader } from '../components/SquadDetailHeader'
@@ -12,6 +14,8 @@ import type { SquadDetailViewModel } from '../utils/squadDetailTypes'
 
 export function SquadDetailPage() {
   const { squadId } = useParams<{ squadId: string }>()
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const userId = useAppSelector((state) => state.auth.user?.id)
   const [squad, setSquad] = useState<SquadDetailViewModel | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -28,6 +32,12 @@ export function SquadDetailPage() {
 
       setIsLoading(true)
       setNotFound(false)
+
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
 
       const result = await squadService.getById(squadId)
 
@@ -51,7 +61,7 @@ export function SquadDetailPage() {
     return () => {
       cancelled = true
     }
-  }, [squadId])
+  }, [squadId, isAuthenticated, userId])
 
   if (isLoading) {
     return (

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useAppSelector } from '@/core/store/hooks'
+import { authService } from '@/features/auth/authService'
 import { PostCommentsSection } from '../components/PostCommentsSection'
 import { PostDetailArticle } from '../components/PostDetailArticle'
 import { PostDetailBreadcrumb } from '../components/PostDetailBreadcrumb'
@@ -10,6 +12,8 @@ import type { PostResponseDto } from '../postTypes'
 
 export function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>()
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const userId = useAppSelector((state) => state.auth.user?.id)
   const [post, setPost] = useState<PostResponseDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -28,6 +32,12 @@ export function PostDetailPage() {
     async function loadPost() {
       setIsLoading(true)
       setNotFound(false)
+
+      await authService.ensureViewerSession()
+
+      if (cancelled) {
+        return
+      }
 
       const result = await postService.getById(detailPostId)
 
@@ -51,7 +61,7 @@ export function PostDetailPage() {
     return () => {
       cancelled = true
     }
-  }, [postId])
+  }, [postId, isAuthenticated, userId])
 
   if (isLoading) {
     return (
