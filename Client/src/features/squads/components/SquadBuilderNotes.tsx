@@ -22,7 +22,7 @@ export function SquadBuilderNotes({ notes, onNotesChange }: SquadBuilderNotesPro
               : 'font-kicker text-kicker text-on-surface-variant uppercase'
           }
         >
-          {notes.length} / {NOTES_MAX_LENGTH}
+          {notes.length} / {NOTES_MAX_LENGTH} Karakter
         </span>
       </div>
 
@@ -33,7 +33,7 @@ export function SquadBuilderNotes({ notes, onNotesChange }: SquadBuilderNotesPro
         onChange={(event) => {
           onNotesChange(event.target.value.slice(0, NOTES_MAX_LENGTH))
         }}
-        placeholder="Kadronuzun taktik fikrini kısa ve net yazın (en fazla 400 karakter)..."
+        placeholder="Kadronuzun kısa ve net taktiksel fikri..."
         className="font-body w-full bg-surface-container p-space-sm text-body-sm leading-relaxed text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
       />
     </div>

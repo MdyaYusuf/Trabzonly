@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import categoryService from '../../categories/categoryService'
 import type { CategoryResponseDto } from '../../categories/categoryTypes'
-import { PostEditorBreadcrumb } from '../components/PostEditorBreadcrumb'
 import { PostEditorForm } from '../components/PostEditorForm'
 import { PostEditorSidebar } from '../components/PostEditorSidebar'
+import { PostEditorToolbar } from '../components/PostEditorToolbar'
 import postService from '../postService'
 
 type PostCreateEditPageProps = {
@@ -25,7 +25,6 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
-  const [pollEnabled, setPollEnabled] = useState(false)
   const [pollQuestion, setPollQuestion] = useState('')
   const [pollOptions, setPollOptions] = useState(['', ''])
   const [hasExistingPoll, setHasExistingPoll] = useState(false)
@@ -36,6 +35,9 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
   const [isLoading, setIsLoading] = useState(mode === 'edit')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
+
+  const canPublish =
+    title.trim().length > 0 && body.trim().length > 0 && categoryId !== '' && !isSubmitting
 
   useEffect(() => {
     let cancelled = false
@@ -94,7 +96,6 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
       setExistingPollQuestion(post.poll?.question ?? null)
       setExistingPollTotalVotes(post.poll?.totalVotes ?? 0)
       setDeactivatePoll(false)
-      setPollEnabled(false)
       setPollQuestion('')
       setPollOptions(['', ''])
       setIsLoading(false)
@@ -149,13 +150,13 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
       return
     }
 
+    const filledOptions = pollOptions.map((option) => option.trim()).filter(Boolean)
+    const trimmedQuestion = pollQuestion.trim()
+    const hasPollIntent = trimmedQuestion.length > 0 || filledOptions.length > 0
     const includePoll =
-      pollEnabled &&
-      !hasExistingPoll &&
-      pollQuestion.trim().length > 0 &&
-      pollOptions.filter((option) => option.trim().length > 0).length >= 2
+      !hasExistingPoll && trimmedQuestion.length > 0 && filledOptions.length >= 2
 
-    if (pollEnabled && !hasExistingPoll && !includePoll) {
+    if (hasPollIntent && !includePoll) {
       setStatusMessage('Anket için soru ve en az 2 seçenek gerekli.')
       return
     }
@@ -165,8 +166,8 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
 
     const pollPayload = includePoll
       ? {
-          question: pollQuestion.trim(),
-          options: pollOptions.map((option) => option.trim()).filter(Boolean),
+          question: trimmedQuestion,
+          options: filledOptions,
         }
       : undefined
 
@@ -225,52 +226,54 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-      <PostEditorBreadcrumb mode={mode} />
+      <PostEditorToolbar
+        mode={mode}
+        title={title}
+        categoryId={categoryId}
+        categories={categories}
+        isSubmitting={isSubmitting}
+        canPublish={canPublish}
+        onTitleChange={setTitle}
+        onCategoryChange={setCategoryId}
+        onPublish={() => {
+          void handlePublish()
+        }}
+      />
 
-      <div className="w-full bg-surface-container-lowest">
-        <div className="mx-auto max-w-[1360px] px-4 py-space-lg sm:px-6 lg:px-12">
-          <div className="flex flex-col gap-space-xs">
-            <h1 className="font-headline text-headline-lg tracking-tight text-primary uppercase">
-              {mode === 'edit' ? 'Gönderiyi Düzenle' : 'Yeni Gönderi Oluştur'}
-            </h1>
-            <p className="font-body max-w-4xl text-body-md text-on-surface-variant">
-              Bordo-Mavi fırtınanın sahadaki taktiğini, tribün anılarını veya transfer nabzını tüm
-              camia ile paylaş.
-            </p>
-            {statusMessage ? (
-              <p className="font-label text-label-md font-bold text-secondary">{statusMessage}</p>
-            ) : null}
+      {statusMessage ? (
+        <div className="w-full bg-surface-container-low">
+          <div className="mx-auto max-w-[1360px] px-4 py-space-sm sm:px-6 lg:px-12">
+            <p className="font-label text-label-md font-bold text-secondary">{statusMessage}</p>
           </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="w-full py-space-xl">
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
-          <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
-            <PostEditorForm
+          <div className="grid grid-cols-1 items-stretch gap-gutter lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <PostEditorForm
+                summary={summary}
+                body={body}
+                coverPreviewUrl={coverPreviewUrl}
+                coverFileName={coverFile?.name ?? null}
+                onSummaryChange={setSummary}
+                onBodyChange={setBody}
+                onCoverFileChange={handleCoverFileChange}
+                onRemoveCover={handleRemoveCover}
+              />
+            </div>
+
+            <PostEditorSidebar
               mode={mode}
-              title={title}
-              categoryId={categoryId}
-              categories={categories}
-              summary={summary}
-              body={body}
-              coverPreviewUrl={coverPreviewUrl}
-              coverFileName={coverFile?.name ?? null}
-              pollEnabled={pollEnabled}
               pollQuestion={pollQuestion}
               pollOptions={pollOptions}
               hasExistingPoll={hasExistingPoll}
               existingPollQuestion={existingPollQuestion}
               existingPollTotalVotes={existingPollTotalVotes}
               deactivatePoll={deactivatePoll}
+              canPublish={canPublish}
               isSubmitting={isSubmitting}
-              onTitleChange={setTitle}
-              onCategoryChange={setCategoryId}
-              onSummaryChange={setSummary}
-              onBodyChange={setBody}
-              onCoverFileChange={handleCoverFileChange}
-              onRemoveCover={handleRemoveCover}
-              onPollEnabledChange={setPollEnabled}
               onPollQuestionChange={setPollQuestion}
               onPollOptionChange={(index, value) => {
                 setPollOptions((current) =>
@@ -283,14 +286,15 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
                 setPollOptions((current) => [...current, ''])
               }}
               onRemovePollOption={(index) => {
-                setPollOptions((current) => current.filter((_, optionIndex) => optionIndex !== index))
+                setPollOptions((current) =>
+                  current.filter((_, optionIndex) => optionIndex !== index),
+                )
               }}
               onDeactivatePollChange={setDeactivatePoll}
               onPublish={() => {
                 void handlePublish()
               }}
             />
-            <PostEditorSidebar />
           </div>
         </div>
       </div>

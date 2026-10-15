@@ -26,7 +26,9 @@ export function SquadBuilderBench({
     <div className="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-space-xs">
         <h2 className="font-headline flex items-center gap-1.5 text-headline-sm font-bold text-primary uppercase">
-          <span className="material-symbols-outlined text-[20px]">airline_seat_recline_extra</span>
+          <span className="material-symbols-outlined text-[20px] text-secondary">
+            airline_seat_recline_extra
+          </span>
           Yedek Kulübesi
         </h2>
         <span className="font-label text-label-md font-bold text-on-surface-variant">

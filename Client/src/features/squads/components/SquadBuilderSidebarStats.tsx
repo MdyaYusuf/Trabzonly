@@ -10,7 +10,7 @@ export function SquadBuilderSidebarStats({
   return (
     <div className="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm">
       <h2 className="font-headline flex items-center gap-1.5 text-headline-sm font-bold text-primary uppercase">
-        <span className="material-symbols-outlined text-[20px]">groups</span>
+        <span className="material-symbols-outlined text-[20px] text-secondary">groups</span>
         Kadro Özeti
       </h2>
       <p className="font-body text-body-sm text-on-surface-variant">
@@ -31,7 +31,7 @@ export function SquadBuilderSidebarStats({
         </div>
         <div className="font-label flex min-w-0 flex-1 flex-col gap-0.5 bg-surface-container px-3 py-2 text-[12px] text-on-surface sm:min-w-[10rem]">
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[16px] text-tertiary-container">
+            <span className="material-symbols-outlined text-[16px] text-secondary">
               payments
             </span>
             <span className="font-bold">Piyasa Değeri</span>

@@ -139,21 +139,19 @@ export function PostsFeedPage() {
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
             <div className="flex flex-col gap-space-md lg:col-span-8">
-              {isLoading ? (
-                <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-                  Gönderiler yükleniyor...
-                </p>
-              ) : posts.length === 0 ? (
-                <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-                  Bu filtrelere uygun gönderi bulunamadı.
-                </p>
-              ) : (
-                <div className="flex flex-col">
-                  {posts.map((post) => (
-                    <PostCard key={post.id} post={post} />
-                  ))}
-                </div>
-              )}
+              <div className="flex flex-col bg-background px-space-md py-space-sm shadow-[0_4px_24px_rgba(31,27,23,0.06)] sm:px-space-lg">
+                {isLoading ? (
+                  <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                    Gönderiler yükleniyor...
+                  </p>
+                ) : posts.length === 0 ? (
+                  <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                    Bu filtrelere uygun gönderi bulunamadı.
+                  </p>
+                ) : (
+                  posts.map((post) => <PostCard key={post.id} post={post} />)
+                )}
+              </div>
 
               <PostsFeedPagination
                 filteredCount={totalCount}

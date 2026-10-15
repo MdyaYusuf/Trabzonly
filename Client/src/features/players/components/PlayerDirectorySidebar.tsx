@@ -157,7 +157,7 @@ export function PlayerDirectorySidebar() {
         )}
       </div>
 
-      <div className="relative flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
+      <div className="flex flex-col gap-space-md bg-surface-container p-space-lg">
         <div className="flex items-center gap-space-xs">
           <span className="material-symbols-outlined text-lg text-secondary">sports_soccer</span>
           <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
@@ -167,21 +167,21 @@ export function PlayerDirectorySidebar() {
         <p className="font-body text-body-sm text-on-surface-variant">
           Oyuncu kartlarından detaya gir, taraftar puanı ver ve favori 11&apos;ini kur.
         </p>
-        <ul className="flex flex-col gap-space-sm">
+        <div className="flex flex-col gap-space-sm">
           {ratingTips.map((tip, index) => (
-            <li key={tip.title} className="flex items-start gap-space-xs">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-primary-container font-headline text-kicker font-bold text-on-primary">
+            <div
+              key={tip.title}
+              className="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm"
+            >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-on-secondary">
                 {index + 1}
               </span>
-              <div className="flex flex-col">
-                <span className="font-label text-label-md font-bold text-on-surface">
-                  {tip.title}
-                </span>
-                <span className="font-body text-body-sm text-on-surface-variant">{tip.body}</span>
-              </div>
-            </li>
+              <p className="font-body text-body-sm text-on-surface">
+                <strong>{tip.title}:</strong> {tip.body}
+              </p>
+            </div>
           ))}
-        </ul>
+        </div>
         <Link
           to="/kadrolar/olustur"
           className="font-label ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"

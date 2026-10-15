@@ -77,7 +77,10 @@ export function SquadBuilderPlayerPool({
       <div className="flex flex-col gap-space-xs">
         <div className="flex items-center justify-between gap-space-sm">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-headline text-headline-sm font-bold text-primary uppercase">
+            <span className="font-headline flex items-center gap-2 text-headline-sm font-bold text-primary uppercase">
+              <span className="material-symbols-outlined text-[20px] text-secondary">
+                diversity_3
+              </span>
               Oyuncu Havuzu
             </span>
             <span className="font-kicker bg-secondary-container px-2 py-0.5 text-[10px] font-bold text-on-secondary-container">
