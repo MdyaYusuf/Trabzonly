@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgBox" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F0A21" />
+      <stop offset="100%" stop-color="#28030F" />
+    </linearGradient>
+
+    <!-- Vibrant Mavi Gradient -->
+    <linearGradient id="maviGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#89CBF8" />
+      <stop offset="100%" stop-color="#559FD4" />
+    </linearGradient>
+
+    <filter id="crispShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- App / Bookmark Icon Squircle Container -->
+  <rect x="20" y="20" width="472" height="472" rx="112" fill="url(#bgBox)" stroke="#89CBF8" stroke-width="6" stroke-opacity="0.35" filter="url(#crispShadow)"/>
+
+  <!-- Bold, Architectonic Modern 'T' Monogram -->
+  <!-- Crossbar: Top bar with bold Karadeniz dynamic cuts -->
+  <!-- Left Wing (Mavi): Dynamic angled spearhead/wave motif -->
+  <path d="M72 136 L240 136 L240 220 L128 220 L72 136 Z" fill="url(#maviGrad)"/>
+
+  <!-- Right Wing (Pure White): Balanced aerodynamic chevron cut -->
+  <path d="M272 136 L440 136 L384 220 L272 220 L272 136 Z" fill="#FFFFFF"/>
+
+  <!-- Central Monogram Stem: Bold dual-column sword/anchor silhouette -->
+  <!-- Left column (Sky Blue) -->
+  <path d="M208 236 L248 236 L248 392 L208 352 Z" fill="url(#maviGrad)"/>
+  <!-- Right column (Crisp White) -->
+  <path d="M264 236 L304 236 L304 352 L264 392 Z" fill="#FFFFFF"/>
+
+  <!-- Clean Bottom Anchor Wave Stripe -->
+  <path d="M120 420 C 180 436, 332 436, 392 420" fill="none" stroke="#89CBF8" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+</svg>

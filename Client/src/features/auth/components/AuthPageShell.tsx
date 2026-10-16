@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { BrandLogo } from '@/core/components/BrandLogo'
 import { metricsService } from '@/features/metrics/metricsService'
 import type { ShellMetricsDto } from '@/features/metrics/metricsTypes'
 
@@ -108,13 +109,13 @@ export function AuthPageShell({
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
       <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden bg-primary sm:min-h-[calc(100vh-5rem)]">
         <div
-          className="pointer-events-none absolute inset-0 scale-105 bg-cover bg-center opacity-40 mix-blend-luminosity"
+          className="pointer-events-none absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${HERO_BG}')` }}
           role="img"
           aria-label="Akyazı stadyum atmosferi"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary via-primary/95 to-primary-container/85" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary via-transparent to-primary/40" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-ground via-dark-ground/60 to-dark-ground/85" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#1A040B_80%)]" />
 
         <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-col justify-center px-4 py-space-xl sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 items-center gap-space-lg lg:grid-cols-12 lg:gap-gutter">
@@ -166,7 +167,7 @@ export function AuthPageShell({
                 </span>
                 <span className="h-1.5 w-1.5 rounded-full bg-secondary-fixed" />
                 <span className="font-kicker text-kicker tracking-widest text-surface-variant uppercase">
-                  256-BİT SSL ŞİFRELEME
+                  BORDO-MAVİ DİJİTAL TRİBÜN
                 </span>
               </div>
             </div>
@@ -215,14 +216,7 @@ export function AuthCard({
   return (
     <div className="relative flex w-full flex-col overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg text-on-surface shadow-2xl sm:p-space-xl">
       <div className="flex items-center gap-space-md pb-space-lg">
-        <div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-sm bg-surface-container p-1">
-          <div className="flex h-full w-full flex-col items-center justify-center bg-primary-container/90 text-tertiary-fixed-dim">
-            <span className="text-xl leading-none">★</span>
-            <span className="mt-0.5 font-kicker text-[8px] font-bold tracking-widest text-on-primary">
-              1967
-            </span>
-          </div>
-        </div>
+        <BrandLogo size={56} />
         <div className="flex flex-col">
           <span className="font-headline text-headline-sm font-bold tracking-tight text-primary uppercase">
             TRABZONLY
@@ -246,16 +240,7 @@ export function AuthCard({
 
       {children}
 
-      {footer ?? (
-        <div className="mt-space-md flex items-center justify-between pt-space-sm text-on-surface-variant">
-          <span className="font-kicker text-kicker font-bold tracking-widest text-primary uppercase">
-            61. DAKİKA COŞKUSU
-          </span>
-          <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-            BORDO - MAVİ
-          </span>
-        </div>
-      )}
+      {footer}
     </div>
   )
 }

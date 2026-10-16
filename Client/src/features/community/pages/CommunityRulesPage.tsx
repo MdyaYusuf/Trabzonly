@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { BrandLogo } from '@/core/components/BrandLogo'
 import {
   communityRuleSections,
   communityRulesToc,
@@ -72,9 +73,7 @@ export function CommunityRulesPage() {
 
         <div className="relative z-10 mx-auto flex min-h-[520px] max-w-[1240px] flex-col justify-end px-4 pt-20 pb-16 sm:px-6 md:min-h-[580px] md:pt-28 md:pb-24 lg:px-12">
           <div className="mb-space-md flex items-center gap-space-sm">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-xs text-on-secondary">
-              ★
-            </span>
+            <BrandLogo size={28} />
             <span className="font-kicker text-kicker tracking-[0.22em] text-secondary-fixed-dim uppercase">
               TRABZONLY BAĞIMSIZ TARAFTAR TOPLULUĞU
             </span>

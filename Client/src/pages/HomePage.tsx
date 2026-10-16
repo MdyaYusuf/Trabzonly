@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { BrandLogo } from '../core/components/BrandLogo'
 import { useAppSelector } from '../core/store/hooks'
 import postService from '../features/posts/postService'
 import type { PostResponseDto } from '../features/posts/postTypes'
@@ -366,14 +367,10 @@ export function HomePage() {
 
           <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-col items-center px-4 text-center sm:px-6 lg:px-12">
             <div className="mb-space-sm flex items-center justify-center p-space-lg">
-              <div className="flex h-20 w-16 items-center justify-center rounded-lg bg-surface-container-lowest/10 p-space-xs shadow-2xl backdrop-blur-md sm:h-24 sm:w-20">
-                <div className="flex h-full w-full flex-col items-center justify-center rounded bg-primary-container/80 text-tertiary-fixed-dim">
-                  <span className="text-2xl leading-none">★</span>
-                  <span className="mt-1 font-kicker text-[9px] font-bold tracking-widest text-on-primary">
-                    1967
-                  </span>
-                </div>
-              </div>
+              <BrandLogo
+                size={96}
+                className="h-20 w-20 drop-shadow-2xl sm:h-24 sm:w-24"
+              />
             </div>
 
             <div className="mb-space-xs flex items-center gap-space-xs">

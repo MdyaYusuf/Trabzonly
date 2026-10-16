@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
+import { BrandLogo } from '@/core/components/BrandLogo'
 import { adminShellProfile } from '@/features/admin/utils/adminHubPlaceholders'
 
 export function AdminSidebar() {
@@ -7,14 +8,7 @@ export function AdminSidebar() {
   return (
     <aside className="flex w-64 shrink-0 flex-col bg-primary text-on-primary">
       <div className="flex items-center gap-space-sm border-b border-white/10 px-space-md py-space-md">
-        <div className="flex h-10 w-10 items-center justify-center bg-primary-container">
-          <span
-            className="material-symbols-outlined text-[22px] text-tertiary-fixed-dim"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            sports_soccer
-          </span>
-        </div>
+        <BrandLogo size={40} />
         <div className="flex flex-col">
           <span className="font-headline text-headline-sm font-extrabold tracking-tight uppercase">
             {shell.brandTitle}

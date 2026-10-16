@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useState } from 'react'
+import { BrandLogo } from '@/core/components/BrandLogo'
 import { useAppSelector } from '@/core/store/hooks'
 
 const navItems = [
@@ -17,9 +18,7 @@ export function SiteHeader() {
     <header className="fixed top-0 right-0 left-0 z-50 w-full bg-primary/95 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-12">
         <Link to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container ring-1 ring-secondary-container/40">
-            <span className="text-xs font-extrabold text-tertiary-fixed-dim">★</span>
-          </div>
+          <BrandLogo size={36} className="sm:h-10 sm:w-10" />
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1">
               <span className="font-headline text-lg font-bold tracking-tight text-on-primary uppercase sm:text-headline-md">
