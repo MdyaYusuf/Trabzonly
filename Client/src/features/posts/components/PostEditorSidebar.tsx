@@ -3,6 +3,7 @@ import { editorGuidelines, featureTips } from '../utils/postEditorPlaceholders'
 
 type PostEditorSidebarProps = {
   mode: 'create' | 'edit'
+  cancelTo: string
   pollQuestion: string
   pollOptions: string[]
   hasExistingPoll?: boolean
@@ -21,6 +22,7 @@ type PostEditorSidebarProps = {
 
 export function PostEditorSidebar({
   mode,
+  cancelTo,
   pollQuestion,
   pollOptions,
   hasExistingPoll = false,
@@ -194,7 +196,7 @@ export function PostEditorSidebar({
 
       <div className="mt-auto flex w-full flex-wrap items-center justify-end gap-space-sm pt-space-md">
         <Link
-          to="/gonderiler"
+          to={cancelTo}
           className="font-label flex items-center gap-1 px-space-md py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase transition-colors hover:text-error"
         >
           <span className="material-symbols-outlined text-[18px]">close</span>

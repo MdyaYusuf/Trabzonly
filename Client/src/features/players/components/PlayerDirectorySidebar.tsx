@@ -184,11 +184,13 @@ export function PlayerDirectorySidebar() {
         </div>
         <Link
           to="/kadrolar/olustur"
-          className="font-label ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
+          className="font-label group ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
         >
           <SquadCreateIcon size={16} />
           <span>Kadro oluştur</span>
-          <span className="material-symbols-outlined text-base">arrow_forward</span>
+          <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-0.5">
+            arrow_forward
+          </span>
         </Link>
       </div>
     </aside>

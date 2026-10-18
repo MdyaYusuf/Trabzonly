@@ -5,6 +5,7 @@ import type { CategoryResponseDto } from '../../categories/categoryTypes'
 
 type PostEditorToolbarProps = {
   mode: 'create' | 'edit'
+  cancelTo: string
   title: string
   categoryId: number | ''
   categories: CategoryResponseDto[]
@@ -17,6 +18,7 @@ type PostEditorToolbarProps = {
 
 export function PostEditorToolbar({
   mode,
+  cancelTo,
   title,
   categoryId,
   categories,
@@ -30,7 +32,10 @@ export function PostEditorToolbar({
     <section className="w-full bg-surface py-space-md">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-md px-4 sm:px-6 lg:px-12">
         <div className="flex flex-wrap items-center gap-space-md">
-          <PageBackButton to="/gonderiler" label="Gönderiler listesine dön" />
+          <PageBackButton
+            to={cancelTo}
+            label={mode === 'edit' ? 'Gönderi detayına dön' : 'Gönderiler listesine dön'}
+          />
           <nav
             aria-label="Breadcrumb"
             className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
@@ -58,7 +63,7 @@ export function PostEditorToolbar({
           </div>
           <div className="flex flex-wrap items-center gap-space-sm">
             <Link
-              to="/gonderiler"
+              to={cancelTo}
               className="font-label flex items-center gap-1 px-space-md py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase transition-colors hover:text-error"
             >
               <span className="material-symbols-outlined text-[18px]">close</span>

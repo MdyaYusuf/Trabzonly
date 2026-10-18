@@ -33,7 +33,4 @@
   <path d="M208 236 L248 236 L248 392 L208 352 Z" fill="url(#maviGrad)"/>
   <!-- Right column (Crisp White) -->
   <path d="M264 236 L304 236 L304 352 L264 392 Z" fill="#FFFFFF"/>
-
-  <!-- Clean Bottom Anchor Wave Stripe -->
-  <path d="M120 420 C 180 436, 332 436, 392 420" fill="none" stroke="#89CBF8" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
 </svg>

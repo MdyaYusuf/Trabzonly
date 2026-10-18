@@ -415,7 +415,7 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
                         )
                         setReplyDraft('')
                       }}
-                      className="inline-flex items-center gap-1 hover:text-primary"
+                      className="inline-flex cursor-pointer items-center gap-1 hover:text-primary"
                     >
                       <span className="material-symbols-outlined text-[16px]">reply</span>
                       Cevapla{replies.length > 0 ? ` (${replies.length})` : ''}

@@ -240,11 +240,13 @@ export function SquadsGallerySidebar() {
 
             <Link
               to="/kadrolarim"
-              className="font-label ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
+              className="font-label group ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
             >
               <span className="material-symbols-outlined text-base">folder_special</span>
               <span>Kadrolarıma Git</span>
-              <span className="material-symbols-outlined text-base">arrow_forward</span>
+              <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-0.5">
+                arrow_forward
+              </span>
             </Link>
           </div>
         )}

@@ -84,11 +84,13 @@ export function PostsFeedSidebar() {
         </div>
         <Link
           to="/topluluk-kurallari"
-          className="font-label ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
+          className="font-label group ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
         >
           <span className="material-symbols-outlined text-base">menu_book</span>
           <span>Tüm topluluk kuralları</span>
-          <span className="material-symbols-outlined text-base">arrow_forward</span>
+          <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-0.5">
+            arrow_forward
+          </span>
         </Link>
       </div>
 

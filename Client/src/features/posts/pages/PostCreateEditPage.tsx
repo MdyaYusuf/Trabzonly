@@ -16,6 +16,8 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
   const navigate = useNavigate()
   const mode = modeProp ?? (params.postId ? 'edit' : 'create')
   const postId = params.postId
+  const cancelTo =
+    mode === 'edit' && postId ? `/gonderiler/${postId}` : '/gonderiler'
 
   const [categories, setCategories] = useState<CategoryResponseDto[]>([])
   const [title, setTitle] = useState('')
@@ -228,6 +230,7 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
       <PostEditorToolbar
         mode={mode}
+        cancelTo={cancelTo}
         title={title}
         categoryId={categoryId}
         categories={categories}
@@ -266,6 +269,7 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
 
             <PostEditorSidebar
               mode={mode}
+              cancelTo={cancelTo}
               pollQuestion={pollQuestion}
               pollOptions={pollOptions}
               hasExistingPoll={hasExistingPoll}

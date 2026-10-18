@@ -65,7 +65,7 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
       ) : null}
 
       <div
-        className="font-body whitespace-pre-wrap text-body-lg leading-relaxed text-on-surface"
+        className="font-body whitespace-pre-wrap bg-on-surface/[0.03] px-space-md py-space-md text-body-lg leading-relaxed text-text-dark sm:px-space-lg sm:py-space-lg"
         style={{ fontSize: `${textScale}rem` }}
       >
         {post.content}

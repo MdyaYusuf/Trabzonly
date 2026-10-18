@@ -221,6 +221,17 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
         playerId={player.id}
         positionAbbreviation={player.positionAbbreviation}
       />
+
+      <Link
+        to="/oyuncular"
+        className="font-label group flex w-full cursor-pointer items-center justify-start gap-space-xs bg-surface-container-lowest px-space-md py-space-sm text-label-md font-bold tracking-wider text-primary uppercase shadow-sm transition-all hover:text-secondary"
+      >
+        <span className="material-symbols-outlined text-[18px]">groups</span>
+        <span className="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-0.5">
+          arrow_back
+        </span>
+        <span>Tüm Oyunculara Dön</span>
+      </Link>
     </aside>
   )
 }

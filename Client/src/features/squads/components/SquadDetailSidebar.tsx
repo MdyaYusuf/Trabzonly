@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { SquadDetailViewModel, SquadInstructionRow } from '../utils/squadDetailTypes'
 
 type SquadDetailSidebarProps = {
@@ -170,6 +171,17 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
           </div>
         </div>
       ) : null}
+
+      <Link
+        to="/kadrolar"
+        className="font-label group flex w-full cursor-pointer items-center justify-start gap-space-xs bg-surface-container-lowest px-space-md py-space-sm text-label-md font-bold tracking-wider text-primary uppercase shadow-sm transition-all hover:text-secondary"
+      >
+        <span className="material-symbols-outlined text-[18px]">grid_on</span>
+        <span className="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-0.5">
+          arrow_back
+        </span>
+        <span>Tüm Kadrolara Dön</span>
+      </Link>
     </aside>
   )
 }

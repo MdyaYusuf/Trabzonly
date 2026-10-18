@@ -83,12 +83,17 @@ export function PostDetailHeader({
         ) : null}
       </div>
 
-      <h1 className="font-headline text-headline-lg font-bold tracking-tight text-primary uppercase lg:text-display-sm">
+      <h1 className="font-headline max-w-full text-headline-md leading-tight font-extrabold tracking-tight text-primary uppercase sm:text-[32px] sm:leading-9">
         {post.title}
       </h1>
 
       {post.description ? (
-        <p className="font-body max-w-3xl text-body-lg text-on-surface-variant">{post.description}</p>
+        <p
+          className="font-body max-w-3xl leading-relaxed text-on-surface-variant"
+          style={{ fontSize: `${textScale}rem` }}
+        >
+          {post.description}
+        </p>
       ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-space-sm border-y border-surface-container py-space-sm">
