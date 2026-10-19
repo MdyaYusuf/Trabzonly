@@ -33,6 +33,14 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
     }
   }
 
+  public void UsernameMustNotBeEmpty(string? username)
+  {
+    if (string.IsNullOrWhiteSpace(username))
+    {
+      throw new BusinessException("Kullanıcı adı boş olamaz.");
+    }
+  }
+
   public async Task EmailMustBeUniqueAsync(string email, Guid? id = null, CancellationToken cancellationToken = default)
   {
     string normalized = email.Trim().ToLowerInvariant();

@@ -209,7 +209,7 @@ type AuthCardProps = {
 export function AuthCard({
   title,
   subtitle,
-  brandKicker = 'TARAFTAR PLATFORMU',
+  brandKicker = 'TARAFTAR TOPLULUĞU',
   children,
   footer,
 }: AuthCardProps) {

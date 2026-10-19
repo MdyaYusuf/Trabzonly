@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Api.Core.Exceptions;
 using Api.Core.Helpers;
 using Api.Core.Repositories;
 using Api.Core.Responses;
@@ -115,6 +116,95 @@ public class UserService(
     {
       Success = true,
       Message = "Kullanıcı bilgileri başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<PublicUserProfileDto>> GetPublicByUsernameAsync(
+    string username,
+    Guid? currentUserId = null,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.UsernameMustNotBeEmpty(username);
+
+    string normalizedUsername = username.Trim().ToLowerInvariant();
+
+    var profile = await _userRepository.Query(enableTracking: false)
+      .Where(u => u.IsActive && u.Username.ToLower() == normalizedUsername)
+      .Select(u => new
+      {
+        u.Id,
+        u.Username,
+        u.Bio,
+        u.DisplayTag,
+        u.ProfileImageUrl,
+        u.CreatedDate,
+        FollowerCount = u.Followers.Count,
+        FollowingCount = u.Following.Count,
+        PostCount = u.Posts.Count(p => p.IsActive),
+        SquadCount = u.Squads.Count,
+        QuizAttemptCount = u.QuizResults.Count
+      })
+      .FirstOrDefaultAsync(cancellationToken);
+
+    if (profile == null)
+    {
+      throw new NotFoundException("Kullanıcı bulunamadı.");
+    }
+
+    int? quizAveragePercent = null;
+
+    if (profile.QuizAttemptCount > 0)
+    {
+      List<double> attemptPercents = await _userRepository.Query(enableTracking: false)
+        .Where(u => u.Id == profile.Id)
+        .SelectMany(u => u.QuizResults)
+        .Select(r => new
+        {
+          r.Score,
+          MaxPoints = r.Quiz.Questions.Sum(q => q.Points)
+        })
+        .Where(r => r.MaxPoints > 0)
+        .Select(r => 100.0 * r.Score / r.MaxPoints)
+        .ToListAsync(cancellationToken);
+
+      if (attemptPercents.Count > 0)
+      {
+        quizAveragePercent = (int)Math.Round(attemptPercents.Average());
+      }
+    }
+
+    bool? isFollowedByCurrentUser = null;
+
+    if (currentUserId.HasValue && currentUserId.Value != profile.Id)
+    {
+      isFollowedByCurrentUser = await _userFollowRepository.AnyAsync(
+        f => f.FollowerId == currentUserId.Value && f.FollowingId == profile.Id,
+        cancellationToken);
+    }
+
+    PublicUserProfileDto response = new()
+    {
+      Id = profile.Id,
+      Username = profile.Username,
+      Bio = profile.Bio,
+      DisplayTag = profile.DisplayTag,
+      ProfileImageUrl = profile.ProfileImageUrl,
+      CreatedDate = profile.CreatedDate,
+      FollowerCount = profile.FollowerCount,
+      FollowingCount = profile.FollowingCount,
+      IsFollowedByCurrentUser = isFollowedByCurrentUser,
+      PostCount = profile.PostCount,
+      SquadCount = profile.SquadCount,
+      QuizAttemptCount = profile.QuizAttemptCount,
+      QuizAveragePercent = quizAveragePercent
+    };
+
+    return new ReturnModel<PublicUserProfileDto>()
+    {
+      Success = true,
+      Message = "Herkese açık profil bilgileri başarılı bir şekilde getirildi.",
       Data = response,
       StatusCode = 200
     };

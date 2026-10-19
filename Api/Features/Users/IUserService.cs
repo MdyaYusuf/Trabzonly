@@ -33,6 +33,11 @@ public interface IUserService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PublicUserProfileDto>> GetPublicByUsernameAsync(
+    string username,
+    Guid? currentUserId = null,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<List<UserPreviewDto>>> GetTopContributorsAsync(
     int count,
     Func<IQueryable<User>, IQueryable<User>>? include = null,

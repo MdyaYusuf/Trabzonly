@@ -31,6 +31,23 @@ public sealed record UserPreviewDto
   public DateTime CreatedDate { get; init; }
 }
 
+public sealed record PublicUserProfileDto
+{
+  public Guid Id { get; init; }
+  public string Username { get; init; } = null!;
+  public string? Bio { get; init; }
+  public string? DisplayTag { get; init; }
+  public string? ProfileImageUrl { get; init; }
+  public DateTime CreatedDate { get; init; }
+  public int FollowerCount { get; init; }
+  public int FollowingCount { get; init; }
+  public bool? IsFollowedByCurrentUser { get; init; }
+  public int PostCount { get; init; }
+  public int SquadCount { get; init; }
+  public int QuizAttemptCount { get; init; }
+  public int? QuizAveragePercent { get; init; }
+}
+
 public sealed record CreatedUserResponseDto
 {
   public Guid Id { get; init; }

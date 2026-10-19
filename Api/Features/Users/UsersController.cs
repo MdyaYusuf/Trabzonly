@@ -53,6 +53,20 @@ public class UsersController(IUserService _userService) : CustomBaseController
   }
 
   [AllowAnonymous]
+  [HttpGet("by-username/{username}")]
+  public async Task<IActionResult> GetPublicByUsername(
+    string username,
+    CancellationToken cancellationToken)
+  {
+    var result = await _userService.GetPublicByUsernameAsync(
+      username: username,
+      currentUserId: TryGetUserId(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [AllowAnonymous]
   [HttpGet("top-contributors/{count:int}")]
   public async Task<IActionResult> GetTopContributors(
     int count,
