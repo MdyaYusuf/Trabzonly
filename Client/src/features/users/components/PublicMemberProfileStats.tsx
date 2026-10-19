@@ -1,13 +1,60 @@
-import type { PublicMemberProfile } from '../utils/publicMemberProfileTypes'
+import type { PublicUserProfileDto } from '../userTypes'
+import type { PublicMemberStat } from '../utils/publicMemberProfileTypes'
 
 type PublicMemberProfileStatsProps = {
-  profile: PublicMemberProfile
+  profile: PublicUserProfileDto
+  followerCount: number
+  followingCount: number
 }
 
-export function PublicMemberProfileStats({ profile }: PublicMemberProfileStatsProps) {
+function buildStats(
+  profile: PublicUserProfileDto,
+  followerCount: number,
+  followingCount: number,
+): PublicMemberStat[] {
+  const quizValue =
+    profile.quizAttemptCount === 0
+      ? '0 / *'
+      : `${profile.quizAveragePercent ?? 0}% / ${profile.quizAttemptCount}`
+
+  return [
+    {
+      id: 'quiz',
+      label: 'Quiz Ortalaması',
+      value: quizValue,
+      unit: 'Başarı',
+    },
+    {
+      id: 'posts',
+      label: 'Toplam Gönderi',
+      value: String(profile.postCount),
+      unit: 'Yazı',
+    },
+    {
+      id: 'squads',
+      label: 'Taktik Kadrolar',
+      value: String(profile.squadCount),
+      unit: 'Diziliş',
+    },
+    {
+      id: 'network',
+      label: 'Topluluk Ağı',
+      value: String(followerCount),
+      unit: `Takipçi / ${followingCount} Takip`,
+    },
+  ]
+}
+
+export function PublicMemberProfileStats({
+  profile,
+  followerCount,
+  followingCount,
+}: PublicMemberProfileStatsProps) {
+  const stats = buildStats(profile, followerCount, followingCount)
+
   return (
-    <section className="grid grid-cols-2 gap-px overflow-hidden border border-outline-variant/40 bg-outline-variant/40 sm:grid-cols-3 lg:grid-cols-5">
-      {profile.stats.map((stat) => (
+    <section className="grid grid-cols-2 gap-px overflow-hidden border border-outline-variant/40 bg-outline-variant/40 sm:grid-cols-4">
+      {stats.map((stat) => (
         <div
           key={stat.id}
           className="flex flex-col gap-1 bg-surface-container-low px-space-md py-space-md"
@@ -15,7 +62,7 @@ export function PublicMemberProfileStats({ profile }: PublicMemberProfileStatsPr
           <span className="font-kicker text-kicker text-on-surface-variant uppercase">
             {stat.label}
           </span>
-          <div className="flex items-baseline gap-space-xs">
+          <div className="flex flex-wrap items-baseline gap-space-xs">
             <span className="font-headline text-headline-md font-extrabold text-primary tabular-nums">
               {stat.value}
             </span>
@@ -23,30 +70,6 @@ export function PublicMemberProfileStats({ profile }: PublicMemberProfileStatsPr
           </div>
         </div>
       ))}
-
-      <div className="col-span-2 flex flex-col justify-center gap-space-sm bg-surface-container-low px-space-md py-space-md sm:col-span-3 lg:col-span-1">
-        <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-          12 Rozet Kazanıldı
-        </span>
-        <div className="flex items-center gap-1">
-          {profile.badgePreviewIcons.map((icon) => (
-            <span
-              key={icon}
-              className="flex h-8 w-8 items-center justify-center bg-primary-container text-tertiary-fixed-dim"
-            >
-              <span
-                className="material-symbols-outlined text-[18px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                {icon}
-              </span>
-            </span>
-          ))}
-          <span className="font-label bg-surface-container-high px-space-sm py-1 text-label-md font-bold text-primary">
-            +{profile.badgeExtraCount}
-          </span>
-        </div>
-      </div>
     </section>
   )
 }
