@@ -331,14 +331,11 @@ public class UserService(
 
     User user = await _businessRules.GetUserIfExistAsync(currentUserId, enableTracking: true, cancellationToken: cancellationToken);
 
-    _businessRules.UsernameCannotBeRestrictedWord(request.Username);
-    await _businessRules.UsernameMustBeUniqueAsync(request.Username, user.Id, cancellationToken);
-
     user.ProfileImageUrl = await FileHelper.ReplaceImageOnDisk(
       request.ImageFile,
       user.ProfileImageUrl,
       "profiles",
-      request.Username,
+      user.Username,
       cancellationToken);
 
     _mapper.UpdateEntityFromRequest(request, user);

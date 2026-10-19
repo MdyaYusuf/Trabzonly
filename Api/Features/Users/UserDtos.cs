@@ -61,7 +61,6 @@ public sealed record UserFollowResponseDto(
 
 // Requests
 public sealed record UpdateUserRequest(
-  string Username,
   string? Bio,
   string? DisplayTag,
   IFormFile? ImageFile);

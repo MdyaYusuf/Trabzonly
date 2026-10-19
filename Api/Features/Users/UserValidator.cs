@@ -6,10 +6,6 @@ public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
 {
   public UpdateUserRequestValidator()
   {
-    RuleFor(u => u.Username)
-      .NotEmpty().WithMessage("Kullanıcı adı boş olamaz.")
-      .MinimumLength(3).WithMessage("Kullanıcı adı en az 3 karakter olmalıdır.");
-
     RuleFor(u => u.Bio)
       .MaximumLength(1000).WithMessage("Bio en fazla 1000 karakter olabilir.");
 

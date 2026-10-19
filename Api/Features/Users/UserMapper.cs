@@ -11,6 +11,8 @@ public partial class UserMapper
   [MapperIgnoreTarget(nameof(User.PasswordHash))]
   [MapperIgnoreTarget(nameof(User.PasswordKey))]
   public partial User CreateToEntity(RegisterUserRequest request);
+  [MapperIgnoreSource(nameof(UpdateUserRequest.ImageFile))]
+  [MapperIgnoreTarget(nameof(User.Username))]
   [MapperIgnoreTarget(nameof(User.ProfileImageUrl))]
   public partial void UpdateEntityFromRequest(UpdateUserRequest request, User entity);
   [MapProperty("Role.Name", nameof(UserResponseDto.RoleName))]
