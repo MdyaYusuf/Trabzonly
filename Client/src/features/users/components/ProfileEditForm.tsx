@@ -71,7 +71,6 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
   }, [dispatch])
 
   function handleReset() {
-    setUsername(authUser?.username ?? '')
     setBio(authUser?.bio ?? '')
     setDisplayTag(authUser?.displayTag ?? DEFAULT_USER_DISPLAY_TAG)
     setImageFile(null)
@@ -84,14 +83,13 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (isSaving || username.trim().length === 0) {
+    if (isSaving) {
       return
     }
 
     setIsSaving(true)
 
     const result = await userService.updateProfile({
-      username: username.trim(),
       bio: bio.trim().length > 0 ? bio.trim() : null,
       displayTag: displayTag.trim() || DEFAULT_USER_DISPLAY_TAG,
       imageFile,
@@ -193,25 +191,17 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
       <form className="flex flex-col gap-space-md" onSubmit={(event) => void handleSubmit(event)}>
         <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
           <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <label className="font-label text-label-md font-bold text-on-surface uppercase">
-                Kullanıcı Adı
-              </label>
-              <span className="font-kicker text-kicker text-on-surface-variant">
-                {username.length}/50
-              </span>
-            </div>
+            <label className="font-label text-label-md font-bold text-on-surface uppercase">
+              Kullanıcı Adı
+            </label>
             <input
               type="text"
-              maxLength={50}
+              readOnly
               value={username}
-              onChange={(event) => {
-                setUsername(event.target.value)
-              }}
-              className="font-body w-full bg-surface-container-lowest px-space-md py-space-xs text-body-md text-on-surface shadow-sm focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:outline-none"
+              className="font-body w-full cursor-default bg-surface-container-low px-space-md py-space-xs text-body-md text-on-surface-variant shadow-sm outline-none"
             />
             <span className="font-body text-body-sm text-on-surface-variant">
-              Yorumlarınızda ve profilinizde bu isim görünür.
+              Kullanıcı adı kayıt sonrası değiştirilemez.
             </span>
           </div>
 
@@ -342,7 +332,7 @@ export function ProfileEditForm({ onSaved }: ProfileEditFormProps) {
           </button>
           <button
             type="submit"
-            disabled={isSaving || username.trim().length === 0}
+            disabled={isSaving}
             className="bg-primary px-space-lg py-space-xs font-label text-label-md tracking-wider text-on-primary uppercase shadow-md transition-all hover:bg-primary-container disabled:opacity-50"
           >
             {isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}

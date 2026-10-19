@@ -3,6 +3,7 @@ import type { ApiResponse, NoData, PaginationRequest, PagedResponse, CursorPaged
 import type {
   UserResponseDto,
   UserPreviewDto,
+  PublicUserProfileDto,
   UpdateUserRequest,
   ChangePasswordRequest,
   UserFollowResponseDto,
@@ -43,6 +44,14 @@ const getById = async (id: string): Promise<ApiResponse<UserResponseDto>> => {
 
 const getMe = async (): Promise<ApiResponse<UserResponseDto>> => {
   return await apiClient<UserResponseDto>(`${API_URL}/me`);
+};
+
+const getByUsername = async (
+  username: string,
+): Promise<ApiResponse<PublicUserProfileDto>> => {
+  return await apiClient<PublicUserProfileDto>(
+    `${API_URL}/by-username/${encodeURIComponent(username)}`,
+  );
 };
 
 const getTopContributors = async (count: number): Promise<ApiResponse<UserPreviewDto[]>> => {
@@ -105,6 +114,7 @@ const userService = {
   getAll,
   getById,
   getMe,
+  getByUsername,
   getTopContributors,
   getNewestMembers,
   updateProfile,

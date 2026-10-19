@@ -27,6 +27,22 @@ export interface UserPreviewDto {
   createdDate: string
 }
 
+export interface PublicUserProfileDto {
+  id: string
+  username: string
+  bio?: string | null
+  displayTag?: string | null
+  profileImageUrl?: string | null
+  createdDate: string
+  followerCount: number
+  followingCount: number
+  isFollowedByCurrentUser?: boolean | null
+  postCount: number
+  squadCount: number
+  quizAttemptCount: number
+  quizAveragePercent?: number | null
+}
+
 export interface CreatedUserResponseDto {
   id: string
   username: string
@@ -40,7 +56,6 @@ export interface UserFollowResponseDto {
 
 // Requests
 export interface UpdateUserRequest {
-  username: string
   bio?: string | null
   displayTag?: string | null
   imageFile?: File | null
