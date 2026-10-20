@@ -205,6 +205,7 @@ export function mapSquadToDetailView(squad: SquadResponseDto): SquadDetailViewMo
     authorUsername: squad.authorUsername,
     authorDisplayTag: squad.authorDisplayTag,
     authorInitials: initialsFromUsername(squad.authorUsername),
+    authorProfileImageUrl: squad.authorProfileImageUrl,
     publishedLabel: formatRelativeTime(squad.createdDate),
     rating: squad.averageRating,
     ratingCount: squad.ratingCount,

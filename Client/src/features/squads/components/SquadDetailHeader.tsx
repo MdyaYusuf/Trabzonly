@@ -137,9 +137,17 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
                 <UserProfileLink
                   username={squad.authorUsername}
                   aria-label={`@${squad.authorUsername} profili`}
-                  className="font-headline relative flex h-12 w-12 items-center justify-center bg-primary text-headline-sm font-bold text-on-primary shadow-sm"
+                  className="font-headline relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-primary text-[13px] font-bold text-on-primary shadow-sm"
                 >
-                  {squad.authorInitials}
+                  {squad.authorProfileImageUrl ? (
+                    <img
+                      src={squad.authorProfileImageUrl}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    squad.authorInitials
+                  )}
                 </UserProfileLink>
                 <div className="flex flex-col">
                   <div className="flex flex-wrap items-center gap-space-xs">

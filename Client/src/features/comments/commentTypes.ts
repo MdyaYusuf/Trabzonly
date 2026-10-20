@@ -27,6 +27,7 @@ export interface CommentResponseDto {
   userId: string
   authorUsername: string
   authorDisplayTag?: string | null
+  authorProfileImageUrl?: string | null
   postId?: string
   playerId?: number
   squadId?: string

@@ -26,6 +26,7 @@ export interface SquadResponseDto {
   userId: string
   authorUsername: string
   authorDisplayTag?: string | null
+  authorProfileImageUrl?: string | null
   averageRating: number
   ratingCount: number
   viewCount: number
@@ -56,6 +57,7 @@ export interface SquadPreviewDto {
   userId: string
   authorUsername: string
   authorDisplayTag?: string | null
+  authorProfileImageUrl?: string | null
   averageRating: number
   ratingCount: number
   viewCount: number

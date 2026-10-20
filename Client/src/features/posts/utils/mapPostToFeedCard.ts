@@ -99,6 +99,7 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
     authorInitials: initialsFromUsername(post.authorUsername),
     authorUsername: post.authorUsername,
     authorDisplayTag: post.authorDisplayTag,
+    authorProfileImageUrl: post.authorProfileImageUrl,
     likeCount: post.likeCount,
     dislikeCount: post.dislikeCount,
     commentCount: post.commentCount,

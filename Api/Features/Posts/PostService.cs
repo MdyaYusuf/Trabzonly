@@ -67,6 +67,7 @@ public class PostService(
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
+        AuthorProfileImageUrl = p.User.ProfileImageUrl,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name,
         Poll = p.Polls
@@ -104,7 +105,13 @@ public class PostService(
           })
           .FirstOrDefault(),
         IsAuthorFollowedByCurrentUser = viewerId.HasValue &&
-          p.User.Followers.Any(follow => follow.FollowerId == viewerId.Value)
+          p.User.Followers.Any(follow => follow.FollowerId == viewerId.Value),
+        CurrentReaction = viewerId.HasValue
+          ? p.Reactions
+              .Where(reaction => reaction.UserId == viewerId.Value)
+              .Select(reaction => (PostReactionType?)reaction.Type)
+              .FirstOrDefault()
+          : null
       })
       .ToListAsync(cancellationToken);
 
@@ -149,6 +156,7 @@ public class PostService(
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
+        AuthorProfileImageUrl = p.User.ProfileImageUrl,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name,
         Poll = p.Polls
@@ -241,6 +249,7 @@ public class PostService(
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
+        AuthorProfileImageUrl = p.User.ProfileImageUrl,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name,
         Poll = p.Polls
@@ -335,6 +344,7 @@ public class PostService(
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
+        AuthorProfileImageUrl = p.User.ProfileImageUrl,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name,
         Poll = p.Polls
@@ -465,6 +475,7 @@ public class PostService(
         UserId = p.UserId,
         AuthorUsername = p.User.Username,
         AuthorDisplayTag = p.User.DisplayTag,
+        AuthorProfileImageUrl = p.User.ProfileImageUrl,
         CategoryId = p.CategoryId,
         CategoryName = p.Category.Name,
         Poll = p.Polls
@@ -662,6 +673,7 @@ public class PostService(
       cancellationToken: cancellationToken);
 
     _businessRules.PostMustBeActive(post);
+    _businessRules.UserCannotReactToOwnPost(post, currentUserId);
 
     PostReaction? existingReaction = await _postReactionRepository.GetAsync(
       predicate: r => r.PostId == postId && r.UserId == currentUserId,

@@ -38,6 +38,7 @@ export interface PostResponseDto {
   userId: string;
   authorUsername: string;
   authorDisplayTag?: string | null;
+  authorProfileImageUrl?: string | null;
   categoryId: number;
   categoryName: string;
   poll?: PostPollSummaryDto | null;

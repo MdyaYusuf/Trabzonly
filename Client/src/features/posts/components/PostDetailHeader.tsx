@@ -21,6 +21,16 @@ function formatPublishedLabel(isoDate: string): string {
   })
 }
 
+function initialsFromUsername(username: string): string {
+  const cleaned = username.trim()
+
+  if (cleaned.length === 0) {
+    return '?'
+  }
+
+  return cleaned.slice(0, 2).toUpperCase()
+}
+
 export function PostDetailHeader({
   post,
   textScale,
@@ -101,25 +111,42 @@ export function PostDetailHeader({
         <div className="flex flex-wrap items-center gap-space-sm">
           <UserProfileLink
             username={post.authorUsername}
-            className="font-label text-label-md font-bold text-on-surface transition-colors hover:text-primary"
-          />
-          {post.authorDisplayTag ? (
-            <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
-              {post.authorDisplayTag}
-            </span>
-          ) : null}
-          {canFollow ? (
-            <button
-              type="button"
-              disabled={isFollowUpdating}
-              onClick={() => {
-                void handleFollowToggle()
-              }}
-              className="font-kicker cursor-pointer px-space-xs py-0.5 text-kicker font-bold text-secondary uppercase disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isFollowing ? 'Takiptesin' : 'Takip Et'}
-            </button>
-          ) : null}
+            aria-label={`@${post.authorUsername} profili`}
+            className="font-headline flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-container text-[12px] font-bold text-on-primary"
+          >
+            {post.authorProfileImageUrl ? (
+              <img
+                src={post.authorProfileImageUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              initialsFromUsername(post.authorUsername)
+            )}
+          </UserProfileLink>
+          <div className="flex flex-wrap items-center gap-space-sm">
+            <UserProfileLink
+              username={post.authorUsername}
+              className="font-label text-label-md font-bold text-on-surface transition-colors hover:text-primary"
+            />
+            {post.authorDisplayTag ? (
+              <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
+                {post.authorDisplayTag}
+              </span>
+            ) : null}
+            {canFollow ? (
+              <button
+                type="button"
+                disabled={isFollowUpdating}
+                onClick={() => {
+                  void handleFollowToggle()
+                }}
+                className="font-kicker cursor-pointer px-space-xs py-0.5 text-kicker font-bold text-secondary uppercase disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isFollowing ? 'Takiptesin' : 'Takip Et'}
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="flex items-center gap-space-xs">

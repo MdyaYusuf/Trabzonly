@@ -108,6 +108,14 @@ public class PostBusinessRules(IPostRepository _postRepository)
     }
   }
 
+  public void UserCannotReactToOwnPost(Post post, Guid currentUserId)
+  {
+    if (post.UserId == currentUserId)
+    {
+      throw new BusinessException("Kendi gönderinize tepki veremezsiniz.");
+    }
+  }
+
   public void PostMustNotHaveActivePoll(Post post)
   {
     bool hasActivePoll = post.Polls.Any(poll => poll.IsActive);

@@ -34,6 +34,7 @@ export type SquadDetailViewModel = {
   authorUsername: string
   authorDisplayTag?: string | null
   authorInitials: string
+  authorProfileImageUrl?: string | null
   publishedLabel: string
   rating: number
   ratingCount: number

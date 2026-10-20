@@ -16,6 +16,7 @@ type PostDetailArticleProps = {
 
 export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const currentUserId = useAppSelector((state) => state.auth.user?.id)
   const [likeCount, setLikeCount] = useState(post.likeCount)
   const [dislikeCount, setDislikeCount] = useState(post.dislikeCount)
   const [currentReaction, setCurrentReaction] = useState<PostReactionType | null>(
@@ -25,6 +26,11 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
 
   async function handleReact(type: PostReactionType) {
     if (!isAuthenticated || isReacting) {
+      return
+    }
+
+    if (currentUserId != null && currentUserId === post.userId) {
+      toast.warning('Kendi gönderinize tepki veremezsiniz.')
       return
     }
 

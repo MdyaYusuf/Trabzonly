@@ -42,6 +42,7 @@ export type FeedPostCard = {
   authorInitials: string
   authorUsername: string
   authorDisplayTag?: string | null
+  authorProfileImageUrl?: string | null
   likeCount: number
   dislikeCount: number
   commentCount: number

@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useState } from 'react'
 import { BrandLogo } from '@/core/components/BrandLogo'
+import { SiteHeaderAccountMenu } from '@/core/components/layout/SiteHeaderAccountMenu'
 import { useAppSelector } from '@/core/store/hooks'
 
 const navItems = [
@@ -11,7 +12,7 @@ const navItems = [
 ] as const
 
 export function SiteHeader() {
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth)
+  const { isAuthenticated } = useAppSelector((state) => state.auth)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
@@ -53,12 +54,7 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 lg:flex">
           {isAuthenticated ? (
-            <Link
-              to="/profil"
-              className="bg-secondary-container px-4 py-1 font-label text-label-md tracking-wider text-on-secondary-container uppercase transition-all hover:bg-surface-container-lowest hover:text-on-surface"
-            >
-              {user?.username ?? 'Profil'}
-            </Link>
+            <SiteHeaderAccountMenu />
           ) : (
             <>
               <Link
@@ -77,17 +73,26 @@ export function SiteHeader() {
           )}
         </div>
 
-        <button
-          type="button"
-          className="flex h-10 w-10 items-center justify-center text-on-primary lg:hidden"
-          aria-expanded={mobileOpen}
-          aria-label={mobileOpen ? 'Menüyü kapat' : 'Menüyü aç'}
-          onClick={() => setMobileOpen((open) => !open)}
-        >
-          <span className="material-symbols-outlined text-2xl">
-            {mobileOpen ? 'close' : 'menu'}
-          </span>
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          {isAuthenticated ? (
+            <SiteHeaderAccountMenu
+              onNavigate={() => {
+                setMobileOpen(false)
+              }}
+            />
+          ) : null}
+          <button
+            type="button"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center text-on-primary"
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+            onClick={() => setMobileOpen((open) => !open)}
+          >
+            <span className="material-symbols-outlined text-2xl">
+              {mobileOpen ? 'close' : 'menu'}
+            </span>
+          </button>
+        </div>
       </div>
 
       {mobileOpen ? (
@@ -104,34 +109,24 @@ export function SiteHeader() {
               </NavLink>
             ))}
           </nav>
-          <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
-            {isAuthenticated ? (
+          {!isAuthenticated ? (
+            <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
               <Link
-                to="/profil"
+                to="/login"
                 onClick={() => setMobileOpen(false)}
                 className="bg-secondary-container px-4 py-3 text-center font-label text-label-md tracking-wider text-on-secondary-container uppercase"
               >
-                {user?.username ?? 'Profil'}
+                Giriş Yap
               </Link>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="bg-secondary-container px-4 py-3 text-center font-label text-label-md tracking-wider text-on-secondary-container uppercase"
-                >
-                  Giriş Yap
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setMobileOpen(false)}
-                  className="bg-primary-container px-4 py-3 text-center font-label text-label-md tracking-wider text-on-primary uppercase"
-                >
-                  Topluluğa Katıl
-                </Link>
-              </>
-            )}
-          </div>
+              <Link
+                to="/register"
+                onClick={() => setMobileOpen(false)}
+                className="bg-primary-container px-4 py-3 text-center font-label text-label-md tracking-wider text-on-primary uppercase"
+              >
+                Topluluğa Katıl
+              </Link>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </header>

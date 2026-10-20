@@ -277,6 +277,8 @@ public class CommentService(
       enableTracking: true,
       cancellationToken: cancellationToken);
 
+    _businessRules.UserCannotReactToOwnComment(comment, currentUserId);
+
     CommentReaction? existingReaction = await _commentReactionRepository.GetAsync(
       predicate: r => r.CommentId == commentId && r.UserId == currentUserId,
       enableTracking: true,

@@ -10,6 +10,7 @@ public partial class SquadMapper
 
   [MapProperty("User.Username", "AuthorUsername")]
   [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
+  [MapProperty("User.ProfileImageUrl", "AuthorProfileImageUrl")]
   [MapperIgnoreTarget(nameof(SquadResponseDto.CurrentUserScore))]
   [MapperIgnoreTarget(nameof(SquadResponseDto.IsAuthorFollowedByCurrentUser))]
   [MapperIgnoreTarget(nameof(SquadResponseDto.Slots))]
@@ -19,6 +20,7 @@ public partial class SquadMapper
 
   [MapProperty("User.Username", "AuthorUsername")]
   [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
+  [MapProperty("User.ProfileImageUrl", "AuthorProfileImageUrl")]
   [MapperIgnoreTarget(nameof(SquadPreviewDto.Slots))]
   public partial SquadPreviewDto EntityToPreviewDto(Squad entity);
 

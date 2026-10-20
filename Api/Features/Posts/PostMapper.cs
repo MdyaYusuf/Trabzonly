@@ -9,6 +9,7 @@ public partial class PostMapper
   public partial void UpdateEntityFromRequest(UpdatePostRequest request, Post entity);
   [MapProperty("User.Username", "AuthorUsername")]
   [MapProperty("User.DisplayTag", "AuthorDisplayTag")]
+  [MapProperty("User.ProfileImageUrl", "AuthorProfileImageUrl")]
   [MapProperty("Category.Name", "CategoryName")]
   public partial PostResponseDto EntityToResponseDto(Post entity);
   public partial CreatedPostResponseDto EntityToCreatedResponseDto(Post entity);

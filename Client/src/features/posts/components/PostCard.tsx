@@ -69,6 +69,11 @@ export function PostCard({ post }: PostCardProps) {
       return
     }
 
+    if (currentUserId != null && currentUserId === post.authorUserId) {
+      toast.warning('Kendi gönderinize tepki veremezsiniz.')
+      return
+    }
+
     setIsReacting(true)
 
     try {
@@ -100,17 +105,31 @@ export function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <article className="group relative border-b border-outline-variant/20 px-1 py-space-lg last:border-b-0 transition-colors hover:bg-on-surface/[0.03]">
-      <div className="flex gap-space-md">
+    <article className="group relative cursor-pointer border-b border-outline-variant/20 px-1 py-space-lg last:border-b-0 transition-colors hover:bg-on-surface/[0.03]">
+      <Link
+        to={detailPath}
+        className="absolute inset-0 z-0"
+        aria-label={post.title}
+      />
+
+      <div className="relative z-10 flex gap-space-md pointer-events-none">
         <UserProfileLink
           username={post.authorUsername}
           aria-label={`@${post.authorUsername} profili`}
           className={[
-            'flex h-10 w-10 shrink-0 items-center justify-center font-headline text-label-md font-bold',
+            'pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full font-headline text-label-md font-bold',
             avatarToneClass[post.categoryTone],
           ].join(' ')}
         >
-          {post.authorInitials}
+          {post.authorProfileImageUrl ? (
+            <img
+              src={post.authorProfileImageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            post.authorInitials
+          )}
         </UserProfileLink>
 
         <div className="min-w-0 flex-1">
@@ -118,7 +137,7 @@ export function PostCard({ post }: PostCardProps) {
             <div className="flex min-w-0 flex-wrap items-center gap-x-space-xs gap-y-0.5">
               <UserProfileLink
                 username={post.authorUsername}
-                className="font-label text-label-md font-bold text-on-surface transition-colors hover:text-primary"
+                className="pointer-events-auto font-label text-label-md font-bold text-on-surface transition-colors hover:text-primary"
               />
               {post.authorDisplayTag ? (
                 <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
@@ -133,7 +152,7 @@ export function PostCard({ post }: PostCardProps) {
                     void handleFollowToggle()
                   }}
                   className={[
-                    'font-kicker text-kicker font-bold uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+                    'pointer-events-auto font-kicker cursor-pointer text-kicker font-bold uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-50',
                     isFollowingAuthor
                       ? 'text-on-surface-variant hover:text-primary'
                       : 'text-secondary hover:text-primary',
@@ -152,26 +171,21 @@ export function PostCard({ post }: PostCardProps) {
             {post.categoryLabel}
           </span>
 
-          <Link to={detailPath} className="block">
-            <h2 className="font-headline text-headline-sm leading-snug font-bold text-primary transition-colors group-hover:text-secondary">
-              {post.title}
-            </h2>
-            <p className="font-body mt-space-sm line-clamp-3 text-body-md text-on-surface-variant">
-              {post.excerpt}
-            </p>
-          </Link>
+          <h2 className="font-headline text-headline-sm leading-snug font-bold text-primary transition-colors group-hover:text-secondary">
+            {post.title}
+          </h2>
+          <p className="font-body mt-space-sm line-clamp-3 text-body-md text-on-surface-variant">
+            {post.excerpt}
+          </p>
 
           {post.imageUrl ? (
-            <Link
-              to={detailPath}
-              className="mt-space-md block overflow-hidden border border-outline-variant/25"
-            >
+            <div className="mt-space-md overflow-hidden border border-outline-variant/25">
               <img
                 src={post.imageUrl}
                 alt=""
                 className="max-h-72 w-full object-cover transition-transform duration-300 group-hover:scale-[1.01]"
               />
-            </Link>
+            </div>
           ) : null}
 
           {post.topComment ? (
@@ -196,7 +210,7 @@ export function PostCard({ post }: PostCardProps) {
               </p>
               <UserProfileLink
                 username={post.topComment.authorUsername}
-                className="font-kicker mt-1 inline-block text-[10px] text-on-surface-variant uppercase transition-colors hover:text-primary"
+                className="pointer-events-auto font-kicker mt-1 inline-block text-[10px] text-on-surface-variant uppercase transition-colors hover:text-primary"
               >
                 — @{post.topComment.authorUsername}
               </UserProfileLink>
@@ -204,10 +218,7 @@ export function PostCard({ post }: PostCardProps) {
           ) : null}
 
           {post.poll ? (
-            <Link
-              to={detailPath}
-              className="mt-space-md block border-l-[3px] border-secondary bg-surface-container/55 px-space-sm py-space-sm transition-colors hover:bg-surface-container/80"
-            >
+            <div className="mt-space-md border-l-[3px] border-secondary bg-surface-container/55 px-space-sm py-space-sm transition-colors group-hover:bg-surface-container/80">
               <div className="mb-1 flex items-center justify-between gap-space-xs">
                 <span className="font-kicker text-[10px] font-bold tracking-wider text-secondary uppercase">
                   Anket
@@ -227,10 +238,10 @@ export function PostCard({ post }: PostCardProps) {
                   {post.poll.leadingOption.percentage}%
                 </span>
               </div>
-            </Link>
+            </div>
           ) : null}
 
-          <div className="mt-space-md flex flex-wrap items-center gap-space-xs">
+          <div className="pointer-events-auto mt-space-md flex flex-wrap items-center gap-space-xs">
             <ReactionButtons
               size="sm"
               likeCount={likeCount}
@@ -246,13 +257,10 @@ export function PostCard({ post }: PostCardProps) {
               }}
             />
 
-            <Link
-              to={detailPath}
-              className="inline-flex items-center gap-1 px-space-xs py-1 font-label text-[12px] font-bold text-on-surface-variant transition-colors hover:text-secondary"
-            >
+            <span className="inline-flex items-center gap-1 px-space-xs py-1 font-label text-[12px] font-bold text-on-surface-variant">
               <span className="material-symbols-outlined text-[16px]">chat</span>
               <span>{post.commentCount}</span>
-            </Link>
+            </span>
 
             <div className="ml-auto flex items-center gap-space-xs">
               {post.readTimeLabel ? (

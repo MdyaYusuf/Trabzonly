@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { authService } from '@/features/auth/authService'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { CommentAuthorAvatar } from '@/features/comments/components/CommentAuthorAvatar'
 import { UserProfileLink } from '@/features/users/components/UserProfileLink'
 import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
@@ -18,16 +20,6 @@ type PlayerCommentsSectionProps = {
 }
 
 const PAGE_COUNT = 20
-
-function initialsFromUsername(username: string): string {
-  const cleaned = username.trim()
-
-  if (cleaned.length === 0) {
-    return '?'
-  }
-
-  return cleaned.slice(0, 2).toUpperCase()
-}
 
 function formatRelativeTime(isoDate: string): string {
   const created = new Date(isoDate).getTime()
@@ -245,6 +237,13 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
       return
     }
 
+    const target = comments.find((comment) => comment.id === commentId)
+
+    if (target && user?.id === target.userId) {
+      toast.warning('Kendi yorumunuza tepki veremezsiniz.')
+      return
+    }
+
     const result =
       type === CommentReaction.Like
         ? await commentService.like(commentId)
@@ -268,7 +267,6 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
   }
 
   const displayUsername = user?.username ?? 'Misafir'
-  const displayInitials = initialsFromUsername(displayUsername)
 
   return (
     <section
@@ -295,9 +293,12 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
           onSubmit={handleCommentSubmit}
         >
           <div className="flex items-center gap-space-sm">
-            <div className="flex h-9 w-9 items-center justify-center bg-primary text-[13px] font-bold text-on-primary uppercase">
-              {displayInitials}
-            </div>
+            <CommentAuthorAvatar
+              username={displayUsername}
+              profileImageUrl={user?.profileImageUrl}
+              size="sm"
+              linkToProfile={false}
+            />
             <div className="flex flex-col">
               <span className="font-label text-label-md font-bold text-on-surface">
                 @{displayUsername}
@@ -371,13 +372,10 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
               <div key={comment.id} className="flex flex-col gap-space-sm bg-surface p-space-md">
                 <div className="flex items-start justify-between gap-space-sm">
                   <div className="flex items-center gap-space-sm">
-                    <UserProfileLink
+                    <CommentAuthorAvatar
                       username={comment.authorUsername}
-                      aria-label={`@${comment.authorUsername} profili`}
-                      className="font-headline flex h-10 w-10 items-center justify-center bg-primary-container text-headline-sm font-bold text-on-primary"
-                    >
-                      {initialsFromUsername(comment.authorUsername)}
-                    </UserProfileLink>
+                      profileImageUrl={comment.authorProfileImageUrl}
+                    />
                     <div>
                       <div className="flex flex-wrap items-center gap-space-xs">
                         <UserProfileLink

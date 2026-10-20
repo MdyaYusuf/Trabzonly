@@ -10,6 +10,7 @@ public sealed record CommentResponseDto(
   Guid UserId,
   string AuthorUsername,
   string? AuthorDisplayTag,
+  string? AuthorProfileImageUrl,
   Guid? PostId,
   int? PlayerId,
   Guid? SquadId,

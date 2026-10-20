@@ -42,6 +42,7 @@ public sealed record PostResponseDto
   public Guid UserId { get; init; }
   public string AuthorUsername { get; init; } = default!;
   public string? AuthorDisplayTag { get; init; }
+  public string? AuthorProfileImageUrl { get; init; }
   public int CategoryId { get; init; }
   public string CategoryName { get; init; } = default!;
   public PostPollSummaryDto? Poll { get; init; }

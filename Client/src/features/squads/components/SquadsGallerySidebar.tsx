@@ -145,11 +145,19 @@ export function SquadsGallerySidebar() {
                     username={squad.authorUsername}
                     aria-label={`@${squad.authorUsername} profili`}
                     className={[
-                      'flex h-8 w-8 shrink-0 items-center justify-center font-headline text-kicker font-bold',
+                      'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full font-headline text-label-md font-bold',
                       avatarTone,
                     ].join(' ')}
                   >
-                    {initialsFromUsername(squad.authorUsername)}
+                    {squad.authorProfileImageUrl ? (
+                      <img
+                        src={squad.authorProfileImageUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initialsFromUsername(squad.authorUsername)
+                    )}
                   </UserProfileLink>
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <span className="font-label line-clamp-2 text-label-md font-bold text-secondary">

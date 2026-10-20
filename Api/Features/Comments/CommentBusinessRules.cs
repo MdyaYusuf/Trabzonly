@@ -29,6 +29,14 @@ public class CommentBusinessRules(ICommentRepository _commentRepository)
     }
   }
 
+  public void UserCannotReactToOwnComment(Comment comment, Guid currentUserId)
+  {
+    if (comment.UserId == currentUserId)
+    {
+      throw new BusinessException("Kendi yorumunuza tepki veremezsiniz.");
+    }
+  }
+
   public async Task UserCannotExceedDailyCommentLimitAsync(
     Guid userId,
     string userRole,
