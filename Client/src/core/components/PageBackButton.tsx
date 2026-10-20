@@ -15,7 +15,7 @@ export function PageBackButton({
   const navigate = useNavigate()
 
   const className =
-    "flex h-12 w-12 shrink-0 items-center justify-center bg-surface-container text-primary shadow-sm transition-colors hover:bg-primary hover:text-on-primary"
+    'flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center bg-surface-container text-primary shadow-sm transition-colors hover:bg-primary hover:text-on-primary'
 
   const icon = (
     <span

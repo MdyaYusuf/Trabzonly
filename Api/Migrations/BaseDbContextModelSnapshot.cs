@@ -1055,8 +1055,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnName("Id");
 
                     b.Property<string>("Bio")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")

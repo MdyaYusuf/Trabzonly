@@ -56,7 +56,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
       .IsRequired(false);
 
     builder.Property(u => u.Bio)
-      .HasMaxLength(1000)
+      .HasMaxLength(User.BioMaxLength)
       .IsRequired(false);
 
     builder.Property(u => u.DisplayTag)

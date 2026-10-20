@@ -11,6 +11,8 @@ namespace Api.Features.Users;
 
 public class User : Entity<Guid>
 {
+  public const int BioMaxLength = 400;
+
   [SetsRequiredMembers]
   public User()
   {

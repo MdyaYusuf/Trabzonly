@@ -1,124 +1,104 @@
 import { Link } from 'react-router-dom'
-import { defaultProfileSettings } from '../utils/profileSettingsPlaceholders'
+import { useAppSelector } from '@/core/store/hooks'
+import { DEFAULT_USER_DISPLAY_TAG } from '../utils/userDisplayTags'
 
 type ProfileSettingsHeroProps = {
   onLogout: () => void
 }
 
+function initialsFromUsername(username: string): string {
+  const cleaned = username.trim()
+
+  if (cleaned.length === 0) {
+    return '?'
+  }
+
+  return cleaned.slice(0, 2).toUpperCase()
+}
+
+function formatJoinedLabel(isoDate: string | undefined): string {
+  if (!isoDate) {
+    return ''
+  }
+
+  const label = new Date(isoDate).toLocaleDateString('tr-TR', {
+    month: 'long',
+    year: 'numeric',
+  })
+
+  return `Katılım: ${label}`
+}
+
 export function ProfileSettingsHero({ onLogout }: ProfileSettingsHeroProps) {
-  const profile = defaultProfileSettings
+  const user = useAppSelector((state) => state.auth.user)
+  const username = user?.username ?? ''
+  const displayTag = user?.displayTag?.trim() || DEFAULT_USER_DISPLAY_TAG
+  const initials = initialsFromUsername(username)
+  const joinedLabel = formatJoinedLabel(user?.createdDate)
+  const publicProfilePath = username ? `/uyeler/${encodeURIComponent(username)}` : '/uyeler'
 
   return (
-    <section className="relative w-full overflow-hidden bg-primary-container text-on-primary">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-15 mix-blend-screen"
-        style={{
-          backgroundImage: 'radial-gradient(#8ccefd 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
-      <div className="pointer-events-none absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-secondary/20 blur-3xl" />
+    <section className="overflow-hidden shadow-[0_8px_28px_rgba(26,4,11,0.18)]">
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#1a040b] via-primary to-[#0b3a55]">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 20% 30%, rgba(140,206,253,0.25), transparent 45%), radial-gradient(circle at 80% 70%, rgba(247,189,91,0.15), transparent 40%)',
+          }}
+        />
 
-      <div className="relative z-10 mx-auto max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
-        <div className="flex flex-col justify-between gap-space-lg lg:flex-row lg:items-end">
-          <div className="flex flex-col items-start gap-space-lg sm:flex-row sm:items-center">
-            <div className="group relative">
-              <div className="relative flex h-28 w-28 items-center justify-center overflow-hidden bg-primary text-on-primary shadow-xl sm:h-32 sm:w-32">
-                <span className="font-display text-stat-counter tracking-tighter text-secondary-container select-none font-extrabold">
-                  {profile.initials}
+        <div className="relative z-10 flex flex-col gap-space-md p-space-md sm:flex-row sm:items-start sm:justify-between sm:p-space-lg">
+          <div className="flex min-w-0 flex-col gap-space-md sm:flex-row sm:items-start">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary-container ring-2 ring-white/30 sm:h-24 sm:w-24">
+              {user?.profileImageUrl ? (
+                <img
+                  src={user.profileImageUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="font-headline text-headline-sm font-extrabold text-on-secondary-container sm:text-headline-md">
+                  {initials}
                 </span>
-                <div className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-1 bg-primary/80 opacity-0 transition-opacity group-hover:opacity-100">
-                  <span className="material-symbols-outlined text-secondary-container">
-                    photo_camera
-                  </span>
-                  <span className="font-kicker text-center text-kicker tracking-wider text-on-primary uppercase">
-                    Değiştir
-                  </span>
-                </div>
-              </div>
-              <div className="absolute -top-2 -right-2 flex items-center gap-1 bg-primary px-2 py-0.5 shadow-md">
-                <span
-                  className="material-symbols-outlined text-[16px] text-tertiary-fixed-dim"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  star
-                </span>
-                <span className="font-kicker text-kicker tracking-wider text-tertiary-fixed-dim uppercase">
-                  {profile.kongreBadge}
-                </span>
-              </div>
+              )}
             </div>
 
-            <div className="flex flex-col gap-space-xs">
-              <div className="flex flex-wrap items-center gap-space-xs">
-                <h1 className="font-headline text-headline-lg font-bold tracking-tight text-on-primary uppercase">
-                  {profile.displayName}
-                </h1>
-                <div className="flex items-center gap-1 bg-tertiary-container px-2.5 py-1 text-on-tertiary-container">
-                  <span
-                    className="material-symbols-outlined text-[15px] text-tertiary-fixed-dim"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    verified
-                  </span>
-                  <span className="font-kicker text-kicker tracking-wider text-tertiary-fixed-dim uppercase">
-                    {profile.roleBadge}
-                  </span>
-                </div>
-              </div>
-              <p className="font-body max-w-xl text-body-md text-on-primary/80">
-                {profile.subtitle}
-              </p>
-              <div className="font-label flex items-center gap-space-sm text-label-md text-secondary-container">
-                <span className="font-bold">@{profile.handle}</span>
-                <span className="text-on-primary/40">•</span>
-                <span className="text-on-primary/70">{profile.memberSince}</span>
-              </div>
+            <div className="flex min-w-0 flex-col gap-space-xs">
+              <span className="font-kicker w-fit bg-secondary-container px-space-sm py-1 text-kicker text-on-secondary-container uppercase">
+                {displayTag}
+              </span>
+
+              <h1 className="font-headline text-headline-md font-extrabold text-on-primary">
+                @{username || '—'}
+              </h1>
+
+              {joinedLabel ? (
+                <p className="font-body inline-flex items-center gap-1 text-body-sm text-on-primary/75">
+                  <span className="material-symbols-outlined text-[16px]">calendar_month</span>
+                  {joinedLabel}
+                </p>
+              ) : null}
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-space-md lg:items-end">
-            <div className="flex flex-wrap items-center gap-space-sm">
-              <Link
-                to="/gonderiler"
-                className="font-label flex items-center gap-space-xs bg-transparent px-space-md py-space-xs text-label-md tracking-wider text-on-primary uppercase transition-all hover:bg-on-primary hover:text-primary"
-              >
-                <span className="material-symbols-outlined text-[18px]">visibility</span>
-                Genel Profili Görüntüle
-              </Link>
-              <button
-                type="button"
-                onClick={onLogout}
-                className="bg-primary px-space-md py-space-xs font-label text-label-md tracking-wider text-on-primary uppercase transition-all hover:bg-surface-container-lowest hover:text-primary"
-              >
-                Çıkış Yap
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-space-xs">
-              <div className="flex items-baseline gap-1.5 bg-primary/90 px-3 py-1.5 shadow-sm">
-                <span className="font-headline text-headline-sm font-bold text-secondary-container">
-                  {profile.stats.posts}
-                </span>
-                <span className="font-kicker text-kicker text-on-primary/70 uppercase">Gönderi</span>
-              </div>
-              <div className="flex items-baseline gap-1.5 bg-primary/90 px-3 py-1.5 shadow-sm">
-                <span className="font-headline text-headline-sm font-bold text-secondary-container">
-                  {profile.stats.squads}
-                </span>
-                <span className="font-kicker text-kicker text-on-primary/70 uppercase">
-                  Taktik Kadro
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1.5 bg-primary/90 px-3 py-1.5 shadow-sm">
-                <span className="font-headline text-headline-sm font-bold text-tertiary-fixed-dim">
-                  {profile.stats.communityScore}
-                </span>
-                <span className="font-kicker text-kicker text-on-primary/70 uppercase">
-                  Topluluk Skoru
-                </span>
-              </div>
-            </div>
+          <div className="flex flex-wrap items-center gap-space-sm sm:shrink-0">
+            <Link
+              to={publicProfilePath}
+              className="font-label inline-flex cursor-pointer items-center justify-center gap-space-xs bg-secondary-container px-space-md py-space-sm text-label-md font-bold tracking-wider text-on-secondary-container uppercase transition-all hover:brightness-110"
+            >
+              <span className="material-symbols-outlined text-[18px]">visibility</span>
+              Genel Profili Görüntüle
+            </Link>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center border border-on-primary/35 text-on-primary transition-colors hover:border-on-primary hover:bg-on-primary/10"
+              aria-label="Çıkış Yap"
+              title="Çıkış Yap"
+            >
+              <span className="material-symbols-outlined text-[18px]">logout</span>
+            </button>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import userService from '../userService'
 
 type ProfilePasswordFormProps = {
   onUpdated: () => void
@@ -7,8 +8,9 @@ type ProfilePasswordFormProps = {
 function passwordChecks(password: string) {
   return {
     minLength: password.length >= 8,
+    hasUpper: /[A-Z]/.test(password),
+    hasLower: /[a-z]/.test(password),
     hasDigit: /\d/.test(password),
-    hasSpecial: /[^A-Za-z0-9]/.test(password),
   }
 }
 
@@ -18,27 +20,55 @@ export function ProfilePasswordForm({ onUpdated }: ProfilePasswordFormProps) {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showCurrent, setShowCurrent] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
 
   const checks = passwordChecks(newPassword)
-  const passedCount = [checks.minLength, checks.hasDigit, checks.hasSpecial].filter(Boolean).length
-  const strengthWidth = `${(passedCount / 3) * 100}%`
+  const passedCount = [
+    checks.minLength,
+    checks.hasUpper,
+    checks.hasLower,
+    checks.hasDigit,
+  ].filter(Boolean).length
+  const strengthWidth = `${(passedCount / 4) * 100}%`
   const strengthLabel =
-    passedCount === 3 ? 'Güçlü Seviye' : passedCount === 2 ? 'Orta Seviye' : 'Zayıf Seviye'
+    passedCount === 4
+      ? 'Güçlü Seviye'
+      : passedCount >= 3
+        ? 'Orta Seviye'
+        : 'Zayıf Seviye'
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    if (isSaving) {
+      return
+    }
 
     if (!currentPassword || !newPassword || newPassword !== confirmPassword) {
       setStatusMessage('Şifre alanlarını kontrol edin.')
       return
     }
 
-    if (passedCount < 3) {
+    if (passedCount < 4) {
       setStatusMessage('Yeni şifre güvenlik kurallarını karşılamıyor.')
       return
     }
 
+    setIsSaving(true)
     setStatusMessage(null)
+
+    const result = await userService.changePassword({
+      currentPassword,
+      newPassword,
+      confirmNewPassword: confirmPassword,
+    })
+
+    setIsSaving(false)
+
+    if (!result.success) {
+      return
+    }
+
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
@@ -46,42 +76,24 @@ export function ProfilePasswordForm({ onUpdated }: ProfilePasswordFormProps) {
   }
 
   return (
-    <section className="flex flex-col gap-space-lg bg-surface-container-lowest p-space-lg shadow-sm">
-      <div className="flex flex-col gap-space-xs bg-surface-container-low p-space-md pb-space-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-space-xs">
-            <span className="inline-block h-3 w-3 bg-secondary" />
-            <h2 className="font-headline text-headline-md font-extrabold tracking-tight text-primary uppercase">
-              Şifre Değiştir
-            </h2>
-          </div>
-          <span className="font-kicker text-kicker font-bold tracking-widest text-on-surface-variant uppercase">
-            Hesap Muhafızı
-          </span>
-        </div>
-        <p className="font-body text-body-md text-on-surface-variant">
-          Hesap ve yayıncı haklarının güvenliği için güçlü, tahmin edilemez bir parola belirleyin.
+    <section className="flex flex-col border border-outline-variant/30 bg-surface-container-lowest shadow-[0_4px_24px_rgba(31,27,23,0.06)]">
+      <div className="border-b border-outline-variant/25 px-space-lg pt-space-lg pb-space-md">
+        <h2 className="font-headline text-headline-sm font-extrabold tracking-tight text-primary">
+          Şifre Değiştir
+        </h2>
+        <p className="font-body mt-1 text-body-sm text-on-surface-variant">
+          Hesap güvenliği için güçlü bir parola belirleyin.
         </p>
       </div>
 
-      <div className="flex items-start gap-space-sm bg-primary/5 p-space-md shadow-sm">
-        <span className="material-symbols-outlined text-[24px] text-secondary">shield</span>
-        <div className="flex flex-col gap-0.5">
-          <span className="font-label text-label-md font-bold text-primary uppercase">
-            İki Adımlı Doğrulama (2FA) Aktif
-          </span>
-          <p className="font-body text-body-sm text-on-surface-variant">
-            Hesabınız Akyazı seviyesinde korunmaktadır. Yeni bir cihazdan giriş yapıldığında SMS /
-            Authenticator onay kodu talep edilir.
-          </p>
-        </div>
-      </div>
-
-      <form className="flex flex-col gap-space-md" onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-1">
-          <label className="font-label text-label-md font-bold text-on-surface uppercase">
-            Mevcut Şifre
-          </label>
+      <form
+        className="flex flex-col gap-space-lg p-space-lg"
+        onSubmit={(event) => {
+          void handleSubmit(event)
+        }}
+      >
+        <div className="flex flex-col gap-1.5">
+          <label className="font-label text-label-md font-bold text-on-surface">Mevcut şifre</label>
           <div className="relative">
             <input
               type={showCurrent ? 'text' : 'password'}
@@ -89,14 +101,14 @@ export function ProfilePasswordForm({ onUpdated }: ProfilePasswordFormProps) {
               onChange={(event) => {
                 setCurrentPassword(event.target.value)
               }}
-              className="font-body w-full bg-surface-container-lowest px-space-md py-space-xs pr-10 text-body-md text-on-surface shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+              className="font-body w-full border border-outline-variant/30 bg-background px-space-md py-space-xs pr-10 text-body-md text-on-surface outline-none transition-colors focus:border-primary"
             />
             <button
               type="button"
               onClick={() => {
                 setShowCurrent((value) => !value)
               }}
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant hover:text-primary"
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-on-surface-variant hover:text-primary"
             >
               <span className="material-symbols-outlined text-[18px]">
                 {showCurrent ? 'visibility_off' : 'visibility'}
@@ -105,11 +117,9 @@ export function ProfilePasswordForm({ onUpdated }: ProfilePasswordFormProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
-          <div className="flex flex-col gap-1">
-            <label className="font-label text-label-md font-bold text-on-surface uppercase">
-              Yeni Şifre
-            </label>
+        <div className="grid grid-cols-1 gap-space-md">
+          <div className="flex flex-col gap-1.5">
+            <label className="font-label text-label-md font-bold text-on-surface">Yeni şifre</label>
             <input
               type="password"
               value={newPassword}
@@ -117,12 +127,12 @@ export function ProfilePasswordForm({ onUpdated }: ProfilePasswordFormProps) {
                 setNewPassword(event.target.value)
               }}
               placeholder="Yeni parolanızı girin"
-              className="font-body w-full bg-surface-container-lowest px-space-md py-space-xs text-body-md text-on-surface shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+              className="font-body w-full border border-outline-variant/30 bg-background px-space-md py-space-xs text-body-md text-on-surface outline-none transition-colors focus:border-primary"
             />
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="font-label text-label-md font-bold text-on-surface uppercase">
-              Yeni Şifre (Tekrar)
+          <div className="flex flex-col gap-1.5">
+            <label className="font-label text-label-md font-bold text-on-surface">
+              Yeni şifre (tekrar)
             </label>
             <input
               type="password"
@@ -131,64 +141,64 @@ export function ProfilePasswordForm({ onUpdated }: ProfilePasswordFormProps) {
                 setConfirmPassword(event.target.value)
               }}
               placeholder="Yeni parolayı onaylayın"
-              className="font-body w-full bg-surface-container-lowest px-space-md py-space-xs text-body-md text-on-surface shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+              className="font-body w-full border border-outline-variant/30 bg-background px-space-md py-space-xs text-body-md text-on-surface outline-none transition-colors focus:border-primary"
             />
           </div>
         </div>
 
-        <div className="flex flex-col gap-space-xs bg-surface-container-low p-space-sm">
-          <div className="flex items-center justify-between">
-            <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-              Şifre Mukavemeti
+        <div className="flex flex-col gap-space-sm rounded-sm border border-outline-variant/25 bg-surface-container/40 p-space-md">
+          <div className="flex items-center justify-between gap-space-sm">
+            <span className="font-label text-label-md font-bold text-on-surface">
+              Şifre gücü
             </span>
-            <span className="font-label text-label-md font-bold text-secondary uppercase">
-              {strengthLabel}
-            </span>
+            <span className="font-label text-label-md font-bold text-secondary">{strengthLabel}</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden bg-surface-container-highest">
             <div className="h-full bg-secondary transition-all" style={{ width: strengthWidth }} />
           </div>
-          <div className="font-body grid grid-cols-1 gap-space-xs pt-1 text-body-sm sm:grid-cols-3">
-            <div
-              className={[
-                'flex items-center gap-1',
-                checks.minLength ? 'text-secondary' : 'text-on-surface-variant',
-              ].join(' ')}
+          <ul className="font-body grid grid-cols-1 gap-1 text-body-sm sm:grid-cols-2">
+            <li
+              className={
+                checks.minLength ? 'text-secondary' : 'text-on-surface-variant'
+              }
             >
-              <span className="material-symbols-outlined text-[14px]">check_circle</span>
-              <span>En az 8 karakter</span>
-            </div>
-            <div
-              className={[
-                'flex items-center gap-1',
-                checks.hasDigit ? 'text-secondary' : 'text-on-surface-variant',
-              ].join(' ')}
+              En az 8 karakter
+            </li>
+            <li
+              className={
+                checks.hasUpper ? 'text-secondary' : 'text-on-surface-variant'
+              }
             >
-              <span className="material-symbols-outlined text-[14px]">check_circle</span>
-              <span>En az 1 rakam</span>
-            </div>
-            <div
-              className={[
-                'flex items-center gap-1',
-                checks.hasSpecial ? 'text-secondary' : 'text-on-surface-variant',
-              ].join(' ')}
+              En az 1 büyük harf
+            </li>
+            <li
+              className={
+                checks.hasLower ? 'text-secondary' : 'text-on-surface-variant'
+              }
             >
-              <span className="material-symbols-outlined text-[14px]">check_circle</span>
-              <span>En az 1 özel karakter</span>
-            </div>
-          </div>
+              En az 1 küçük harf
+            </li>
+            <li
+              className={
+                checks.hasDigit ? 'text-secondary' : 'text-on-surface-variant'
+              }
+            >
+              En az 1 rakam
+            </li>
+          </ul>
         </div>
 
         {statusMessage ? (
           <p className="font-label text-label-md font-bold text-error">{statusMessage}</p>
         ) : null}
 
-        <div className="flex items-center justify-end gap-space-sm pt-space-xs">
+        <div className="flex items-center justify-end border-t border-outline-variant/25 pt-space-md">
           <button
             type="submit"
-            className="bg-surface-container px-space-lg py-space-xs font-label text-label-md tracking-wider text-primary uppercase transition-all hover:bg-primary hover:text-on-primary"
+            disabled={isSaving}
+            className="cursor-pointer bg-primary px-space-lg py-space-xs font-label text-label-md tracking-wider text-on-primary uppercase transition-colors hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Şifreyi Güncelle
+            {isSaving ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
           </button>
         </div>
       </form>

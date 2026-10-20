@@ -7,7 +7,8 @@ public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
   public UpdateUserRequestValidator()
   {
     RuleFor(u => u.Bio)
-      .MaximumLength(1000).WithMessage("Bio en fazla 1000 karakter olabilir.");
+      .MaximumLength(User.BioMaxLength)
+      .WithMessage($"Bio en fazla {User.BioMaxLength} karakter olabilir.");
 
     RuleFor(u => u.DisplayTag)
       .NotEmpty().WithMessage("Görünen etiket seçilmelidir.")

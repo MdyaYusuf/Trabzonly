@@ -136,43 +136,37 @@ export function PublicMemberProfileHero({
           }}
         />
 
-        <div className="relative z-10 flex flex-col gap-space-md p-space-md sm:flex-row sm:items-start sm:justify-between sm:p-space-lg">
-          <div className="flex min-w-0 flex-col gap-space-md sm:flex-row sm:items-start">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary-container ring-2 ring-white/30 sm:h-24 sm:w-24">
-              {profile.profileImageUrl ? (
-                <img
-                  src={profile.profileImageUrl}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="font-headline text-headline-sm font-extrabold text-on-secondary-container sm:text-headline-md">
-                  {initials}
-                </span>
-              )}
-            </div>
-
-            <div className="flex min-w-0 flex-col gap-space-xs">
-              <span className="font-kicker w-fit bg-secondary-container px-space-sm py-1 text-kicker text-on-secondary-container uppercase">
-                {displayTag}
+        <div className="relative z-10 grid grid-cols-1 gap-space-md p-space-md sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-x-space-md sm:gap-y-space-md sm:p-space-lg">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary-container ring-2 ring-white/30 sm:row-span-2 sm:h-24 sm:w-24">
+            {profile.profileImageUrl ? (
+              <img
+                src={profile.profileImageUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="font-headline text-headline-sm font-extrabold text-on-secondary-container sm:text-headline-md">
+                {initials}
               </span>
-
-              <h1 className="font-headline text-headline-md font-extrabold text-on-primary">
-                @{profile.username}
-              </h1>
-
-              <p className="font-body inline-flex items-center gap-1 text-body-sm text-on-primary/75">
-                <span className="material-symbols-outlined text-[16px]">calendar_month</span>
-                {formatJoinedLabel(profile.createdDate)}
-              </p>
-
-              {profile.bio ? (
-                <p className="font-body max-w-2xl text-body-md text-on-primary/85">{profile.bio}</p>
-              ) : null}
-            </div>
+            )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-space-sm sm:shrink-0">
+          <div className="flex min-w-0 flex-col gap-space-xs">
+            <span className="font-kicker w-fit bg-secondary-container px-space-sm py-1 text-kicker text-on-secondary-container uppercase">
+              {displayTag}
+            </span>
+
+            <h1 className="font-headline text-headline-md font-extrabold text-on-primary">
+              @{profile.username}
+            </h1>
+
+            <p className="font-body inline-flex items-center gap-1 text-body-sm text-on-primary/75">
+              <span className="material-symbols-outlined text-[16px]">calendar_month</span>
+              {formatJoinedLabel(profile.createdDate)}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-space-sm sm:justify-self-end">
             {isOwnProfile ? (
               <Link
                 to="/profil"
@@ -208,6 +202,12 @@ export function PublicMemberProfileHero({
               <span className="material-symbols-outlined text-[18px]">share</span>
             </button>
           </div>
+
+          {profile.bio ? (
+            <p className="font-body text-body-md text-on-primary/85 sm:col-start-2 sm:col-end-3">
+              {profile.bio}
+            </p>
+          ) : null}
         </div>
       </div>
 
