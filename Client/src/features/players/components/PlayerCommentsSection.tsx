@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { authService } from '@/features/auth/authService'
 import { Link } from 'react-router-dom'
+import { UserProfileLink } from '@/features/users/components/UserProfileLink'
 import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
 import commentService from '../../comments/commentService'
@@ -370,14 +371,21 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
               <div key={comment.id} className="flex flex-col gap-space-sm bg-surface p-space-md">
                 <div className="flex items-start justify-between gap-space-sm">
                   <div className="flex items-center gap-space-sm">
-                    <div className="font-headline flex h-10 w-10 items-center justify-center bg-primary-container text-headline-sm font-bold text-on-primary">
+                    <UserProfileLink
+                      username={comment.authorUsername}
+                      aria-label={`@${comment.authorUsername} profili`}
+                      className="font-headline flex h-10 w-10 items-center justify-center bg-primary-container text-headline-sm font-bold text-on-primary"
+                    >
                       {initialsFromUsername(comment.authorUsername)}
-                    </div>
+                    </UserProfileLink>
                     <div>
                       <div className="flex flex-wrap items-center gap-space-xs">
-                        <span className="font-headline text-[16px] font-bold text-on-surface">
+                        <UserProfileLink
+                          username={comment.authorUsername}
+                          className="font-headline text-[16px] font-bold text-on-surface transition-colors hover:text-primary"
+                        >
                           {comment.authorUsername}
-                        </span>
+                        </UserProfileLink>
                         {comment.authorDisplayTag ? (
                           <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
                             {comment.authorDisplayTag}
@@ -385,7 +393,11 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
                         ) : null}
                       </div>
                       <span className="font-body text-[11px] text-on-surface-variant">
-                        @{comment.authorUsername} • {formatRelativeTime(comment.createdDate)}
+                        <UserProfileLink
+                          username={comment.authorUsername}
+                          className="transition-colors hover:text-primary"
+                        />{' '}
+                        • {formatRelativeTime(comment.createdDate)}
                       </span>
                     </div>
                   </div>
@@ -469,16 +481,23 @@ export function PlayerCommentsSection({ playerId, playerName }: PlayerCommentsSe
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-space-xs">
-                        <span className="font-label text-label-md font-bold text-on-surface">
+                        <UserProfileLink
+                          username={reply.authorUsername}
+                          className="font-label text-label-md font-bold text-on-surface transition-colors hover:text-primary"
+                        >
                           {reply.authorUsername}
-                        </span>
+                        </UserProfileLink>
                         {reply.authorDisplayTag ? (
                           <span className="bg-primary-container px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-primary uppercase">
                             {reply.authorDisplayTag}
                           </span>
                         ) : null}
                         <span className="font-body text-[11px] text-on-surface-variant">
-                          @{reply.authorUsername} • {formatRelativeTime(reply.createdDate)}
+                          <UserProfileLink
+                            username={reply.authorUsername}
+                            className="transition-colors hover:text-primary"
+                          />{' '}
+                          • {formatRelativeTime(reply.createdDate)}
                         </span>
                       </div>
                       <ReactionButtons

@@ -57,7 +57,7 @@ export function PublicMemberProfileSquads({ userId }: PublicMemberProfileSquadsP
   }
 
   return (
-    <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3">
       {squads.map((squad) => (
         <SquadGalleryCard key={squad.id} squad={squad} />
       ))}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '../../../core/store/hooks'
+import { UserProfileLink } from '../../users/components/UserProfileLink'
 import userService from '../../users/userService'
 import type { PostResponseDto } from '../postTypes'
 import { estimateReadTimeLabel } from '../utils/estimateReadTime'
@@ -98,9 +99,10 @@ export function PostDetailHeader({
 
       <div className="flex flex-wrap items-center justify-between gap-space-sm border-y border-surface-container py-space-sm">
         <div className="flex flex-wrap items-center gap-space-sm">
-          <span className="font-label text-label-md font-bold text-on-surface">
-            @{post.authorUsername}
-          </span>
+          <UserProfileLink
+            username={post.authorUsername}
+            className="font-label text-label-md font-bold text-on-surface transition-colors hover:text-primary"
+          />
           {post.authorDisplayTag ? (
             <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
               {post.authorDisplayTag}

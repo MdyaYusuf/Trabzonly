@@ -9,6 +9,7 @@ import type { PlayerResponseDto } from '../features/players/playerTypes'
 import { formatMarketValue } from '../features/players/utils/formatMarketValue'
 import squadService from '../features/squads/squadService'
 import type { SquadPreviewDto } from '../features/squads/squadTypes'
+import { UserProfileLink } from '../features/users/components/UserProfileLink'
 import userService from '../features/users/userService'
 import type { UserPreviewDto } from '../features/users/userTypes'
 
@@ -494,12 +495,21 @@ export function HomePage() {
                       </div>
                       <div className="-mx-space-lg -mb-space-lg flex items-center justify-between bg-surface-container/50 px-space-lg pt-space-md pb-space-md">
                         <div className="flex items-center gap-space-xs">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-on-primary">
+                          <UserProfileLink
+                            nested
+                            username={post.authorUsername}
+                            aria-label={`@${post.authorUsername} profili`}
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-on-primary"
+                          >
                             {initialsFromName(post.authorUsername)}
-                          </div>
-                          <span className="font-label text-label-md font-semibold text-on-surface">
+                          </UserProfileLink>
+                          <UserProfileLink
+                            nested
+                            username={post.authorUsername}
+                            className="font-label text-label-md font-semibold text-on-surface transition-colors hover:text-primary"
+                          >
                             {post.authorUsername}
-                          </span>
+                          </UserProfileLink>
                         </div>
                         <div className="font-body flex items-center gap-space-md text-body-sm text-on-surface-variant">
                           <span className="flex items-center gap-1">
@@ -700,9 +710,10 @@ export function HomePage() {
                         <div className="font-body mb-space-md flex items-center gap-space-xs text-body-sm text-on-surface-variant">
                           <span>
                             Kurucu:{' '}
-                            <strong className={SQUAD_AUTHOR_CLASSES[index % SQUAD_AUTHOR_CLASSES.length]}>
-                              @{squad.authorUsername}
-                            </strong>
+                            <UserProfileLink
+                              username={squad.authorUsername}
+                              className={`font-bold transition-colors hover:text-primary ${SQUAD_AUTHOR_CLASSES[index % SQUAD_AUTHOR_CLASSES.length]}`}
+                            />
                           </span>
                           <span>•</span>
                           <span>{squad.ratingCount} Oy</span>
@@ -767,9 +778,10 @@ export function HomePage() {
                     const style = CONTRIBUTOR_STYLES[index % CONTRIBUTOR_STYLES.length]
 
                     return (
-                      <div
+                      <UserProfileLink
                         key={contributor.id}
-                        className="flex flex-col items-center rounded bg-surface-container-lowest p-space-md text-center shadow-sm transition-shadow hover:shadow-md"
+                        username={contributor.username}
+                        className="group flex flex-col items-center rounded bg-surface-container-lowest p-space-md text-center shadow-sm transition-shadow hover:shadow-md"
                       >
                         <div className="relative mb-space-sm">
                           <div
@@ -795,7 +807,7 @@ export function HomePage() {
                             #{index + 1}
                           </span>
                         </div>
-                        <h4 className="font-headline mb-0.5 text-headline-sm font-bold text-on-surface uppercase">
+                        <h4 className="font-headline mb-0.5 text-headline-sm font-bold text-on-surface uppercase transition-colors group-hover:text-primary">
                           {contributor.username}
                         </h4>
                         <span
@@ -811,7 +823,7 @@ export function HomePage() {
                             {formatCompactNumber(contributor.totalLikeCount)} Beğeni
                           </span>
                         </div>
-                      </div>
+                      </UserProfileLink>
                     )
                   })
                 )}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { ReactionButtons } from '../../../core/components/ReactionButtons'
 import { useAppSelector } from '../../../core/store/hooks'
+import { UserProfileLink } from '../../users/components/UserProfileLink'
 import userService from '../../users/userService'
 import postService from '../postService'
 import type { PostReactionType } from '../postTypes'
@@ -101,26 +102,24 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <article className="group relative border-b border-outline-variant/20 px-1 py-space-lg last:border-b-0 transition-colors hover:bg-on-surface/[0.03]">
       <div className="flex gap-space-md">
-        <Link
-          to={`/uyeler/${post.authorUsername}`}
+        <UserProfileLink
+          username={post.authorUsername}
+          aria-label={`@${post.authorUsername} profili`}
           className={[
             'flex h-10 w-10 shrink-0 items-center justify-center font-headline text-label-md font-bold',
             avatarToneClass[post.categoryTone],
           ].join(' ')}
-          aria-label={`@${post.authorUsername} profili`}
         >
           {post.authorInitials}
-        </Link>
+        </UserProfileLink>
 
         <div className="min-w-0 flex-1">
           <div className="mb-space-xs flex flex-wrap items-center justify-between gap-x-space-sm gap-y-0.5">
             <div className="flex min-w-0 flex-wrap items-center gap-x-space-xs gap-y-0.5">
-              <Link
-                to={`/uyeler/${post.authorUsername}`}
+              <UserProfileLink
+                username={post.authorUsername}
                 className="font-label text-label-md font-bold text-on-surface transition-colors hover:text-primary"
-              >
-                @{post.authorUsername}
-              </Link>
+              />
               {post.authorDisplayTag ? (
                 <span className="bg-secondary px-1.5 py-0.5 font-kicker text-[9px] font-bold text-on-secondary uppercase">
                   {post.authorDisplayTag}
@@ -195,9 +194,12 @@ export function PostCard({ post }: PostCardProps) {
               <p className="font-body line-clamp-2 text-body-sm text-on-surface">
                 &quot;{post.topComment.content}&quot;
               </p>
-              <span className="font-kicker mt-1 inline-block text-[10px] text-on-surface-variant uppercase">
+              <UserProfileLink
+                username={post.topComment.authorUsername}
+                className="font-kicker mt-1 inline-block text-[10px] text-on-surface-variant uppercase transition-colors hover:text-primary"
+              >
                 — @{post.topComment.authorUsername}
-              </span>
+              </UserProfileLink>
             </div>
           ) : null}
 

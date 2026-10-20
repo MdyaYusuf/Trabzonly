@@ -120,7 +120,7 @@ export function PostsFeedSidebar() {
                 <Link
                   key={contributor.id}
                   to={`/uyeler/${contributor.username}`}
-                  className="flex items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
+                  className="flex cursor-pointer items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
                 >
                   <span
                     aria-label={`${rank}. sıra`}

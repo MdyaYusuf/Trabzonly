@@ -4,7 +4,6 @@ import { PublicMemberProfileBreadcrumb } from '../components/PublicMemberProfile
 import { PublicMemberProfileHero } from '../components/PublicMemberProfileHero'
 import { PublicMemberProfilePosts } from '../components/PublicMemberProfilePosts'
 import { PublicMemberProfileSquads } from '../components/PublicMemberProfileSquads'
-import { PublicMemberProfileStats } from '../components/PublicMemberProfileStats'
 import { PublicMemberProfileTabs } from '../components/PublicMemberProfileTabs'
 import userService from '../userService'
 import type { PublicUserProfileDto } from '../userTypes'
@@ -97,15 +96,12 @@ export function PublicMemberProfilePage() {
             <PublicMemberProfileHero
               profile={profile}
               isFollowing={isFollowing}
+              followerCount={followerCount}
+              followingCount={followingCount}
               onFollowChange={(nextFollowing, nextFollowerCount) => {
                 setIsFollowing(nextFollowing)
                 setFollowerCount(nextFollowerCount)
               }}
-            />
-            <PublicMemberProfileStats
-              profile={profile}
-              followerCount={followerCount}
-              followingCount={followingCount}
             />
             <PublicMemberProfileTabs
               tabs={buildTabs(profile)}

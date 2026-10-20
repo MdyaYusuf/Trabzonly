@@ -26,7 +26,7 @@ export function PublicMemberProfileTabs({
             onClick={() => {
               onChange(tab.id)
             }}
-            className={`font-label inline-flex shrink-0 items-center gap-space-xs border-b-2 px-space-md py-space-sm text-label-md uppercase transition-colors ${
+            className={`font-label inline-flex shrink-0 cursor-pointer items-center gap-space-xs border-b-2 px-space-md py-space-sm text-label-md uppercase transition-colors ${
               isActive
                 ? 'border-primary font-bold text-primary'
                 : 'border-transparent text-on-surface-variant hover:text-primary'

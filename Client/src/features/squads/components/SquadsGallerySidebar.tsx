@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@/core/store/hooks'
+import { UserProfileLink } from '@/features/users/components/UserProfileLink'
 import squadService from '../squadService'
 import type { SquadPreviewDto } from '../squadTypes'
 import { SquadCreateIcon } from './SquadCreateIcon'
@@ -128,7 +129,7 @@ export function SquadsGallerySidebar() {
                 <Link
                   key={squad.id}
                   to={`/kadrolar/${squad.id}`}
-                  className="flex items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
+                  className="flex cursor-pointer items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
                 >
                   <span
                     aria-label={`${rank}. sıra`}
@@ -139,21 +140,26 @@ export function SquadsGallerySidebar() {
                   >
                     {rank}
                   </span>
-                  <div
+                  <UserProfileLink
+                    nested
+                    username={squad.authorUsername}
+                    aria-label={`@${squad.authorUsername} profili`}
                     className={[
                       'flex h-8 w-8 shrink-0 items-center justify-center font-headline text-kicker font-bold',
                       avatarTone,
                     ].join(' ')}
                   >
                     {initialsFromUsername(squad.authorUsername)}
-                  </div>
+                  </UserProfileLink>
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <span className="font-label line-clamp-2 text-label-md font-bold text-secondary">
                       {squad.title}
                     </span>
-                    <span className="font-kicker text-kicker text-on-surface-variant">
-                      @{squad.authorUsername}
-                    </span>
+                    <UserProfileLink
+                      nested
+                      username={squad.authorUsername}
+                      className="font-kicker text-kicker text-on-surface-variant transition-colors hover:text-primary"
+                    />
                     <span className="font-body text-body-sm text-on-surface-variant">
                       {squad.averageRating.toFixed(1)} / 5.0 ortalama
                     </span>

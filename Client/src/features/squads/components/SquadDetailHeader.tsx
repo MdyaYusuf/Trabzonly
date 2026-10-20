@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '@/core/store/hooks'
+import { UserProfileLink } from '@/features/users/components/UserProfileLink'
 import userService from '@/features/users/userService'
 import type { SquadDetailViewModel } from '../utils/squadDetailTypes'
 
@@ -64,10 +65,6 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
   const [isFollowing, setIsFollowing] = useState(squad.isAuthorFollowedByCurrentUser)
   const [isFollowUpdating, setIsFollowUpdating] = useState(false)
   const [isSharing, setIsSharing] = useState(false)
-
-  const authorLabel = squad.authorUsername.startsWith('@')
-    ? squad.authorUsername
-    : `@${squad.authorUsername}`
 
   const canFollow =
     isAuthenticated && currentUserId != null && currentUserId !== squad.userId
@@ -137,14 +134,19 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
 
             <div className="flex flex-wrap items-center gap-space-lg pt-space-xs">
               <div className="flex items-center gap-space-sm">
-                <div className="font-headline relative flex h-12 w-12 items-center justify-center bg-primary text-headline-sm font-bold text-on-primary shadow-sm">
+                <UserProfileLink
+                  username={squad.authorUsername}
+                  aria-label={`@${squad.authorUsername} profili`}
+                  className="font-headline relative flex h-12 w-12 items-center justify-center bg-primary text-headline-sm font-bold text-on-primary shadow-sm"
+                >
                   {squad.authorInitials}
-                </div>
+                </UserProfileLink>
                 <div className="flex flex-col">
                   <div className="flex flex-wrap items-center gap-space-xs">
-                    <span className="font-headline text-headline-sm font-bold text-on-surface">
-                      {authorLabel}
-                    </span>
+                    <UserProfileLink
+                      username={squad.authorUsername}
+                      className="font-headline text-headline-sm font-bold text-on-surface transition-colors hover:text-primary"
+                    />
                     {squad.authorDisplayTag ? (
                       <span className="font-kicker bg-surface-container-highest px-1.5 py-0.5 text-kicker font-bold text-primary uppercase">
                         {squad.authorDisplayTag}
@@ -165,7 +167,7 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
                     onClick={() => {
                       void handleFollowToggle()
                     }}
-                    className="font-label flex items-center gap-1.5 bg-surface-container px-space-md py-space-xs text-label-md tracking-wider text-on-surface uppercase transition-colors hover:bg-surface-container-highest disabled:opacity-50"
+                    className="font-label flex cursor-pointer items-center gap-1.5 bg-surface-container px-space-md py-space-xs text-label-md tracking-wider text-on-surface uppercase transition-colors hover:bg-surface-container-highest disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <span className="material-symbols-outlined text-[18px]">person_add</span>
                     <span>{isFollowing ? 'Takiptesin' : 'Yazarı Takip Et'}</span>

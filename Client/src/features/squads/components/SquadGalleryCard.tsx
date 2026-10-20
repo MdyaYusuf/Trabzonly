@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { UserProfileLink } from '@/features/users/components/UserProfileLink'
 import type { SquadGalleryCardData } from '../utils/squadsGalleryTypes'
 import { SquadPitchPreview } from './SquadPitchPreview'
 
@@ -49,30 +50,30 @@ function RatingStars({ rating }: { rating: number }) {
 
 export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardProps) {
   const detailPath = `/kadrolar/${squad.id}`
-  const authorLabel = squad.authorUsername.startsWith('@')
-    ? squad.authorUsername
-    : `@${squad.authorUsername}`
 
   return (
-    <Link
-      to={detailPath}
+    <article
       className={
         listMode
-          ? 'group relative flex cursor-pointer flex-col bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md md:flex-row'
-          : 'group relative flex cursor-pointer flex-col bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md'
+          ? 'group relative flex flex-col bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md md:flex-row'
+          : 'group relative flex flex-col bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md'
       }
     >
-      <div className={listMode ? 'md:w-[320px] md:shrink-0' : undefined}>
+      <Link
+        to={detailPath}
+        className={`cursor-pointer ${listMode ? 'md:w-[320px] md:shrink-0' : 'block'}`}
+      >
         <SquadPitchPreview formationLabel={squad.formationLabel} columns={squad.columns} />
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col justify-between p-space-md">
         <div className="flex flex-col">
           <div className="mb-space-xs flex items-center justify-between gap-space-xs">
             <div className="flex min-w-0 items-center gap-space-xs">
-              <span className="font-label truncate text-label-md font-bold text-on-surface">
-                {authorLabel}
-              </span>
+              <UserProfileLink
+                username={squad.authorUsername}
+                className="font-label truncate text-label-md font-bold text-on-surface transition-colors hover:text-primary"
+              />
               {squad.authorDisplayTag ? (
                 <span className="font-kicker hidden bg-secondary-fixed px-1.5 text-[10px] font-bold text-on-secondary-fixed uppercase sm:inline">
                   {squad.authorDisplayTag}
@@ -84,26 +85,31 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
             </span>
           </div>
 
-          <h2 className="font-headline mb-space-xs line-clamp-2 text-headline-sm leading-snug font-bold text-primary transition-colors group-hover:text-secondary">
-            {squad.title}
-          </h2>
+          <Link to={detailPath} className="cursor-pointer">
+            <h2 className="font-headline mb-space-xs line-clamp-2 text-headline-sm leading-snug font-bold text-primary transition-colors group-hover:text-secondary">
+              {squad.title}
+            </h2>
 
-          <div className="mb-space-sm flex items-center gap-space-xs">
-            <RatingStars rating={squad.rating} />
-            <span className="font-label text-label-md font-bold text-on-surface">
-              {squad.rating.toFixed(1)}
-            </span>
-            <span className="font-body text-body-sm text-on-surface-variant">
-              ({squad.ratingCount} oy)
-            </span>
-          </div>
+            <div className="mb-space-sm flex items-center gap-space-xs">
+              <RatingStars rating={squad.rating} />
+              <span className="font-label text-label-md font-bold text-on-surface">
+                {squad.rating.toFixed(1)}
+              </span>
+              <span className="font-body text-body-sm text-on-surface-variant">
+                ({squad.ratingCount} oy)
+              </span>
+            </div>
 
-          <p className="font-body mb-space-md line-clamp-2 min-h-[2.5rem] text-body-sm text-on-surface-variant">
-            {squad.excerpt}
-          </p>
+            <p className="font-body mb-space-md line-clamp-2 min-h-[2.5rem] text-body-sm text-on-surface-variant">
+              {squad.excerpt}
+            </p>
+          </Link>
         </div>
 
-        <div className="-mx-space-md -mb-space-md flex items-center justify-between bg-surface-container-low px-space-md py-space-sm pt-space-sm">
+        <Link
+          to={detailPath}
+          className="-mx-space-md -mb-space-md flex cursor-pointer items-center justify-between bg-surface-container-low px-space-md py-space-sm pt-space-sm"
+        >
           <div className="font-body flex items-center gap-space-md text-[12px] text-on-surface-variant">
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-[15px]">mode_comment</span>
@@ -122,8 +128,8 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
               arrow_forward
             </span>
           </span>
-        </div>
+        </Link>
       </div>
-    </Link>
+    </article>
   )
 }

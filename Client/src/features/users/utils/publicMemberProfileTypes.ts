@@ -12,4 +12,5 @@ export type PublicMemberStat = {
   label: string
   value: string
   unit: string
+  title?: string
 }

@@ -150,7 +150,7 @@ export function PostDetailSidebar({
 
             <Link
               to={`/uyeler/${authorUsername}`}
-              className="font-label group ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
+              className="font-label group ml-auto inline-flex cursor-pointer items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
             >
               <span className="material-symbols-outlined text-base">person</span>
               <span>Profiline Git</span>
