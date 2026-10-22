@@ -141,9 +141,12 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
       <PlayerPollCard playerId={player.id} />
 
       <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-        <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-          POZİSYON KIYASI · {groupLabel}
-        </span>
+        <div className="flex items-center gap-space-xs">
+          <span className="material-symbols-outlined text-lg text-secondary">compare_arrows</span>
+          <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
+            Pozisyon Kıyası · {groupLabel}
+          </span>
+        </div>
 
         {isLoading ? (
           <p className="font-body text-body-sm text-on-surface-variant">Kadro verisi yükleniyor...</p>
@@ -179,9 +182,12 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
       </div>
 
       <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-        <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-          Pozisyonundaki Diğer Oyuncular
-        </span>
+        <div className="flex items-center gap-space-xs">
+          <span className="material-symbols-outlined text-lg text-secondary">groups</span>
+          <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
+            Pozisyonundaki Diğer Oyuncular
+          </span>
+        </div>
 
         {isLoading ? (
           <p className="font-body text-body-sm text-on-surface-variant">Rakipler yükleniyor...</p>
@@ -198,7 +204,7 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
                 className="flex items-center justify-between gap-space-sm bg-surface-container-low p-space-sm transition-colors hover:bg-surface-container"
               >
                 <div className="flex items-center gap-space-sm">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-primary-container font-headline text-sm font-bold text-on-primary">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-container font-headline text-sm font-bold text-on-primary">
                     {rival.shirtNumber != null ? rival.shirtNumber : '—'}
                   </div>
                   <div>

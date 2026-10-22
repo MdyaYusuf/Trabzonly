@@ -59,9 +59,12 @@ export function PlayerCareerArchive({
 
   return (
     <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-      <span className="font-kicker text-kicker font-bold tracking-widest text-secondary uppercase">
-        KARİYER ARŞİVİ
-      </span>
+      <div className="flex items-center gap-space-xs">
+        <span className="material-symbols-outlined text-lg text-secondary">timeline</span>
+        <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
+          Kariyer Arşivi
+        </span>
+      </div>
 
       {isLoading ? (
         <p className="font-body text-body-sm text-on-surface-variant">Kariyer yükleniyor...</p>
@@ -75,7 +78,7 @@ export function PlayerCareerArchive({
             <div key={entry.id} className="relative">
               <span className="absolute top-1 -left-[1.4rem] h-3 w-3 rounded-full bg-primary" />
               <span className="font-headline block text-sm font-bold text-primary">{entry.team}</span>
-              <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+              <span className="font-kicker text-kicker text-secondary uppercase">
                 {entry.seasonName}
               </span>
               <span className="font-body block text-body-sm text-on-surface">

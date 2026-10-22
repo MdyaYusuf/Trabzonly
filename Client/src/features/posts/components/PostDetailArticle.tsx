@@ -53,12 +53,12 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
     }
   }
 
-  async function handleShare() {
+  async function handleCopyPostText() {
     try {
-      await navigator.clipboard.writeText(window.location.href)
-      toast.success('Bağlantı panoya kopyalandı.')
+      await navigator.clipboard.writeText(post.content)
+      toast.success('Yazı panoya kopyalandı.')
     } catch {
-      toast.error('Bağlantı kopyalanamadı.')
+      toast.error('Yazı kopyalanamadı.')
     }
   }
 
@@ -96,13 +96,14 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
         <button
           type="button"
           onClick={() => {
-            void handleShare()
+            void handleCopyPostText()
           }}
-          title="Bağlantıyı kopyala"
-          aria-label="Bağlantıyı kopyala"
-          className="cursor-pointer bg-surface-container px-space-sm py-space-xs font-label text-label-md font-bold text-on-surface uppercase"
+          title="Yazıyı kopyala"
+          aria-label="Yazıyı kopyala"
+          className="font-label ml-auto inline-flex cursor-pointer items-center gap-1.5 bg-surface-container px-space-sm py-space-xs text-label-md font-bold text-on-surface uppercase"
         >
-          Paylaş
+          <span className="material-symbols-outlined text-base">content_copy</span>
+          Yazıyı Kopyala
         </button>
       </div>
     </div>
