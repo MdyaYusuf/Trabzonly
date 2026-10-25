@@ -27,6 +27,18 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
       .HasMaxLength(1000)
       .IsRequired();
 
+    builder.Property(q => q.Explanation)
+      .HasMaxLength(2000)
+      .IsRequired(false);
+
+    builder.Property(q => q.Points)
+      .IsRequired();
+
+    builder.Property(q => q.SortOrder)
+      .IsRequired();
+
+    builder.HasIndex(q => new { q.QuizId, q.SortOrder });
+
     builder.HasOne(q => q.Quiz)
       .WithMany(qz => qz.Questions)
       .HasForeignKey(q => q.QuizId)

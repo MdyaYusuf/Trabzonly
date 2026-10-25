@@ -5,13 +5,16 @@ public sealed record QuizResponseDto(
   Guid Id,
   string Title,
   string? Description,
+  QuizCategory Category,
   bool IsActive,
   List<QuestionResponseDto> Questions);
 
 public sealed record QuestionResponseDto(
   Guid Id,
   string Text,
+  string? Explanation,
   int Points,
+  int SortOrder,
   List<AnswerResponseDto> Answers);
 
 public sealed record AnswerResponseDto(
@@ -35,16 +38,31 @@ public sealed record QuizPreviewDto(
   Guid Id,
   string Title,
   string? Description,
+  QuizCategory Category,
   bool IsActive);
 
 // Requests
-public sealed record CreateQuizRequest(string Title, string? Description, List<CreateQuestionRequest> Questions);
+public sealed record CreateQuizRequest(
+  string Title,
+  string? Description,
+  QuizCategory Category,
+  List<CreateQuestionRequest> Questions);
 
-public sealed record CreateQuestionRequest(string Text, int Points, List<CreateAnswerRequest> Answers);
+public sealed record CreateQuestionRequest(
+  string Text,
+  string? Explanation,
+  int Points,
+  int SortOrder,
+  List<CreateAnswerRequest> Answers);
 
 public sealed record CreateAnswerRequest(string Text, bool IsCorrect);
 
-public sealed record UpdateQuizRequest(Guid Id, string Title, string? Description, bool IsActive);
+public sealed record UpdateQuizRequest(
+  Guid Id,
+  string Title,
+  string? Description,
+  QuizCategory Category,
+  bool IsActive);
 
 public sealed record SubmitQuizRequest(Guid QuizId, TimeSpan CompletionTime, List<QuestionAnswerDto> Answers);
 

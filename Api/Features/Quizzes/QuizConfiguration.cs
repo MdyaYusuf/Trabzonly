@@ -30,5 +30,19 @@ public class QuizConfiguration : IEntityTypeConfiguration<Quiz>
     builder.Property(q => q.Description)
       .HasMaxLength(1000)
       .IsRequired(false);
+
+    builder.Property(q => q.Category)
+      .HasConversion<int>()
+      .IsRequired();
+
+    builder.Property(q => q.SeedKey)
+      .HasMaxLength(100)
+      .IsRequired(false);
+
+    builder.HasIndex(q => q.SeedKey)
+      .IsUnique()
+      .HasFilter("[SeedKey] IS NOT NULL");
+
+    builder.HasIndex(q => q.Category);
   }
 }

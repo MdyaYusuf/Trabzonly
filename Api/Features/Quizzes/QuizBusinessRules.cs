@@ -4,6 +4,8 @@ namespace Api.Features.Quizzes;
 
 public class QuizBusinessRules(IQuizRepository _quizRepository)
 {
+  public const int SecondsPerQuestion = 10;
+
   public async Task<Quiz> GetQuizIfExistAsync(
     Guid id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
@@ -53,6 +55,7 @@ public class QuizBusinessRules(IQuizRepository _quizRepository)
     foreach (var question in questions)
     {
       int correctCount = question.Answers.Count(a => a.IsCorrect);
+
       if (correctCount != 1)
       {
         throw new BusinessException($"'{question.Text}' sorusu için tam olarak 1 adet doğru cevap belirlenmelidir.");

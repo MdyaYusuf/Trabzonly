@@ -659,11 +659,18 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
+                    b.Property<string>("Explanation")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -676,7 +683,7 @@ namespace Trabzonly.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QuizId");
+                    b.HasIndex("QuizId", "SortOrder");
 
                     b.ToTable("Questions", (string)null);
                 });
@@ -687,6 +694,9 @@ namespace Trabzonly.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
@@ -699,6 +709,10 @@ namespace Trabzonly.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<string>("SeedKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -709,6 +723,12 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Category");
+
+                    b.HasIndex("SeedKey")
+                        .IsUnique()
+                        .HasFilter("[SeedKey] IS NOT NULL");
 
                     b.ToTable("Quizzes", (string)null);
                 });

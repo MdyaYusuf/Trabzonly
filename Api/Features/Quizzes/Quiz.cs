@@ -13,6 +13,8 @@ public class Quiz : Entity<Guid>
 
   public required string Title { get; set; }
   public string? Description { get; set; }
+  public QuizCategory Category { get; set; }
+  public string? SeedKey { get; set; }
   public bool IsActive { get; set; } = true;
 
   // Navigation properties

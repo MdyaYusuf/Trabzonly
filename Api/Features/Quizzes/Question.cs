@@ -12,7 +12,9 @@ public class Question : Entity<Guid>
   }
 
   public required string Text { get; set; }
+  public string? Explanation { get; set; }
   public int Points { get; set; } = 10;
+  public int SortOrder { get; set; }
 
   // Navigation properties
   public Guid QuizId { get; set; }
