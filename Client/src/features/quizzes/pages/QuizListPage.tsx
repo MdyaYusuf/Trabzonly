@@ -1,67 +1,63 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { QuizCard } from '../components/QuizCard'
-import { QuizListFeatured } from '../components/QuizListFeatured'
-import { QuizListFilters } from '../components/QuizListFilters'
+import {
+  QuizListFilters,
+  type QuizListCategoryFilter,
+} from '../components/QuizListFilters'
 import { QuizListHero } from '../components/QuizListHero'
 import { QuizListPagination } from '../components/QuizListPagination'
 import { QuizListSidebar } from '../components/QuizListSidebar'
-import {
-  difficultyRank,
-  PAGE_SIZE,
-  placeholderQuizzes,
-  TOTAL_QUIZZES,
-} from '../utils/quizListPlaceholders'
-import type { QuizCategoryId, QuizSortOption } from '../utils/quizListTypes'
+import quizService from '../quizService'
+import type { QuizListItemDto } from '../quizTypes'
+
+const PAGE_SIZE = 6
 
 export function QuizListPage() {
-  const [categoryId, setCategoryId] = useState<QuizCategoryId>('all')
-  const [search, setSearch] = useState('')
-  const [sort, setSort] = useState<QuizSortOption>('most-solved')
+  const [categoryId, setCategoryId] = useState<QuizListCategoryFilter>('all')
   const [page, setPage] = useState(1)
+  const [quizzes, setQuizzes] = useState<QuizListItemDto[]>([])
+  const [totalUnfilteredCount, setTotalUnfilteredCount] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filteredQuizzes = useMemo(() => {
-    let result = [...placeholderQuizzes]
+  useEffect(() => {
+    let cancelled = false
 
-    if (categoryId === 'popular') {
-      result = result.filter((quiz) => quiz.isPopular)
-    } else if (categoryId !== 'all') {
-      result = result.filter((quiz) => quiz.categoryId === categoryId)
-    }
+    async function loadQuizzes() {
+      setIsLoading(true)
 
-    const query = search.trim().toLowerCase()
+      const result = await quizService.getActiveList({
+        category: categoryId === 'all' ? undefined : categoryId,
+        sort: 'most-taken',
+      })
 
-    if (query) {
-      result = result.filter(
-        (quiz) =>
-          quiz.title.toLowerCase().includes(query) ||
-          quiz.excerpt.toLowerCase().includes(query) ||
-          quiz.categoryLabel.toLowerCase().includes(query),
-      )
-    }
-
-    result.sort((a, b) => {
-      if (sort === 'difficulty') {
-        return difficultyRank[b.difficulty] - difficultyRank[a.difficulty]
+      if (cancelled) {
+        return
       }
 
-      if (sort === 'newest') {
-        return Number(b.id) - Number(a.id)
+      if (result.success && result.data) {
+        setQuizzes(result.data)
+
+        if (categoryId === 'all') {
+          setTotalUnfilteredCount(result.data.length)
+        }
+      } else {
+        setQuizzes([])
       }
 
-      return Number(a.id) - Number(b.id)
-    })
+      setIsLoading(false)
+    }
 
-    return result
-  }, [categoryId, search, sort])
+    void loadQuizzes()
 
-  const totalPages = Math.max(1, Math.ceil(filteredQuizzes.length / PAGE_SIZE))
+    return () => {
+      cancelled = true
+    }
+  }, [categoryId])
+
+  const totalPages = Math.max(1, Math.ceil(quizzes.length / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
   const pageStart = (currentPage - 1) * PAGE_SIZE
-  const pageQuizzes = filteredQuizzes.slice(pageStart, pageStart + PAGE_SIZE)
-
-  function resetPage() {
-    setPage(1)
-  }
+  const pageQuizzes = quizzes.slice(pageStart, pageStart + PAGE_SIZE)
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
@@ -69,22 +65,12 @@ export function QuizListPage() {
         <QuizListHero />
         <QuizListFilters
           categoryId={categoryId}
-          search={search}
-          sort={sort}
+          totalCount={totalUnfilteredCount}
           onCategoryChange={(value) => {
             setCategoryId(value)
-            resetPage()
-          }}
-          onSearchChange={(value) => {
-            setSearch(value)
-            resetPage()
-          }}
-          onSortChange={(value) => {
-            setSort(value)
-            resetPage()
+            setPage(1)
           }}
         />
-        <QuizListFeatured />
 
         <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
           <section className="flex flex-col gap-space-md lg:col-span-8">
@@ -96,27 +82,39 @@ export function QuizListPage() {
                 </h2>
               </div>
               <span className="font-label text-label-md text-on-surface-variant uppercase">
-                {pageQuizzes.length} / {TOTAL_QUIZZES} TEST GÖSTERİLİYOR
+                {isLoading
+                  ? 'Yükleniyor...'
+                  : `${pageQuizzes.length} / ${quizzes.length} TEST GÖSTERİLİYOR`}
               </span>
             </div>
 
-            {pageQuizzes.length === 0 ? (
+            {isLoading ? (
               <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-                Bu filtrelere uygun quiz bulunamadı.
+                Quizler yükleniyor...
               </p>
-            ) : (
+            ) : null}
+
+            {!isLoading && pageQuizzes.length === 0 ? (
+              <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                Bu kategoriye uygun quiz bulunamadı.
+              </p>
+            ) : null}
+
+            {!isLoading && pageQuizzes.length > 0 ? (
               <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
                 {pageQuizzes.map((quiz) => (
                   <QuizCard key={quiz.id} quiz={quiz} />
                 ))}
               </div>
-            )}
+            ) : null}
 
-            <QuizListPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
+            {!isLoading && quizzes.length > PAGE_SIZE ? (
+              <QuizListPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            ) : null}
           </section>
 
           <div className="lg:col-span-4">

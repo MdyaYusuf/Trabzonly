@@ -1,13 +1,80 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  badgeShowcase,
-  dailyQuestion,
-  leaderboardEntries,
-} from '../utils/quizListPlaceholders'
+import { useAppSelector } from '@/core/store/hooks'
+import { FeedGlobalPollCard } from '@/features/posts/components/FeedGlobalPollCard'
+import quizService from '../quizService'
+import type { QuizLeaderboardEntryDto, QuizUserStatsDto } from '../quizTypes'
+import { formatQuizDuration, formatQuizScore } from '../utils/quizFormat'
 
 export function QuizListSidebar() {
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const username = useAppSelector((state) => state.auth.user?.username)
+  const [leaderboard, setLeaderboard] = useState<QuizLeaderboardEntryDto[]>([])
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true)
+  const [myStats, setMyStats] = useState<QuizUserStatsDto | null>(null)
+  const [isLoadingMyStats, setIsLoadingMyStats] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadLeaderboard() {
+      setIsLoadingLeaderboard(true)
+
+      const result = await quizService.getLeaderboard(10)
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setLeaderboard(result.data)
+      } else {
+        setLeaderboard([])
+      }
+
+      setIsLoadingLeaderboard(false)
+    }
+
+    void loadLeaderboard()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadMyStats() {
+      if (!isAuthenticated) {
+        setMyStats(null)
+        setIsLoadingMyStats(false)
+        return
+      }
+
+      setIsLoadingMyStats(true)
+
+      const result = await quizService.getMyStats()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setMyStats(result.data)
+      } else {
+        setMyStats(null)
+      }
+
+      setIsLoadingMyStats(false)
+    }
+
+    void loadMyStats()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthenticated])
 
   return (
     <aside className="flex flex-col gap-space-lg">
@@ -20,20 +87,44 @@ export function QuizListSidebar() {
             </h3>
           </div>
           <span className="font-kicker text-kicker font-bold text-secondary uppercase">
-            BU AYIN TRİBÜN HAFIZALARI
+            TOP 10
           </span>
         </div>
 
         <div className="p-space-md pb-space-sm">
-          {leaderboardEntries.map((entry) => {
-            if (entry.compact) {
+          {isLoadingLeaderboard ? (
+            <p className="font-body py-space-sm text-body-sm text-on-surface-variant">
+              Sıralama yükleniyor...
+            </p>
+          ) : null}
+
+          {!isLoadingLeaderboard && leaderboard.length === 0 ? (
+            <p className="font-body py-space-sm text-body-sm text-on-surface-variant">
+              Henüz sıralamaya girecek yeterli sonuç yok. En az 3 farklı quiz çözülmeli.
+            </p>
+          ) : null}
+
+          {leaderboard.map((entry) => {
+            const isTopThree = entry.rank <= 3
+            const rankTone =
+              entry.rank === 1
+                ? 'bg-tertiary-fixed-dim text-on-tertiary-fixed'
+                : entry.rank === 2
+                  ? 'bg-surface-container-highest text-on-surface'
+                  : entry.rank === 3
+                    ? 'bg-surface-container-high text-on-surface'
+                    : 'bg-surface-container text-on-surface-variant'
+
+            if (!isTopThree) {
               return (
                 <div
-                  key={entry.username}
+                  key={`${entry.rank}-${entry.username}`}
                   className="flex items-center justify-between p-space-sm"
                 >
                   <div className="flex items-center gap-space-sm">
-                    <div className="font-label flex h-7 w-7 items-center justify-center bg-surface-container text-label-md text-on-surface-variant">
+                    <div
+                      className={`font-label flex h-7 w-7 items-center justify-center text-label-md ${rankTone}`}
+                    >
                       {entry.rank}
                     </div>
                     <span className="font-label text-label-md font-medium text-on-surface">
@@ -41,22 +132,15 @@ export function QuizListSidebar() {
                     </span>
                   </div>
                   <span className="font-label text-label-md font-bold text-on-surface-variant">
-                    {entry.pointsLabel ?? `${entry.points.toLocaleString('tr-TR')} P`}
+                    %{formatQuizScore(entry.averageScore)}
                   </span>
                 </div>
               )
             }
 
-            const rankTone =
-              entry.rank === 1
-                ? 'bg-tertiary-fixed-dim text-on-tertiary-fixed'
-                : entry.rank === 2
-                  ? 'bg-surface-container-highest text-on-surface'
-                  : 'bg-surface-container-high text-on-surface'
-
             return (
               <div
-                key={entry.username}
+                key={`${entry.rank}-${entry.username}`}
                 className="mb-space-xs flex items-center justify-between bg-surface-container-lowest p-space-sm"
               >
                 <div className="flex items-center gap-space-sm">
@@ -66,151 +150,98 @@ export function QuizListSidebar() {
                     {entry.rank}
                   </div>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-space-xs">
-                      <span className="font-label text-label-md font-bold text-primary">
-                        {entry.username}
-                      </span>
-                      {entry.verified ? (
-                        <span
-                          className="material-symbols-outlined text-[16px] text-tertiary-fixed-dim"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          verified
-                        </span>
-                      ) : null}
-                    </div>
-                    {entry.badge ? (
-                      <span className="font-kicker text-[10px] font-bold text-tertiary uppercase">
-                        {entry.badge}
-                      </span>
-                    ) : null}
+                    <span className="font-label text-label-md font-bold text-primary">
+                      {entry.username}
+                    </span>
+                    <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
+                      {entry.distinctQuizCount} quiz ·{' '}
+                      {formatQuizDuration(entry.averageCompletionTime)}
+                    </span>
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="font-headline text-headline-sm font-extrabold text-primary">
-                    {entry.points.toLocaleString('tr-TR')}
+                    %{formatQuizScore(entry.averageScore)}
                   </span>
                   <span className="font-kicker block text-[9px] text-on-surface-variant uppercase">
-                    PUAN
+                    Ort.
                   </span>
                 </div>
               </div>
             )
           })}
         </div>
-
-        <div className="p-space-md pt-0">
-          <Link
-            to="/quizler"
-            className="font-label block w-full bg-surface-container py-space-xs text-center text-label-md font-bold text-primary uppercase transition-all hover:bg-secondary-container hover:text-on-secondary-container"
-          >
-            Tüm Sıralamayı Gör (TOP 100)
-          </Link>
-        </div>
       </div>
 
-      <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-lg shadow-sm">
-        <div className="flex items-center gap-space-sm">
-          <div className="flex h-10 w-10 items-center justify-center bg-secondary text-on-secondary">
-            <span className="material-symbols-outlined text-2xl">military_tech</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-kicker text-kicker font-bold text-secondary uppercase">
-              TRİBÜN PUANI SİSTEMİ
-            </span>
-            <span className="font-headline text-headline-sm font-bold text-primary uppercase">
-              ROZETLERİ TOPLA
-            </span>
-          </div>
-        </div>
-        <p className="font-body text-body-sm leading-relaxed text-on-surface-variant">
-          Quizleri tamamla, doğru cevaplarınla tribün puanlarını topla, profil rozetlerini kazan!
-          Toplulukta ve maç günü canlı sohbetlerinde rütbenle öne çık.
-        </p>
-        <div className="grid grid-cols-3 gap-space-xs py-space-xs">
-          {badgeShowcase.map((badge) => (
-            <div
-              key={badge.label}
-              className="flex flex-col items-center bg-surface-container-low p-space-xs text-center"
-            >
-              <span
-                className={`material-symbols-outlined text-xl ${
-                  badge.tone === 'primary'
-                    ? 'text-primary'
-                    : badge.tone === 'secondary'
-                      ? 'text-secondary'
-                      : 'text-tertiary-fixed-dim'
-                }`}
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                {badge.icon}
+      {isAuthenticated ? (
+        <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-lg shadow-sm">
+          <div className="flex items-center gap-space-sm">
+            <div className="flex h-10 w-10 items-center justify-center bg-secondary text-on-secondary">
+              <span className="material-symbols-outlined text-2xl">person</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-kicker text-kicker font-bold text-secondary uppercase">
+                Senin İstatistiklerin
               </span>
-              <span
-                className={`font-kicker mt-1 text-[10px] font-bold uppercase ${
-                  badge.tone === 'primary'
-                    ? 'text-primary'
-                    : badge.tone === 'secondary'
-                      ? 'text-secondary'
-                      : 'text-tertiary'
-                }`}
-              >
-                {badge.label}
+              <span className="font-headline text-headline-sm font-bold text-primary uppercase">
+                {username ?? 'Üye'}
               </span>
             </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-between bg-surface-container p-space-sm">
-          <span className="font-label text-label-md text-on-surface">
-            Senin Puanın: <strong className="font-bold text-primary">340 P</strong>
-          </span>
+          </div>
+
+          {isLoadingMyStats ? (
+            <p className="font-body text-body-sm text-on-surface-variant">İstatistikler yükleniyor...</p>
+          ) : myStats == null || myStats.attemptsCount === 0 ? (
+            <p className="font-body text-body-sm text-on-surface-variant">
+              Henüz quiz çözmedin. Listeden bir test seçip başla.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-space-xs">
+              <div className="bg-surface-container-low p-space-sm">
+                <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+                  Ort. Skor
+                </span>
+                <span className="font-headline mt-1 block text-headline-sm font-bold text-primary">
+                  %{formatQuizScore(myStats.averageScore)}
+                </span>
+              </div>
+              <div className="bg-surface-container-low p-space-sm">
+                <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+                  Ort. Süre
+                </span>
+                <span className="font-headline mt-1 block text-headline-sm font-bold text-primary">
+                  {formatQuizDuration(myStats.averageCompletionTime)}
+                </span>
+              </div>
+              <div className="bg-surface-container-low p-space-sm">
+                <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+                  Deneme
+                </span>
+                <span className="font-headline mt-1 block text-headline-sm font-bold text-primary">
+                  {myStats.attemptsCount.toLocaleString('tr-TR')}
+                </span>
+              </div>
+              <div className="bg-surface-container-low p-space-sm">
+                <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+                  Farklı Quiz
+                </span>
+                <span className="font-headline mt-1 block text-headline-sm font-bold text-primary">
+                  {myStats.distinctQuizCount.toLocaleString('tr-TR')}
+                </span>
+              </div>
+            </div>
+          )}
+
           <Link
             to="/profil"
             className="font-label text-label-md font-bold text-secondary uppercase hover:underline"
           >
-            Detaylar
+            Profile git
           </Link>
         </div>
-      </div>
+      ) : null}
 
-      <div className="relative flex flex-col gap-space-sm overflow-hidden bg-primary p-space-lg text-on-primary shadow-sm">
-        <div className="flex items-center justify-between">
-          <span className="font-kicker text-kicker font-bold tracking-widest text-tertiary-fixed-dim uppercase">
-            GÜNÜN HIZLI SORUSU
-          </span>
-          <span className="font-kicker bg-primary-container px-2 py-0.5 text-[10px] font-bold text-on-primary uppercase">
-            {dailyQuestion.pointsLabel}
-          </span>
-        </div>
-        <h4 className="font-headline text-[18px] leading-tight font-bold text-on-primary">
-          {dailyQuestion.prompt}
-        </h4>
-        <div className="mt-space-xs flex flex-col gap-space-xs">
-          {dailyQuestion.options.map((option) => {
-            const isSelected = selectedOption === option.id
-
-            return (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => {
-                  setSelectedOption(option.id)
-                }}
-                className={
-                  isSelected
-                    ? 'font-label flex w-full items-center justify-between bg-secondary-container px-space-md py-space-xs text-left text-label-md text-on-secondary-container uppercase transition-all'
-                    : 'font-label flex w-full items-center justify-between bg-primary-container px-space-md py-space-xs text-left text-label-md text-on-primary uppercase transition-all hover:bg-secondary-container hover:text-on-secondary-container'
-                }
-              >
-                <span>{option.label}</span>
-                <span className="font-kicker text-[11px] opacity-60">Seç</span>
-              </button>
-            )
-          })}
-        </div>
-        <span className="font-kicker text-right text-[10px] text-on-primary/60 uppercase">
-          Cevaplamak için giriş yapın
-        </span>
-      </div>
+      <FeedGlobalPollCard />
     </aside>
   )
 }

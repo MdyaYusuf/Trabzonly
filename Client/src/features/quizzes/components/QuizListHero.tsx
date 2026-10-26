@@ -1,7 +1,39 @@
+import { useEffect, useState } from 'react'
 import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
-import { quizListStats } from '../utils/quizListPlaceholders'
+import quizService from '../quizService'
+import type { QuizPlatformStatsDto } from '../quizTypes'
+import { formatQuizScore } from '../utils/quizFormat'
 
 export function QuizListHero() {
+  const [stats, setStats] = useState<QuizPlatformStatsDto | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadStats() {
+      const result = await quizService.getPlatformStats()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setStats(result.data)
+      } else {
+        setStats(null)
+      }
+    }
+
+    void loadStats()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const avgPercent =
+    stats == null ? null : Math.min(100, Math.max(0, Math.round(stats.averageScore)))
+
   return (
     <header className="flex flex-col gap-space-lg">
       <div className="flex flex-wrap items-center justify-between gap-space-sm">
@@ -32,14 +64,6 @@ export function QuizListHero() {
           </p>
         </div>
         <div className="flex items-center justify-start gap-space-md lg:col-span-4 lg:justify-end">
-          <div className="flex flex-col items-end bg-surface-container-highest px-space-md py-space-sm">
-            <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-              GÜNCEL SEZON
-            </span>
-            <span className="font-headline text-headline-sm font-bold text-primary">
-              {quizListStats.seasonLabel}
-            </span>
-          </div>
           <div className="flex h-12 w-12 items-center justify-center bg-primary-container text-on-primary">
             <span
               className="material-symbols-outlined text-[28px]"
@@ -58,7 +82,7 @@ export function QuizListHero() {
               Toplam Quiz
             </span>
             <span className="font-headline mt-1 text-headline-md font-bold text-primary">
-              {quizListStats.totalQuizzes}
+              {stats == null ? '—' : stats.totalQuizzes.toLocaleString('tr-TR')}
             </span>
           </div>
           <span className="material-symbols-outlined text-3xl text-secondary">library_books</span>
@@ -69,7 +93,7 @@ export function QuizListHero() {
               Toplam Çözülme
             </span>
             <span className="font-headline mt-1 text-headline-md font-bold text-primary">
-              {quizListStats.totalSolves}
+              {stats == null ? '—' : stats.totalCompletions.toLocaleString('tr-TR')}
             </span>
           </div>
           <span className="material-symbols-outlined text-3xl text-secondary">groups</span>
@@ -80,7 +104,7 @@ export function QuizListHero() {
               Ortalama Başarı
             </span>
             <span className="font-headline mt-1 text-headline-md font-bold text-primary">
-              {quizListStats.avgSuccess}
+              {stats == null ? '—' : `%${formatQuizScore(stats.averageScore)}`}
             </span>
           </div>
           <div className="relative flex items-center justify-center">
@@ -97,31 +121,31 @@ export function QuizListHero() {
                 d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 fill="none"
                 stroke="currentColor"
-                strokeDasharray={`${quizListStats.avgSuccessPercent}, 100`}
+                strokeDasharray={`${avgPercent ?? 0}, 100`}
                 strokeLinecap="square"
                 strokeWidth="4"
               />
             </svg>
             <span className="font-kicker absolute text-[10px] font-bold text-primary">
-              {quizListStats.avgSuccessPercent}%
+              {avgPercent == null ? '—' : `${avgPercent}%`}
             </span>
           </div>
         </div>
         <div className="flex items-center justify-between bg-primary-container p-space-md text-on-primary shadow-sm">
           <div className="flex flex-col">
             <span className="font-kicker text-kicker text-tertiary-fixed-dim uppercase">
-              Haftanın Rekortmeni
+              Lider
             </span>
-            <span className="font-headline mt-1 text-headline-md font-bold text-on-primary">
-              {quizListStats.weeklyChampion}
+            <span className="font-headline mt-1 line-clamp-1 text-headline-md font-bold text-on-primary">
+              {stats?.topUsername?.trim() || 'Henüz yok'}
             </span>
           </div>
-          <div className="flex flex-col items-end">
-            <span className="font-label text-label-md font-bold text-tertiary-fixed-dim">
-              {quizListStats.weeklyScore}
-            </span>
-            <span className="font-kicker text-kicker text-on-primary/70 uppercase">Puan</span>
-          </div>
+          <span
+            className="material-symbols-outlined text-3xl text-tertiary-fixed-dim"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            emoji_events
+          </span>
         </div>
       </div>
     </header>
