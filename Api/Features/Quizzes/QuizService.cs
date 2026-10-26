@@ -265,11 +265,14 @@ public class QuizService(
     await _userQuizResultRepository.AddAsync(result, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+    int maxScore = quiz.Questions.Sum(q => q.Points);
+
     var response = new UserQuizResultResponseDto(
       result.Id,
       result.QuizId,
       result.UserId,
       result.Score,
+      maxScore,
       result.CompletionTime,
       result.CompletedAt
     );

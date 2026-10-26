@@ -8,7 +8,7 @@ export const QuizCategory = {
 
 export type QuizCategory = (typeof QuizCategory)[keyof typeof QuizCategory]
 
-// Responses
+// Responses — admin / full (may include isCorrect)
 export interface AnswerResponseDto {
   id: string
   text: string
@@ -38,6 +38,7 @@ export interface UserQuizResultResponseDto {
   quizId: string
   userId: string
   score: number
+  maxScore: number
   completionTime: string
   completedAt: string
 }
@@ -47,7 +48,76 @@ export interface CreatedQuizResponseDto {
   title: string
 }
 
-// Requests
+// Public list (no questions, no answers)
+export interface QuizListItemDto {
+  id: string
+  title: string
+  description?: string
+  category: QuizCategory
+  questionCount: number
+  takenCount: number
+  isActive: boolean
+}
+
+// Take attempt (no isCorrect, no explanation)
+export interface QuizTakeAnswerDto {
+  id: string
+  text: string
+}
+
+export interface QuizTakeQuestionDto {
+  id: string
+  text: string
+  points: number
+  sortOrder: number
+  answers: QuizTakeAnswerDto[]
+}
+
+export interface QuizTakeDto {
+  id: string
+  title: string
+  description?: string
+  category: QuizCategory
+  questions: QuizTakeQuestionDto[]
+}
+
+// Per-question check
+export interface CheckQuizAnswerRequest {
+  quizId: string
+  questionId: string
+  answerId?: string | null
+}
+
+export interface CheckQuizAnswerResponse {
+  isCorrect: boolean
+  correctAnswerId: string
+  explanation?: string
+}
+
+// Platform / leaderboard / me stats
+export interface QuizPlatformStatsDto {
+  totalQuizzes: number
+  totalCompletions: number
+  averageScore: number
+  topUsername?: string | null
+}
+
+export interface QuizLeaderboardEntryDto {
+  rank: number
+  username: string
+  averageScore: number
+  averageCompletionTime: string
+  distinctQuizCount: number
+}
+
+export interface QuizUserStatsDto {
+  averageScore: number
+  averageCompletionTime: string
+  attemptsCount: number
+  distinctQuizCount: number
+}
+
+// Requests — admin create/update
 export interface CreateAnswerRequest {
   text: string
   isCorrect: boolean
