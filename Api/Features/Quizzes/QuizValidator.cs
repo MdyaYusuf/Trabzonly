@@ -90,6 +90,34 @@ public class SubmitQuizRequestValidator : AbstractValidator<SubmitQuizRequest>
       .GreaterThan(TimeSpan.Zero).WithMessage("Tamamlanma süresi geçerli olmalıdır.");
 
     RuleFor(s => s.Answers)
-      .NotEmpty().WithMessage("Cevaplar boş olamaz.");
+      .NotNull().WithMessage("Cevap listesi zorunludur.");
+
+    RuleFor(s => s.Answers)
+      .Must(answers => answers.Select(a => a.QuestionId).Distinct().Count() == answers.Count)
+      .WithMessage("Aynı soruya birden fazla cevap gönderilemez.")
+      .When(s => s.Answers != null);
+
+    RuleForEach(s => s.Answers)
+      .ChildRules(answer =>
+      {
+        answer.RuleFor(a => a.QuestionId)
+          .NotEmpty().WithMessage("Soru ID boş olamaz.");
+
+        answer.RuleFor(a => a.AnswerId)
+          .NotEmpty().WithMessage("Cevap ID boş olamaz.");
+      })
+      .When(s => s.Answers != null);
+  }
+}
+
+public class CheckQuizAnswerRequestValidator : AbstractValidator<CheckQuizAnswerRequest>
+{
+  public CheckQuizAnswerRequestValidator()
+  {
+    RuleFor(c => c.QuizId)
+      .NotEmpty().WithMessage("Quiz ID boş olamaz.");
+
+    RuleFor(c => c.QuestionId)
+      .NotEmpty().WithMessage("Soru ID boş olamaz.");
   }
 }
