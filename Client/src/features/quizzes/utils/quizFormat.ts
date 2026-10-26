@@ -41,3 +41,35 @@ export function formatQuizScore(score: number | null | undefined): string {
 
   return `${Math.round(score)}`
 }
+
+/** Wall-clock seconds → ASP.NET TimeSpan JSON string (hh:mm:ss). */
+export function secondsToTimeSpanString(totalSeconds: number): string {
+  const safe = Math.max(1, Math.floor(totalSeconds))
+  const hours = Math.floor(safe / 3600)
+  const minutes = Math.floor((safe % 3600) / 60)
+  const seconds = safe % 60
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+export function scorePercent(score: number, maxScore: number): number {
+  if (maxScore <= 0) {
+    return 0
+  }
+
+  return Math.round((score / maxScore) * 100)
+}
+
+export function shuffleInPlace<T>(items: T[]): T[] {
+  for (let i = items.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = items[i]
+    items[i] = items[j]
+    items[j] = tmp
+  }
+
+  return items
+}
+
+export const QUIZ_SECONDS_PER_QUESTION = 10
+export const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'] as const

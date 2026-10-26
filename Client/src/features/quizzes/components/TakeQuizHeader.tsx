@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom'
 import { PageBackButton } from '@/core/components/PageBackButton'
 import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
-import type { TakeQuizSession } from '../utils/takeQuizTypes'
+import { getQuizCategoryLabel } from '../quizCategoryUtils'
+import type { QuizCategory } from '../quizTypes'
 
 type TakeQuizHeaderProps = {
-  session: TakeQuizSession
+  title: string
+  category: QuizCategory
+  questionCount: number
 }
 
-export function TakeQuizHeader({ session }: TakeQuizHeaderProps) {
+export function TakeQuizHeader({ title, category, questionCount }: TakeQuizHeaderProps) {
   return (
     <header className="flex flex-col gap-space-md">
       <div className="flex flex-wrap items-center gap-space-md">
@@ -22,24 +25,24 @@ export function TakeQuizHeader({ session }: TakeQuizHeaderProps) {
             Quizler
           </Link>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="font-bold text-primary">{session.breadcrumbTitle}</span>
+          <span className="font-bold text-primary">{title}</span>
         </nav>
       </div>
 
       <div className="flex max-w-4xl flex-col gap-space-sm">
         <h1 className="font-headline text-headline-md font-extrabold tracking-tight text-primary uppercase lg:text-headline-lg">
-          {session.title}
+          {title}
         </h1>
         <div className="flex flex-wrap items-center gap-space-sm">
           <span className="font-kicker border border-outline-variant/60 px-space-sm py-1 text-kicker text-on-surface-variant uppercase">
-            Zorluk: {session.difficultyLabel}
+            {getQuizCategoryLabel(category)}
           </span>
           <span className="font-kicker border border-outline-variant/60 px-space-sm py-1 text-kicker text-on-surface-variant uppercase">
-            {session.questionCount} Soru
+            {questionCount} Soru
           </span>
           <span className="font-kicker flex items-center gap-1 bg-tertiary-container px-space-sm py-1 text-kicker text-tertiary-fixed-dim uppercase">
-            <span className="material-symbols-outlined text-[14px]">star</span>
-            {session.pointsLabel}
+            <span className="material-symbols-outlined text-[14px]">timer</span>
+            10 sn / soru
           </span>
         </div>
       </div>

@@ -1,10 +1,11 @@
+type QuestionStatus = 'upcoming' | 'current' | 'correct' | 'incorrect'
+
 type TakeQuizProgressProps = {
   currentIndex: number
   total: number
-  answeredIds: Set<string>
-  questionIds: string[]
+  statuses: QuestionStatus[]
   remainingSeconds: number
-  onJump: (index: number) => void
+  isTimerActive: boolean
 }
 
 function formatTime(totalSeconds: number) {
@@ -16,15 +17,16 @@ function formatTime(totalSeconds: number) {
 export function TakeQuizProgress({
   currentIndex,
   total,
-  answeredIds,
-  questionIds,
+  statuses,
   remainingSeconds,
-  onJump,
+  isTimerActive,
 }: TakeQuizProgressProps) {
-  const answeredCount = answeredIds.size
-  const progressPercent = Math.round((answeredCount / total) * 100)
-  const remainingQuestions = Math.max(0, total - answeredCount)
+  const completedCount = statuses.filter(
+    (status) => status === 'correct' || status === 'incorrect',
+  ).length
+  const progressPercent = total === 0 ? 0 : Math.round((completedCount / total) * 100)
   const currentNumber = currentIndex + 1
+  const timerUrgent = isTimerActive && remainingSeconds <= 3
 
   return (
     <section className="flex flex-col gap-space-md border border-outline-variant/50 bg-surface-container-lowest p-space-md">
@@ -40,14 +42,9 @@ export function TakeQuizProgress({
               </span>
               <span className="font-label text-label-md text-on-surface-variant">/ {total}</span>
             </div>
-            <div className="flex items-center gap-space-md">
-              <span className="font-kicker text-kicker text-primary uppercase">
-                %{progressPercent} Tamamlandı
-              </span>
-              <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                Kalan: {remainingQuestions} Soru
-              </span>
-            </div>
+            <span className="font-kicker text-kicker text-primary uppercase">
+              %{progressPercent} Tamamlandı
+            </span>
           </div>
 
           <div className="h-2 w-full overflow-hidden bg-surface-container-high">
@@ -58,12 +55,24 @@ export function TakeQuizProgress({
           </div>
         </div>
 
-        <div className="flex items-center gap-space-sm bg-primary-container px-space-md py-space-sm text-on-primary">
-          <span className="material-symbols-outlined animate-pulse text-secondary-container">
+        <div
+          className={`flex items-center gap-space-sm px-space-md py-space-sm ${
+            timerUrgent
+              ? 'bg-error text-on-error'
+              : 'bg-primary-container text-on-primary'
+          }`}
+        >
+          <span
+            className={`material-symbols-outlined ${isTimerActive ? 'animate-pulse' : ''} ${
+              timerUrgent ? '' : 'text-secondary-container'
+            }`}
+          >
             timer
           </span>
           <div className="flex flex-col">
-            <span className="font-kicker text-kicker uppercase opacity-80">Kalan Süre</span>
+            <span className="font-kicker text-kicker uppercase opacity-80">
+              {isTimerActive ? 'Kalan Süre' : 'Süre Doldu'}
+            </span>
             <span className="font-headline text-headline-sm font-bold tracking-wider tabular-nums">
               {formatTime(remainingSeconds)}
             </span>
@@ -72,44 +81,41 @@ export function TakeQuizProgress({
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {questionIds.map((id, index) => {
+        {statuses.map((status, index) => {
           const number = index + 1
-          const isCurrent = index === currentIndex
-          const isAnswered = answeredIds.has(id)
-
           let className =
-            'font-label flex h-9 w-9 items-center justify-center text-label-md transition-colors '
+            'font-label flex h-9 w-9 items-center justify-center text-label-md '
 
-          if (isCurrent) {
+          if (status === 'current') {
             className += 'bg-secondary-container text-on-secondary-container font-bold'
-          } else if (isAnswered) {
+          } else if (status === 'correct') {
             className += 'bg-primary text-on-primary'
+          } else if (status === 'incorrect') {
+            className += 'bg-error text-on-error'
           } else {
-            className += 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container'
+            className += 'bg-surface-container-high text-on-surface-variant'
           }
 
           return (
-            <button
-              key={id}
-              type="button"
-              aria-label={
-                isAnswered ? `Soru ${number} (Çözüldü)` : `Soru ${number}`
-              }
-              aria-current={isCurrent ? 'step' : undefined}
+            <div
+              key={number}
+              aria-label={`Soru ${number}`}
+              aria-current={status === 'current' ? 'step' : undefined}
               className={className}
-              onClick={() => {
-                onJump(index)
-              }}
             >
-              {isAnswered && !isCurrent ? (
+              {status === 'correct' ? (
                 <span className="material-symbols-outlined text-[16px]">check</span>
+              ) : status === 'incorrect' ? (
+                <span className="material-symbols-outlined text-[16px]">close</span>
               ) : (
                 number
               )}
-            </button>
+            </div>
           )
         })}
       </div>
     </section>
   )
 }
+
+export type { QuestionStatus }

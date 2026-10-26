@@ -1,25 +1,50 @@
-import { useRef } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { PageBackButton } from '@/core/components/PageBackButton'
 import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
+import { useAppSelector } from '@/core/store/hooks'
 import { QuizResultActions } from '../components/QuizResultActions'
-import { QuizResultAnalysis } from '../components/QuizResultAnalysis'
 import { QuizResultHero } from '../components/QuizResultHero'
-import { QuizResultRecommendations } from '../components/QuizResultRecommendations'
 import type { QuizResultLocationState } from './TakeQuizPage'
-import { getQuizResultProfile } from '../utils/takeQuizPlaceholders'
 
 export function QuizResultPage() {
   const { quizId } = useParams<{ quizId: string }>()
   const location = useLocation()
-  const reviewRef = useRef<HTMLElement | null>(null)
-
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const state = location.state as QuizResultLocationState | null
-  const result = state?.result ?? getQuizResultProfile(quizId)
 
-  function scrollToReview() {
-    reviewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
   }
+
+  if (!quizId || !state?.result || state.result.quizId !== quizId) {
+    return (
+      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
+        <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-md px-4 py-space-xl sm:px-6 lg:px-12">
+          <p className="font-body text-body-md text-on-surface-variant">
+            Sonuç bulunamadı. Quizi çözdükten sonra buraya yönlendirilirsin.
+          </p>
+          <div className="flex flex-wrap gap-space-sm">
+            <Link
+              to="/quizler"
+              className="font-label bg-primary-container px-space-md py-space-sm text-label-md font-bold text-on-primary uppercase"
+            >
+              Quiz listesi
+            </Link>
+            {quizId ? (
+              <Link
+                to={`/quizler/${quizId}`}
+                className="font-label border border-outline-variant px-space-md py-space-sm text-label-md font-bold text-primary uppercase"
+              >
+                Tekrar çöz
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  const { result, quizTitle } = state
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
@@ -41,22 +66,27 @@ export function QuizResultPage() {
                 to={`/quizler/${result.quizId}`}
                 className="transition-colors hover:text-primary"
               >
-                {result.breadcrumbTitle}
+                {quizTitle}
               </Link>
               <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-              <span className="font-bold text-primary">Sonuç Özeti</span>
+              <span className="font-bold text-primary">Sonuç</span>
             </nav>
           </div>
           <span className="font-kicker flex items-center gap-1 bg-surface-container px-space-md py-1 text-kicker text-primary uppercase">
             <span className="h-2 w-2 rounded-full bg-secondary-container" />
-            {result.statusLabel}
+            Tamamlandı
           </span>
         </div>
 
-        <QuizResultHero result={result} />
-        <QuizResultActions result={result} onReview={scrollToReview} />
-        <QuizResultAnalysis result={result} reviewRef={reviewRef} />
-        <QuizResultRecommendations items={result.recommended} />
+        <QuizResultHero
+          quizTitle={quizTitle}
+          score={result.score}
+          maxScore={result.maxScore}
+          completionTime={result.completionTime}
+          correctCount={state.correctCount}
+          totalCount={state.totalCount}
+        />
+        <QuizResultActions quizId={result.quizId} />
       </div>
     </main>
   )

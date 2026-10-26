@@ -1,13 +1,36 @@
 import { Link } from 'react-router-dom'
-import type { QuizResultProfile } from '../utils/takeQuizTypes'
+import { formatQuizDuration, scorePercent } from '../utils/quizFormat'
 
 type QuizResultHeroProps = {
-  result: QuizResultProfile
+  quizTitle: string
+  score: number
+  maxScore: number
+  completionTime: string
+  correctCount: number
+  totalCount: number
 }
 
-export function QuizResultHero({ result }: QuizResultHeroProps) {
+export function QuizResultHero({
+  quizTitle,
+  score,
+  maxScore,
+  completionTime,
+  correctCount,
+  totalCount,
+}: QuizResultHeroProps) {
+  const percent = scorePercent(score, maxScore)
   const circumference = 2 * Math.PI * 54
-  const offset = circumference - (result.successPercent / 100) * circumference
+  const offset = circumference - (percent / 100) * circumference
+  const wrongCount = Math.max(0, totalCount - correctCount)
+
+  const headline =
+    percent >= 80 ? 'Harika iş' : percent >= 50 ? 'İyi deneme' : 'Tekrar dene'
+  const accent =
+    percent >= 80
+      ? 'Tribün hafızası kuvvetli!'
+      : percent >= 50
+        ? 'Biraz daha çalış.'
+        : 'Hafızayı tazeleyelim.'
 
   return (
     <section className="overflow-hidden bg-gradient-to-br from-primary via-primary-container to-[#1a040b]">
@@ -28,24 +51,36 @@ export function QuizResultHero({ result }: QuizResultHeroProps) {
             >
               stars
             </span>
-            RESMİ TRİBÜN DERECESİ
+            Quiz sonucu
           </span>
 
           <h1 className="font-display text-headline-lg font-extrabold tracking-tight text-on-primary uppercase lg:text-display-xl">
-            {result.headline}
+            {headline}
             <br />
-            <span className="text-secondary-container">{result.headlineAccent}</span>
+            <span className="text-secondary-container">{accent}</span>
           </h1>
 
           <p className="font-headline text-headline-sm font-bold text-secondary-container lg:text-headline-md">
-            {result.subheadline}
+            {quizTitle}
           </p>
 
           <p className="font-body max-w-2xl text-body-md text-on-primary/85 lg:text-body-lg">
-            {result.body}
+            Skorun sunucuda kaydedildi. İstersen aynı testi tekrar çözebilir veya listeden yeni bir
+            quiz seçebilirsin.
           </p>
 
           <div className="mt-space-sm flex flex-col gap-space-sm sm:flex-row">
+            <div className="flex items-center gap-space-sm bg-black/30 px-space-md py-space-sm">
+              <span className="material-symbols-outlined text-secondary-container">schedule</span>
+              <div className="flex flex-col">
+                <span className="font-kicker text-kicker text-on-primary/70 uppercase">
+                  Tamamlanma
+                </span>
+                <span className="font-label text-label-md font-bold text-on-primary">
+                  {formatQuizDuration(completionTime)}
+                </span>
+              </div>
+            </div>
             <div className="flex items-center gap-space-sm bg-black/30 px-space-md py-space-sm">
               <span
                 className="material-symbols-outlined text-tertiary-fixed-dim"
@@ -54,22 +89,9 @@ export function QuizResultHero({ result }: QuizResultHeroProps) {
                 military_tech
               </span>
               <div className="flex flex-col">
-                <span className="font-kicker text-kicker text-on-primary/70 uppercase">
-                  Kazanılan Unvan
-                </span>
+                <span className="font-kicker text-kicker text-on-primary/70 uppercase">Puan</span>
                 <span className="font-label text-label-md font-bold text-on-primary uppercase">
-                  {result.titleEarned}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-space-sm bg-black/30 px-space-md py-space-sm">
-              <span className="material-symbols-outlined text-secondary-container">schedule</span>
-              <div className="flex flex-col">
-                <span className="font-kicker text-kicker text-on-primary/70 uppercase">
-                  Tamamlanma:
-                </span>
-                <span className="font-label text-label-md font-bold text-on-primary">
-                  {result.completionTime}
+                  {score} / {maxScore}
                 </span>
               </div>
             </div>
@@ -80,11 +102,9 @@ export function QuizResultHero({ result }: QuizResultHeroProps) {
           <div className="flex h-full flex-col border border-white/10 bg-surface-container-lowest">
             <div className="flex items-center justify-between border-b border-outline-variant/40 px-space-md py-space-sm">
               <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-                SONUÇ RAPORU
+                Sonuç raporu
               </span>
-              <span className="font-kicker text-kicker text-primary uppercase">
-                {result.seasonLabel}
-              </span>
+              <span className="font-kicker text-kicker text-primary uppercase">100 üzerinden</span>
             </div>
 
             <div className="flex flex-1 flex-col items-center gap-space-md p-space-lg">
@@ -114,10 +134,10 @@ export function QuizResultHero({ result }: QuizResultHeroProps) {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="font-headline text-stat-counter font-extrabold text-primary tabular-nums">
-                    %{result.successPercent}
+                    %{percent}
                   </span>
                   <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                    Başarı Oranı
+                    Başarı
                   </span>
                 </div>
               </div>
@@ -125,7 +145,7 @@ export function QuizResultHero({ result }: QuizResultHeroProps) {
               <div className="grid w-full grid-cols-2 gap-space-sm">
                 <div className="bg-surface-container-low p-space-md text-center">
                   <p className="font-headline text-headline-sm font-extrabold text-primary tabular-nums">
-                    {result.correctCount} / {result.totalCount}
+                    {correctCount} / {totalCount}
                   </p>
                   <p className="font-kicker mt-1 text-kicker text-on-surface-variant uppercase">
                     Doğru / Toplam
@@ -133,10 +153,10 @@ export function QuizResultHero({ result }: QuizResultHeroProps) {
                 </div>
                 <div className="bg-error-container/40 p-space-md text-center">
                   <p className="font-headline text-headline-sm font-extrabold text-error tabular-nums">
-                    {result.wrongCount}
+                    {wrongCount}
                   </p>
                   <p className="font-kicker mt-1 text-kicker text-on-error-container uppercase">
-                    Yanlış Cevap
+                    Yanlış / Boş
                   </p>
                 </div>
               </div>
@@ -145,10 +165,10 @@ export function QuizResultHero({ result }: QuizResultHeroProps) {
             <div className="flex items-center justify-between bg-primary-container px-space-md py-space-sm text-on-primary">
               <span className="font-kicker flex items-center gap-1 text-kicker uppercase">
                 <span className="material-symbols-outlined text-[16px]">toll</span>
-                Kazanılan Puan
+                Skor
               </span>
               <span className="font-headline text-headline-sm font-extrabold text-tertiary-fixed-dim">
-                {result.pointsEarned} TP
+                {score} / {maxScore}
               </span>
             </div>
           </div>
