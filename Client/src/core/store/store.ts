@@ -7,7 +7,6 @@ import postReducer from "../../features/posts/postSlice";
 import categoryReducer from "../../features/categories/categorySlice";
 import injuryReducer from "../../features/injuries/injurySlice";
 import positionReducer from "../../features/positions/positionSlice";
-import quizReducer from "../../features/quizzes/quizSlice";
 import seasonReducer from "../../features/seasons/seasonSlice";
 import playerStatsReducer from "../../features/stats/playerStatsSlice";
 import userReducer from "../../features/users/userSlice";
@@ -23,7 +22,6 @@ export const store = configureStore({
     categories: categoryReducer,
     injuries: injuryReducer,
     positions: positionReducer,
-    quizzes: quizReducer,
     seasons: seasonReducer,
     playerStats: playerStatsReducer,
     users: userReducer,

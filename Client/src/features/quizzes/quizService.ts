@@ -1,5 +1,5 @@
 import { apiClient } from '../../core/api/apiClient'
-import type { ApiResponse, NoData, CursorPagedResponse } from '../../core/types/ApiResponse'
+import type { ApiResponse, NoData } from '../../core/types/ApiResponse'
 import type {
   QuizCategory,
   QuizResponseDto,
@@ -82,31 +82,6 @@ const getById = async (id: string): Promise<ApiResponse<QuizResponseDto>> => {
   return await apiClient<QuizResponseDto>(`${API_URL}/${id}`)
 }
 
-const getMostTaken = async (count: number): Promise<ApiResponse<QuizListItemDto[]>> => {
-  return await apiClient<QuizListItemDto[]>(`${API_URL}/most-taken/${count}`)
-}
-
-const getRecent = async (
-  count: number,
-  lastDate?: string,
-  lastId?: string,
-): Promise<ApiResponse<CursorPagedResponse<QuizListItemDto>>> => {
-  const queryParams = new URLSearchParams()
-
-  if (lastDate) {
-    queryParams.append('lastDate', lastDate)
-  }
-
-  if (lastId) {
-    queryParams.append('lastId', lastId)
-  }
-
-  const qs = queryParams.toString() ? `?${queryParams.toString()}` : ''
-  return await apiClient<CursorPagedResponse<QuizListItemDto>>(
-    `${API_URL}/recent/${count}${qs}`,
-  )
-}
-
 const add = async (request: CreateQuizRequest): Promise<ApiResponse<CreatedQuizResponseDto>> => {
   return await apiClient<CreatedQuizResponseDto>(API_URL, {
     method: 'POST',
@@ -145,8 +120,6 @@ const quizService = {
   getMyStats,
   getAllForAdmin,
   getById,
-  getMostTaken,
-  getRecent,
   add,
   update,
   remove,

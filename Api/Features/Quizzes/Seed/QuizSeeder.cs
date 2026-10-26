@@ -7,8 +7,10 @@ using Microsoft.Extensions.Logging;
 namespace Api.Features.Quizzes.Seed;
 
 /// <summary>
-/// Idempotent startup seed: inserts the 20 thematic quiz packs from trabzonly-quiz.json
-/// when their SeedKey is missing. Never updates existing seeded rows.
+/// Idempotent startup seed: inserts the 20 thematic quiz packs from
+/// <c>trabzonly-quiz.json</c> at the repository root (gitignored) when their
+/// <see cref="Quiz.SeedKey"/> is missing. Always runs on API startup; never
+/// updates or deletes existing seeded rows. Admin CRUD can still change content later.
 /// </summary>
 public static class QuizSeeder
 {

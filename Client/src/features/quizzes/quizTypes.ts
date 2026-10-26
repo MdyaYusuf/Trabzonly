@@ -48,7 +48,7 @@ export interface CreatedQuizResponseDto {
   title: string
 }
 
-// Public list (no questions, no answers)
+/** Public list payload — never includes questions, answers, or isCorrect. */
 export interface QuizListItemDto {
   id: string
   title: string
@@ -59,7 +59,7 @@ export interface QuizListItemDto {
   isActive: boolean
 }
 
-// Take attempt (no isCorrect, no explanation)
+/** Take attempt answer — text only; never includes isCorrect or explanation. */
 export interface QuizTakeAnswerDto {
   id: string
   text: string
