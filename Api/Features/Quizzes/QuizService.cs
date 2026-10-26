@@ -9,6 +9,7 @@ namespace Api.Features.Quizzes;
 
 public class QuizService(
   IQuizRepository _quizRepository,
+  IQuestionRepository _questionRepository,
   IUserQuizResultRepository _userQuizResultRepository,
   QuizMapper _mapper,
   QuizBusinessRules _businessRules,
@@ -349,9 +350,19 @@ public class QuizService(
 
     await _businessRules.QuizTitleCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Title, cancellationToken);
 
-    Quiz quiz = await _businessRules.GetQuizIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+    Quiz quiz = await _businessRules.GetQuizIfExistAsync(
+      request.Id,
+      include: query => query.Include(q => q.Questions).ThenInclude(q => q.Answers),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
 
     _mapper.UpdateEntityFromRequest(request, quiz);
+
+    if (request.Questions is not null)
+    {
+      _businessRules.QuestionsMustHaveExactlyOneCorrectAnswer(request.Questions);
+      ReplaceQuizQuestions(quiz, request.Questions);
+    }
 
     _quizRepository.Update(quiz);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -362,6 +373,37 @@ public class QuizService(
       Message = "Quiz başarılı bir şekilde güncellendi.",
       StatusCode = 200
     };
+  }
+
+  private void ReplaceQuizQuestions(Quiz quiz, List<CreateQuestionRequest> questions)
+  {
+    if (quiz.Questions.Count > 0)
+    {
+      _questionRepository.DeleteRange(quiz.Questions.ToList());
+      quiz.Questions.Clear();
+    }
+
+    foreach (CreateQuestionRequest questionRequest in questions.OrderBy(q => q.SortOrder))
+    {
+      var question = new Question
+      {
+        Text = questionRequest.Text,
+        Explanation = questionRequest.Explanation,
+        Points = questionRequest.Points,
+        SortOrder = questionRequest.SortOrder
+      };
+
+      foreach (CreateAnswerRequest answerRequest in questionRequest.Answers)
+      {
+        question.Answers.Add(new Answer
+        {
+          Text = answerRequest.Text,
+          IsCorrect = answerRequest.IsCorrect
+        });
+      }
+
+      quiz.Questions.Add(question);
+    }
   }
 
   public async Task<ReturnModel<NoData>> RemoveAsync(

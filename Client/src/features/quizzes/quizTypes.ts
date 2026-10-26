@@ -135,6 +135,7 @@ export interface CreateQuizRequest {
   title: string
   description?: string
   category: QuizCategory
+  isActive: boolean
   questions: CreateQuestionRequest[]
 }
 
@@ -144,6 +145,8 @@ export interface UpdateQuizRequest {
   description?: string
   category: QuizCategory
   isActive: boolean
+  /** When provided, replaces all quiz questions. */
+  questions?: CreateQuestionRequest[]
 }
 
 export interface QuestionAnswerDto {

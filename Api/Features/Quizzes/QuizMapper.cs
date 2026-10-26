@@ -6,6 +6,8 @@ namespace Api.Features.Quizzes;
 public partial class QuizMapper
 {
   public partial Quiz CreateToEntity(CreateQuizRequest request);
+
+  [MapperIgnoreSource(nameof(UpdateQuizRequest.Questions))]
   public partial void UpdateEntityFromRequest(UpdateQuizRequest request, Quiz entity);
   public partial QuizResponseDto EntityToResponseDto(Quiz entity);
   public partial CreatedQuizResponseDto EntityToCreatedResponseDto(Quiz entity);

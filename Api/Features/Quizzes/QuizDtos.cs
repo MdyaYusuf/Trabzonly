@@ -107,6 +107,7 @@ public sealed record CreateQuizRequest(
   string Title,
   string? Description,
   QuizCategory Category,
+  bool IsActive,
   List<CreateQuestionRequest> Questions);
 
 public sealed record CreateQuestionRequest(
@@ -123,7 +124,8 @@ public sealed record UpdateQuizRequest(
   string Title,
   string? Description,
   QuizCategory Category,
-  bool IsActive);
+  bool IsActive,
+  List<CreateQuestionRequest>? Questions = null);
 
 public sealed record SubmitQuizRequest(Guid QuizId, TimeSpan CompletionTime, List<QuestionAnswerDto> Answers);
 

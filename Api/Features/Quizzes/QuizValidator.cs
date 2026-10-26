@@ -17,6 +17,9 @@ public class CreateQuizRequestValidator : AbstractValidator<CreateQuizRequest>
     RuleFor(q => q.Category)
       .IsInEnum().WithMessage("Geçersiz quiz kategorisi.");
 
+    RuleFor(q => q.Questions)
+      .NotEmpty().WithMessage("Quiz en az bir soru içermelidir.");
+
     RuleForEach(q => q.Questions)
       .SetValidator(new CreateQuestionRequestValidator());
   }
@@ -41,8 +44,11 @@ public class CreateQuestionRequestValidator : AbstractValidator<CreateQuestionRe
       .GreaterThanOrEqualTo(0).WithMessage("Soru sırası 0 veya daha büyük olmalıdır.");
 
     RuleFor(q => q.Answers)
-      .NotEmpty().WithMessage("Bir sorunun en az 1 cevabı olmalıdır.")
-      .Must(answers => answers.Any(a => a.IsCorrect)).WithMessage("Soru için en az bir doğru cevap işaretlenmelidir.");
+      .NotNull().WithMessage("Cevap listesi zorunludur.")
+      .Must(answers => answers != null && answers.Count == 4)
+      .WithMessage("Her soruda tam 4 şık olmalıdır.")
+      .Must(answers => answers != null && answers.Count(a => a.IsCorrect) == 1)
+      .WithMessage("Soru için tam olarak 1 doğru cevap işaretlenmelidir.");
 
     RuleForEach(q => q.Answers)
       .SetValidator(new CreateAnswerRequestValidator());
@@ -76,6 +82,15 @@ public class UpdateQuizRequestValidator : AbstractValidator<UpdateQuizRequest>
 
     RuleFor(q => q.Category)
       .IsInEnum().WithMessage("Geçersiz quiz kategorisi.");
+
+    When(q => q.Questions != null, () =>
+    {
+      RuleFor(q => q.Questions!)
+        .NotEmpty().WithMessage("Soru listesi boş olamaz.");
+
+      RuleForEach(q => q.Questions!)
+        .SetValidator(new CreateQuestionRequestValidator());
+    });
   }
 }
 

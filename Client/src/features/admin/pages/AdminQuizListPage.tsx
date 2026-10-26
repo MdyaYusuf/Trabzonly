@@ -1,36 +1,59 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import quizService from '@/features/quizzes/quizService'
 import { AdminQuizListFilters } from '../components/AdminQuizListFilters'
 import { AdminQuizListHeader } from '../components/AdminQuizListHeader'
 import { AdminQuizPagination } from '../components/AdminQuizPagination'
 import { AdminQuizTable } from '../components/AdminQuizTable'
-import { adminQuizListRows } from '../utils/adminQuizPlaceholders'
-import type { AdminQuizStatusFilter } from '../utils/adminQuizTypes'
+import { mapQuizResponseToListRow } from '../utils/adminQuizDraftUtils'
+import type { AdminQuizListRow, AdminQuizStatusFilter } from '../utils/adminQuizTypes'
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 8
 
 export function AdminQuizListPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<AdminQuizStatusFilter>('all')
   const [category, setCategory] = useState('all')
   const [page, setPage] = useState(1)
+  const [rows, setRows] = useState<AdminQuizListRow[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  async function loadQuizzes() {
+    setIsLoading(true)
+
+    const result = await quizService.getAllForAdmin()
+
+    if (result.success && result.data) {
+      setRows(result.data.map(mapQuizResponseToListRow))
+    } else {
+      setRows([])
+    }
+
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    void loadQuizzes()
+  }, [])
 
   const counts = useMemo(() => {
     return {
-      all: 12,
-      active: 8,
-      passive: 4,
+      all: rows.length,
+      active: rows.filter((row) => row.status === 'active').length,
+      passive: rows.filter((row) => row.status === 'passive').length,
     }
-  }, [])
+  }, [rows])
 
   const filtered = useMemo(() => {
-    let result = [...adminQuizListRows]
+    let result = [...rows]
 
     if (statusFilter !== 'all') {
       result = result.filter((row) => row.status === statusFilter)
     }
 
     if (category !== 'all') {
-      result = result.filter((row) => row.categoryKey === category)
+      const categoryValue = Number(category)
+      result = result.filter((row) => row.category === categoryValue)
     }
 
     const query = search.trim().toLowerCase()
@@ -39,13 +62,13 @@ export function AdminQuizListPage() {
       result = result.filter(
         (row) =>
           row.title.toLowerCase().includes(query) ||
-          row.category.toLowerCase().includes(query) ||
+          row.categoryLabel.toLowerCase().includes(query) ||
           row.description.toLowerCase().includes(query),
       )
     }
 
     return result
-  }, [search, statusFilter, category])
+  }, [rows, search, statusFilter, category])
 
   const totalPages = Math.max(1, Math.ceil(Math.max(filtered.length, 1) / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
@@ -63,17 +86,35 @@ export function AdminQuizListPage() {
     setPage(1)
   }
 
-  const displayTotal =
-    filtered.length === adminQuizListRows.length &&
-    statusFilter === 'all' &&
-    category === 'all' &&
-    !search.trim()
-      ? 12
-      : filtered.length
+  async function handleDelete(id: string) {
+    if (deletingId) {
+      return
+    }
+
+    const confirmed = window.confirm('Bu quizi silmek istediğine emin misin?')
+
+    if (!confirmed) {
+      return
+    }
+
+    setDeletingId(id)
+
+    const result = await quizService.remove(id)
+
+    if (result.success) {
+      setRows((prev) => prev.filter((row) => row.id !== id))
+    }
+
+    setDeletingId(null)
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-      <AdminQuizListHeader />
+      <AdminQuizListHeader
+        totalCount={counts.all}
+        activeCount={counts.active}
+        passiveCount={counts.passive}
+      />
 
       <AdminQuizListFilters
         search={search}
@@ -95,28 +136,28 @@ export function AdminQuizListPage() {
         onClear={clearFilters}
       />
 
-      <AdminQuizTable rows={pageRows} />
+      {isLoading ? (
+        <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+          Quizler yükleniyor...
+        </p>
+      ) : (
+        <AdminQuizTable
+          rows={pageRows}
+          deletingId={deletingId}
+          onDelete={(id) => {
+            void handleDelete(id)
+          }}
+        />
+      )}
 
-      <AdminQuizPagination
-        page={currentPage}
-        pageSize={PAGE_SIZE}
-        total={displayTotal}
-        onPageChange={setPage}
-      />
-
-      <section className="flex gap-space-sm border border-outline-variant/40 bg-surface-container-low p-space-md">
-        <span className="material-symbols-outlined text-secondary">info</span>
-        <div>
-          <h2 className="font-label text-label-md font-bold text-on-surface uppercase">
-            Quiz Moderasyon ve Canlı Yayın Protokolü
-          </h2>
-          <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-            Yayınlanan tüm quizler anlık olarak Trabzonly taraftar mobil ve masaüstü arayüzünde
-            puanlama ve liderlik tablosuyla eşlenir. Değişiklikler anlık önbellek yenilemesiyle
-            taraftarlara yansıtılır.
-          </p>
-        </div>
-      </section>
+      {!isLoading && filtered.length > PAGE_SIZE ? (
+        <AdminQuizPagination
+          page={currentPage}
+          pageSize={PAGE_SIZE}
+          total={filtered.length}
+          onPageChange={setPage}
+        />
+      ) : null}
     </main>
   )
 }

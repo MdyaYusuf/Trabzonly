@@ -1,5 +1,5 @@
+import { ADMIN_QUIZ_CATEGORY_FILTER_OPTIONS } from '../utils/adminQuizDraftUtils'
 import type { AdminQuizStatusFilter } from '../utils/adminQuizTypes'
-import { adminQuizCategoryOptions } from '../utils/adminQuizPlaceholders'
 
 type AdminQuizListFiltersProps = {
   search: string
@@ -41,7 +41,7 @@ export function AdminQuizListFilters({
             onChange={(event) => {
               onSearchChange(event.target.value)
             }}
-            placeholder="Quiz adı, etiket"
+            placeholder="Quiz adı veya açıklama"
             className="font-body w-full border border-outline-variant/50 bg-surface py-space-sm pr-space-md pl-10 text-body-md text-on-surface outline-none focus:border-primary"
           />
         </label>
@@ -76,7 +76,7 @@ export function AdminQuizListFilters({
           }}
           className="font-label border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md outline-none focus:border-primary"
         >
-          {adminQuizCategoryOptions.map((option) => (
+          {ADMIN_QUIZ_CATEGORY_FILTER_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
