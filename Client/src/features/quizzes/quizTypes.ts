@@ -56,6 +56,7 @@ export interface QuizListItemDto {
   category: QuizCategory
   questionCount: number
   takenCount: number
+  averageSuccessPercent?: number | null
   isActive: boolean
 }
 
@@ -97,8 +98,6 @@ export interface CheckQuizAnswerResponse {
 // Platform / leaderboard / me stats
 export interface QuizPlatformStatsDto {
   totalQuizzes: number
-  totalCompletions: number
-  averageScore: number
   topUsername?: string | null
 }
 

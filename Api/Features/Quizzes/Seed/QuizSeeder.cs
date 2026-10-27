@@ -23,7 +23,7 @@ public static class QuizSeeder
 
   public static async Task SeedAsync(IServiceProvider services, CancellationToken cancellationToken = default)
   {
-    using IServiceScope scope = services.CreateScope();
+    await using AsyncServiceScope scope = services.CreateAsyncScope();
     IServiceProvider sp = scope.ServiceProvider;
     ILogger logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger("QuizSeeder");
     IQuizRepository quizRepository = sp.GetRequiredService<IQuizRepository>();

@@ -50,6 +50,7 @@ public sealed record QuizListItemDto(
   QuizCategory Category,
   int QuestionCount,
   int TakenCount,
+  double? AverageSuccessPercent,
   bool IsActive);
 
 // Take attempt (no IsCorrect, no Explanation)
@@ -85,8 +86,6 @@ public sealed record CheckQuizAnswerResponse(
 // Platform / leaderboard / me stats
 public sealed record QuizPlatformStatsDto(
   int TotalQuizzes,
-  int TotalCompletions,
-  double AverageScore,
   string? TopUsername);
 
 public sealed record QuizLeaderboardEntryDto(

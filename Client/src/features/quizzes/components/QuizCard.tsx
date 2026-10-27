@@ -4,6 +4,7 @@ import {
   getQuizCategoryLabel,
 } from '../quizCategoryUtils'
 import type { QuizListItemDto } from '../quizTypes'
+import { formatQuizScore } from '../utils/quizFormat'
 
 type QuizCardProps = {
   quiz: QuizListItemDto
@@ -13,6 +14,10 @@ export function QuizCard({ quiz }: QuizCardProps) {
   const categoryLabel = getQuizCategoryLabel(quiz.category)
   const categoryIcon = getQuizCategoryIcon(quiz.category)
   const description = quiz.description?.trim() || 'Bu test için açıklama eklenmemiş.'
+  const averageLabel =
+    quiz.averageSuccessPercent == null
+      ? 'Henüz çözülmedi'
+      : `Ort. %${formatQuizScore(quiz.averageSuccessPercent)} başarı`
 
   return (
     <article className="flex flex-col justify-between bg-surface-container-lowest p-space-lg shadow-sm transition-shadow hover:shadow-md">
@@ -41,7 +46,7 @@ export function QuizCard({ quiz }: QuizCardProps) {
             {quiz.questionCount} Soru
           </span>
           <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-            {quiz.takenCount.toLocaleString('tr-TR')} Çözülme
+            {quiz.takenCount.toLocaleString('tr-TR')} Çözülme · {averageLabel}
           </span>
         </div>
         <Link

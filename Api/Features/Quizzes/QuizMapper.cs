@@ -17,6 +17,20 @@ public partial class QuizMapper
 
   public QuizListItemDto EntityToListItemDto(Quiz entity)
   {
+    double? averageSuccessPercent = null;
+
+    if (entity.UserQuizResults.Count > 0)
+    {
+      int maxScore = entity.Questions.Sum(q => q.Points);
+
+      if (maxScore > 0)
+      {
+        averageSuccessPercent = Math.Round(
+          entity.UserQuizResults.Average(r => (double)r.Score / maxScore * 100),
+          1);
+      }
+    }
+
     return new QuizListItemDto(
       entity.Id,
       entity.Title,
@@ -24,6 +38,7 @@ public partial class QuizMapper
       entity.Category,
       entity.Questions.Count,
       entity.UserQuizResults.Count,
+      averageSuccessPercent,
       entity.IsActive);
   }
 

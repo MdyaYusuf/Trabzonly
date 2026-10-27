@@ -84,11 +84,6 @@ public class QuizService(
       enableTracking: false,
       cancellationToken: cancellationToken);
 
-    int totalCompletions = results.Count;
-    double averageScore = totalCompletions == 0
-      ? 0
-      : Math.Round(results.Average(r => (double)r.Score), 2);
-
     string? topUsername = BuildLeaderboardEntries(
         results,
         take: 1,
@@ -98,8 +93,6 @@ public class QuizService(
 
     var response = new QuizPlatformStatsDto(
       totalQuizzes,
-      totalCompletions,
-      averageScore,
       topUsername);
 
     return new ReturnModel<QuizPlatformStatsDto>()
