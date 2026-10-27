@@ -1,12 +1,31 @@
-/** Matches Api.Features.Quizzes.QuizCategory (JSON number). */
-export const QuizCategory = {
-  HistoryAndFirsts: 1,
-  FacilitiesAndRecords: 2,
-  EternalRivalry: 3,
-  ChampionshipsAndAchievements: 4,
-} as const
+// Quiz category (table-backed)
+export interface QuizCategoryResponseDto {
+  id: number
+  name: string
+  description?: string | null
+  imageUrl?: string | null
+  isActive: boolean
+}
 
-export type QuizCategory = (typeof QuizCategory)[keyof typeof QuizCategory]
+export interface CreatedQuizCategoryResponseDto {
+  id: number
+  name: string
+}
+
+export interface CreateQuizCategoryRequest {
+  name: string
+  description?: string | null
+  imageUrl?: string | null
+  isActive: boolean
+}
+
+export interface UpdateQuizCategoryRequest {
+  id: number
+  name: string
+  description?: string | null
+  imageUrl?: string | null
+  isActive: boolean
+}
 
 // Responses — admin / full (may include isCorrect)
 export interface AnswerResponseDto {
@@ -28,7 +47,9 @@ export interface QuizResponseDto {
   id: string
   title: string
   description?: string
-  category: QuizCategory
+  quizCategoryId: number
+  categoryName: string
+  categoryImageUrl?: string | null
   isActive: boolean
   questions: QuestionResponseDto[]
 }
@@ -53,7 +74,9 @@ export interface QuizListItemDto {
   id: string
   title: string
   description?: string
-  category: QuizCategory
+  quizCategoryId: number
+  categoryName: string
+  categoryImageUrl?: string | null
   questionCount: number
   takenCount: number
   averageSuccessPercent?: number | null
@@ -78,7 +101,9 @@ export interface QuizTakeDto {
   id: string
   title: string
   description?: string
-  category: QuizCategory
+  quizCategoryId: number
+  categoryName: string
+  categoryImageUrl?: string | null
   questions: QuizTakeQuestionDto[]
 }
 
@@ -133,7 +158,7 @@ export interface CreateQuestionRequest {
 export interface CreateQuizRequest {
   title: string
   description?: string
-  category: QuizCategory
+  quizCategoryId: number
   isActive: boolean
   questions: CreateQuestionRequest[]
 }
@@ -142,7 +167,7 @@ export interface UpdateQuizRequest {
   id: string
   title: string
   description?: string
-  category: QuizCategory
+  quizCategoryId: number
   isActive: boolean
   /** When provided, replaces all quiz questions. */
   questions?: CreateQuestionRequest[]

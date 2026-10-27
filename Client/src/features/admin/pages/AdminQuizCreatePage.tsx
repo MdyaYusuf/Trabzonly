@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import quizCategoryService from '@/features/quizzes/quizCategoryService'
 import quizService from '@/features/quizzes/quizService'
+import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
 import { AdminQuizCreateFormFields } from '../components/AdminQuizCreateFormFields'
 import { AdminQuizCreateSidebar } from '../components/AdminQuizCreateSidebar'
 import {
   createEmptyAdminQuestion,
   createEmptyAdminQuizCreateDraft,
   mapCreateDraftToRequest,
+  resolveCategoryName,
   validateAdminQuizDraft,
 } from '../utils/adminQuizDraftUtils'
 import type { AdminQuizCreateDraft, AdminQuizQuestion } from '../utils/adminQuizTypes'
@@ -14,8 +17,48 @@ import type { AdminQuizCreateDraft, AdminQuizQuestion } from '../utils/adminQuiz
 export function AdminQuizCreatePage() {
   const navigate = useNavigate()
   const [draft, setDraft] = useState<AdminQuizCreateDraft>(createEmptyAdminQuizCreateDraft)
+  const [categories, setCategories] = useState<QuizCategoryResponseDto[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadCategories() {
+      const result = await quizCategoryService.getAllForAdmin()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data && result.data.length > 0) {
+        setCategories(result.data)
+        setDraft((prev) => {
+          if (prev.quizCategoryId > 0) {
+            return prev
+          }
+
+          return {
+            ...prev,
+            quizCategoryId: result.data![0]!.id,
+          }
+        })
+      } else {
+        setCategories([])
+      }
+    }
+
+    void loadCategories()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const categoryName = useMemo(
+    () => resolveCategoryName(categories, draft.quizCategoryId),
+    [categories, draft.quizCategoryId],
+  )
 
   function updateField<K extends keyof AdminQuizCreateDraft>(
     key: K,
@@ -221,6 +264,7 @@ export function AdminQuizCreatePage() {
           <div className="lg:col-span-7">
             <AdminQuizCreateFormFields
               draft={draft}
+              categories={categories}
               onChange={updateField}
               onUpdateQuestion={updateQuestion}
               onSetCorrectOption={setCorrectOption}
@@ -231,7 +275,7 @@ export function AdminQuizCreatePage() {
             />
           </div>
           <div className="lg:col-span-5">
-            <AdminQuizCreateSidebar draft={draft} />
+            <AdminQuizCreateSidebar draft={draft} categoryName={categoryName} />
           </div>
         </div>
       </main>

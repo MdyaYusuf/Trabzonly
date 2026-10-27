@@ -1,5 +1,3 @@
-import type { QuizCategory } from '@/features/quizzes/quizTypes'
-
 export type AdminQuizStatusFilter = 'all' | 'active' | 'passive'
 
 export type AdminQuizStatus = 'active' | 'passive'
@@ -7,14 +5,13 @@ export type AdminQuizStatus = 'active' | 'passive'
 export type AdminQuizListRow = {
   id: string
   title: string
-  category: QuizCategory
+  quizCategoryId: number
   categoryLabel: string
   description: string
   questionCount: number
   totalPoints: number
   status: AdminQuizStatus
   statusLabel: string
-  icon: string
 }
 
 export type AdminQuizOption = {
@@ -37,7 +34,7 @@ export type AdminQuizQuestion = {
 export type AdminQuizCreateDraft = {
   title: string
   description: string
-  category: QuizCategory
+  quizCategoryId: number
   isActive: boolean
   questions: AdminQuizQuestion[]
 }
@@ -46,7 +43,7 @@ export type AdminQuizEditDraft = {
   id: string
   title: string
   description: string
-  category: QuizCategory
+  quizCategoryId: number
   isActive: boolean
   questions: AdminQuizQuestion[]
 }

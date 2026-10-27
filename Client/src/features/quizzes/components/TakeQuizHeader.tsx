@@ -1,16 +1,14 @@
 import { Link } from 'react-router-dom'
 import { PageBackButton } from '@/core/components/PageBackButton'
 import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
-import { getQuizCategoryLabel } from '../quizCategoryUtils'
-import type { QuizCategory } from '../quizTypes'
 
 type TakeQuizHeaderProps = {
   title: string
-  category: QuizCategory
+  categoryName: string
   questionCount: number
 }
 
-export function TakeQuizHeader({ title, category, questionCount }: TakeQuizHeaderProps) {
+export function TakeQuizHeader({ title, categoryName, questionCount }: TakeQuizHeaderProps) {
   return (
     <header className="flex flex-col gap-space-md">
       <div className="flex flex-wrap items-center gap-space-md">
@@ -35,7 +33,7 @@ export function TakeQuizHeader({ title, category, questionCount }: TakeQuizHeade
         </h1>
         <div className="flex flex-wrap items-center gap-space-sm">
           <span className="font-kicker border border-outline-variant/60 px-space-sm py-1 text-kicker text-on-surface-variant uppercase">
-            {getQuizCategoryLabel(category)}
+            {categoryName}
           </span>
           <span className="font-kicker border border-outline-variant/60 px-space-sm py-1 text-kicker text-on-surface-variant uppercase">
             {questionCount} Soru

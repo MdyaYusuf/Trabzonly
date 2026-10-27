@@ -13,6 +13,7 @@ public class QuizService(
   IUserQuizResultRepository _userQuizResultRepository,
   QuizMapper _mapper,
   QuizBusinessRules _businessRules,
+  QuizCategoryBusinessRules _categoryBusinessRules,
   IUnitOfWork _unitOfWork,
   IValidator<CreateQuizRequest> _createValidator,
   IValidator<UpdateQuizRequest> _updateValidator,
@@ -20,17 +21,18 @@ public class QuizService(
   IValidator<CheckQuizAnswerRequest> _checkAnswerValidator) : IQuizService
 {
   public async Task<ReturnModel<List<QuizListItemDto>>> GetActiveListAsync(
-    QuizCategory? category = null,
+    int? categoryId = null,
     string? sort = null,
     CancellationToken cancellationToken = default)
   {
-    Expression<Func<Quiz, bool>> filter = category.HasValue
-      ? q => q.IsActive && q.Category == category.Value
+    Expression<Func<Quiz, bool>> filter = categoryId.HasValue
+      ? q => q.IsActive && q.QuizCategoryId == categoryId.Value
       : q => q.IsActive;
 
     List<Quiz> quizzes = await _quizRepository.GetAllAsync(
       filter: filter,
       include: query => query
+        .Include(q => q.QuizCategory)
         .Include(q => q.Questions)
         .Include(q => q.UserQuizResults),
       orderBy: query => query.OrderByDescending(q => q.UserQuizResults.Count).ThenBy(q => q.Title),
@@ -55,6 +57,7 @@ public class QuizService(
     Quiz quiz = await _businessRules.GetQuizIfExistAsync(
       id,
       include: query => query
+        .Include(q => q.QuizCategory)
         .Include(q => q.Questions)
         .ThenInclude(q => q.Answers),
       enableTracking: false,
@@ -193,7 +196,10 @@ public class QuizService(
   {
     List<Quiz> quizzes = await _quizRepository.GetAllAsync(
       filter,
-      include: include ?? (query => query.Include(q => q.Questions).ThenInclude(q => q.Answers)),
+      include: include ?? (query => query
+        .Include(q => q.QuizCategory)
+        .Include(q => q.Questions)
+        .ThenInclude(q => q.Answers)),
       orderBy: orderBy ?? (query => query.OrderBy(q => q.Title)),
       enableTracking,
       withDeleted,
@@ -218,7 +224,10 @@ public class QuizService(
   {
     Quiz quiz = await _businessRules.GetQuizIfExistAsync(
       id,
-      include: include ?? (query => query.Include(q => q.Questions).ThenInclude(q => q.Answers)),
+      include: include ?? (query => query
+        .Include(q => q.QuizCategory)
+        .Include(q => q.Questions)
+        .ThenInclude(q => q.Answers)),
       enableTracking,
       cancellationToken);
 
@@ -240,6 +249,7 @@ public class QuizService(
     List<Quiz> quizzes = await _quizRepository.GetMostTakenQuizzesAsync(
       count,
       include: query => query
+        .Include(q => q.QuizCategory)
         .Include(q => q.Questions)
         .Include(q => q.UserQuizResults),
       enableTracking: false,
@@ -267,6 +277,7 @@ public class QuizService(
       lastDateCursor,
       lastIdCursor,
       include: query => query
+        .Include(q => q.QuizCategory)
         .Include(q => q.Questions)
         .Include(q => q.UserQuizResults),
       enableTracking: false,
@@ -309,6 +320,7 @@ public class QuizService(
     }
 
     await _businessRules.QuizTitleCannotBeDuplicatedAsync(request.Title, cancellationToken);
+    await _categoryBusinessRules.CategoryMustExistAsync(request.QuizCategoryId, cancellationToken);
     _businessRules.QuestionsMustHaveExactlyOneCorrectAnswer(request.Questions);
 
     Quiz quiz = _mapper.CreateToEntity(request);
@@ -342,6 +354,7 @@ public class QuizService(
     }
 
     await _businessRules.QuizTitleCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Title, cancellationToken);
+    await _categoryBusinessRules.CategoryMustExistAsync(request.QuizCategoryId, cancellationToken);
 
     Quiz quiz = await _businessRules.GetQuizIfExistAsync(
       request.Id,

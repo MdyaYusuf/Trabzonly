@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
+import quizCategoryService from '@/features/quizzes/quizCategoryService'
 import quizService from '@/features/quizzes/quizService'
+import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
 import { AdminQuizListFilters } from '../components/AdminQuizListFilters'
 import { AdminQuizListHeader } from '../components/AdminQuizListHeader'
 import { AdminQuizPagination } from '../components/AdminQuizPagination'
 import { AdminQuizTable } from '../components/AdminQuizTable'
-import { mapQuizResponseToListRow } from '../utils/adminQuizDraftUtils'
+import {
+  buildAdminQuizCategoryFilterOptions,
+  mapQuizResponseToListRow,
+} from '../utils/adminQuizDraftUtils'
 import type { AdminQuizListRow, AdminQuizStatusFilter } from '../utils/adminQuizTypes'
 
 const PAGE_SIZE = 8
@@ -15,18 +20,28 @@ export function AdminQuizListPage() {
   const [category, setCategory] = useState('all')
   const [page, setPage] = useState(1)
   const [rows, setRows] = useState<AdminQuizListRow[]>([])
+  const [categories, setCategories] = useState<QuizCategoryResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   async function loadQuizzes() {
     setIsLoading(true)
 
-    const result = await quizService.getAllForAdmin()
+    const [quizResult, categoryResult] = await Promise.all([
+      quizService.getAllForAdmin(),
+      quizCategoryService.getAllForAdmin(),
+    ])
 
-    if (result.success && result.data) {
-      setRows(result.data.map(mapQuizResponseToListRow))
+    if (quizResult.success && quizResult.data) {
+      setRows(quizResult.data.map(mapQuizResponseToListRow))
     } else {
       setRows([])
+    }
+
+    if (categoryResult.success && categoryResult.data) {
+      setCategories(categoryResult.data)
+    } else {
+      setCategories([])
     }
 
     setIsLoading(false)
@@ -35,6 +50,11 @@ export function AdminQuizListPage() {
   useEffect(() => {
     void loadQuizzes()
   }, [])
+
+  const categoryOptions = useMemo(
+    () => buildAdminQuizCategoryFilterOptions(categories),
+    [categories],
+  )
 
   const counts = useMemo(() => {
     return {
@@ -53,7 +73,7 @@ export function AdminQuizListPage() {
 
     if (category !== 'all') {
       const categoryValue = Number(category)
-      result = result.filter((row) => row.category === categoryValue)
+      result = result.filter((row) => row.quizCategoryId === categoryValue)
     }
 
     const query = search.trim().toLowerCase()
@@ -120,6 +140,7 @@ export function AdminQuizListPage() {
         search={search}
         statusFilter={statusFilter}
         category={category}
+        categoryOptions={categoryOptions}
         counts={counts}
         onSearchChange={(value) => {
           setSearch(value)

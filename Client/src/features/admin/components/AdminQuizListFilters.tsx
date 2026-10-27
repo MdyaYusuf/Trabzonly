@@ -1,10 +1,10 @@
-import { ADMIN_QUIZ_CATEGORY_FILTER_OPTIONS } from '../utils/adminQuizDraftUtils'
 import type { AdminQuizStatusFilter } from '../utils/adminQuizTypes'
 
 type AdminQuizListFiltersProps = {
   search: string
   statusFilter: AdminQuizStatusFilter
   category: string
+  categoryOptions: { value: string; label: string }[]
   counts: Record<AdminQuizStatusFilter, number>
   onSearchChange: (value: string) => void
   onStatusChange: (value: AdminQuizStatusFilter) => void
@@ -16,6 +16,7 @@ export function AdminQuizListFilters({
   search,
   statusFilter,
   category,
+  categoryOptions,
   counts,
   onSearchChange,
   onStatusChange,
@@ -76,7 +77,7 @@ export function AdminQuizListFilters({
           }}
           className="font-label border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md outline-none focus:border-primary"
         >
-          {ADMIN_QUIZ_CATEGORY_FILTER_OPTIONS.map((option) => (
+          {categoryOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

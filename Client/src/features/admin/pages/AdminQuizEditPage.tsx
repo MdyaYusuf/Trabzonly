@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import quizCategoryService from '@/features/quizzes/quizCategoryService'
 import quizService from '@/features/quizzes/quizService'
+import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
 import { AdminQuizEditFormFields } from '../components/AdminQuizEditFormFields'
 import { AdminQuizEditSidebar } from '../components/AdminQuizEditSidebar'
 import {
   createEmptyAdminQuestion,
   mapEditDraftToRequest,
   mapQuizResponseToEditDraft,
+  resolveCategoryName,
   validateAdminQuizDraft,
 } from '../utils/adminQuizDraftUtils'
 import type { AdminQuizEditDraft, AdminQuizQuestion } from '../utils/adminQuizTypes'
@@ -15,6 +18,7 @@ export function AdminQuizEditPage() {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
   const [draft, setDraft] = useState<AdminQuizEditDraft | null>(null)
+  const [categories, setCategories] = useState<QuizCategoryResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -34,14 +38,23 @@ export function AdminQuizEditPage() {
       setIsLoading(true)
       setLoadError(false)
 
-      const result = await quizService.getById(quizId!)
+      const [quizResult, categoryResult] = await Promise.all([
+        quizService.getById(quizId!),
+        quizCategoryService.getAllForAdmin(),
+      ])
 
       if (cancelled) {
         return
       }
 
-      if (result.success && result.data) {
-        setDraft(mapQuizResponseToEditDraft(result.data))
+      if (categoryResult.success && categoryResult.data) {
+        setCategories(categoryResult.data)
+      } else {
+        setCategories([])
+      }
+
+      if (quizResult.success && quizResult.data) {
+        setDraft(mapQuizResponseToEditDraft(quizResult.data))
       } else {
         setDraft(null)
         setLoadError(true)
@@ -56,6 +69,11 @@ export function AdminQuizEditPage() {
       cancelled = true
     }
   }, [quizId])
+
+  const categoryName = useMemo(
+    () => resolveCategoryName(categories, draft?.quizCategoryId ?? 0),
+    [categories, draft?.quizCategoryId],
+  )
 
   function updateField<K extends keyof AdminQuizEditDraft>(
     key: K,
@@ -327,6 +345,7 @@ export function AdminQuizEditPage() {
           <div className="lg:col-span-7">
             <AdminQuizEditFormFields
               draft={draft}
+              categories={categories}
               onChange={updateField}
               onUpdateQuestion={updateQuestion}
               onSetCorrectOption={setCorrectOption}
@@ -337,7 +356,7 @@ export function AdminQuizEditPage() {
             />
           </div>
           <div className="lg:col-span-5">
-            <AdminQuizEditSidebar draft={draft} />
+            <AdminQuizEditSidebar draft={draft} categoryName={categoryName} />
           </div>
         </div>
       </main>

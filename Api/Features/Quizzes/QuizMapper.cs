@@ -9,10 +9,18 @@ public partial class QuizMapper
 
   [MapperIgnoreSource(nameof(UpdateQuizRequest.Questions))]
   public partial void UpdateEntityFromRequest(UpdateQuizRequest request, Quiz entity);
+
+  [MapProperty("QuizCategory.Name", "CategoryName")]
+  [MapProperty("QuizCategory.ImageUrl", "CategoryImageUrl")]
   public partial QuizResponseDto EntityToResponseDto(Quiz entity);
+
   public partial CreatedQuizResponseDto EntityToCreatedResponseDto(Quiz entity);
   public partial List<QuizResponseDto> EntityToResponseDtoList(List<Quiz> entities);
+
+  [MapProperty("QuizCategory.Name", "CategoryName")]
+  [MapProperty("QuizCategory.ImageUrl", "CategoryImageUrl")]
   public partial QuizPreviewDto EntityToPreviewDto(Quiz entity);
+
   public partial List<QuizPreviewDto> EntityToPreviewDtoList(List<Quiz> entities);
 
   public QuizListItemDto EntityToListItemDto(Quiz entity)
@@ -35,7 +43,9 @@ public partial class QuizMapper
       entity.Id,
       entity.Title,
       entity.Description,
-      entity.Category,
+      entity.QuizCategoryId,
+      entity.QuizCategory?.Name ?? string.Empty,
+      entity.QuizCategory?.ImageUrl,
       entity.Questions.Count,
       entity.UserQuizResults.Count,
       averageSuccessPercent,
@@ -65,7 +75,9 @@ public partial class QuizMapper
       entity.Id,
       entity.Title,
       entity.Description,
-      entity.Category,
+      entity.QuizCategoryId,
+      entity.QuizCategory?.Name ?? string.Empty,
+      entity.QuizCategory?.ImageUrl,
       questions);
   }
 }

@@ -1,14 +1,12 @@
-import { getQuizCategoryIcon, getQuizCategoryLabel } from '@/features/quizzes/quizCategoryUtils'
 import type { AdminQuizEditDraft } from '../utils/adminQuizTypes'
 
 type AdminQuizEditSidebarProps = {
   draft: AdminQuizEditDraft
+  categoryName: string
 }
 
-export function AdminQuizEditSidebar({ draft }: AdminQuizEditSidebarProps) {
+export function AdminQuizEditSidebar({ draft, categoryName }: AdminQuizEditSidebarProps) {
   const totalPoints = draft.questions.reduce((sum, question) => sum + question.points, 0)
-  const categoryLabel = getQuizCategoryLabel(draft.category)
-  const categoryIcon = getQuizCategoryIcon(draft.category)
 
   return (
     <aside className="flex flex-col gap-space-md">
@@ -22,12 +20,9 @@ export function AdminQuizEditSidebar({ draft }: AdminQuizEditSidebarProps) {
 
         <article className="overflow-hidden border border-outline-variant/40">
           <div className="bg-primary-container p-space-md text-on-primary">
-            <div className="flex items-center gap-space-sm">
-              <span className="material-symbols-outlined text-[22px]">{categoryIcon}</span>
-              <span className="font-kicker bg-black/25 px-space-sm py-0.5 text-kicker uppercase">
-                {categoryLabel}
-              </span>
-            </div>
+            <span className="font-kicker bg-black/25 px-space-sm py-0.5 text-kicker uppercase">
+              {categoryName}
+            </span>
             <h3 className="font-headline mt-space-md text-headline-sm font-extrabold uppercase">
               {draft.title.trim() || 'Quiz'}
             </h3>
@@ -46,7 +41,7 @@ export function AdminQuizEditSidebar({ draft }: AdminQuizEditSidebarProps) {
             <p className="font-body text-body-sm text-on-surface-variant">
               {draft.description.trim() || 'Açıklama yok.'}
             </p>
-            <p className="font-kicker mt-space-md text-kicker uppercase text-on-surface-variant">
+            <p className="font-kicker mt-space-md text-kicker text-on-surface-variant uppercase">
               Durum: {draft.isActive ? 'Aktif' : 'Pasif'}
             </p>
           </div>

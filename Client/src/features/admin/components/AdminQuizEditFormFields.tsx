@@ -1,10 +1,10 @@
-import { QUIZ_CATEGORY_OPTIONS, getQuizCategoryIcon } from '@/features/quizzes/quizCategoryUtils'
-import type { QuizCategory } from '@/features/quizzes/quizTypes'
+import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
 import type { AdminQuizEditDraft, AdminQuizQuestion } from '../utils/adminQuizTypes'
 import { AdminQuizQuestionEditor } from './AdminQuizQuestionEditor'
 
 type AdminQuizEditFormFieldsProps = {
   draft: AdminQuizEditDraft
+  categories: QuizCategoryResponseDto[]
   onChange: <K extends keyof AdminQuizEditDraft>(
     key: K,
     value: AdminQuizEditDraft[K],
@@ -22,6 +22,7 @@ const inputClass =
 
 export function AdminQuizEditFormFields({
   draft,
+  categories,
   onChange,
   onUpdateQuestion,
   onSetCorrectOption,
@@ -30,8 +31,6 @@ export function AdminQuizEditFormFields({
   onRemoveQuestion,
   onToggleExpand,
 }: AdminQuizEditFormFieldsProps) {
-  const categoryIcon = getQuizCategoryIcon(draft.category)
-
   return (
     <div className="flex flex-col gap-space-md">
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
@@ -85,31 +84,25 @@ export function AdminQuizEditFormFields({
               htmlFor="editCategory"
               className="font-label mb-1 block text-label-md text-on-surface-variant"
             >
-              Kategori
+              Kategori <span className="text-error">*</span>
             </label>
-            <div className="flex items-center gap-space-sm">
-              <select
-                id="editCategory"
-                className={inputClass}
-                value={draft.category}
-                onChange={(event) => {
-                  onChange('category', Number(event.target.value) as QuizCategory)
-                }}
-              >
-                {QUIZ_CATEGORY_OPTIONS.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <span
-                className="material-symbols-outlined shrink-0 text-[28px] text-secondary"
-                title="Kategori ikonu (salt okunur)"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                {categoryIcon}
-              </span>
-            </div>
+            <select
+              id="editCategory"
+              className={inputClass}
+              value={draft.quizCategoryId || ''}
+              onChange={(event) => {
+                onChange('quizCategoryId', Number(event.target.value))
+              }}
+            >
+              <option value="" disabled>
+                Kategori seçin
+              </option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <label className="flex items-center justify-between gap-space-md border border-outline-variant/40 bg-surface-container-low px-space-md py-space-sm">

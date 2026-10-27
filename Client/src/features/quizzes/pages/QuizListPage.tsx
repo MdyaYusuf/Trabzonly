@@ -8,18 +8,44 @@ import {
 import { QuizListHero } from '../components/QuizListHero'
 import { QuizListPagination } from '../components/QuizListPagination'
 import { QuizListSidebar } from '../components/QuizListSidebar'
+import quizCategoryService from '../quizCategoryService'
 import quizService from '../quizService'
-import type { QuizListItemDto } from '../quizTypes'
+import type { QuizCategoryResponseDto, QuizListItemDto } from '../quizTypes'
 
 const PAGE_SIZE = 6
 
 export function QuizListPage() {
+  const [categories, setCategories] = useState<QuizCategoryResponseDto[]>([])
   const [categoryId, setCategoryId] = useState<QuizListCategoryFilter>('all')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
   const [quizzes, setQuizzes] = useState<QuizListItemDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadCategories() {
+      const result = await quizCategoryService.getActive()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setCategories(result.data)
+      } else {
+        setCategories([])
+      }
+    }
+
+    void loadCategories()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -39,7 +65,7 @@ export function QuizListPage() {
       setIsLoading(true)
 
       const result = await quizService.getActiveList({
-        category: categoryId === 'all' ? undefined : categoryId,
+        categoryId: categoryId === 'all' ? undefined : categoryId,
         sort: 'most-taken',
       })
 
@@ -99,6 +125,7 @@ export function QuizListPage() {
       <QuizListHero />
 
       <QuizListFilters
+        categories={categories}
         categoryId={categoryId}
         search={search}
         onCategoryChange={(value) => {

@@ -1,12 +1,7 @@
-import {
-  getQuizCategoryIcon,
-  getQuizCategoryLabel,
-  QUIZ_CATEGORY_OPTIONS,
-} from '@/features/quizzes/quizCategoryUtils'
-import { QuizCategory } from '@/features/quizzes/quizTypes'
 import type {
   CreateQuestionRequest,
   CreateQuizRequest,
+  QuizCategoryResponseDto,
   QuizResponseDto,
   UpdateQuizRequest,
 } from '@/features/quizzes/quizTypes'
@@ -21,16 +16,17 @@ import type {
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const
 
-export const ADMIN_QUIZ_CATEGORY_FILTER_OPTIONS: {
-  value: string
-  label: string
-}[] = [
-  { value: 'all', label: 'Kategori: Tümü' },
-  ...QUIZ_CATEGORY_OPTIONS.map((option) => ({
-    value: String(option.id),
-    label: option.label,
-  })),
-]
+export function buildAdminQuizCategoryFilterOptions(
+  categories: QuizCategoryResponseDto[],
+): { value: string; label: string }[] {
+  return [
+    { value: 'all', label: 'Kategori: Tümü' },
+    ...categories.map((category) => ({
+      value: String(category.id),
+      label: category.name,
+    })),
+  ]
+}
 
 export function createEmptyAdminQuestion(number: number): AdminQuizQuestion {
   return {
@@ -49,11 +45,13 @@ export function createEmptyAdminQuestion(number: number): AdminQuizQuestion {
   }
 }
 
-export function createEmptyAdminQuizCreateDraft(): AdminQuizCreateDraft {
+export function createEmptyAdminQuizCreateDraft(
+  defaultCategoryId: number = 0,
+): AdminQuizCreateDraft {
   return {
     title: '',
     description: '',
-    category: QuizCategory.HistoryAndFirsts,
+    quizCategoryId: defaultCategoryId,
     isActive: true,
     questions: [createEmptyAdminQuestion(1)],
   }
@@ -66,14 +64,13 @@ export function mapQuizResponseToListRow(quiz: QuizResponseDto): AdminQuizListRo
   return {
     id: quiz.id,
     title: quiz.title,
-    category: quiz.category,
-    categoryLabel: getQuizCategoryLabel(quiz.category),
+    quizCategoryId: quiz.quizCategoryId,
+    categoryLabel: quiz.categoryName,
     description: quiz.description?.trim() || '—',
     questionCount: quiz.questions.length,
     totalPoints,
     status,
     statusLabel: quiz.isActive ? 'Aktif' : 'Pasif',
-    icon: getQuizCategoryIcon(quiz.category),
   }
 }
 
@@ -84,7 +81,7 @@ export function mapQuizResponseToEditDraft(quiz: QuizResponseDto): AdminQuizEdit
     id: quiz.id,
     title: quiz.title,
     description: quiz.description ?? '',
-    category: quiz.category,
+    quizCategoryId: quiz.quizCategoryId,
     isActive: quiz.isActive,
     questions: ordered.map((question, index) => {
       const options: AdminQuizOption[] = question.answers.map((answer, answerIndex) => ({
@@ -140,7 +137,7 @@ export function mapCreateDraftToRequest(draft: AdminQuizCreateDraft): CreateQuiz
   return {
     title: draft.title.trim(),
     description: draft.description.trim() || undefined,
-    category: draft.category,
+    quizCategoryId: draft.quizCategoryId,
     isActive: draft.isActive,
     questions: mapDraftQuestionsToRequest(draft.questions),
   }
@@ -151,7 +148,7 @@ export function mapEditDraftToRequest(draft: AdminQuizEditDraft): UpdateQuizRequ
     id: draft.id,
     title: draft.title.trim(),
     description: draft.description.trim() || undefined,
-    category: draft.category,
+    quizCategoryId: draft.quizCategoryId,
     isActive: draft.isActive,
     questions: mapDraftQuestionsToRequest(draft.questions),
   }
@@ -159,10 +156,15 @@ export function mapEditDraftToRequest(draft: AdminQuizEditDraft): UpdateQuizRequ
 
 export function validateAdminQuizDraft(draft: {
   title: string
+  quizCategoryId: number
   questions: AdminQuizQuestion[]
 }): string | null {
   if (!draft.title.trim()) {
     return 'Quiz başlığı zorunludur.'
+  }
+
+  if (draft.quizCategoryId < 1) {
+    return 'Bir kategori seçin.'
   }
 
   if (draft.questions.length === 0) {
@@ -190,4 +192,11 @@ export function validateAdminQuizDraft(draft: {
   }
 
   return null
+}
+
+export function resolveCategoryName(
+  categories: QuizCategoryResponseDto[],
+  quizCategoryId: number,
+): string {
+  return categories.find((category) => category.id === quizCategoryId)?.name ?? 'Kategori'
 }

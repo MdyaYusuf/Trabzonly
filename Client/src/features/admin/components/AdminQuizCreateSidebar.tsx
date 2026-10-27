@@ -1,16 +1,14 @@
-import { getQuizCategoryIcon, getQuizCategoryLabel } from '@/features/quizzes/quizCategoryUtils'
 import type { AdminQuizCreateDraft } from '../utils/adminQuizTypes'
 
 type AdminQuizCreateSidebarProps = {
   draft: AdminQuizCreateDraft
+  categoryName: string
 }
 
-export function AdminQuizCreateSidebar({ draft }: AdminQuizCreateSidebarProps) {
+export function AdminQuizCreateSidebar({ draft, categoryName }: AdminQuizCreateSidebarProps) {
   const firstQuestion = draft.questions[0]
   const previewOptions = firstQuestion?.options.slice(0, 4) ?? []
   const totalPoints = draft.questions.reduce((sum, question) => sum + question.points, 0)
-  const categoryLabel = getQuizCategoryLabel(draft.category)
-  const categoryIcon = getQuizCategoryIcon(draft.category)
 
   return (
     <aside className="flex flex-col gap-space-md">
@@ -24,12 +22,9 @@ export function AdminQuizCreateSidebar({ draft }: AdminQuizCreateSidebarProps) {
 
         <article className="overflow-hidden border border-outline-variant/40">
           <div className="bg-primary-container p-space-md text-on-primary">
-            <div className="flex items-center gap-space-sm">
-              <span className="material-symbols-outlined text-[22px]">{categoryIcon}</span>
-              <span className="font-kicker bg-black/25 px-space-sm py-0.5 text-kicker uppercase">
-                {categoryLabel}
-              </span>
-            </div>
+            <span className="font-kicker bg-black/25 px-space-sm py-0.5 text-kicker uppercase">
+              {categoryName}
+            </span>
             <p className="font-kicker mt-space-sm text-kicker text-on-primary/80 uppercase">
               {draft.questions.length} Soru • {totalPoints} Puan
             </p>

@@ -6,7 +6,7 @@ namespace Api.Features.Quizzes;
 public interface IQuizService
 {
   Task<ReturnModel<List<QuizListItemDto>>> GetActiveListAsync(
-    QuizCategory? category = null,
+    int? categoryId = null,
     string? sort = null,
     CancellationToken cancellationToken = default);
 

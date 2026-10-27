@@ -14,8 +14,8 @@ public class CreateQuizRequestValidator : AbstractValidator<CreateQuizRequest>
       .MaximumLength(1000)
       .When(q => !string.IsNullOrEmpty(q.Description));
 
-    RuleFor(q => q.Category)
-      .IsInEnum().WithMessage("Geçersiz quiz kategorisi.");
+    RuleFor(q => q.QuizCategoryId)
+      .GreaterThan(0).WithMessage("Geçersiz quiz kategorisi.");
 
     RuleFor(q => q.Questions)
       .NotEmpty().WithMessage("Quiz en az bir soru içermelidir.");
@@ -80,8 +80,8 @@ public class UpdateQuizRequestValidator : AbstractValidator<UpdateQuizRequest>
       .MaximumLength(1000)
       .When(q => !string.IsNullOrEmpty(q.Description));
 
-    RuleFor(q => q.Category)
-      .IsInEnum().WithMessage("Geçersiz quiz kategorisi.");
+    RuleFor(q => q.QuizCategoryId)
+      .GreaterThan(0).WithMessage("Geçersiz quiz kategorisi.");
 
     When(q => q.Questions != null, () =>
     {

@@ -1,9 +1,9 @@
-import { QUIZ_CATEGORY_OPTIONS } from '../quizCategoryUtils'
-import type { QuizCategory } from '../quizTypes'
+import type { QuizCategoryResponseDto } from '../quizTypes'
 
-export type QuizListCategoryFilter = QuizCategory | 'all'
+export type QuizListCategoryFilter = number | 'all'
 
 type QuizListFiltersProps = {
+  categories: QuizCategoryResponseDto[]
   categoryId: QuizListCategoryFilter
   search: string
   onCategoryChange: (value: QuizListCategoryFilter) => void
@@ -14,6 +14,7 @@ const controlClass =
   'h-10 border border-outline-variant/40 bg-surface-container-low font-label text-label-md font-semibold tracking-wider text-on-surface uppercase transition-colors focus:border-primary focus:bg-surface-container-lowest focus:outline-none'
 
 export function QuizListFilters({
+  categories,
   categoryId,
   search,
   onCategoryChange,
@@ -42,7 +43,7 @@ export function QuizListFilters({
           >
             Tümü
           </button>
-          {QUIZ_CATEGORY_OPTIONS.map((tab) => {
+          {categories.map((tab) => {
             const isActive = categoryId === tab.id
 
             return (
@@ -60,7 +61,7 @@ export function QuizListFilters({
                     : 'min-w-[30%] flex-1 cursor-pointer px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
                 }
               >
-                {tab.label}
+                {tab.name}
               </button>
             )
           })}

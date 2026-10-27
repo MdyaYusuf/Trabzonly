@@ -1,9 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
+using Api.Core.Entities;
+
 namespace Api.Features.Quizzes;
 
-public enum QuizCategory
+public class QuizCategory : Entity<int>
 {
-  HistoryAndFirsts = 1,
-  FacilitiesAndRecords = 2,
-  EternalRivalry = 3,
-  ChampionshipsAndAchievements = 4
+  [SetsRequiredMembers]
+  public QuizCategory()
+  {
+    Name = default!;
+  }
+
+  public required string Name { get; set; }
+  public string? Description { get; set; }
+  public string? ImageUrl { get; set; }
+  public string? SeedKey { get; set; }
+  public bool IsActive { get; set; } = true;
+
+  public virtual ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();
 }

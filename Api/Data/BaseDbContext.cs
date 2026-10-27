@@ -39,6 +39,7 @@ public class BaseDbContext : DbContext
   public DbSet<PlayerStats> PlayerStats { get; set; }
   public DbSet<Injury> Injuries { get; set; }
   public DbSet<Quiz> Quizzes { get; set; }
+  public DbSet<QuizCategory> QuizCategories { get; set; }
   public DbSet<Question> Questions { get; set; }
   public DbSet<Answer> Answers { get; set; }
   public DbSet<UserQuizResult> UserQuizResults { get; set; }

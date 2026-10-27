@@ -1,7 +1,6 @@
 import { apiClient } from '../../core/api/apiClient'
 import type { ApiResponse, NoData } from '../../core/types/ApiResponse'
 import type {
-  QuizCategory,
   QuizResponseDto,
   QuizListItemDto,
   QuizTakeDto,
@@ -20,7 +19,7 @@ import type {
 const API_URL = '/quizzes'
 
 export type GetActiveListParams = {
-  category?: QuizCategory
+  categoryId?: number
   sort?: 'most-taken'
 }
 
@@ -29,8 +28,8 @@ const getActiveList = async (
 ): Promise<ApiResponse<QuizListItemDto[]>> => {
   const queryParams = new URLSearchParams()
 
-  if (params.category != null) {
-    queryParams.append('category', String(params.category))
+  if (params.categoryId != null) {
+    queryParams.append('categoryId', String(params.categoryId))
   }
 
   if (params.sort) {

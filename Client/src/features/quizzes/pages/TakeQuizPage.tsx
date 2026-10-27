@@ -11,7 +11,6 @@ import {
   type TakeQuestionFeedback,
 } from '../components/TakeQuizQuestionPanel'
 import { TakeQuizSidebar } from '../components/TakeQuizSidebar'
-import { getQuizCategoryLabel } from '../quizCategoryUtils'
 import quizService from '../quizService'
 import type { QuizTakeAnswerDto, QuizTakeDto, UserQuizResultResponseDto } from '../quizTypes'
 import {
@@ -296,7 +295,7 @@ export function TakeQuizPage() {
       <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
         <TakeQuizHeader
           title={quiz.title}
-          category={quiz.category}
+          categoryName={quiz.categoryName}
           questionCount={quiz.questions.length}
         />
         <TakeQuizProgress
@@ -311,7 +310,7 @@ export function TakeQuizPage() {
           <div className="lg:col-span-8">
             <TakeQuizQuestionPanel
               questionNumber={currentIndex + 1}
-              categoryLabel={getQuizCategoryLabel(quiz.category)}
+              categoryLabel={quiz.categoryName}
               points={question.points}
               prompt={question.text}
               options={shuffledOptions}

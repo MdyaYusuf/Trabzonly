@@ -10,12 +10,12 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
 {
   [HttpGet]
   public async Task<IActionResult> GetActiveList(
-    [FromQuery] QuizCategory? category = null,
+    [FromQuery] int? categoryId = null,
     [FromQuery] string? sort = "most-taken",
     CancellationToken cancellationToken = default)
   {
     var result = await _quizService.GetActiveListAsync(
-      category: category,
+      categoryId: categoryId,
       sort: sort,
       cancellationToken: cancellationToken);
 

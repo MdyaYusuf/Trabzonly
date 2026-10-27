@@ -37,16 +37,11 @@ export function AdminQuizTable({ rows, deletingId, onDelete }: AdminQuizTablePro
               className="border-t border-outline-variant/30 transition-colors hover:bg-surface-container-low/60"
             >
               <td className="px-space-sm py-space-sm">
-                <div className="flex items-start gap-space-sm">
-                  <span className="material-symbols-outlined mt-0.5 text-secondary">
-                    {row.icon}
-                  </span>
-                  <div>
-                    <p className="font-label text-label-md font-bold text-on-surface">{row.title}</p>
-                    <p className="font-kicker mt-1 text-kicker text-on-surface-variant uppercase">
-                      {row.categoryLabel}
-                    </p>
-                  </div>
+                <div>
+                  <p className="font-label text-label-md font-bold text-on-surface">{row.title}</p>
+                  <p className="font-kicker mt-1 text-kicker text-on-surface-variant uppercase">
+                    {row.categoryLabel}
+                  </p>
                 </div>
               </td>
               <td className="max-w-xs px-space-sm py-space-sm">

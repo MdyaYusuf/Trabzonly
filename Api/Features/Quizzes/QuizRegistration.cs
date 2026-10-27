@@ -10,9 +10,13 @@ public static class QuizRegistration
     services.AddScoped<IQuestionRepository, EfQuestionRepository>();
     services.AddScoped<IAnswerRepository, EfAnswerRepository>();
     services.AddScoped<IUserQuizResultRepository, EfUserQuizResultRepository>();
+    services.AddScoped<IQuizCategoryRepository, EfQuizCategoryRepository>();
     services.AddScoped<QuizBusinessRules>();
+    services.AddScoped<QuizCategoryBusinessRules>();
     services.AddScoped<IQuizService, QuizService>();
+    services.AddScoped<IQuizCategoryService, QuizCategoryService>();
     services.AddSingleton<QuizMapper>();
+    services.AddSingleton<QuizCategoryMapper>();
 
     return services;
   }

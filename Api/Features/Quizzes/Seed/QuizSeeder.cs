@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 namespace Api.Features.Quizzes.Seed;
 
 /// <summary>
-/// Idempotent startup seed: inserts the 20 thematic quiz packs from
-/// <c>trabzonly-quiz.json</c> at the repository root (gitignored) when their
-/// <see cref="Quiz.SeedKey"/> is missing. Always runs on API startup; never
+/// Idempotent startup seed: ensures quiz categories exist, then inserts the 20 thematic
+/// quiz packs from <c>trabzonly-quiz.json</c> at the repository root (gitignored) when
+/// their <see cref="Quiz.SeedKey"/> is missing. Always runs on API startup; never
 /// updates or deletes existing seeded rows. Admin CRUD can still change content later.
 /// </summary>
 public static class QuizSeeder
@@ -26,8 +26,15 @@ public static class QuizSeeder
     await using AsyncServiceScope scope = services.CreateAsyncScope();
     IServiceProvider sp = scope.ServiceProvider;
     ILogger logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger("QuizSeeder");
+    IQuizCategoryRepository categoryRepository = sp.GetRequiredService<IQuizCategoryRepository>();
     IQuizRepository quizRepository = sp.GetRequiredService<IQuizRepository>();
     IUnitOfWork unitOfWork = sp.GetRequiredService<IUnitOfWork>();
+
+    Dictionary<string, int> categoryIdsBySeedKey = await EnsureCategoriesAsync(
+      categoryRepository,
+      unitOfWork,
+      logger,
+      cancellationToken);
 
     List<string> existingKeys = await quizRepository.Query(enableTracking: false)
       .Where(q => q.SeedKey != null)
@@ -74,7 +81,16 @@ public static class QuizSeeder
 
     foreach (QuizSeedPack pack in missingPacks)
     {
-      Quiz quiz = BuildQuiz(pack, byNumber, logger);
+      if (!categoryIdsBySeedKey.TryGetValue(pack.CategorySeedKey, out int categoryId))
+      {
+        logger.LogWarning(
+          "Quiz seed skipped pack {SeedKey}: category seed key {CategorySeedKey} was not resolved.",
+          pack.SeedKey,
+          pack.CategorySeedKey);
+        continue;
+      }
+
+      Quiz quiz = BuildQuiz(pack, categoryId, byNumber, logger);
 
       if (quiz.Questions.Count != pack.QuestionNumbers.Count)
       {
@@ -101,8 +117,64 @@ public static class QuizSeeder
       bankPath);
   }
 
+  private static async Task<Dictionary<string, int>> EnsureCategoriesAsync(
+    IQuizCategoryRepository categoryRepository,
+    IUnitOfWork unitOfWork,
+    ILogger logger,
+    CancellationToken cancellationToken)
+  {
+    List<QuizCategory> existing = await categoryRepository.GetAllAsync(
+      filter: c => c.SeedKey != null,
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    Dictionary<string, int> bySeedKey = existing
+      .Where(c => !string.IsNullOrWhiteSpace(c.SeedKey))
+      .ToDictionary(c => c.SeedKey!, c => c.Id, StringComparer.Ordinal);
+
+    int inserted = 0;
+
+    foreach (QuizCategorySeedDef def in QuizCategorySeedManifest.Categories)
+    {
+      if (bySeedKey.ContainsKey(def.SeedKey))
+      {
+        continue;
+      }
+
+      var category = new QuizCategory
+      {
+        Name = def.Name,
+        Description = def.Description,
+        SeedKey = def.SeedKey,
+        IsActive = true
+      };
+
+      await categoryRepository.AddAsync(category, cancellationToken);
+      inserted++;
+    }
+
+    if (inserted > 0)
+    {
+      await unitOfWork.SaveChangesAsync(cancellationToken);
+
+      existing = await categoryRepository.GetAllAsync(
+        filter: c => c.SeedKey != null,
+        enableTracking: false,
+        cancellationToken: cancellationToken);
+
+      bySeedKey = existing
+        .Where(c => !string.IsNullOrWhiteSpace(c.SeedKey))
+        .ToDictionary(c => c.SeedKey!, c => c.Id, StringComparer.Ordinal);
+
+      logger.LogInformation("Quiz category seed inserted {InsertedCount} categor(y/ies).", inserted);
+    }
+
+    return bySeedKey;
+  }
+
   private static Quiz BuildQuiz(
     QuizSeedPack pack,
+    int quizCategoryId,
     Dictionary<int, QuizBankQuestionJson> byNumber,
     ILogger logger)
   {
@@ -110,7 +182,7 @@ public static class QuizSeeder
     {
       Title = pack.Title,
       Description = pack.Description,
-      Category = pack.Category,
+      QuizCategoryId = quizCategoryId,
       SeedKey = pack.SeedKey,
       IsActive = true
     };

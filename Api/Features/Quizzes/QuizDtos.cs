@@ -5,7 +5,9 @@ public sealed record QuizResponseDto(
   Guid Id,
   string Title,
   string? Description,
-  QuizCategory Category,
+  int QuizCategoryId,
+  string CategoryName,
+  string? CategoryImageUrl,
   bool IsActive,
   List<QuestionResponseDto> Questions);
 
@@ -39,7 +41,9 @@ public sealed record QuizPreviewDto(
   Guid Id,
   string Title,
   string? Description,
-  QuizCategory Category,
+  int QuizCategoryId,
+  string CategoryName,
+  string? CategoryImageUrl,
   bool IsActive);
 
 // Public list (no questions, no answers)
@@ -47,7 +51,9 @@ public sealed record QuizListItemDto(
   Guid Id,
   string Title,
   string? Description,
-  QuizCategory Category,
+  int QuizCategoryId,
+  string CategoryName,
+  string? CategoryImageUrl,
   int QuestionCount,
   int TakenCount,
   double? AverageSuccessPercent,
@@ -58,7 +64,9 @@ public sealed record QuizTakeDto(
   Guid Id,
   string Title,
   string? Description,
-  QuizCategory Category,
+  int QuizCategoryId,
+  string CategoryName,
+  string? CategoryImageUrl,
   List<QuizTakeQuestionDto> Questions);
 
 public sealed record QuizTakeQuestionDto(
@@ -105,7 +113,7 @@ public sealed record QuizUserStatsDto(
 public sealed record CreateQuizRequest(
   string Title,
   string? Description,
-  QuizCategory Category,
+  int QuizCategoryId,
   bool IsActive,
   List<CreateQuestionRequest> Questions);
 
@@ -122,7 +130,7 @@ public sealed record UpdateQuizRequest(
   Guid Id,
   string Title,
   string? Description,
-  QuizCategory Category,
+  int QuizCategoryId,
   bool IsActive,
   List<CreateQuestionRequest>? Questions = null);
 
