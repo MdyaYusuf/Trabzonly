@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAppSelector } from '@/core/store/hooks'
 import { TakeQuizHeader } from '../components/TakeQuizHeader'
 import {
@@ -80,6 +81,7 @@ export function TakeQuizPage() {
         setCurrentIndex(0)
         setFeedbackByQuestion({})
         setSelectedAnswers({})
+        toast.info('Quiz başladı. Bol şans!')
       } else {
         setQuiz(null)
         setLoadError(true)
@@ -292,7 +294,7 @@ export function TakeQuizPage() {
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-      <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+      <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-md px-4 py-space-md sm:px-6 lg:px-12">
         <TakeQuizHeader
           title={quiz.title}
           categoryName={quiz.categoryName}
@@ -302,11 +304,9 @@ export function TakeQuizPage() {
           currentIndex={currentIndex}
           total={quiz.questions.length}
           statuses={statuses}
-          remainingSeconds={remainingSeconds}
-          isTimerActive={phase === 'answering'}
         />
 
-        <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
+        <div className="grid grid-cols-1 items-start gap-space-md lg:grid-cols-12 lg:gap-gutter">
           <div className="lg:col-span-8">
             <TakeQuizQuestionPanel
               questionNumber={currentIndex + 1}
@@ -316,6 +316,7 @@ export function TakeQuizPage() {
               options={shuffledOptions}
               phase={phase}
               feedback={feedbackByQuestion[question.id] ?? null}
+              remainingSeconds={remainingSeconds}
               onSelect={(optionId) => {
                 void resolveAnswer(optionId)
               }}

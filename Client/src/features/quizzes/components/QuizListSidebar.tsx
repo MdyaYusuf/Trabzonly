@@ -2,13 +2,34 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@/core/store/hooks'
 import { FeedGlobalPollCard } from '@/features/posts/components/FeedGlobalPollCard'
+import {
+  publicProfilePath,
+  UserProfileLink,
+} from '@/features/users/components/UserProfileLink'
 import quizService from '../quizService'
 import type { QuizLeaderboardEntryDto, QuizUserStatsDto } from '../quizTypes'
 import { formatQuizDuration, formatQuizScore } from '../utils/quizFormat'
 
+const AVATAR_TONES = [
+  'bg-primary-container text-on-primary',
+  'bg-secondary text-on-secondary',
+  'bg-primary text-on-primary',
+] as const
+
+function initialsFromUsername(username: string): string {
+  const cleaned = username.trim()
+
+  if (cleaned.length === 0) {
+    return '?'
+  }
+
+  return cleaned.slice(0, 2).toUpperCase()
+}
+
 export function QuizListSidebar() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const username = useAppSelector((state) => state.auth.user?.username)
+  const profileImageUrl = useAppSelector((state) => state.auth.user?.profileImageUrl)
   const [leaderboard, setLeaderboard] = useState<QuizLeaderboardEntryDto[]>([])
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true)
   const [myStats, setMyStats] = useState<QuizUserStatsDto | null>(null)
@@ -78,114 +99,110 @@ export function QuizListSidebar() {
 
   return (
     <aside className="flex flex-col gap-space-lg">
-      <div className="overflow-hidden bg-surface-container-lowest shadow-sm">
-        <div className="flex items-center justify-between bg-surface-container-low p-space-md">
-          <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-[20px] text-primary">leaderboard</span>
-            <h3 className="font-headline text-headline-sm font-bold text-primary uppercase">
-              Liderlik Tablosu
-            </h3>
-          </div>
-          <span className="font-kicker text-kicker font-bold text-secondary uppercase">
-            TOP 10
+      <FeedGlobalPollCard />
+
+      <div className="bg-surface-container-lowest p-space-md shadow-sm">
+        <div className="mb-space-sm flex items-center gap-space-xs">
+          <span className="material-symbols-outlined text-lg text-tertiary-fixed-dim">
+            leaderboard
+          </span>
+          <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
+            Liderlik Tablosu
           </span>
         </div>
 
-        <div className="p-space-md pb-space-sm">
-          {isLoadingLeaderboard ? (
-            <p className="font-body py-space-sm text-body-sm text-on-surface-variant">
-              Sıralama yükleniyor...
-            </p>
-          ) : null}
+        {isLoadingLeaderboard ? (
+          <p className="font-body text-body-sm text-on-surface-variant">Sıralama yükleniyor...</p>
+        ) : leaderboard.length === 0 ? (
+          <p className="font-body text-body-sm text-on-surface-variant">
+            Henüz sıralamaya girecek yeterli sonuç yok. En az 3 farklı quiz çözülmeli.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-space-sm">
+            {leaderboard.map((entry, index) => {
+              const avatarTone = AVATAR_TONES[index % AVATAR_TONES.length]
 
-          {!isLoadingLeaderboard && leaderboard.length === 0 ? (
-            <p className="font-body py-space-sm text-body-sm text-on-surface-variant">
-              Henüz sıralamaya girecek yeterli sonuç yok. En az 3 farklı quiz çözülmeli.
-            </p>
-          ) : null}
-
-          {leaderboard.map((entry) => {
-            const isTopThree = entry.rank <= 3
-            const rankTone =
-              entry.rank === 1
-                ? 'bg-tertiary-fixed-dim text-on-tertiary-fixed'
-                : entry.rank === 2
-                  ? 'bg-surface-container-highest text-on-surface'
-                  : entry.rank === 3
-                    ? 'bg-surface-container-high text-on-surface'
-                    : 'bg-surface-container text-on-surface-variant'
-
-            if (!isTopThree) {
               return (
-                <div
+                <Link
                   key={`${entry.rank}-${entry.username}`}
-                  className="flex items-center justify-between p-space-sm"
+                  to={publicProfilePath(entry.username)}
+                  className="flex cursor-pointer items-center gap-space-sm bg-surface-container p-space-xs transition-colors hover:bg-surface-container-high"
                 >
-                  <div className="flex items-center gap-space-sm">
-                    <div
-                      className={`font-label flex h-7 w-7 items-center justify-center text-label-md ${rankTone}`}
-                    >
-                      {entry.rank}
-                    </div>
-                    <span className="font-label text-label-md font-medium text-on-surface">
-                      {entry.username}
-                    </span>
-                  </div>
-                  <span className="font-label text-label-md font-bold text-on-surface-variant">
-                    %{formatQuizScore(entry.averageScore)}
-                  </span>
-                </div>
-              )
-            }
-
-            return (
-              <div
-                key={`${entry.rank}-${entry.username}`}
-                className="mb-space-xs flex items-center justify-between bg-surface-container-lowest p-space-sm"
-              >
-                <div className="flex items-center gap-space-sm">
-                  <div
-                    className={`font-headline flex h-7 w-7 items-center justify-center text-[13px] font-bold ${rankTone}`}
+                  <span
+                    aria-label={`${entry.rank}. sıra`}
+                    className={[
+                      'font-headline w-8 shrink-0 text-center text-[22px] leading-none font-bold tabular-nums',
+                      entry.rank === 1 ? 'text-primary' : 'text-on-surface-variant/45',
+                    ].join(' ')}
                   >
                     {entry.rank}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-label text-label-md font-bold text-primary">
-                      {entry.username}
-                    </span>
-                    <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
-                      {entry.distinctQuizCount} quiz ·{' '}
-                      {formatQuizDuration(entry.averageCompletionTime)}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="font-headline text-headline-sm font-extrabold text-primary">
-                    %{formatQuizScore(entry.averageScore)}
                   </span>
-                  <span className="font-kicker block text-[9px] text-on-surface-variant uppercase">
-                    Ort.
-                  </span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+                  <UserProfileLink
+                    nested
+                    username={entry.username}
+                    aria-label={`@${entry.username} profili`}
+                    className={[
+                      'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full font-headline text-label-md font-bold',
+                      avatarTone,
+                    ].join(' ')}
+                  >
+                    {entry.profileImageUrl ? (
+                      <img
+                        src={entry.profileImageUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initialsFromUsername(entry.username)
+                    )}
+                  </UserProfileLink>
+                  <div className="flex min-w-0 flex-col gap-0.5">
+                    <UserProfileLink
+                      nested
+                      username={entry.username}
+                      className="font-label truncate text-label-md font-bold text-secondary transition-colors hover:text-primary"
+                    />
+                    <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+                      {entry.distinctQuizCount} quiz
+                    </span>
+                    <span className="font-body text-body-sm text-on-surface-variant">
+                      %{formatQuizScore(entry.averageScore)} /{' '}
+                      {formatQuizDuration(entry.averageCompletionTime)} ortalama
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </div>
 
-      {isAuthenticated ? (
-        <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-lg shadow-sm">
+      {isAuthenticated && username ? (
+        <div className="relative flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
           <div className="flex items-center gap-space-sm">
-            <div className="flex h-10 w-10 items-center justify-center bg-secondary text-on-secondary">
-              <span className="material-symbols-outlined text-2xl">person</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-kicker text-kicker font-bold text-secondary uppercase">
+            <UserProfileLink
+              username={username}
+              aria-label={`@${username} profili`}
+              className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary font-headline text-label-md font-bold text-on-secondary"
+            >
+              {profileImageUrl ? (
+                <img
+                  src={profileImageUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initialsFromUsername(username)
+              )}
+            </UserProfileLink>
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
                 Senin İstatistiklerin
               </span>
-              <span className="font-headline text-headline-sm font-bold text-primary uppercase">
-                {username ?? 'Üye'}
-              </span>
+              <UserProfileLink
+                username={username}
+                className="font-kicker text-kicker text-on-surface-variant transition-colors hover:text-primary"
+              />
             </div>
           </div>
 
@@ -199,7 +216,7 @@ export function QuizListSidebar() {
             <div className="grid grid-cols-2 gap-space-xs">
               <div className="bg-surface-container-low p-space-sm">
                 <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                  Ort. Skor
+                  Ort. Başarı
                 </span>
                 <span className="font-headline mt-1 block text-headline-sm font-bold text-primary">
                   %{formatQuizScore(myStats.averageScore)}
@@ -233,15 +250,17 @@ export function QuizListSidebar() {
           )}
 
           <Link
-            to="/profil"
-            className="font-label text-label-md font-bold text-secondary uppercase hover:underline"
+            to={publicProfilePath(username)}
+            className="font-label group ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
           >
-            Profile git
+            <span className="material-symbols-outlined text-base">person</span>
+            <span>Profile Git</span>
+            <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-0.5">
+              arrow_forward
+            </span>
           </Link>
         </div>
       ) : null}
-
-      <FeedGlobalPollCard />
     </aside>
   )
 }

@@ -50,6 +50,7 @@ const checkAnswer = async (
   return await apiClient<CheckQuizAnswerResponse>(`${API_URL}/check-answer`, {
     method: 'POST',
     body: JSON.stringify(request),
+    silentSuccess: true,
   })
 }
 

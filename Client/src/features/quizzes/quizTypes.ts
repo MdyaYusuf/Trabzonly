@@ -129,6 +129,7 @@ export interface QuizPlatformStatsDto {
 export interface QuizLeaderboardEntryDto {
   rank: number
   username: string
+  profileImageUrl?: string | null
   averageScore: number
   averageCompletionTime: string
   distinctQuizCount: number

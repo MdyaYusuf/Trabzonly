@@ -99,6 +99,7 @@ public sealed record QuizPlatformStatsDto(
 public sealed record QuizLeaderboardEntryDto(
   int Rank,
   string Username,
+  string? ProfileImageUrl,
   double AverageScore,
   TimeSpan AverageCompletionTime,
   int DistinctQuizCount);

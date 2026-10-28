@@ -64,7 +64,7 @@ function buildStats(
       id: 'quiz',
       label: 'Quiz Ortalaması',
       value: hasQuizAttempts
-        ? `${profile.quizAveragePercent ?? 0}% / ${profile.quizAttemptCount}`
+        ? `%${profile.quizAveragePercent ?? 0} / ${profile.quizAttemptCount}`
         : '—',
       unit: hasQuizAttempts ? 'Başarı' : '',
       title: hasQuizAttempts ? undefined : 'Henüz quiz çözmedi.',

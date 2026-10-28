@@ -17,13 +17,19 @@ function isPublicAuthPath(pathname: string = window.location.pathname): boolean 
   );
 }
 
+export type ApiClientOptions = RequestInit & {
+  /** Skip success toast for mutating requests (errors still toast). */
+  silentSuccess?: boolean;
+};
+
 export const apiClient = async <T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: ApiClientOptions = {}
 ): Promise<ApiResponse<T>> => {
-  const headers = new Headers(options.headers);
+  const { silentSuccess = false, ...requestOptions } = options;
+  const headers = new Headers(requestOptions.headers);
 
-  if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
+  if (!headers.has("Content-Type") && !(requestOptions.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
   }
 
@@ -32,7 +38,7 @@ export const apiClient = async <T>(
   }
 
   const config: RequestInit = {
-    ...options,
+    ...requestOptions,
     headers,
     credentials: "include",
   };
@@ -87,7 +93,12 @@ export const apiClient = async <T>(
       throw result;
     }
 
-    if (options.method && options.method !== "GET" && result.message) {
+    if (
+      !silentSuccess &&
+      requestOptions.method &&
+      requestOptions.method !== "GET" &&
+      result.message
+    ) {
       toast.success(result.message);
     }
 

@@ -568,10 +568,16 @@ public class QuizService(
     int minDistinctQuizzes)
   {
     return results
-      .GroupBy(r => new { r.UserId, Username = r.User.Username })
+      .GroupBy(r => new
+      {
+        r.UserId,
+        Username = r.User.Username,
+        ProfileImageUrl = r.User.ProfileImageUrl
+      })
       .Select(g => new
       {
         g.Key.Username,
+        g.Key.ProfileImageUrl,
         AverageScore = Math.Round(g.Average(r => (double)r.Score), 2),
         AverageCompletionTime = TimeSpan.FromTicks((long)g.Average(r => r.CompletionTime.Ticks)),
         DistinctQuizCount = g.Select(r => r.QuizId).Distinct().Count()
@@ -583,6 +589,7 @@ public class QuizService(
       .Select((x, index) => new QuizLeaderboardEntryDto(
         Rank: index + 1,
         Username: x.Username,
+        ProfileImageUrl: x.ProfileImageUrl,
         AverageScore: x.AverageScore,
         AverageCompletionTime: x.AverageCompletionTime,
         DistinctQuizCount: x.DistinctQuizCount))

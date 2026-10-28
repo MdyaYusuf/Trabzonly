@@ -145,6 +145,7 @@ public static class QuizSeeder
       {
         Name = def.Name,
         Description = def.Description,
+        ImageUrl = def.ImageUrl,
         SeedKey = def.SeedKey,
         IsActive = true
       };

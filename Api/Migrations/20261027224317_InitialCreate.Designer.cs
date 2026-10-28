@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Trabzonly.Api.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20261009145713_InitialCreate")]
+    [Migration("20261027224317_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -662,11 +662,18 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
+                    b.Property<string>("Explanation")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -679,7 +686,7 @@ namespace Trabzonly.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QuizId");
+                    b.HasIndex("QuizId", "SortOrder");
 
                     b.ToTable("Questions", (string)null);
                 });
@@ -702,6 +709,13 @@ namespace Trabzonly.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int>("QuizCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeedKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -713,7 +727,61 @@ namespace Trabzonly.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("QuizCategoryId");
+
+                    b.HasIndex("SeedKey")
+                        .IsUnique()
+                        .HasFilter("[SeedKey] IS NOT NULL");
+
                     b.ToTable("Quizzes", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.Quizzes.QuizCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SeedKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("SeedKey")
+                        .IsUnique()
+                        .HasFilter("[SeedKey] IS NOT NULL");
+
+                    b.ToTable("QuizCategories", (string)null);
                 });
 
             modelBuilder.Entity("Api.Features.Quizzes.UserQuizResult", b =>
@@ -1058,8 +1126,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnName("Id");
 
                     b.Property<string>("Bio")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
@@ -1382,6 +1450,17 @@ namespace Trabzonly.Api.Migrations
                     b.Navigation("Quiz");
                 });
 
+            modelBuilder.Entity("Api.Features.Quizzes.Quiz", b =>
+                {
+                    b.HasOne("Api.Features.Quizzes.QuizCategory", "QuizCategory")
+                        .WithMany("Quizzes")
+                        .HasForeignKey("QuizCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("QuizCategory");
+                });
+
             modelBuilder.Entity("Api.Features.Quizzes.UserQuizResult", b =>
                 {
                     b.HasOne("Api.Features.Quizzes.Quiz", "Quiz")
@@ -1584,6 +1663,11 @@ namespace Trabzonly.Api.Migrations
                     b.Navigation("Questions");
 
                     b.Navigation("UserQuizResults");
+                });
+
+            modelBuilder.Entity("Api.Features.Quizzes.QuizCategory", b =>
+                {
+                    b.Navigation("Quizzes");
                 });
 
             modelBuilder.Entity("Api.Features.Roles.Role", b =>
