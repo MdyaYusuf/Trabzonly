@@ -97,11 +97,7 @@ export function PlayerDetailPage() {
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-      <PlayerDetailBreadcrumb
-        playerName={player.name}
-        seasonLabel={player.currentSeasonStats?.seasonName}
-        currentTeam={player.currentTeam}
-      />
+      <PlayerDetailBreadcrumb playerName={player.name} />
       <PlayerDetailHero player={player} />
       <PlayerDetailRatingBar
         playerId={player.id}

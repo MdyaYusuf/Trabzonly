@@ -40,6 +40,9 @@ public interface IPostService
     int count,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PostPlatformStatsDto>> GetPlatformStatsAsync(
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CursorPagedResponse<PostResponseDto>>> GetRecentPostsAsync(
     int count,
     DateTime? lastDateCursor = null,

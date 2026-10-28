@@ -429,6 +429,32 @@ public class PostService(
     };
   }
 
+  public async Task<ReturnModel<PostPlatformStatsDto>> GetPlatformStatsAsync(
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<Post> activePosts = _postRepository.Query(enableTracking: false)
+      .Where(p => p.IsActive);
+
+    int totalPosts = await activePosts.CountAsync(cancellationToken);
+    int totalComments = await activePosts.SumAsync(p => p.CommentCount, cancellationToken);
+    int totalLikes = await activePosts.SumAsync(p => p.LikeCount, cancellationToken);
+    int totalDislikes = await activePosts.SumAsync(p => p.DislikeCount, cancellationToken);
+
+    var response = new PostPlatformStatsDto(
+      TotalPosts: totalPosts,
+      TotalComments: totalComments,
+      TotalLikes: totalLikes,
+      TotalDislikes: totalDislikes);
+
+    return new ReturnModel<PostPlatformStatsDto>()
+    {
+      Success = true,
+      Message = "Gönderi platform istatistikleri başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<CursorPagedResponse<PostResponseDto>>> GetRecentPostsAsync(
     int count,
     DateTime? lastDateCursor = null,

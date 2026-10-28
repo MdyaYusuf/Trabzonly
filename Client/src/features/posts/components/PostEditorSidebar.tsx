@@ -123,7 +123,7 @@ export function PostEditorSidebar({
                       onClick={() => {
                         onRemovePollOption(index)
                       }}
-                      className="font-label shrink-0 px-space-sm py-space-xs text-label-md text-error uppercase"
+                      className="font-label shrink-0 cursor-pointer px-space-sm py-space-xs text-label-md text-error uppercase"
                     >
                       Sil
                     </button>
@@ -134,7 +134,7 @@ export function PostEditorSidebar({
                 <button
                   type="button"
                   onClick={onAddPollOption}
-                  className="font-label self-start px-space-sm py-1 text-label-md font-bold text-secondary uppercase"
+                  className="font-label cursor-pointer self-end px-space-sm py-1 text-label-md font-bold text-secondary uppercase"
                 >
                   + Seçenek Ekle
                 </button>

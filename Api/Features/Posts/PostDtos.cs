@@ -101,3 +101,9 @@ public sealed record PostReactionResponseDto(
   int LikeCount,
   int DislikeCount,
   PostReactionType? CurrentReaction);
+
+public sealed record PostPlatformStatsDto(
+  int TotalPosts,
+  int TotalComments,
+  int TotalLikes,
+  int TotalDislikes);

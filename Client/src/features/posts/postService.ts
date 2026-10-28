@@ -8,6 +8,7 @@ import type {
   UpdatePostRequest,
   PostReactionResponseDto,
   PostListQuery,
+  PostPlatformStatsDto,
 } from './postTypes';
 
 const API_URL = '/posts';
@@ -82,6 +83,10 @@ const getMostEngaged = async (count: number): Promise<ApiResponse<PostPreviewDto
   return await apiClient<PostPreviewDto[]>(`${API_URL}/most-engaged/${count}`);
 };
 
+const getPlatformStats = async (): Promise<ApiResponse<PostPlatformStatsDto>> => {
+  return await apiClient<PostPlatformStatsDto>(`${API_URL}/stats/platform`);
+};
+
 const getRecent = async (
   count: number,
   lastDate?: string,
@@ -139,6 +144,7 @@ const postService = {
   getById,
   getTopCommented,
   getMostEngaged,
+  getPlatformStats,
   getRecent,
   add,
   update,

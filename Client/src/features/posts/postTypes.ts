@@ -66,6 +66,13 @@ export interface PostPreviewDto {
   commentCount: number;
 }
 
+export interface PostPlatformStatsDto {
+  totalPosts: number;
+  totalComments: number;
+  totalLikes: number;
+  totalDislikes: number;
+}
+
 // Requests
 export interface CreatePostPollRequest {
   question: string;

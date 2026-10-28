@@ -125,6 +125,16 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
 
             <div className="flex h-full flex-col justify-between gap-space-sm pt-space-sm lg:col-span-8">
               <div className="flex flex-col gap-space-sm">
+                <div className="font-label flex flex-wrap items-center gap-space-sm text-label-md font-semibold tracking-wider text-on-primary uppercase">
+                  <span>
+                    <span className="text-tertiary-fixed-dim">SEZON:</span>{' '}
+                    {player.currentSeasonStats?.seasonName?.trim() || '—'}
+                  </span>
+                  <span>
+                    <span className="text-tertiary-fixed-dim">TAKIM:</span> {player.currentTeam}
+                  </span>
+                </div>
+
                 <div className="flex flex-wrap items-center justify-between gap-space-sm">
                   <div className="flex flex-wrap items-center gap-space-xs">
                     <span className="bg-secondary px-space-sm py-space-xs font-kicker text-kicker font-bold tracking-wider text-on-secondary uppercase">

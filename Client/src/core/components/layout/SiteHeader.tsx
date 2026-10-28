@@ -11,6 +11,20 @@ const navItems = [
   { to: '/quizler', label: 'Quizler' },
 ] as const
 
+function ActiveNavUnderline({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden viewBox="0 0 100 6" preserveAspectRatio="none" className={className}>
+      <path
+        d="M2 4.2 C 28 1.2, 72 1.2, 98 4.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export function SiteHeader() {
   const { isAuthenticated } = useAppSelector((state) => state.auth)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -42,12 +56,19 @@ export function SiteHeader() {
                 [
                   'px-4 py-1 font-label text-label-md uppercase transition-colors',
                   isActive
-                    ? 'bg-primary-container font-bold text-on-primary'
+                    ? 'font-bold text-on-primary'
                     : 'text-on-primary/80 hover:text-on-primary',
                 ].join(' ')
               }
             >
-              {item.label}
+              {({ isActive }) => (
+                <span className="relative inline-block">
+                  {item.label}
+                  {isActive ? (
+                    <ActiveNavUnderline className="pointer-events-none absolute -bottom-2.5 left-0 h-1.5 w-full text-tertiary-fixed-dim" />
+                  ) : null}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -103,9 +124,21 @@ export function SiteHeader() {
                 key={item.to}
                 to={item.to}
                 onClick={() => setMobileOpen(false)}
-                className="px-3 py-3 font-label text-label-md text-on-primary/90 uppercase"
+                className={({ isActive }) =>
+                  [
+                    'px-3 py-3 font-label text-label-md uppercase transition-colors',
+                    isActive ? 'font-bold text-on-primary' : 'text-on-primary/90',
+                  ].join(' ')
+                }
               >
-                {item.label}
+                {({ isActive }) => (
+                  <span className="relative inline-block">
+                    {item.label}
+                    {isActive ? (
+                      <ActiveNavUnderline className="pointer-events-none absolute -bottom-1.5 left-0 h-1.5 w-full text-tertiary-fixed-dim" />
+                    ) : null}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>

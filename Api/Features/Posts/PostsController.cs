@@ -103,6 +103,16 @@ public class PostsController(IPostService _postService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [HttpGet("stats/platform")]
+  public async Task<IActionResult> GetPlatformStats(
+    CancellationToken cancellationToken)
+  {
+    var result = await _postService.GetPlatformStatsAsync(
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("recent/{count:int}")]
   public async Task<IActionResult> GetRecentPosts(
     int count,
