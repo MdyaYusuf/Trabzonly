@@ -14,6 +14,8 @@ import type {
   RatePlayerRequest,
   PlayerRatingResponseDto,
   PlayerListQuery,
+  PlayerAdminListQuery,
+  PlayerAdminSummaryDto,
 } from './playerTypes'
 
 const API_URL = '/players'
@@ -61,6 +63,39 @@ const getAll = async (
 
 const getRosterOverview = async (): Promise<ApiResponse<PlayerRosterOverviewDto>> => {
   return await apiClient<PlayerRosterOverviewDto>(`${API_URL}/roster-overview`)
+}
+
+const getAllForAdmin = async (
+  query: PlayerAdminListQuery = {},
+): Promise<ApiResponse<PagedResponse<PlayerResponseDto>>> => {
+  const queryParams = new URLSearchParams()
+
+  queryParams.set('pageNumber', String(query.pageNumber ?? 1))
+  queryParams.set('pageSize', String(query.pageSize ?? 12))
+
+  if (query.search?.trim()) {
+    queryParams.set('search', query.search.trim())
+  }
+
+  if (query.positionGroup && query.positionGroup !== 'all') {
+    queryParams.set('positionGroup', query.positionGroup)
+  }
+
+  if (query.isActive !== undefined) {
+    queryParams.set('isActive', String(query.isActive))
+  }
+
+  if (query.sort) {
+    queryParams.set('sort', query.sort)
+  }
+
+  return await apiClient<PagedResponse<PlayerResponseDto>>(
+    `${API_URL}/manage?${queryParams}`,
+  )
+}
+
+const getAdminSummary = async (): Promise<ApiResponse<PlayerAdminSummaryDto>> => {
+  return await apiClient<PlayerAdminSummaryDto>(`${API_URL}/manage/summary`)
 }
 
 const getById = async (id: number): Promise<ApiResponse<PlayerResponseDto>> => {
@@ -142,6 +177,8 @@ const rate = async (
 const playerService = {
   getAll,
   getRosterOverview,
+  getAllForAdmin,
+  getAdminSummary,
   getById,
   getTopValued,
   getMostCommented,

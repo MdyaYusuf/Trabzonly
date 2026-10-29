@@ -1,78 +1,46 @@
-export type AdminPlayerStatus = 'active' | 'injured' | 'inactive'
+import type { PlayerPositionGroup } from '@/features/players/playerTypes'
 
-export type AdminPlayerPositionGroup = 'all' | 'gk' | 'def' | 'mid' | 'att'
-
-export type AdminPlayerSquadFilter = 'all' | 'first-team' | 'loan' | 'u19'
+export type AdminPlayerStatus = 'active' | 'inactive'
 
 export type AdminPlayerStatusFilter = 'all' | 'active' | 'inactive'
 
+export type AdminPlayerPositionFilter = PlayerPositionGroup
+
+export type AdminPlayerPreferredFoot = 'Right' | 'Left' | 'Both'
+
 export type AdminPlayerListRow = {
-  id: string
-  number: number
+  id: number
+  number: number | null
   fullName: string
-  secondaryName: string
   positionLabel: string
-  positionGroup: Exclude<AdminPlayerPositionGroup, 'all'>
-  squadLabel: string
-  squadFilter: Exclude<AdminPlayerSquadFilter, 'all'>
+  currentTeam: string
   nationality: string
-  nationalityFlag: string
   age: number
   marketValueLabel: string
-  marketValueMillions: number
   status: AdminPlayerStatus
   statusLabel: string
-  isCaptain?: boolean
-  isViceCaptain?: boolean
+  isCaptain: boolean
+  imageUrl?: string | null
   initials: string
-  avatarTone: string
-}
-
-export type AdminPlayerListStats = {
-  totalLabel: string
-  totalValue: string
-  activeLabel: string
-  activeValue: string
-  inactiveLabel: string
-  inactiveValue: string
-  positionDistribution: string
-  positionNote: string
-  averageAge: string
-  averageAgeNote: string
-  nationalCount: string
-  nationalNote: string
-  reportTitle: string
-  reportSubtitle: string
-  reportNote: string
-}
-
-export type AdminPlayerReportStrip = {
-  kicker: string
-  message: string
-  marketValueTotal: string
 }
 
 export type AdminPlayerFormDraft = {
-  id: string
-  recordCode: string
-  fullName: string
-  jerseyNumber: string
-  birthDate: string
+  id: number | null
+  name: string
+  shirtNumber: string
+  dateOfBirth: string
   nationality: string
-  preferredFoot: 'right' | 'left' | 'both'
-  isActiveInSquad: boolean
+  preferredFoot: AdminPlayerPreferredFoot
+  isActive: boolean
   heightCm: string
-  primaryPosition: string
-  secondaryPosition: string
-  currentSquad: string
-  contractEnd: string
+  positionId: number
+  currentTeam: string
   marketValue: string
-  annualSalary: string
-  tacticalProfile: string
-  createdBy: string
-  lastUpdated: string
-  tffLicenseCode: string
-  contractTypeLabel: string
-  initials: string
-  avatarTone: string
+  wage: string
+  description: string
+  isCaptain: boolean
+  imageUrl?: string | null
+  imageFile: File | null
+  createdDate?: string | null
+  updatedDate?: string | null
 }

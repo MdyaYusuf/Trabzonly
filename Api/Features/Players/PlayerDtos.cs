@@ -113,3 +113,16 @@ public sealed record PlayerListQueryRequest(
   string? Sort = null,
   int PageNumber = 1,
   int PageSize = 12);
+
+public sealed record PlayerAdminListQueryRequest(
+  string? Search = null,
+  string? PositionGroup = null,
+  bool? IsActive = null,
+  string? Sort = null,
+  int PageNumber = 1,
+  int PageSize = 12);
+
+public sealed record PlayerAdminSummaryDto(
+  int TotalCount,
+  int ActiveCount,
+  int InactiveCount);

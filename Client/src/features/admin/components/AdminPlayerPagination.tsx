@@ -6,6 +6,17 @@ type AdminPlayerPaginationProps = {
   onPageSizeChange: (size: number) => void
 }
 
+function buildPageWindow(currentPage: number, totalPages: number): number[] {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1)
+  }
+
+  const start = Math.max(1, Math.min(currentPage - 2, totalPages - 4))
+  const end = Math.min(totalPages, start + 4)
+
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index)
+}
+
 export function AdminPlayerPagination({
   page,
   pageSize,
@@ -17,8 +28,7 @@ export function AdminPlayerPagination({
   const currentPage = Math.min(page, totalPages)
   const start = total === 0 ? 0 : (currentPage - 1) * pageSize + 1
   const end = Math.min(currentPage * pageSize, total)
-
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1).slice(0, 4)
+  const pages = buildPageWindow(currentPage, totalPages)
 
   return (
     <div className="flex flex-col gap-space-sm border border-outline-variant/40 bg-surface-container-lowest px-space-md py-space-sm lg:flex-row lg:items-center lg:justify-between">
@@ -38,11 +48,11 @@ export function AdminPlayerPagination({
             onChange={(event) => {
               onPageSizeChange(Number(event.target.value))
             }}
-            className="border border-outline-variant/50 bg-surface px-space-sm py-1 outline-none focus:border-primary"
+            className="cursor-pointer border border-outline-variant/50 bg-surface px-space-sm py-1 outline-none focus:border-primary"
           >
-            <option value={7}>7</option>
-            <option value={14}>14</option>
-            <option value={28}>28</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={30}>30</option>
           </select>
         </label>
       </div>
@@ -54,7 +64,7 @@ export function AdminPlayerPagination({
           onClick={() => {
             onPageChange(currentPage - 1)
           }}
-          className="font-label inline-flex items-center gap-1 px-space-sm py-space-xs text-label-md uppercase disabled:opacity-40"
+          className="font-label inline-flex cursor-pointer items-center gap-1 px-space-sm py-space-xs text-label-md uppercase disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span className="material-symbols-outlined text-[16px]">chevron_left</span>
           Önceki
@@ -66,7 +76,7 @@ export function AdminPlayerPagination({
             onClick={() => {
               onPageChange(pageNumber)
             }}
-            className={`font-label h-8 w-8 text-label-md ${
+            className={`font-label h-8 w-8 cursor-pointer text-label-md ${
               pageNumber === currentPage
                 ? 'bg-primary text-on-primary'
                 : 'text-on-surface-variant hover:bg-surface-container-high'
@@ -81,7 +91,7 @@ export function AdminPlayerPagination({
           onClick={() => {
             onPageChange(currentPage + 1)
           }}
-          className="font-label inline-flex items-center gap-1 px-space-sm py-space-xs text-label-md uppercase disabled:opacity-40"
+          className="font-label inline-flex cursor-pointer items-center gap-1 px-space-sm py-space-xs text-label-md uppercase disabled:cursor-not-allowed disabled:opacity-40"
         >
           Sonraki
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>

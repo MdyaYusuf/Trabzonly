@@ -71,6 +71,46 @@ public class PlayerService(
       cancellationToken: cancellationToken);
   }
 
+  public async Task<ReturnModel<PagedResponse<PlayerResponseDto>>> GetAdminRosterAsync(
+    PlayerAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 50);
+    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+
+    return await GetAllAsync(
+      filter: BuildAdminListFilter(query),
+      include: BuildDefaultInclude(currentSeasonId),
+      orderBy: BuildListOrderBy(query.Sort, currentSeasonId),
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+  }
+
+  public async Task<ReturnModel<PlayerAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default)
+  {
+    List<Player> players = await _playerRepository.GetAllAsync(
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    int totalCount = players.Count;
+    int activeCount = players.Count(p => p.IsActive);
+    int inactiveCount = totalCount - activeCount;
+
+    return new ReturnModel<PlayerAdminSummaryDto>()
+    {
+      Success = true,
+      Message = "Oyuncu yönetim özeti başarılı bir şekilde getirildi.",
+      Data = new PlayerAdminSummaryDto(
+        TotalCount: totalCount,
+        ActiveCount: activeCount,
+        InactiveCount: inactiveCount),
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<PlayerRosterOverviewDto>> GetRosterOverviewAsync(
     CancellationToken cancellationToken = default)
   {
@@ -462,6 +502,21 @@ public class PlayerService(
 
     return player =>
       player.IsActive &&
+      (string.IsNullOrEmpty(search) ||
+        player.Name.Contains(search) ||
+        (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&
+      (abbreviations == null || abbreviations.Contains(player.Position.Abbreviation));
+  }
+
+  private static Expression<Func<Player, bool>> BuildAdminListFilter(
+    PlayerAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    string[]? abbreviations = PlayerPositionGroups.GetAbbreviations(query.PositionGroup);
+    bool? isActive = query.IsActive;
+
+    return player =>
+      (!isActive.HasValue || player.IsActive == isActive.Value) &&
       (string.IsNullOrEmpty(search) ||
         player.Name.Contains(search) ||
         (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&

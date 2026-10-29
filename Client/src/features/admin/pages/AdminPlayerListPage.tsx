@@ -1,203 +1,208 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import playerService from '@/features/players/playerService'
+import type { PlayerAdminSummaryDto } from '@/features/players/playerTypes'
+import { AdminPlayerDeleteModal } from '../components/AdminPlayerDeleteModal'
 import { AdminPlayerListFilters } from '../components/AdminPlayerListFilters'
 import { AdminPlayerListHeader } from '../components/AdminPlayerListHeader'
 import { AdminPlayerPagination } from '../components/AdminPlayerPagination'
-import { AdminPlayerReportBar } from '../components/AdminPlayerReportBar'
 import { AdminPlayerTable } from '../components/AdminPlayerTable'
-import {
-  adminPlayerListRows,
-  adminPlayerListStats,
-  adminPlayerReportStrip,
-} from '../utils/adminPlayerPlaceholders'
+import { mapPlayerResponseToListRow } from '../utils/adminPlayerDraftUtils'
 import type {
-  AdminPlayerPositionGroup,
-  AdminPlayerSquadFilter,
+  AdminPlayerListRow,
+  AdminPlayerPositionFilter,
   AdminPlayerStatusFilter,
 } from '../utils/adminPlayerTypes'
 
+const DEFAULT_PAGE_SIZE = 10
+
 export function AdminPlayerListPage() {
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<AdminPlayerStatusFilter>('all')
-  const [positionFilter, setPositionFilter] = useState<AdminPlayerPositionGroup>('all')
-  const [squadFilter, setSquadFilter] = useState<AdminPlayerSquadFilter>('all')
+  const [positionFilter, setPositionFilter] = useState<AdminPlayerPositionFilter>('all')
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(7)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const [rows, setRows] = useState<AdminPlayerListRow[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [summary, setSummary] = useState<PlayerAdminSummaryDto | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<AdminPlayerListRow | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [listVersion, setListVersion] = useState(0)
 
-  const counts = useMemo(() => {
-    const active = adminPlayerListRows.filter((player) => player.status === 'active').length
-    const inactive = adminPlayerListRows.filter((player) => player.status !== 'active').length
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
 
-    return {
-      all: adminPlayerListRows.length,
-      active,
-      inactive,
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, statusFilter, positionFilter, pageSize])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadSummary() {
+      const result = await playerService.getAdminSummary()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setSummary(result.data)
+      } else {
+        setSummary(null)
+      }
+    }
+
+    void loadSummary()
+
+    return () => {
+      cancelled = true
     }
   }, [])
 
-  const filtered = useMemo(() => {
-    let result = [...adminPlayerListRows]
+  useEffect(() => {
+    let cancelled = false
 
-    if (statusFilter === 'active') {
-      result = result.filter((player) => player.status === 'active')
-    } else if (statusFilter === 'inactive') {
-      result = result.filter((player) => player.status !== 'active')
+    async function loadPlayers() {
+      setIsLoading(true)
+
+      const isActive =
+        statusFilter === 'all' ? undefined : statusFilter === 'active'
+
+      const result = await playerService.getAllForAdmin({
+        pageNumber: page,
+        pageSize,
+        search: debouncedSearch || undefined,
+        positionGroup: positionFilter,
+        isActive,
+      })
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setRows(result.data.items.map(mapPlayerResponseToListRow))
+        setTotalCount(result.data.totalCount)
+
+        if (result.data.items.length === 0 && result.data.totalCount > 0 && page > 1) {
+          setPage((prev) => Math.max(1, prev - 1))
+        }
+      } else {
+        setRows([])
+        setTotalCount(0)
+      }
+
+      setIsLoading(false)
     }
 
-    if (positionFilter !== 'all') {
-      result = result.filter((player) => player.positionGroup === positionFilter)
+    void loadPlayers()
+
+    return () => {
+      cancelled = true
     }
-
-    if (squadFilter !== 'all') {
-      result = result.filter((player) => player.squadFilter === squadFilter)
-    }
-
-    const query = search.trim().toLowerCase()
-
-    if (query) {
-      result = result.filter(
-        (player) =>
-          player.fullName.toLowerCase().includes(query) ||
-          player.secondaryName.toLowerCase().includes(query) ||
-          player.positionLabel.toLowerCase().includes(query) ||
-          String(player.number).includes(query),
-      )
-    }
-
-    return result
-  }, [search, statusFilter, positionFilter, squadFilter])
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
-  const currentPage = Math.min(page, totalPages)
-  const pageStart = (currentPage - 1) * pageSize
-  const pagePlayers = filtered.slice(pageStart, pageStart + pageSize)
-
-  function resetPage() {
-    setPage(1)
-  }
+  }, [page, pageSize, debouncedSearch, statusFilter, positionFilter, listVersion])
 
   function clearFilters() {
     setSearch('')
+    setDebouncedSearch('')
     setStatusFilter('all')
     setPositionFilter('all')
-    setSquadFilter('all')
     setPage(1)
   }
 
-  function toggleId(id: string) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deletingId != null) {
+      return
+    }
 
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
+    const deletedId = deleteTarget.id
+    setDeletingId(deletedId)
+
+    const result = await playerService.remove(deletedId)
+
+    if (result.success) {
+      setDeleteTarget(null)
+      setListVersion((prev) => prev + 1)
+
+      const summaryResult = await playerService.getAdminSummary()
+
+      if (summaryResult.success && summaryResult.data) {
+        setSummary(summaryResult.data)
       }
+    }
 
-      return next
-    })
+    setDeletingId(null)
   }
 
-  function toggleAll() {
-    const pageIds = pagePlayers.map((player) => player.id)
-    const allSelected = pageIds.every((id) => selectedIds.has(id))
-
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-
-      if (allSelected) {
-        for (const id of pageIds) {
-          next.delete(id)
-        }
-      } else {
-        for (const id of pageIds) {
-          next.add(id)
-        }
-      }
-
-      return next
-    })
+  const counts = {
+    all: summary?.totalCount ?? totalCount,
+    active: summary?.activeCount ?? 0,
+    inactive: summary?.inactiveCount ?? 0,
   }
 
   return (
     <div className="flex flex-col">
-      <AdminPlayerReportBar report={adminPlayerReportStrip} />
-
       <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-        <AdminPlayerListHeader stats={adminPlayerListStats} />
+        <AdminPlayerListHeader />
 
         <AdminPlayerListFilters
           search={search}
           statusFilter={statusFilter}
           positionFilter={positionFilter}
-          squadFilter={squadFilter}
           counts={counts}
-          onSearchChange={(value) => {
-            setSearch(value)
-            resetPage()
-          }}
-          onStatusChange={(value) => {
-            setStatusFilter(value)
-            resetPage()
-          }}
-          onPositionChange={(value) => {
-            setPositionFilter(value)
-            resetPage()
-          }}
-          onSquadChange={(value) => {
-            setSquadFilter(value)
-            resetPage()
-          }}
+          onSearchChange={setSearch}
+          onStatusChange={setStatusFilter}
+          onPositionChange={setPositionFilter}
+          onClear={clearFilters}
         />
 
-        <AdminPlayerTable
-          players={pagePlayers}
-          selectedIds={selectedIds}
-          onToggle={toggleId}
-          onToggleAll={toggleAll}
-        />
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            Oyuncular yükleniyor...
+          </p>
+        ) : (
+          <AdminPlayerTable
+            players={rows}
+            deletingId={deletingId}
+            onDelete={setDeleteTarget}
+          />
+        )}
 
-        <AdminPlayerPagination
-          page={currentPage}
-          pageSize={pageSize}
-          total={filtered.length}
-          onPageChange={setPage}
-          onPageSizeChange={(size) => {
-            setPageSize(size)
-            setPage(1)
-          }}
-        />
-
-        <section className="flex flex-col gap-space-sm border border-outline-variant/40 bg-surface-container-low px-space-md py-space-md lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex gap-space-sm">
-            <span className="material-symbols-outlined text-secondary">info</span>
-            <div>
-              <h2 className="font-label text-label-md font-bold text-on-surface uppercase">
-                Filtreleme & Arama Bilgilendirmesi
-              </h2>
-              <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-                Kriterlere uyan oyuncu bulunamazsa sistem otomatik olarak &quot;Henüz oyuncu
-                eklenmedi veya eşleşme yok&quot; durumunu sunar.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-space-sm">
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="font-label border border-outline-variant px-space-md py-space-sm text-label-md uppercase transition-colors hover:border-primary hover:text-primary"
-            >
-              Filtreleri Temizle
-            </button>
-            <button
-              type="button"
-              className="font-label bg-primary-container px-space-md py-space-sm text-label-md font-bold text-on-primary uppercase transition-all hover:bg-primary"
-            >
-              Toplu Düzenleme Modu
-            </button>
-          </div>
-        </section>
+        {!isLoading && totalCount > 0 ? (
+          <AdminPlayerPagination
+            page={page}
+            pageSize={pageSize}
+            total={totalCount}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        ) : null}
       </main>
+
+      <AdminPlayerDeleteModal
+        open={Boolean(deleteTarget)}
+        playerName={deleteTarget?.fullName ?? 'Oyuncu'}
+        isDeleting={deletingId != null}
+        onCancel={() => {
+          if (deletingId != null) {
+            return
+          }
+
+          setDeleteTarget(null)
+        }}
+        onConfirm={() => {
+          void handleConfirmDelete()
+        }}
+      />
     </div>
   )
 }

@@ -85,6 +85,22 @@ export interface PlayerListQuery {
   sort?: PlayerSortOption
 }
 
+export interface PlayerAdminListQuery {
+  pageNumber?: number
+  pageSize?: number
+  search?: string
+  positionGroup?: PlayerPositionGroup
+  /** undefined = all, true = active, false = inactive */
+  isActive?: boolean
+  sort?: PlayerSortOption
+}
+
+export interface PlayerAdminSummaryDto {
+  totalCount: number
+  activeCount: number
+  inactiveCount: number
+}
+
 // Requests
 export interface CreatePlayerRequest {
   name: string
