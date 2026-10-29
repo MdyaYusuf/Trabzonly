@@ -18,6 +18,7 @@ export type SquadGalleryCardData = {
   formationLabel: string
   authorUsername: string
   authorDisplayTag?: string | null
+  authorProfileImageUrl?: string | null
   publishedLabel: string
   rating: number
   ratingCount: number

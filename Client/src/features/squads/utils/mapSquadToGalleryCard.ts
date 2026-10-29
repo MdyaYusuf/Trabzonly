@@ -122,6 +122,7 @@ export function mapSquadPreviewToGalleryCard(squad: SquadPreviewDto): SquadGalle
     formationLabel: squad.formation,
     authorUsername: squad.authorUsername,
     authorDisplayTag: squad.authorDisplayTag,
+    authorProfileImageUrl: squad.authorProfileImageUrl,
     publishedLabel: formatRelativeTime(squad.createdDate),
     rating: squad.averageRating,
     ratingCount: squad.ratingCount,

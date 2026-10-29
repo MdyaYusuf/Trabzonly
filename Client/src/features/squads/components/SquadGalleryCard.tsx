@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { CommentAuthorAvatar } from '@/features/comments/components/CommentAuthorAvatar'
 import { UserProfileLink } from '@/features/users/components/UserProfileLink'
 import type { SquadGalleryCardData } from '../utils/squadsGalleryTypes'
 import { SquadPitchPreview } from './SquadPitchPreview'
@@ -70,6 +71,11 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
         <div className="flex flex-col">
           <div className="mb-space-xs flex items-center justify-between gap-space-xs">
             <div className="flex min-w-0 items-center gap-space-xs">
+              <CommentAuthorAvatar
+                username={squad.authorUsername}
+                profileImageUrl={squad.authorProfileImageUrl}
+                size="sm"
+              />
               <UserProfileLink
                 username={squad.authorUsername}
                 className="font-label truncate text-label-md font-bold text-on-surface transition-colors hover:text-primary"
@@ -86,7 +92,7 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
           </div>
 
           <Link to={detailPath} className="cursor-pointer">
-            <h2 className="font-headline mb-space-xs line-clamp-2 text-headline-sm leading-snug font-bold text-primary transition-colors group-hover:text-secondary">
+            <h2 className="font-headline mt-space-xs mb-space-xs line-clamp-2 min-h-[52px] text-headline-sm font-bold text-primary transition-colors group-hover:text-secondary">
               {squad.title}
             </h2>
 
