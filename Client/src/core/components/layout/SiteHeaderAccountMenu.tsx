@@ -25,6 +25,7 @@ export function SiteHeaderAccountMenu({ onNavigate }: SiteHeaderAccountMenuProps
 
   const username = user?.username ?? ''
   const initials = initialsFromUsername(username)
+  const isAdmin = user?.roleName === 'Admin'
 
   useEffect(() => {
     if (!isOpen) {
@@ -97,6 +98,23 @@ export function SiteHeaderAccountMenu({ onNavigate }: SiteHeaderAccountMenuProps
                 @{username}
               </p>
             </div>
+          ) : null}
+
+          {isAdmin ? (
+            <Link
+              role="menuitem"
+              to="/yonetim"
+              className="font-label flex cursor-pointer items-center gap-space-sm px-space-md py-space-sm text-label-md text-on-surface uppercase transition-colors hover:bg-surface-container"
+              onClick={() => {
+                setIsOpen(false)
+                onNavigate?.()
+              }}
+            >
+              <span className="material-symbols-outlined text-[18px] text-primary">
+                admin_panel_settings
+              </span>
+              Yönetim Paneli
+            </Link>
           ) : null}
 
           <Link

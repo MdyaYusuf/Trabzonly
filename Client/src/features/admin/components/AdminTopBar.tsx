@@ -1,168 +1,62 @@
 import { Link, useLocation } from 'react-router-dom'
-import { adminHubProfile } from '../utils/adminHubPlaceholders'
+import { PageBackButton } from '@/core/components/PageBackButton'
+import { resolveAdminBreadcrumb } from '../utils/adminBreadcrumbs'
+import { AdminAccountMenu } from './AdminAccountMenu'
 
 type AdminTopBarProps = {
-  onLogout?: () => void
+  onMenuClick?: () => void
 }
 
-function resolveBreadcrumb(pathname: string): { root: string; current: string } {
-  if (pathname.includes('/oyuncular/yeni')) {
-    return { root: 'Yönetim Masası', current: 'Oyuncular / Yeni Oyuncu' }
-  }
-
-  if (pathname.includes('/oyuncular/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'Oyuncular / Oyuncuyu Düzenle' }
-  }
-
-  if (pathname.endsWith('/oyuncular') || pathname.includes('/oyuncular?')) {
-    return { root: 'Yönetim Masası', current: 'Oyuncular' }
-  }
-
-  if (pathname.includes('/kategoriler/yeni')) {
-    return { root: 'Yönetim Masası', current: 'Kategoriler / Yeni Kategori' }
-  }
-
-  if (pathname.includes('/kategoriler/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'Kategoriler / Kategoriyi Düzenle' }
-  }
-
-  if (pathname.endsWith('/kategoriler') || pathname.includes('/kategoriler?')) {
-    return { root: 'Yönetim Masası', current: 'Kategoriler' }
-  }
-
-  if (pathname.includes('/pozisyonlar/yeni')) {
-    return { root: 'Yönetim Masası', current: 'Pozisyonlar / Yeni Pozisyon' }
-  }
-
-  if (pathname.includes('/pozisyonlar/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'Pozisyonlar / Pozisyonu Düzenle' }
-  }
-
-  if (pathname.endsWith('/pozisyonlar') || pathname.includes('/pozisyonlar?')) {
-    return { root: 'Yönetim Masası', current: 'Pozisyonlar' }
-  }
-
-  if (pathname.includes('/sezonlar/yeni')) {
-    return { root: 'Yönetim Masası', current: 'Sezonlar / Yeni Sezon' }
-  }
-
-  if (pathname.includes('/sezonlar/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'Sezonlar / Sezonu Düzenle' }
-  }
-
-  if (pathname.endsWith('/sezonlar') || pathname.includes('/sezonlar?')) {
-    return { root: 'Yönetim Masası', current: 'Sezonlar' }
-  }
-
-  if (pathname.includes('/istatistikler/yeni')) {
-    return { root: 'Yönetim Masası', current: 'İstatistikler / Yeni İstatistik' }
-  }
-
-  if (pathname.includes('/istatistikler/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'İstatistikler / İstatistik Düzenle' }
-  }
-
-  if (pathname.endsWith('/istatistikler') || pathname.includes('/istatistikler?')) {
-    return { root: 'Yönetim Masası', current: 'İstatistikler' }
-  }
-
-  if (pathname.includes('/sakatliklar/yeni')) {
-    return { root: 'Yönetim Masası', current: 'Sakatlıklar / Yeni Sakatlık' }
-  }
-
-  if (pathname.includes('/sakatliklar/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'Sakatlıklar / Sakatlık Düzenle' }
-  }
-
-  if (pathname.endsWith('/sakatliklar') || pathname.includes('/sakatliklar?')) {
-    return { root: 'Yönetim Masası', current: 'Sakatlıklar' }
-  }
-
-  if (pathname.includes('/quizler/yeni')) {
-    return { root: 'Yönetim Masası', current: 'Quizler / Yeni Quiz' }
-  }
-
-  if (pathname.includes('/quizler/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'Quizler / Quiz Düzenle' }
-  }
-
-  if (pathname.endsWith('/quizler') || pathname.includes('/quizler?')) {
-    return { root: 'Yönetim Masası', current: 'Quizler' }
-  }
-
-  if (pathname.includes('/uyeler/') && pathname !== '/yonetim/uyeler') {
-    return { root: 'Yönetim Masası', current: 'Üyeler / Üye Detayı' }
-  }
-
-  if (pathname.endsWith('/uyeler') || pathname.includes('/uyeler?')) {
-    return { root: 'Yönetim Masası', current: 'Üyeler' }
-  }
-
-  if (pathname.includes('/roller/yeni')) {
-    return { root: 'Yönetim Masası', current: 'Roller / Yeni Rol' }
-  }
-
-  if (pathname.includes('/roller/') && pathname.includes('/duzenle')) {
-    return { root: 'Yönetim Masası', current: 'Roller / Rol Düzenle' }
-  }
-
-  if (pathname.endsWith('/roller') || pathname.includes('/roller?')) {
-    return { root: 'Yönetim Masası', current: 'Roller' }
-  }
-
-  return {
-    root: adminHubProfile.breadcrumbRoot,
-    current: adminHubProfile.breadcrumbCurrent,
-  }
-}
-
-export function AdminTopBar({ onLogout }: AdminTopBarProps) {
+export function AdminTopBar({ onMenuClick }: AdminTopBarProps) {
   const location = useLocation()
-  const hub = adminHubProfile
-  const crumb = resolveBreadcrumb(location.pathname)
+  const crumb = resolveAdminBreadcrumb(location.pathname)
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/50 bg-surface-container-lowest px-space-md py-space-sm lg:px-space-lg">
-      <nav
-        aria-label="Breadcrumb"
-        className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
-      >
-        <span className="font-bold text-primary uppercase">{crumb.root}</span>
-        <span>/</span>
-        <span>{crumb.current}</span>
-      </nav>
-
-      <div className="flex flex-wrap items-center gap-space-md">
-        <div className="font-label flex items-center gap-space-sm text-label-md text-on-surface-variant">
-          <span>
-            {hub.systemStatusLabel}:{' '}
-            <span className="inline-flex items-center gap-1 font-bold text-secondary">
-              <span className="h-2 w-2 rounded-full bg-secondary-container" />
-              {hub.systemStatusValue}
-            </span>
-          </span>
-          <span className="text-outline-variant">|</span>
-          <span className="font-kicker text-kicker uppercase">{hub.versionLabel}</span>
-        </div>
-
-        <div className="flex items-center gap-space-sm">
-          <Link
-            to="/"
-            className="font-label inline-flex items-center gap-1 text-label-md text-on-surface-variant uppercase transition-colors hover:text-primary"
-          >
-            Siteye dön
-            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-          </Link>
+    <header className="flex min-h-16 flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/40 bg-gradient-to-r from-secondary-fixed/55 via-surface-container-lowest to-primary-fixed/45 px-6 py-space-sm sm:px-10 lg:px-16">
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-space-sm sm:gap-space-md">
+        {onMenuClick ? (
           <button
             type="button"
-            onClick={onLogout}
-            className="font-label inline-flex items-center gap-1 text-label-md text-on-surface-variant uppercase transition-colors hover:text-error"
+            className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center bg-surface-container text-primary transition-colors hover:bg-primary hover:text-on-primary lg:hidden"
+            aria-label="Menüyü aç"
+            onClick={onMenuClick}
           >
-            Çıkış yap
-            <span className="material-symbols-outlined text-[16px]">logout</span>
+            <span className="material-symbols-outlined text-[28px]">menu</span>
           </button>
-        </div>
+        ) : null}
+
+        {crumb.backTo ? (
+          <PageBackButton to={crumb.backTo} label={crumb.backLabel ?? 'Geri dön'} />
+        ) : null}
+
+        <nav
+          aria-label="Breadcrumb"
+          className="font-label flex min-w-0 flex-1 flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
+        >
+          {crumb.segments.map((segment, index) => {
+            const isLast = index === crumb.segments.length - 1
+
+            return (
+              <span key={`${segment.label}-${index}`} className="flex items-center gap-space-xs">
+                {index > 0 ? (
+                  <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                ) : null}
+                {segment.to && !isLast ? (
+                  <Link to={segment.to} className="transition-colors hover:text-primary">
+                    {segment.label}
+                  </Link>
+                ) : (
+                  <span className={isLast ? 'font-bold text-primary' : undefined}>
+                    {segment.label}
+                  </span>
+                )}
+              </span>
+            )
+          })}
+        </nav>
       </div>
+
+      <AdminAccountMenu />
     </header>
   )
 }
