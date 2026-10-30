@@ -1,18 +1,20 @@
-export type AdminStatisticPositionGroup = 'all' | 'gk' | 'def' | 'mid' | 'att'
+import type {
+  PlayerStatsPositionGroup,
+  PlayerStatsSortOption,
+} from '@/features/stats/playerStatsTypes'
 
-export type AdminStatisticSort =
-  | 'goals-desc'
-  | 'assists-desc'
-  | 'matches-desc'
-  | 'minutes-desc'
+export type AdminStatisticPositionGroup = PlayerStatsPositionGroup
+
+export type AdminStatisticSort = PlayerStatsSortOption
 
 export type AdminStatisticListRow = {
-  id: string
+  id: number
+  playerId: number
   playerName: string
-  number: number
+  number: number | null
   positionCode: string
-  positionGroup: Exclude<AdminStatisticPositionGroup, 'all'>
   nationality: string
+  seasonId: number
   season: string
   team: string
   matches: number
@@ -22,37 +24,33 @@ export type AdminStatisticListRow = {
   assists: number
   yellowCards: number
   redCards: number
-  cleanSheets: number | null
-  goalsConceded: number | null
-  isVerified?: boolean
+  cleanSheets: number
+  goalsConceded: number
   initials: string
-  avatarTone: string
 }
 
 export type AdminStatisticFormDraft = {
-  id: string
-  recordCode: string
-  playerId: string
-  playerName: string
-  playerNumber: string
-  playerPosition: string
-  season: string
+  id: number | null
+  playerId: number
+  seasonId: number
   team: string
   matches: string
   minutes: string
   goals: string
-  goalsBreakdown: string
   assists: string
   yellowCards: string
   redCards: string
   cleanSheets: string
   goalsConceded: string
-  minutesPerGoalLabel: string
-  minutesPerGoalNote: string
-  previewPositionBadge: string
-  lastUpdated: string
-  seasonStatus: string
-  apiSyncLabel: string
-  initials: string
-  avatarTone: string
+  createdDate?: string | null
+}
+
+export type AdminStatisticPlayerOption = {
+  id: number
+  label: string
+}
+
+export type AdminStatisticSeasonOption = {
+  id: number
+  name: string
 }

@@ -49,7 +49,7 @@ export function AdminPlayerListFilters({
       </label>
 
       <div className="flex flex-col gap-space-sm lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap gap-space-sm">
+        <div className="flex flex-wrap items-center gap-space-sm">
           <div className="flex flex-wrap gap-1">
             {statusTabs.map((tab) => {
               const isActive = statusFilter === tab.id
@@ -98,9 +98,9 @@ export function AdminPlayerListFilters({
 
         <Link
           to="/yonetim/oyuncular/yeni"
-          className="font-label inline-flex cursor-pointer items-center gap-space-xs bg-gradient-to-r from-primary-container via-[#7a1235] to-primary px-space-md py-space-xs text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
+          className="font-label inline-flex h-11 min-w-[11.5rem] shrink-0 cursor-pointer items-center justify-center gap-space-xs self-center bg-gradient-to-r from-primary-container via-[#7a1235] to-primary px-space-lg text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
         >
-          <span className="material-symbols-outlined text-[18px]">person_add</span>
+          <span className="material-symbols-outlined text-[20px]">person_add</span>
           Oyuncu Ekle
         </Link>
       </div>

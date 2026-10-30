@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
+using Api.Features.Players;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +29,7 @@ public class PlayerStatsService(
       pageNumber,
       pageSize,
       filter,
-      include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
+      include: include ?? BuildDefaultInclude(),
       orderBy: orderBy ?? (query => query.OrderByDescending(s => s.CreatedDate)),
       enableTracking,
       withDeleted,
@@ -46,6 +47,22 @@ public class PlayerStatsService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<PlayerStatsResponseDto>>> GetAdminListAsync(
+    PlayerStatsAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
+
+    return await GetAllAsync(
+      filter: BuildAdminListFilter(query),
+      include: BuildDefaultInclude(),
+      orderBy: BuildAdminListOrderBy(query.Sort),
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+  }
+
   public async Task<ReturnModel<PlayerStatsResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,
@@ -54,7 +71,7 @@ public class PlayerStatsService(
   {
     PlayerStats stats = await _businessRules.GetPlayerStatsIfExistAsync(
       id,
-      include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
+      include: include ?? BuildDefaultInclude(),
       enableTracking,
       cancellationToken);
 
@@ -82,7 +99,7 @@ public class PlayerStatsService(
       count + 1,
       lastValueCursor,
       lastIdCursor,
-      include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
+      include: include ?? BuildDefaultInclude(),
       enableTracking,
       withDeleted,
       cancellationToken);
@@ -122,7 +139,7 @@ public class PlayerStatsService(
       count + 1,
       lastValueCursor,
       lastIdCursor,
-      include: include ?? (query => query.Include(s => s.Player).Include(s => s.Season)),
+      include: include ?? BuildDefaultInclude(),
       enableTracking,
       withDeleted,
       cancellationToken);
@@ -243,6 +260,56 @@ public class PlayerStatsService(
       Success = true,
       Message = "İstatistik başarılı bir şekilde silindi.",
       StatusCode = 200
+    };
+  }
+
+  private static Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>> BuildDefaultInclude()
+  {
+    return query => query
+      .Include(s => s.Player)
+        .ThenInclude(p => p.Position)
+      .Include(s => s.Season);
+  }
+
+  private static Expression<Func<PlayerStats, bool>> BuildAdminListFilter(
+    PlayerStatsAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    string? team = query.Team?.Trim();
+    string[]? abbreviations = PlayerPositionGroups.GetAbbreviations(query.PositionGroup);
+    int? seasonId = query.SeasonId;
+    int? playerId = query.PlayerId;
+
+    return stats =>
+      (!seasonId.HasValue || stats.SeasonId == seasonId.Value) &&
+      (!playerId.HasValue || stats.PlayerId == playerId.Value) &&
+      (string.IsNullOrEmpty(team) || stats.Team.Contains(team)) &&
+      (abbreviations == null || abbreviations.Contains(stats.Player.Position.Abbreviation)) &&
+      (string.IsNullOrEmpty(search) ||
+        stats.Player.Name.Contains(search) ||
+        (stats.Player.ShirtNumber.HasValue &&
+          stats.Player.ShirtNumber.Value.ToString().Contains(search)));
+  }
+
+  private static Func<IQueryable<PlayerStats>, IOrderedQueryable<PlayerStats>> BuildAdminListOrderBy(
+    string? sort)
+  {
+    string normalized = sort?.Trim().ToLowerInvariant() ?? PlayerStatsSortOptions.GoalsDesc;
+
+    return normalized switch
+    {
+      PlayerStatsSortOptions.AssistsDesc => query => query
+        .OrderByDescending(s => s.Assists)
+        .ThenBy(s => s.Player.Name),
+      PlayerStatsSortOptions.MatchesDesc => query => query
+        .OrderByDescending(s => s.Appearances)
+        .ThenBy(s => s.Player.Name),
+      PlayerStatsSortOptions.MinutesDesc => query => query
+        .OrderByDescending(s => s.MinutesPlayed)
+        .ThenBy(s => s.Player.Name),
+      _ => query => query
+        .OrderByDescending(s => s.Goals)
+        .ThenBy(s => s.Player.Name)
     };
   }
 }

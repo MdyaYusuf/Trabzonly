@@ -1,152 +1,174 @@
-import type { AdminStatisticFormDraft } from '../utils/adminStatisticTypes'
-import {
-  adminStatisticPlayerOptions,
-  adminStatisticSeasonOptions,
-  adminStatisticTeamOptions,
-} from '../utils/adminStatisticPlaceholders'
+import type { ReactNode } from 'react'
+import type {
+  AdminStatisticFormDraft,
+  AdminStatisticPlayerOption,
+  AdminStatisticSeasonOption,
+} from '../utils/adminStatisticTypes'
 
 type AdminStatisticFormFieldsProps = {
   draft: AdminStatisticFormDraft
+  players: AdminStatisticPlayerOption[]
+  seasons: AdminStatisticSeasonOption[]
+  mode: 'create' | 'edit'
   onChange: <K extends keyof AdminStatisticFormDraft>(
     key: K,
     value: AdminStatisticFormDraft[K],
   ) => void
 }
 
+function SectionHeading({
+  section,
+  title,
+}: {
+  section: string
+  title: string
+}) {
+  return (
+    <div className="mb-space-md flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/40 pb-space-sm">
+      <h2 className="font-headline text-headline-sm font-bold text-primary uppercase">{title}</h2>
+      <span className="font-kicker text-kicker tracking-widest text-on-surface-variant uppercase">
+        {section}
+      </span>
+    </div>
+  )
+}
+
+function FieldLabel({
+  children,
+  required,
+  htmlFor,
+}: {
+  children: ReactNode
+  required?: boolean
+  htmlFor?: string
+}) {
+  return (
+    <label htmlFor={htmlFor} className="font-label mb-1 block text-label-md text-on-surface-variant">
+      {children}
+      {required ? <span className="text-error"> *</span> : null}
+    </label>
+  )
+}
+
+function formatDateParts(value?: string | null): { date: string; time: string | null } {
+  if (!value) {
+    return { date: '—', time: null }
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return { date: value, time: null }
+  }
+
+  return {
+    date: date.toLocaleDateString('tr-TR'),
+    time: date.toLocaleTimeString('tr-TR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }),
+  }
+}
+
 const inputClass =
   'font-body w-full border border-outline-variant/50 bg-surface px-space-md py-space-sm text-body-md text-on-surface outline-none focus:border-primary'
 
-export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticFormFieldsProps) {
+export function AdminStatisticFormFields({
+  draft,
+  players,
+  seasons,
+  mode,
+  onChange,
+}: AdminStatisticFormFieldsProps) {
+  const created = formatDateParts(draft.createdDate)
+
   return (
     <div className="flex flex-col gap-space-md">
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div className="mb-space-md border-b border-outline-variant/40 pb-space-sm">
-          <h2 className="font-headline flex items-center gap-space-xs text-headline-sm font-bold text-primary uppercase">
-            <span className="material-symbols-outlined text-[22px]">badge</span>
-            Temel Oyuncu ve Dönem Bilgileri
-          </h2>
-          <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-            Müsabakanın bağlı olduğu resmi profil ve turnuva kayıtları
-          </p>
-        </div>
-
+        <SectionHeading section="Bölüm 01" title="Oyuncu ve Dönem" />
         <div className="grid grid-cols-1 gap-space-md md:grid-cols-2">
           <div className="md:col-span-2">
-            <div className="mb-1 flex flex-wrap items-center gap-space-sm">
-              <label
-                htmlFor="playerSelect"
-                className="font-label text-label-md text-on-surface-variant"
-              >
-                Oyuncu Seçimi <span className="text-error">*</span>
-              </label>
-              <span className="font-kicker bg-secondary-container px-space-xs py-0.5 text-kicker text-on-secondary-container uppercase">
-                Kadro Verisinden Aktif
-              </span>
-            </div>
+            <FieldLabel htmlFor="playerSelect" required>
+              Oyuncu
+            </FieldLabel>
             <select
               id="playerSelect"
               className={inputClass}
-              value={draft.playerId}
+              value={draft.playerId > 0 ? String(draft.playerId) : ''}
               onChange={(event) => {
-                const selected = adminStatisticPlayerOptions.find(
-                  (player) => player.id === event.target.value,
-                )
-                onChange('playerId', event.target.value)
-                if (selected) {
-                  onChange('playerName', selected.name)
-                  onChange('playerNumber', selected.number)
-                  onChange('playerPosition', selected.position)
-                  onChange('initials', selected.name.split(' ').map((part) => part[0]).join('').slice(0, 2))
-                }
+                onChange('playerId', Number(event.target.value) || 0)
               }}
             >
-              {adminStatisticPlayerOptions.map((player) => (
+              <option value="">Oyuncu seçin</option>
+              {players.map((player) => (
                 <option key={player.id} value={player.id}>
-                  {player.name} #{player.number} — {player.position}
+                  {player.label}
                 </option>
               ))}
             </select>
-            <p className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-              Kadroda kayıtlı aktif futbolculardan seçin.
-            </p>
           </div>
 
           <div>
-            <label htmlFor="season" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Sezon <span className="text-error">*</span>
-            </label>
+            <FieldLabel htmlFor="season" required>
+              Sezon
+            </FieldLabel>
             <select
               id="season"
               className={inputClass}
-              value={draft.season}
+              value={draft.seasonId > 0 ? String(draft.seasonId) : ''}
               onChange={(event) => {
-                onChange('season', event.target.value)
+                onChange('seasonId', Number(event.target.value) || 0)
               }}
             >
-              {adminStatisticSeasonOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
+              <option value="">Sezon seçin</option>
+              {seasons.map((season) => (
+                <option key={season.id} value={season.id}>
+                  {season.name}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label htmlFor="team" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Takım / Kadro <span className="text-error">*</span>
-            </label>
-            <select
+            <FieldLabel htmlFor="team" required>
+              Takım
+            </FieldLabel>
+            <input
               id="team"
               className={inputClass}
               value={draft.team}
               onChange={(event) => {
                 onChange('team', event.target.value)
               }}
-            >
-              {adminStatisticTeamOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
       </section>
 
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div className="mb-space-md border-b border-outline-variant/40 pb-space-sm">
-          <h2 className="font-headline flex items-center gap-space-xs text-headline-sm font-bold text-primary uppercase">
-            <span className="material-symbols-outlined text-[22px]">timer</span>
-            Müsabaka ve Süre Metrikleri
-          </h2>
-          <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-            Sahada yer alma hacmi ve resmi katılım süresi
-          </p>
-        </div>
+        <SectionHeading section="Bölüm 02" title="Müsabaka ve Süre" />
         <div className="grid grid-cols-1 gap-space-md md:grid-cols-2">
           <div>
-            <label htmlFor="matches" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Maç Sayısı <span className="text-error">*</span>
-            </label>
+            <FieldLabel htmlFor="matches" required>
+              Maç Sayısı
+            </FieldLabel>
             <input
               id="matches"
               type="number"
               min={0}
-              max={60}
               className={inputClass}
               value={draft.matches}
               onChange={(event) => {
                 onChange('matches', event.target.value)
               }}
             />
-            <p className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-              Zorunlu alan (min: 0, max: 60)
-            </p>
           </div>
           <div>
-            <label htmlFor="minutes" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Oynanan Dakika <span className="text-error">*</span>
-            </label>
+            <FieldLabel htmlFor="minutes" required>
+              Oynanan Dakika
+            </FieldLabel>
             <input
               id="minutes"
               type="number"
@@ -157,28 +179,15 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
                 onChange('minutes', event.target.value)
               }}
             />
-            <p className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-              Toplam süre dakika cinsinden
-            </p>
           </div>
         </div>
       </section>
 
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div className="mb-space-md border-b border-outline-variant/40 pb-space-sm">
-          <h2 className="font-headline flex items-center gap-space-xs text-headline-sm font-bold text-primary uppercase">
-            <span className="material-symbols-outlined text-[22px]">sports_soccer</span>
-            Hücum ve Disiplin İstatistikleri
-          </h2>
-          <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-            Skor katkısı ve resmi hakem kart sicili
-          </p>
-        </div>
+        <SectionHeading section="Bölüm 03" title="Hücum ve Disiplin" />
         <div className="grid grid-cols-2 gap-space-md md:grid-cols-4">
           <div>
-            <label htmlFor="goals" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Gol
-            </label>
+            <FieldLabel htmlFor="goals">Gol</FieldLabel>
             <input
               id="goals"
               type="number"
@@ -189,14 +198,9 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
                 onChange('goals', event.target.value)
               }}
             />
-            <p className="font-kicker mt-1 text-kicker text-on-surface-variant uppercase">
-              {draft.goalsBreakdown}
-            </p>
           </div>
           <div>
-            <label htmlFor="assists" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Asist
-            </label>
+            <FieldLabel htmlFor="assists">Asist</FieldLabel>
             <input
               id="assists"
               type="number"
@@ -209,9 +213,7 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
             />
           </div>
           <div>
-            <label htmlFor="yellow" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Sarı Kart
-            </label>
+            <FieldLabel htmlFor="yellow">Sarı Kart</FieldLabel>
             <input
               id="yellow"
               type="number"
@@ -224,9 +226,7 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
             />
           </div>
           <div>
-            <label htmlFor="red" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Kırmızı Kart
-            </label>
+            <FieldLabel htmlFor="red">Kırmızı Kart</FieldLabel>
             <input
               id="red"
               type="number"
@@ -242,25 +242,10 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
       </section>
 
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div className="mb-space-md flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/40 pb-space-sm">
+        <SectionHeading section="Bölüm 04" title="Savunma Metrikleri" />
+        <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
           <div>
-            <h2 className="font-headline flex items-center gap-space-xs text-headline-sm font-bold text-primary uppercase">
-              <span className="material-symbols-outlined text-[22px]">shield</span>
-              Savunma ve Kaleci Metrikleri
-            </h2>
-            <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-              Defansif ve file bekçisi istatistik havuzu
-            </p>
-          </div>
-          <span className="font-kicker bg-surface-container-high px-space-sm py-1 text-kicker text-on-surface-variant uppercase">
-            Özel Durumlar
-          </span>
-        </div>
-        <div className="grid grid-cols-1 gap-space-md sm:grid-cols-3">
-          <div>
-            <label htmlFor="cleanSheets" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Clean Sheet
-            </label>
+            <FieldLabel htmlFor="cleanSheets">Golsüz Maç</FieldLabel>
             <input
               id="cleanSheets"
               type="number"
@@ -271,14 +256,9 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
                 onChange('cleanSheets', event.target.value)
               }}
             />
-            <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-              Kaleci ve savunma maçları
-            </p>
           </div>
           <div>
-            <label htmlFor="conceded" className="font-label mb-1 block text-label-md text-on-surface-variant">
-              Yediği Gol
-            </label>
+            <FieldLabel htmlFor="conceded">Yenilen Gol</FieldLabel>
             <input
               id="conceded"
               type="number"
@@ -289,14 +269,37 @@ export function AdminStatisticFormFields({ draft, onChange }: AdminStatisticForm
                 onChange('goalsConceded', event.target.value)
               }}
             />
-            <p className="font-body mt-1 text-body-sm text-on-surface-variant">Aleyhte gol adedi</p>
           </div>
         </div>
-        <p className="font-body mt-space-md flex items-start gap-1 bg-secondary-fixed/40 px-space-md py-space-sm text-body-sm text-on-surface-variant">
-          <span className="material-symbols-outlined text-[16px] text-secondary">info</span>
-          Mevki hücum/orta saha olduğunda bu alanlar opsiyoneldir ve genel istatistik tablosunda
-          tire (-) olarak işlenir.
-        </p>
+      </section>
+
+      <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
+        <SectionHeading section="Bölüm 05" title="Kayıt Bilgisi" />
+        {mode === 'edit' ? (
+          <div>
+            <FieldLabel>Oluşturulma</FieldLabel>
+            <div className="flex flex-col gap-space-sm border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
+              <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                <span className="material-symbols-outlined text-[18px] text-secondary">
+                  calendar_month
+                </span>
+                <span className="text-on-surface-variant">Tarih:</span>
+                <span className="font-bold tabular-nums">{created.date}</span>
+              </p>
+              <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                <span className="material-symbols-outlined text-[18px] text-secondary">
+                  schedule
+                </span>
+                <span className="text-on-surface-variant">Saat:</span>
+                <span className="font-bold tabular-nums">{created.time ?? '—'}</span>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="font-body text-body-sm text-on-surface-variant">
+            Yeni istatistik kaydı seçilen oyuncu ve sezon için oluşturulur.
+          </p>
+        )}
       </section>
     </div>
   )

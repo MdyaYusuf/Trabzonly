@@ -1,183 +1,258 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import playerService from '@/features/players/playerService'
+import seasonService from '@/features/seasons/seasonService'
+import playerStatsService from '@/features/stats/playerStatsService'
+import { AdminStatisticDeleteModal } from '../components/AdminStatisticDeleteModal'
 import { AdminStatisticListFilters } from '../components/AdminStatisticListFilters'
 import { AdminStatisticListHeader } from '../components/AdminStatisticListHeader'
 import { AdminStatisticPagination } from '../components/AdminStatisticPagination'
 import { AdminStatisticTable } from '../components/AdminStatisticTable'
-import { adminStatisticListRows } from '../utils/adminStatisticPlaceholders'
+import { mapPlayerStatsResponseToListRow } from '../utils/adminStatisticDraftUtils'
 import type {
+  AdminStatisticListRow,
+  AdminStatisticPlayerOption,
   AdminStatisticPositionGroup,
+  AdminStatisticSeasonOption,
   AdminStatisticSort,
 } from '../utils/adminStatisticTypes'
 
-const PAGE_SIZE = 7
+const DEFAULT_PAGE_SIZE = 10
 
 export function AdminStatisticListPage() {
   const [search, setSearch] = useState('')
-  const [season, setSeason] = useState('2024/25')
-  const [playerId, setPlayerId] = useState('all')
-  const [team, setTeam] = useState('all')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [debouncedTeam, setDebouncedTeam] = useState('')
+  const [seasonId, setSeasonId] = useState<number | 'all'>('all')
+  const [playerId, setPlayerId] = useState<number | 'all'>('all')
+  const [team, setTeam] = useState('')
   const [sort, setSort] = useState<AdminStatisticSort>('goals-desc')
   const [positionGroup, setPositionGroup] = useState<AdminStatisticPositionGroup>('all')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const [rows, setRows] = useState<AdminStatisticListRow[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [seasons, setSeasons] = useState<AdminStatisticSeasonOption[]>([])
+  const [players, setPlayers] = useState<AdminStatisticPlayerOption[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<AdminStatisticListRow | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [listVersion, setListVersion] = useState(0)
 
-  const counts = useMemo(() => {
-    return {
-      all: 142,
-      gk: 12,
-      def: 44,
-      mid: 48,
-      att: 38,
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [search])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedTeam(team.trim())
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [team])
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, debouncedTeam, seasonId, playerId, sort, positionGroup, pageSize])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadLookups() {
+      const [seasonsResult, playersResult] = await Promise.all([
+        seasonService.getAll({ pageNumber: 1, pageSize: 100 }),
+        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 100 }),
+      ])
+
+      if (cancelled) {
+        return
+      }
+
+      if (seasonsResult.success && seasonsResult.data) {
+        setSeasons(
+          seasonsResult.data.items.map((season) => ({
+            id: season.id,
+            name: season.name,
+          })),
+        )
+      } else {
+        setSeasons([])
+      }
+
+      if (playersResult.success && playersResult.data) {
+        setPlayers(
+          playersResult.data.items.map((player) => ({
+            id: player.id,
+            label:
+              player.shirtNumber != null
+                ? `${player.name} (#${player.shirtNumber})`
+                : player.name,
+          })),
+        )
+      } else {
+        setPlayers([])
+      }
+    }
+
+    void loadLookups()
+
+    return () => {
+      cancelled = true
     }
   }, [])
 
-  const filtered = useMemo(() => {
-    let result = [...adminStatisticListRows]
+  useEffect(() => {
+    let cancelled = false
 
-    if (season !== 'all') {
-      result = result.filter((row) => row.season === season)
-    }
+    async function loadStats() {
+      setIsLoading(true)
 
-    if (playerId !== 'all') {
-      result = result.filter((row) => row.id === playerId)
-    }
+      const result = await playerStatsService.getAllForAdmin({
+        pageNumber: page,
+        pageSize,
+        search: debouncedSearch || undefined,
+        seasonId: seasonId === 'all' ? undefined : seasonId,
+        playerId: playerId === 'all' ? undefined : playerId,
+        team: debouncedTeam || undefined,
+        positionGroup,
+        sort,
+      })
 
-    if (team !== 'all') {
-      result = result.filter((row) => row.team === team || team === 'Trabzonspor')
-    }
-
-    if (positionGroup !== 'all') {
-      result = result.filter((row) => row.positionGroup === positionGroup)
-    }
-
-    const query = search.trim().toLowerCase()
-
-    if (query) {
-      result = result.filter(
-        (row) =>
-          row.playerName.toLowerCase().includes(query) ||
-          String(row.number).includes(query) ||
-          row.positionCode.toLowerCase().includes(query),
-      )
-    }
-
-    result.sort((a, b) => {
-      if (sort === 'assists-desc') {
-        return b.assists - a.assists
+      if (cancelled) {
+        return
       }
 
-      if (sort === 'matches-desc') {
-        return b.matches - a.matches
+      if (result.success && result.data) {
+        setRows(result.data.items.map(mapPlayerStatsResponseToListRow))
+        setTotalCount(result.data.totalCount)
+
+        if (result.data.items.length === 0 && result.data.totalCount > 0 && page > 1) {
+          setPage((prev) => Math.max(1, prev - 1))
+        }
+      } else {
+        setRows([])
+        setTotalCount(0)
       }
 
-      if (sort === 'minutes-desc') {
-        return b.minutes - a.minutes
-      }
+      setIsLoading(false)
+    }
 
-      return b.goals - a.goals
-    })
+    void loadStats()
 
-    return result
-  }, [search, season, playerId, team, sort, positionGroup])
-
-  const totalPages = Math.max(1, Math.ceil(Math.max(filtered.length, 1) / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pageStart = (currentPage - 1) * PAGE_SIZE
-  const pageRows = filtered.slice(pageStart, pageStart + PAGE_SIZE)
-
-  function resetPage() {
-    setPage(1)
-  }
+    return () => {
+      cancelled = true
+    }
+  }, [
+    page,
+    pageSize,
+    debouncedSearch,
+    debouncedTeam,
+    seasonId,
+    playerId,
+    sort,
+    positionGroup,
+    listVersion,
+  ])
 
   function clearFilters() {
     setSearch('')
-    setSeason('2024/25')
+    setDebouncedSearch('')
+    setTeam('')
+    setDebouncedTeam('')
+    setSeasonId('all')
     setPlayerId('all')
-    setTeam('all')
     setSort('goals-desc')
     setPositionGroup('all')
     setPage(1)
   }
 
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deletingId != null) {
+      return
+    }
+
+    const deletedId = deleteTarget.id
+    setDeletingId(deletedId)
+
+    const result = await playerStatsService.remove(deletedId)
+
+    if (result.success) {
+      setDeleteTarget(null)
+      setListVersion((prev) => prev + 1)
+    }
+
+    setDeletingId(null)
+  }
+
   return (
-    <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-      <AdminStatisticListHeader />
+    <div className="flex flex-col">
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <AdminStatisticListHeader />
 
-      <AdminStatisticListFilters
-        search={search}
-        season={season}
-        playerId={playerId}
-        team={team}
-        sort={sort}
-        positionGroup={positionGroup}
-        counts={counts}
-        visibleCount={filtered.length}
-        onSearchChange={(value) => {
-          setSearch(value)
-          resetPage()
+        <AdminStatisticListFilters
+          search={search}
+          seasonId={seasonId}
+          playerId={playerId}
+          team={team}
+          sort={sort}
+          positionGroup={positionGroup}
+          seasons={seasons}
+          players={players}
+          onSearchChange={setSearch}
+          onSeasonChange={setSeasonId}
+          onPlayerChange={setPlayerId}
+          onTeamChange={setTeam}
+          onSortChange={setSort}
+          onPositionChange={setPositionGroup}
+          onClear={clearFilters}
+        />
+
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            İstatistikler yükleniyor...
+          </p>
+        ) : (
+          <AdminStatisticTable
+            rows={rows}
+            deletingId={deletingId}
+            onDelete={setDeleteTarget}
+          />
+        )}
+
+        {!isLoading && totalCount > 0 ? (
+          <AdminStatisticPagination
+            page={page}
+            pageSize={pageSize}
+            total={totalCount}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        ) : null}
+      </main>
+
+      <AdminStatisticDeleteModal
+        open={Boolean(deleteTarget)}
+        playerName={deleteTarget?.playerName ?? 'Oyuncu'}
+        seasonName={deleteTarget?.season ?? ''}
+        isDeleting={deletingId != null}
+        onCancel={() => {
+          if (deletingId != null) {
+            return
+          }
+
+          setDeleteTarget(null)
         }}
-        onSeasonChange={(value) => {
-          setSeason(value)
-          resetPage()
+        onConfirm={() => {
+          void handleConfirmDelete()
         }}
-        onPlayerChange={(value) => {
-          setPlayerId(value)
-          resetPage()
-        }}
-        onTeamChange={(value) => {
-          setTeam(value)
-          resetPage()
-        }}
-        onSortChange={(value) => {
-          setSort(value)
-          resetPage()
-        }}
-        onPositionChange={(value) => {
-          setPositionGroup(value)
-          resetPage()
-        }}
-        onClear={clearFilters}
       />
-
-      <AdminStatisticTable rows={pageRows} />
-
-      <AdminStatisticPagination
-        page={currentPage}
-        pageSize={PAGE_SIZE}
-        total={filtered.length === adminStatisticListRows.length ? 142 : filtered.length}
-        onPageChange={setPage}
-      />
-
-      <section className="grid grid-cols-1 gap-gutter lg:grid-cols-2">
-        <article className="flex gap-space-sm border border-outline-variant/40 bg-surface-container-low p-space-md">
-          <span className="material-symbols-outlined text-secondary">sync_alt</span>
-          <div>
-            <h2 className="font-label text-label-md font-bold text-on-surface uppercase">
-              Veri Tabanı & Federasyon Senkronizasyonu
-            </h2>
-            <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-              Tüm veriler <strong className="text-primary">TFF ve Opta Sports</strong> istatistik
-              akışları ile her maç bitiminden 15 dakika sonra otomatik senkronize edilir. Manuel
-              eklenen veriler bir sonraki API çağrısında teyit edilerek kalıcı olarak damgalanır.
-            </p>
-          </div>
-        </article>
-        <article className="flex gap-space-sm border border-outline-variant/40 bg-surface-container-low p-space-md">
-          <span className="material-symbols-outlined text-secondary">info</span>
-          <div>
-            <h2 className="font-label text-label-md font-bold text-on-surface uppercase">
-              Filtre Boş Durum Protokolü
-            </h2>
-            <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-              Uygulanan arama kriterlerine karşılık veri bulunamadığında sistem arayüzde{' '}
-              <em>
-                &quot;Bu filtreler için istatistik bulunamadı. Lütfen sezon veya oyuncu
-                kriterlerini güncelleyiniz.&quot;
-              </em>{' '}
-              durum bildirimini dinamik olarak yükler.
-            </p>
-          </div>
-        </article>
-      </section>
-    </main>
+    </div>
   )
 }

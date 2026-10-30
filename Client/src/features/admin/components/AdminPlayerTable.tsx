@@ -102,7 +102,7 @@ export function AdminPlayerTable({
                       <Link
                         to={`/yonetim/oyuncular/${player.id}/duzenle`}
                         aria-label="Düzenle"
-                        className="flex h-8 w-8 cursor-pointer items-center justify-center text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-primary"
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center text-secondary transition-colors hover:bg-secondary-container/40"
                       >
                         <span className="material-symbols-outlined text-[18px]">edit</span>
                       </Link>
@@ -113,7 +113,7 @@ export function AdminPlayerTable({
                         onClick={() => {
                           onDelete(player)
                         }}
-                        className="flex h-8 w-8 cursor-pointer items-center justify-center text-on-surface-variant transition-colors hover:bg-error-container hover:text-error disabled:cursor-not-allowed disabled:opacity-40"
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center text-error transition-colors hover:bg-error-container disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         <span className="material-symbols-outlined text-[18px]">delete</span>
                       </button>

@@ -8,6 +8,10 @@ public partial class PlayerStatsMapper
   public partial PlayerStats CreateToEntity(CreatePlayerStatsRequest request);
   public partial void UpdateEntityFromRequest(UpdatePlayerStatsRequest request, PlayerStats entity);
   [MapProperty("Player.Name", "PlayerName")]
+  [MapProperty("Player.ShirtNumber", "ShirtNumber")]
+  [MapProperty("Player.Nationality", "Nationality")]
+  [MapProperty("Player.Position.Name", "PositionName")]
+  [MapProperty("Player.Position.Abbreviation", "PositionAbbreviation")]
   [MapProperty("Season.Name", "SeasonName")]
   public partial PlayerStatsResponseDto EntityToResponseDto(PlayerStats entity);
   public partial CreatedPlayerStatsResponseDto EntityToCreatedResponseDto(PlayerStats entity);

@@ -23,6 +23,19 @@ public class PlayerStatsController(IPlayerStatsService _playerStatsService) : Cu
     return CreateActionResult(result);
   }
 
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAllForAdmin(
+    [FromQuery] PlayerStatsAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _playerStatsService.GetAdminListAsync(
+      query: query,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("by-player/{playerId:int}")]
   public async Task<IActionResult> GetByPlayer(
     int playerId,
