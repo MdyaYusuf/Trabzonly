@@ -94,8 +94,6 @@ export function createEmptyAdminPlayerFormDraft(
     wage: '',
     description: '',
     isCaptain: false,
-    imageUrl: null,
-    imageFile: null,
     createdDate: null,
     updatedDate: null,
   }
@@ -140,8 +138,6 @@ export function mapPlayerResponseToFormDraft(player: PlayerResponseDto): AdminPl
     wage: player.wage != null ? String(player.wage) : '',
     description: player.description ?? '',
     isCaptain: player.isCaptain,
-    imageUrl: player.imageUrl,
-    imageFile: null,
     createdDate: player.createdDate,
     updatedDate: player.updatedDate,
   }
@@ -211,7 +207,6 @@ function buildBaseRequest(draft: AdminPlayerFormDraft) {
     shirtNumber: shirtNumber != null ? Math.trunc(shirtNumber) : null,
     positionId: draft.positionId,
     isCaptain: draft.isCaptain,
-    imageFile: draft.imageFile ?? undefined,
   }
 }
 

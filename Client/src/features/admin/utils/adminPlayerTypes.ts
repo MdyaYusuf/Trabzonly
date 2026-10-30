@@ -39,8 +39,6 @@ export type AdminPlayerFormDraft = {
   wage: string
   description: string
   isCaptain: boolean
-  imageUrl?: string | null
-  imageFile: File | null
   createdDate?: string | null
   updatedDate?: string | null
 }
