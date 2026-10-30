@@ -8,6 +8,10 @@ public sealed record InjuryResponseDto(
   int GamesMissed,
   int PlayerId,
   string PlayerName,
+  int? ShirtNumber,
+  string Nationality,
+  string PositionName,
+  string PositionAbbreviation,
   int? SeasonId,
   string? SeasonName,
   DateTime CreatedDate);
@@ -32,3 +36,10 @@ public sealed record UpdateInjuryRequest(
   int GamesMissed,
   int PlayerId,
   int? SeasonId);
+
+public sealed record InjuryAdminListQueryRequest(
+  string? Search = null,
+  int? SeasonId = null,
+  int? PlayerId = null,
+  int PageNumber = 1,
+  int PageSize = 10);

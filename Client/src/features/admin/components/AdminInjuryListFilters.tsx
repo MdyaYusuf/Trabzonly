@@ -1,113 +1,114 @@
-import type { AdminInjuryStatusFilter } from '../utils/adminInjuryTypes'
-import { adminInjuryPlayerOptions } from '../utils/adminInjuryPlaceholders'
+import { Link } from 'react-router-dom'
+import type {
+  AdminInjuryPlayerOption,
+  AdminInjurySeasonOption,
+} from '../utils/adminInjuryTypes'
 
 type AdminInjuryListFiltersProps = {
-  playerId: string
-  season: string
-  statusFilter: AdminInjuryStatusFilter
-  counts: Record<AdminInjuryStatusFilter, number>
-  visibleCount: number
-  onPlayerChange: (value: string) => void
-  onSeasonChange: (value: string) => void
-  onStatusChange: (value: AdminInjuryStatusFilter) => void
+  search: string
+  seasonId: number | 'all'
+  playerId: number | 'all'
+  seasons: AdminInjurySeasonOption[]
+  players: AdminInjuryPlayerOption[]
+  onSearchChange: (value: string) => void
+  onSeasonChange: (value: number | 'all') => void
+  onPlayerChange: (value: number | 'all') => void
   onClear: () => void
 }
 
 export function AdminInjuryListFilters({
+  search,
+  seasonId,
   playerId,
-  season,
-  statusFilter,
-  counts,
-  visibleCount,
-  onPlayerChange,
+  seasons,
+  players,
+  onSearchChange,
   onSeasonChange,
-  onStatusChange,
+  onPlayerChange,
   onClear,
 }: AdminInjuryListFiltersProps) {
-  const activeChips: string[] = []
-
-  if (season !== 'all') {
-    activeChips.push(`${season} Sezonu`)
-  }
-
-  activeChips.push('Tüm Mevkiler')
+  const selectClass =
+    'font-label cursor-pointer border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md text-on-surface outline-none focus:border-primary'
 
   return (
     <section className="flex flex-col gap-space-md border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-      <div className="flex flex-col gap-space-sm xl:flex-row xl:items-center">
-        <div className="flex min-w-0 flex-1 flex-wrap gap-space-sm">
+      <label className="relative min-w-0 w-full">
+        <span className="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-on-surface-variant">
+          search
+        </span>
+        <input
+          type="search"
+          value={search}
+          onChange={(event) => {
+            onSearchChange(event.target.value)
+          }}
+          placeholder="Oyuncu adı, forma numarası veya sakatlık ara…"
+          className="font-body w-full border border-outline-variant/50 bg-surface py-space-sm pr-space-md pl-10 text-body-md text-on-surface outline-none focus:border-primary"
+        />
+      </label>
+
+      <div className="flex flex-col gap-space-sm lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-space-sm">
           <select
-            value={playerId}
+            value={seasonId === 'all' ? 'all' : String(seasonId)}
             onChange={(event) => {
-              onPlayerChange(event.target.value)
+              const value = event.target.value
+
+              if (value === 'all') {
+                onSeasonChange('all')
+                return
+              }
+
+              onSeasonChange(Number(value))
             }}
-            className="font-label min-w-[200px] flex-1 border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md outline-none focus:border-primary"
+            className={selectClass}
           >
-            <option value="all">Oyuncu: Tümü (A Takım)</option>
-            {adminInjuryPlayerOptions.map((player) => (
+            <option value="all">Tüm Sezonlar</option>
+            {seasons.map((season) => (
+              <option key={season.id} value={season.id}>
+                {season.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={playerId === 'all' ? 'all' : String(playerId)}
+            onChange={(event) => {
+              const value = event.target.value
+
+              if (value === 'all') {
+                onPlayerChange('all')
+                return
+              }
+
+              onPlayerChange(Number(value))
+            }}
+            className={selectClass}
+          >
+            <option value="all">Oyuncu: Tümü</option>
+            {players.map((player) => (
               <option key={player.id} value={player.id}>
                 {player.label}
               </option>
             ))}
           </select>
 
-          <select
-            value={season}
-            onChange={(event) => {
-              onSeasonChange(event.target.value)
-            }}
-            className="font-label border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md outline-none focus:border-primary"
+          <button
+            type="button"
+            onClick={onClear}
+            className="font-label cursor-pointer border border-outline-variant/50 px-space-md py-space-sm text-label-md text-on-surface-variant uppercase transition-colors hover:border-primary hover:text-primary"
           >
-            <option value="2024/25">Sezon: 2024/25</option>
-            <option value="2023/24">Sezon: 2023/24</option>
-            <option value="2022/23">Sezon: 2022/23</option>
-            <option value="all">Tüm Sezonlar</option>
-          </select>
-
-          <select
-            value={statusFilter}
-            onChange={(event) => {
-              onStatusChange(event.target.value as AdminInjuryStatusFilter)
-            }}
-            className="font-label border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md outline-none focus:border-primary"
-          >
-            <option value="all">Durum: Tümü ({counts.all})</option>
-            <option value="active">Tedavisi Süren ({counts.active})</option>
-            <option value="match-form">Maç Formu Alan ({counts['match-form']})</option>
-            <option value="recovered">İyileşen / Sahada ({counts.recovered})</option>
-          </select>
+            Filtreleri Temizle
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={onClear}
-          className="font-label inline-flex items-center gap-1 border border-outline-variant px-space-md py-space-sm text-label-md uppercase transition-colors hover:border-primary hover:text-primary"
+        <Link
+          to="/yonetim/sakatliklar/yeni"
+          className="font-label inline-flex h-11 min-w-[11.5rem] shrink-0 cursor-pointer items-center justify-center gap-space-xs self-center bg-gradient-to-r from-primary-container via-[#7a1235] to-primary px-space-lg text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
         >
-          <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-          Sıfırla
-        </button>
-      </div>
-
-      <div className="flex flex-col gap-space-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-space-sm">
-          <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-            Aktif Filtreler:
-          </span>
-          {activeChips.map((chip) => (
-            <span
-              key={chip}
-              className="font-label inline-flex items-center gap-1 border border-outline-variant/50 bg-surface-container px-space-sm py-1 text-label-md text-on-surface"
-            >
-              {chip}
-              <span className="material-symbols-outlined text-[14px] text-on-surface-variant">
-                close
-              </span>
-            </span>
-          ))}
-        </div>
-        <p className="font-label text-label-md text-on-surface-variant">
-          <strong className="text-primary">{visibleCount}</strong> kayıt listelendi
-        </p>
+          <span className="material-symbols-outlined text-[20px]">healing</span>
+          Sakatlık Ekle
+        </Link>
       </div>
     </section>
   )

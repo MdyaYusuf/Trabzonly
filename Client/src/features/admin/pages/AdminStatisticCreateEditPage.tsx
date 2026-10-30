@@ -246,8 +246,16 @@ export function AdminStatisticCreateEditPage({
         }}
         className={`${actionButtonClass} border-transparent bg-primary-container font-bold tracking-wider text-on-primary transition-all hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50`}
       >
-        <span className="material-symbols-outlined text-[18px]">save</span>
-        {isSaving ? 'Kaydediliyor…' : 'Kaydet'}
+        <span className="material-symbols-outlined text-[18px]">
+          {mode === 'create' ? 'add' : 'save'}
+        </span>
+        {isSaving
+          ? mode === 'create'
+            ? 'Ekleniyor…'
+            : 'Kaydediliyor…'
+          : mode === 'create'
+            ? 'Ekle'
+            : 'Kaydet'}
       </button>
       <button
         type="button"

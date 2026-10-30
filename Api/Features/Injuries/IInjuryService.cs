@@ -15,6 +15,10 @@ public interface IInjuryService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<InjuryResponseDto>>> GetAdminListAsync(
+    InjuryAdminListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<InjuryResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<Injury>, IQueryable<Injury>>? include = null,

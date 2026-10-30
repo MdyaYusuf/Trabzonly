@@ -28,7 +28,7 @@ public class InjuryService(
       pageNumber,
       pageSize,
       filter,
-      include: include ?? (query => query.Include(i => i.Player).Include(i => i.Season)),
+      include: include ?? BuildDefaultInclude(),
       orderBy: orderBy ?? (query => query.OrderByDescending(i => i.CreatedDate)),
       enableTracking,
       withDeleted,
@@ -46,6 +46,22 @@ public class InjuryService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<InjuryResponseDto>>> GetAdminListAsync(
+    InjuryAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
+
+    return await GetAllAsync(
+      filter: BuildAdminListFilter(query),
+      include: BuildDefaultInclude(),
+      orderBy: query => query.OrderByDescending(i => i.CreatedDate).ThenBy(i => i.Player.Name),
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+  }
+
   public async Task<ReturnModel<InjuryResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<Injury>, IQueryable<Injury>>? include = null,
@@ -54,7 +70,7 @@ public class InjuryService(
   {
     Injury injury = await _businessRules.GetInjuryIfExistAsync(
       id,
-      include: include ?? (query => query.Include(i => i.Player).Include(i => i.Season)),
+      include: include ?? BuildDefaultInclude(),
       enableTracking,
       cancellationToken);
 
@@ -165,5 +181,30 @@ public class InjuryService(
       Message = "Sakatlık başarılı bir şekilde silindi.",
       StatusCode = 200
     };
+  }
+
+  private static Func<IQueryable<Injury>, IQueryable<Injury>> BuildDefaultInclude()
+  {
+    return query => query
+      .Include(i => i.Player)
+        .ThenInclude(p => p.Position)
+      .Include(i => i.Season);
+  }
+
+  private static Expression<Func<Injury, bool>> BuildAdminListFilter(
+    InjuryAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    int? seasonId = query.SeasonId;
+    int? playerId = query.PlayerId;
+
+    return injury =>
+      (!seasonId.HasValue || injury.SeasonId == seasonId.Value) &&
+      (!playerId.HasValue || injury.PlayerId == playerId.Value) &&
+      (string.IsNullOrEmpty(search) ||
+        injury.Name.Contains(search) ||
+        injury.Player.Name.Contains(search) ||
+        (injury.Player.ShirtNumber.HasValue &&
+          injury.Player.ShirtNumber.Value.ToString().Contains(search)));
   }
 }

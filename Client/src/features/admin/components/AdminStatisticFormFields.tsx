@@ -273,9 +273,9 @@ export function AdminStatisticFormFields({
         </div>
       </section>
 
-      <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <SectionHeading section="Bölüm 05" title="Kayıt Bilgisi" />
-        {mode === 'edit' ? (
+      {mode === 'edit' ? (
+        <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
+          <SectionHeading section="Bölüm 05" title="Kayıt Bilgisi" />
           <div>
             <FieldLabel>Oluşturulma</FieldLabel>
             <div className="flex flex-col gap-space-sm border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
@@ -295,12 +295,8 @@ export function AdminStatisticFormFields({
               </p>
             </div>
           </div>
-        ) : (
-          <p className="font-body text-body-sm text-on-surface-variant">
-            Yeni istatistik kaydı seçilen oyuncu ve sezon için oluşturulur.
-          </p>
-        )}
-      </section>
+        </section>
+      ) : null}
     </div>
   )
 }

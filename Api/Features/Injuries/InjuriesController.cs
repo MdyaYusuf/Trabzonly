@@ -33,6 +33,19 @@ public class InjuriesController(IInjuryService _injuryService) : CustomBaseContr
     return CreateActionResult(result);
   }
 
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAllForAdmin(
+    [FromQuery] InjuryAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _injuryService.GetAdminListAsync(
+      query: query,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
     int id,

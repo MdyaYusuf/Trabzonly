@@ -8,6 +8,10 @@ public partial class InjuryMapper
   public partial Injury CreateToEntity(CreateInjuryRequest request);
   public partial void UpdateEntityFromRequest(UpdateInjuryRequest request, Injury entity);
   [MapProperty("Player.Name", "PlayerName")]
+  [MapProperty("Player.ShirtNumber", "ShirtNumber")]
+  [MapProperty("Player.Nationality", "Nationality")]
+  [MapProperty("Player.Position.Name", "PositionName")]
+  [MapProperty("Player.Position.Abbreviation", "PositionAbbreviation")]
   [MapProperty("Season.Name", "SeasonName")]
   public partial InjuryResponseDto EntityToResponseDto(Injury entity);
   public partial CreatedInjuryResponseDto EntityToCreatedResponseDto(Injury entity);

@@ -362,9 +362,9 @@ export function AdminPlayerFormFields({
         </p>
       </section>
 
-      <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <SectionHeading section="Bölüm 05" title="Kayıt Bilgisi" />
-        {mode === 'edit' ? (
+      {mode === 'edit' ? (
+        <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
+          <SectionHeading section="Bölüm 05" title="Kayıt Bilgisi" />
           <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
             <div>
               <FieldLabel>Oluşturulma</FieldLabel>
@@ -405,13 +405,8 @@ export function AdminPlayerFormFields({
               </div>
             </div>
           </div>
-        ) : (
-          <p className="font-body text-body-sm text-on-surface-variant">
-            Yeni oyuncu kaydı varsayılan olarak aktif oluşturulur. Kadro durumunu kayıttan sonra
-            düzenleyebilirsiniz.
-          </p>
-        )}
-      </section>
+        </section>
+      ) : null}
     </div>
   )
 }
