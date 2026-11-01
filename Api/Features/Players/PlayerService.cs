@@ -460,6 +460,16 @@ public class PlayerService(
 
   private async Task<int?> ResolveCurrentSeasonIdAsync(CancellationToken cancellationToken)
   {
+    Season? active = await _seasonRepository.GetAsync(
+      predicate: s => s.IsActive,
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    if (active != null)
+    {
+      return active.Id;
+    }
+
     DateTime now = DateTime.UtcNow;
 
     Season? current = await _seasonRepository.GetAsync(

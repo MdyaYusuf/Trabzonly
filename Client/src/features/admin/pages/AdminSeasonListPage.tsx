@@ -1,135 +1,206 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import seasonService from '@/features/seasons/seasonService'
+import type { SeasonAdminSummaryDto } from '@/features/seasons/seasonTypes'
+import { AdminSeasonDeleteModal } from '../components/AdminSeasonDeleteModal'
 import { AdminSeasonListFilters } from '../components/AdminSeasonListFilters'
 import { AdminSeasonListHeader } from '../components/AdminSeasonListHeader'
 import { AdminSeasonPagination } from '../components/AdminSeasonPagination'
 import { AdminSeasonTable } from '../components/AdminSeasonTable'
-import { adminSeasonListRows } from '../utils/adminSeasonPlaceholders'
-import type { AdminSeasonSort, AdminSeasonStatusFilter } from '../utils/adminSeasonTypes'
+import { mapSeasonResponseToListRow } from '../utils/adminSeasonDraftUtils'
+import type {
+  AdminSeasonListRow,
+  AdminSeasonSort,
+  AdminSeasonStatusFilter,
+} from '../utils/adminSeasonTypes'
 
-const PAGE_SIZE = 6
+const DEFAULT_PAGE_SIZE = 10
 
 export function AdminSeasonListPage() {
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<AdminSeasonStatusFilter>('all')
   const [sort, setSort] = useState<AdminSeasonSort>('start-desc')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const [rows, setRows] = useState<AdminSeasonListRow[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [summary, setSummary] = useState<SeasonAdminSummaryDto | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<AdminSeasonListRow | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [listVersion, setListVersion] = useState(0)
 
-  const counts = useMemo(() => {
-    const active = adminSeasonListRows.filter((row) => row.status === 'active').length
-    const archive = adminSeasonListRows.filter((row) => row.status !== 'active').length
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
 
-    return {
-      all: adminSeasonListRows.length,
-      active,
-      archive,
+    return () => {
+      window.clearTimeout(timer)
     }
-  }, [])
+  }, [search])
 
-  const filtered = useMemo(() => {
-    let result = [...adminSeasonListRows]
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, statusFilter, sort, pageSize])
 
-    if (statusFilter === 'active') {
-      result = result.filter((row) => row.status === 'active')
-    } else if (statusFilter === 'archive') {
-      result = result.filter((row) => row.status !== 'active')
-    }
+  useEffect(() => {
+    let cancelled = false
 
-    const query = search.trim().toLowerCase()
+    async function loadSummary() {
+      const result = await seasonService.getAdminSummary()
 
-    if (query) {
-      result = result.filter(
-        (row) =>
-          row.name.toLowerCase().includes(query) ||
-          row.subtitle.toLowerCase().includes(query) ||
-          row.statusLabel.toLowerCase().includes(query),
-      )
-    }
-
-    result.sort((a, b) => {
-      if (sort === 'start-asc') {
-        return a.startSortKey.localeCompare(b.startSortKey)
+      if (cancelled) {
+        return
       }
 
-      if (sort === 'alpha') {
-        return a.name.localeCompare(b.name, 'tr')
+      if (result.success && result.data) {
+        setSummary(result.data)
+      } else {
+        setSummary(null)
+      }
+    }
+
+    void loadSummary()
+
+    return () => {
+      cancelled = true
+    }
+  }, [listVersion])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadSeasons() {
+      setIsLoading(true)
+
+      const isActive =
+        statusFilter === 'all' ? undefined : statusFilter === 'active'
+
+      const result = await seasonService.getAllForAdmin({
+        pageNumber: page,
+        pageSize,
+        search: debouncedSearch || undefined,
+        isActive,
+        sort,
+      })
+
+      if (cancelled) {
+        return
       }
 
-      if (sort === 'matches') {
-        return b.matchCount - a.matchCount
+      if (result.success && result.data) {
+        setRows(result.data.items.map(mapSeasonResponseToListRow))
+        setTotalCount(result.data.totalCount)
+
+        if (result.data.items.length === 0 && result.data.totalCount > 0 && page > 1) {
+          setPage((prev) => Math.max(1, prev - 1))
+        }
+      } else {
+        setRows([])
+        setTotalCount(0)
       }
 
-      return b.startSortKey.localeCompare(a.startSortKey)
-    })
+      setIsLoading(false)
+    }
 
-    return result
-  }, [search, statusFilter, sort])
+    void loadSeasons()
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pageStart = (currentPage - 1) * PAGE_SIZE
-  const pageSeasons = filtered.slice(pageStart, pageStart + PAGE_SIZE)
+    return () => {
+      cancelled = true
+    }
+  }, [page, pageSize, debouncedSearch, statusFilter, sort, listVersion])
 
-  function resetPage() {
+  function clearFilters() {
+    setSearch('')
+    setDebouncedSearch('')
+    setStatusFilter('all')
+    setSort('start-desc')
     setPage(1)
   }
 
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deletingId != null) {
+      return
+    }
+
+    if (deleteTarget.isActive) {
+      return
+    }
+
+    const deletedId = deleteTarget.id
+    setDeletingId(deletedId)
+
+    const result = await seasonService.remove(deletedId)
+
+    if (result.success) {
+      setDeleteTarget(null)
+      setListVersion((prev) => prev + 1)
+    }
+
+    setDeletingId(null)
+  }
+
+  const counts = {
+    all: summary?.totalCount ?? totalCount,
+    active: summary?.activeCount ?? 0,
+    inactive: summary?.inactiveCount ?? 0,
+  }
+
   return (
-    <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-      <AdminSeasonListHeader />
+    <div className="flex flex-col">
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <AdminSeasonListHeader />
 
-      <AdminSeasonListFilters
-        search={search}
-        statusFilter={statusFilter}
-        sort={sort}
-        counts={counts}
-        onSearchChange={(value) => {
-          setSearch(value)
-          resetPage()
+        <AdminSeasonListFilters
+          search={search}
+          statusFilter={statusFilter}
+          sort={sort}
+          counts={counts}
+          onSearchChange={setSearch}
+          onStatusChange={setStatusFilter}
+          onSortChange={setSort}
+          onClear={clearFilters}
+        />
+
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            Sezonlar yükleniyor...
+          </p>
+        ) : (
+          <AdminSeasonTable
+            seasons={rows}
+            deletingId={deletingId}
+            onDelete={setDeleteTarget}
+          />
+        )}
+
+        {!isLoading && totalCount > 0 ? (
+          <AdminSeasonPagination
+            page={page}
+            pageSize={pageSize}
+            total={totalCount}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        ) : null}
+      </main>
+
+      <AdminSeasonDeleteModal
+        open={Boolean(deleteTarget)}
+        seasonName={deleteTarget?.name ?? 'Sezon'}
+        isDeleting={deletingId != null}
+        onCancel={() => {
+          if (deletingId != null) {
+            return
+          }
+
+          setDeleteTarget(null)
         }}
-        onStatusChange={(value) => {
-          setStatusFilter(value)
-          resetPage()
-        }}
-        onSortChange={(value) => {
-          setSort(value)
-          resetPage()
+        onConfirm={() => {
+          void handleConfirmDelete()
         }}
       />
-
-      <AdminSeasonTable seasons={pageSeasons} />
-
-      <AdminSeasonPagination
-        page={currentPage}
-        pageSize={PAGE_SIZE}
-        total={filtered.length}
-        onPageChange={setPage}
-      />
-
-      <section className="flex flex-col gap-space-md border border-outline-variant/40 bg-surface-container-low p-space-md lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex gap-space-sm">
-          <span className="material-symbols-outlined text-secondary">info</span>
-          <div>
-            <h2 className="font-label text-label-md font-bold text-on-surface uppercase">
-              Sezonlama Sistem Notu & Otomasyon Rehberi
-            </h2>
-            <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-              Bir sezonun başlangıç ve bitiş tarihleri; o periyottaki oyuncu sakatlık raporlarını,
-              maç esame listelerini, teknik heyet görev dağılımlarını ve taraftar quiz puan
-              tablolarını otomatik olarak gruplar. Mevcut sezon statüsü değiştirildiğinde tüm
-              yönetim paneli varsayılan filtreleri ve kamuya açık Trabzonly portalındaki canlı
-              istatistik kartları anlık olarak yeni periyoda senkronize olur.
-            </p>
-          </div>
-        </div>
-        <Link
-          to="/yonetim/sezonlar/yeni"
-          className="font-label inline-flex shrink-0 items-center gap-1 bg-primary-container px-space-md py-space-sm text-label-md font-bold text-on-primary uppercase transition-all hover:bg-primary"
-        >
-          <span className="material-symbols-outlined text-[18px]">calendar_add_on</span>
-          Yeni Sezon Tanımla
-        </Link>
-      </section>
-    </main>
+    </div>
   )
 }

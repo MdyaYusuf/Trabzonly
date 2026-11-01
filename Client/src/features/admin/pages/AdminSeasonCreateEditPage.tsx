@@ -1,8 +1,15 @@
-import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import seasonService from '@/features/seasons/seasonService'
+import { AdminSeasonDeleteModal } from '../components/AdminSeasonDeleteModal'
 import { AdminSeasonFormFields } from '../components/AdminSeasonFormFields'
-import { AdminSeasonFormSidebar } from '../components/AdminSeasonFormSidebar'
-import { getAdminSeasonFormDraft } from '../utils/adminSeasonPlaceholders'
+import {
+  createEmptyAdminSeasonFormDraft,
+  mapDraftToCreateRequest,
+  mapDraftToUpdateRequest,
+  mapSeasonResponseToFormDraft,
+  validateAdminSeasonDraft,
+} from '../utils/adminSeasonDraftUtils'
 import type { AdminSeasonFormDraft } from '../utils/adminSeasonTypes'
 
 type AdminSeasonCreateEditPageProps = {
@@ -13,9 +20,91 @@ export function AdminSeasonCreateEditPage({ mode: modeProp }: AdminSeasonCreateE
   const { seasonId } = useParams<{ seasonId: string }>()
   const navigate = useNavigate()
   const mode = modeProp ?? (seasonId ? 'edit' : 'create')
-  const [draft, setDraft] = useState<AdminSeasonFormDraft>(() =>
-    getAdminSeasonFormDraft(mode === 'edit' ? seasonId : undefined),
-  )
+
+  const [draft, setDraft] = useState<AdminSeasonFormDraft>(createEmptyAdminSeasonFormDraft)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isFirstSeason, setIsFirstSeason] = useState(false)
+  const [activeCount, setActiveCount] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadPage() {
+      setIsLoading(true)
+      setFormError(null)
+
+      if (mode === 'create') {
+        const summaryResult = await seasonService.getAdminSummary()
+
+        if (cancelled) {
+          return
+        }
+
+        const totalCount =
+          summaryResult.success && summaryResult.data ? summaryResult.data.totalCount : 0
+        const summaryActiveCount =
+          summaryResult.success && summaryResult.data ? summaryResult.data.activeCount : 0
+
+        setIsFirstSeason(totalCount === 0)
+        setActiveCount(summaryActiveCount)
+
+        if (totalCount === 0) {
+          setDraft((prev) => ({
+            ...prev,
+            isActive: true,
+          }))
+        }
+
+        setIsLoading(false)
+        return
+      }
+
+      if (!seasonId) {
+        setFormError('Geçersiz sezon kimliği.')
+        setIsLoading(false)
+        return
+      }
+
+      const id = Number(seasonId)
+
+      if (!Number.isFinite(id) || id <= 0) {
+        setFormError('Geçersiz sezon kimliği.')
+        setIsLoading(false)
+        return
+      }
+
+      const [seasonResult, summaryResult] = await Promise.all([
+        seasonService.getById(id),
+        seasonService.getAdminSummary(),
+      ])
+
+      if (cancelled) {
+        return
+      }
+
+      if (summaryResult.success && summaryResult.data) {
+        setActiveCount(summaryResult.data.activeCount)
+      }
+
+      if (seasonResult.success && seasonResult.data) {
+        setDraft(mapSeasonResponseToFormDraft(seasonResult.data))
+      } else {
+        setFormError(seasonResult.message || 'Sezon yüklenemedi.')
+      }
+
+      setIsLoading(false)
+    }
+
+    void loadPage()
+
+    return () => {
+      cancelled = true
+    }
+  }, [mode, seasonId])
 
   function updateField<K extends keyof AdminSeasonFormDraft>(
     key: K,
@@ -31,102 +120,173 @@ export function AdminSeasonCreateEditPage({ mode: modeProp }: AdminSeasonCreateE
     navigate('/yonetim/sezonlar')
   }
 
-  function handleSave() {
-    navigate('/yonetim/sezonlar')
+  async function handleSave() {
+    if (isSaving) {
+      return
+    }
+
+    const validationError = validateAdminSeasonDraft(draft)
+
+    if (validationError) {
+      setFormError(validationError)
+      return
+    }
+
+    setIsSaving(true)
+    setFormError(null)
+
+    if (mode === 'create') {
+      const result = await seasonService.add(mapDraftToCreateRequest(draft))
+
+      if (result.success) {
+        navigate('/yonetim/sezonlar')
+      } else {
+        setFormError(result.message || 'Sezon kaydedilemedi.')
+      }
+    } else {
+      const result = await seasonService.update(mapDraftToUpdateRequest(draft))
+
+      if (result.success) {
+        navigate('/yonetim/sezonlar')
+      } else {
+        setFormError(result.message || 'Sezon güncellenemedi.')
+      }
+    }
+
+    setIsSaving(false)
+  }
+
+  async function handleConfirmDelete() {
+    if (draft.id == null || isDeleting || draft.isActive) {
+      return
+    }
+
+    setIsDeleting(true)
+
+    const result = await seasonService.remove(draft.id)
+
+    if (result.success) {
+      navigate('/yonetim/sezonlar')
+      return
+    }
+
+    setFormError(result.message || 'Sezon silinemedi.')
+    setIsDeleting(false)
+    setDeleteOpen(false)
   }
 
   const title = mode === 'edit' ? 'Sezonu Düzenle' : 'Yeni Sezon Ekle'
+  const description =
+    mode === 'edit'
+      ? 'Sezon adı, tarih aralığı ve aktif durumunu güncelleyin.'
+      : 'Yeni sezon kaydı oluşturun.'
+
+  const isActiveToggleLocked =
+    (mode === 'create' && isFirstSeason) ||
+    (mode === 'edit' && draft.isActive && activeCount <= 1)
+
+  const actionButtonClass =
+    'font-label inline-flex h-10 w-[8.75rem] cursor-pointer items-center justify-center gap-1 border px-space-md text-label-md uppercase'
+
+  const actionButtons = (
+    <div className="flex flex-wrap items-center justify-end gap-space-sm">
+      <button
+        type="button"
+        disabled={isSaving}
+        onClick={() => {
+          void handleSave()
+        }}
+        className={`${actionButtonClass} border-transparent bg-primary-container font-bold tracking-wider text-on-primary transition-all hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50`}
+      >
+        <span className="material-symbols-outlined text-[18px]">
+          {mode === 'create' ? 'add' : 'save'}
+        </span>
+        {mode === 'create' ? (isSaving ? 'Ekleniyor…' : 'Ekle') : 'Kaydet'}
+      </button>
+      <button
+        type="button"
+        onClick={handleCancel}
+        className={`${actionButtonClass} border-outline-variant transition-colors hover:border-primary hover:text-primary`}
+      >
+        <span className="material-symbols-outlined text-[18px]">close</span>
+        İptal
+      </button>
+      {mode === 'edit' ? (
+        <button
+          type="button"
+          disabled={draft.isActive}
+          title={
+            draft.isActive
+              ? 'Aktif sezon silinemez. Önce başka bir sezonu aktif yapın.'
+              : undefined
+          }
+          onClick={() => {
+            setDeleteOpen(true)
+          }}
+          className={`${actionButtonClass} border-error text-error transition-colors hover:bg-error-container disabled:cursor-not-allowed disabled:opacity-40`}
+        >
+          <span className="material-symbols-outlined text-[18px]">delete</span>
+          Sil
+        </button>
+      ) : null}
+    </div>
+  )
+
+  if (isLoading) {
+    return (
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+          Sezon yükleniyor...
+        </p>
+      </main>
+    )
+  }
 
   return (
     <div className="flex min-h-full flex-col">
       <main className="mx-auto flex w-full max-w-[1360px] flex-1 flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
         <header className="flex flex-col gap-space-md lg:flex-row lg:items-start lg:justify-between">
           <div className="flex max-w-3xl flex-col gap-space-xs">
-            <nav
-              aria-label="Breadcrumb"
-              className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
-            >
-              <Link to="/yonetim" className="transition-colors hover:text-primary">
-                Yönetim Masası
-              </Link>
-              <span>/</span>
-              <Link to="/yonetim/sezonlar" className="transition-colors hover:text-primary">
-                Sezonlar
-              </Link>
-              <span>/</span>
-              <span className="font-bold text-primary uppercase">{title}</span>
-            </nav>
             <h1 className="font-headline text-headline-lg font-extrabold tracking-tight text-primary uppercase">
               {title}
             </h1>
-            <p className="font-body text-body-md text-on-surface-variant">
-              <span className="font-bold text-primary">Kayıt Kodu: {draft.recordCode}</span>
-            </p>
+            <p className="font-body text-body-md text-on-surface-variant">{description}</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-space-sm">
-            {mode === 'edit' && (
-              <button
-                type="button"
-                className="font-label inline-flex items-center gap-1 border border-error px-space-md py-space-sm text-label-md text-error uppercase transition-colors hover:bg-error-container"
-              >
-                <span className="material-symbols-outlined text-[18px]">delete</span>
-                Sil
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="font-label inline-flex items-center gap-1 border border-outline-variant px-space-md py-space-sm text-label-md uppercase transition-colors hover:border-primary hover:text-primary"
-            >
-              <span className="material-symbols-outlined text-[18px]">close</span>
-              İptal
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="font-label inline-flex items-center gap-1 bg-primary-container px-space-md py-space-sm text-label-md font-bold tracking-wider text-on-primary uppercase transition-all hover:bg-primary"
-            >
-              <span className="material-symbols-outlined text-[18px]">save</span>
-              Kaydet
-            </button>
-          </div>
+          {actionButtons}
         </header>
 
-        <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <AdminSeasonFormFields draft={draft} onChange={updateField} />
-          </div>
-          <div className="lg:col-span-5">
-            <AdminSeasonFormSidebar draft={draft} />
-          </div>
-        </div>
+        {formError ? (
+          <p className="font-body border border-error/40 bg-error-container px-space-md py-space-sm text-body-md text-on-error-container">
+            {formError}
+          </p>
+        ) : null}
+
+        <AdminSeasonFormFields
+          draft={draft}
+          mode={mode}
+          isActiveToggleLocked={isActiveToggleLocked}
+          onChange={updateField}
+        />
+
+        {actionButtons}
       </main>
 
-      <footer className="sticky bottom-0 border-t border-outline-variant/50 bg-surface-container-lowest px-4 py-space-md sm:px-6 lg:px-12">
-        <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-sm lg:flex-row lg:items-center lg:justify-between">
-          <p className="font-body text-body-sm text-on-surface-variant">
-            Yapılan değişiklikler anlık olarak içerik dağıtım ağına (CDN) yansıtılacaktır.
-          </p>
-          <div className="flex gap-space-sm">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="font-label border border-outline-variant px-space-md py-space-sm text-label-md uppercase transition-colors hover:border-primary hover:text-primary"
-            >
-              İptal
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="font-label inline-flex items-center gap-1 bg-primary-container px-space-md py-space-sm text-label-md font-bold tracking-wider text-on-primary uppercase transition-all hover:bg-primary"
-            >
-              <span className="material-symbols-outlined text-[18px]">verified</span>
-              Değişiklikleri Kaydet
-            </button>
-          </div>
-        </div>
-      </footer>
+      <AdminSeasonDeleteModal
+        open={deleteOpen}
+        seasonName={draft.name.trim() || 'Sezon'}
+        isDeleting={isDeleting}
+        onCancel={() => {
+          if (isDeleting) {
+            return
+          }
+
+          setDeleteOpen(false)
+        }}
+        onConfirm={() => {
+          void handleConfirmDelete()
+        }}
+      />
     </div>
   )
 }

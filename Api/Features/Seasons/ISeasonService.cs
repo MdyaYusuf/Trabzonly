@@ -15,6 +15,13 @@ public interface ISeasonService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<SeasonResponseDto>>> GetAdminListAsync(
+    SeasonAdminListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<SeasonAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<SeasonResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<Season>, IQueryable<Season>>? include = null,

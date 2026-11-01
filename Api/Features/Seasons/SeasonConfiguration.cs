@@ -32,5 +32,9 @@ public class SeasonConfiguration : IEntityTypeConfiguration<Season>
 
     builder.Property(s => s.EndDate)
       .IsRequired();
+
+    builder.Property(s => s.IsActive)
+      .IsRequired()
+      .HasDefaultValue(false);
   }
 }

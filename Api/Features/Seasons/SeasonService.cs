@@ -28,7 +28,7 @@ public class SeasonService(
       pageSize,
       filter,
       include,
-      orderBy,
+      orderBy: orderBy ?? (query => query.OrderByDescending(s => s.StartDate)),
       enableTracking,
       withDeleted,
       cancellationToken);
@@ -41,6 +41,44 @@ public class SeasonService(
       Success = true,
       Message = "Sezon listesi başarılı bir şekilde getirildi.",
       Data = pagedResponse,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<PagedResponse<SeasonResponseDto>>> GetAdminListAsync(
+    SeasonAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
+
+    return await GetAllAsync(
+      filter: BuildAdminListFilter(query),
+      orderBy: BuildAdminListOrderBy(query.Sort),
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+  }
+
+  public async Task<ReturnModel<SeasonAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default)
+  {
+    List<Season> seasons = await _seasonRepository.GetAllAsync(
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    int totalCount = seasons.Count;
+    int activeCount = seasons.Count(s => s.IsActive);
+    int inactiveCount = totalCount - activeCount;
+
+    return new ReturnModel<SeasonAdminSummaryDto>()
+    {
+      Success = true,
+      Message = "Sezon yönetim özeti başarılı bir şekilde getirildi.",
+      Data = new SeasonAdminSummaryDto(
+        TotalCount: totalCount,
+        ActiveCount: activeCount,
+        InactiveCount: inactiveCount),
       StatusCode = 200
     };
   }
@@ -76,12 +114,25 @@ public class SeasonService(
     _businessRules.AdminRoleRequired(userRole);
 
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
-    if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
 
     await _businessRules.SeasonNameCannotBeDuplicatedAsync(request.Name, cancellationToken);
     await _businessRules.SeasonDatesCannotOverlapAsync(request.StartDate, request.EndDate, null, cancellationToken);
 
+    bool isFirstSeason = await _businessRules.IsFirstSeasonAsync(cancellationToken);
+    bool isActive = isFirstSeason || request.IsActive;
+
+    if (isActive)
+    {
+      await DeactivateOtherActiveSeasonsAsync(exceptSeasonId: null, cancellationToken);
+    }
+
     Season season = _mapper.CreateToEntity(request);
+    season.IsActive = isActive;
 
     await _seasonRepository.AddAsync(season, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -116,6 +167,16 @@ public class SeasonService(
 
     Season season = await _businessRules.GetSeasonIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
+    await _businessRules.LastActiveSeasonCannotBeDeactivatedAsync(
+      season,
+      request.IsActive,
+      cancellationToken);
+
+    if (request.IsActive)
+    {
+      await DeactivateOtherActiveSeasonsAsync(exceptSeasonId: request.Id, cancellationToken);
+    }
+
     _mapper.UpdateEntityFromRequest(request, season);
 
     _seasonRepository.Update(season);
@@ -138,6 +199,8 @@ public class SeasonService(
 
     Season season = await _businessRules.GetSeasonIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
+    _businessRules.ActiveSeasonCannotBeDeleted(season);
+
     _seasonRepository.Delete(season);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -146,6 +209,52 @@ public class SeasonService(
       Success = true,
       Message = "Sezon başarılı bir şekilde silindi.",
       StatusCode = 200
+    };
+  }
+
+  private async Task DeactivateOtherActiveSeasonsAsync(
+    int? exceptSeasonId,
+    CancellationToken cancellationToken)
+  {
+    List<Season> activeSeasons = await _seasonRepository.GetAllAsync(
+      filter: s => s.IsActive && (!exceptSeasonId.HasValue || s.Id != exceptSeasonId.Value),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    foreach (Season activeSeason in activeSeasons)
+    {
+      activeSeason.IsActive = false;
+      _seasonRepository.Update(activeSeason);
+    }
+  }
+
+  private static Expression<Func<Season, bool>> BuildAdminListFilter(
+    SeasonAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    bool? isActive = query.IsActive;
+
+    return season =>
+      (!isActive.HasValue || season.IsActive == isActive.Value) &&
+      (string.IsNullOrEmpty(search) || season.Name.Contains(search));
+  }
+
+  private static Func<IQueryable<Season>, IOrderedQueryable<Season>> BuildAdminListOrderBy(
+    string? sort)
+  {
+    string normalized = sort?.Trim().ToLowerInvariant() ?? SeasonSortOptions.StartDesc;
+
+    return normalized switch
+    {
+      SeasonSortOptions.StartAsc => query => query
+        .OrderBy(s => s.StartDate)
+        .ThenBy(s => s.Name),
+      SeasonSortOptions.NameAsc => query => query
+        .OrderBy(s => s.Name)
+        .ThenByDescending(s => s.StartDate),
+      _ => query => query
+        .OrderByDescending(s => s.StartDate)
+        .ThenBy(s => s.Name)
     };
   }
 }

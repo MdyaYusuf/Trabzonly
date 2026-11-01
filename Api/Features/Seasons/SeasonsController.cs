@@ -22,6 +22,29 @@ public class SeasonsController(ISeasonService _seasonService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAllForAdmin(
+    [FromQuery] SeasonAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _seasonService.GetAdminListAsync(
+      query: query,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage/summary")]
+  public async Task<IActionResult> GetAdminSummary(
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _seasonService.GetAdminSummaryAsync(cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
     int id,

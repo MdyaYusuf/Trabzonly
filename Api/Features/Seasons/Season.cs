@@ -16,6 +16,7 @@ public class Season : Entity<int>
   public required string Name { get; set; }
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
+  public bool IsActive { get; set; }
 
   // Navigation properties
   public virtual ICollection<Injury> Injuries { get; set; } = new List<Injury>();

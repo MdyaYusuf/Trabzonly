@@ -59,4 +59,38 @@ public class SeasonBusinessRules(ISeasonRepository _seasonRepository)
       throw new BusinessException("Sezon tarihleri sistemde kayıtlı olan başka bir sezonun tarihleriyle çakışamaz.");
     }
   }
+
+  public void ActiveSeasonCannotBeDeleted(Season season)
+  {
+    if (season.IsActive)
+    {
+      throw new BusinessException("Aktif sezon silinemez. Önce başka bir sezonu aktif yapın.");
+    }
+  }
+
+  public async Task LastActiveSeasonCannotBeDeactivatedAsync(
+    Season season,
+    bool requestedIsActive,
+    CancellationToken cancellationToken = default)
+  {
+    if (!season.IsActive || requestedIsActive)
+    {
+      return;
+    }
+
+    bool otherActiveExists = await _seasonRepository.AnyAsync(
+      s => s.Id != season.Id && s.IsActive,
+      cancellationToken);
+
+    if (!otherActiveExists)
+    {
+      throw new BusinessException(
+        "En az bir aktif sezon olmalıdır. Önce başka bir sezonu aktif yapın.");
+    }
+  }
+
+  public async Task<bool> IsFirstSeasonAsync(CancellationToken cancellationToken = default)
+  {
+    return !await _seasonRepository.AnyAsync(s => true, cancellationToken);
+  }
 }
