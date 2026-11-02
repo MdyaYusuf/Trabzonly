@@ -1,3 +1,4 @@
+import { PositionZone } from '@/features/positions/positionTypes'
 import type { PlayerResponseDto } from '../playerTypes'
 import { getNationalityFlagUrl } from './nationalityFlag'
 import type { PlayerCardData, PlayerCardStat, PositionGroup } from './playerDirectoryTypes'
@@ -10,18 +11,16 @@ const CARD_TONES = [
   'from-[#4A1A4A] to-[#1A040B]',
 ] as const
 
-export function positionGroupFromAbbreviation(abbreviation: string): PositionGroup {
-  const code = abbreviation.toUpperCase()
-
-  if (code === 'GK') {
+export function positionGroupFromZone(zone: PositionZone): PositionGroup {
+  if (zone === PositionZone.Goalkeeper) {
     return 'gk'
   }
 
-  if (code === 'CB' || code === 'LB' || code === 'RB') {
+  if (zone === PositionZone.Defence) {
     return 'def'
   }
 
-  if (code === 'DM' || code === 'CM' || code === 'AM') {
+  if (zone === PositionZone.Midfield) {
     return 'mid'
   }
 
@@ -30,7 +29,7 @@ export function positionGroupFromAbbreviation(abbreviation: string): PositionGro
 
 function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
   const stats = player.currentSeasonStats
-  const group = positionGroupFromAbbreviation(player.positionAbbreviation)
+  const group = positionGroupFromZone(player.positionZone)
   const minutes = String(stats?.minutesPlayed ?? 0)
 
   if (group === 'gk' || group === 'def') {
@@ -48,7 +47,7 @@ function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
 }
 
 export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): PlayerCardData {
-  const positionGroup = positionGroupFromAbbreviation(player.positionAbbreviation)
+  const positionGroup = positionGroupFromZone(player.positionZone)
   const note = player.description?.trim() || player.currentTeam
   const height =
     player.height != null ? `${(player.height / 100).toFixed(2).replace('.', ',')} m` : '—'

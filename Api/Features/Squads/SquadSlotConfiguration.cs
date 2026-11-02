@@ -45,5 +45,13 @@ public class SquadSlotConfiguration : IEntityTypeConfiguration<SquadSlot>
       .WithMany(p => p.SquadSlots)
       .HasForeignKey(s => s.PlayerId)
       .OnDelete(DeleteBehavior.Restrict);
+
+    builder.HasOne(s => s.PositionRole)
+      .WithMany()
+      .HasForeignKey(s => s.PositionRoleId)
+      .OnDelete(DeleteBehavior.Restrict)
+      .IsRequired(false);
+
+    builder.HasIndex(s => s.PositionRoleId);
   }
 }

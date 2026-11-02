@@ -30,6 +30,8 @@ public partial class SquadMapper
   [MapProperty("Player.ShirtNumber", "PlayerShirtNumber")]
   [MapProperty("Player.Age", "Age")]
   [MapProperty("Player.MarketValue", "MarketValue")]
+  [MapProperty("PositionRole.Name", "PositionRoleName")]
+  [MapProperty("PositionRole.Description", "PositionRoleDescription")]
   public partial SquadSlotResponseDto SlotToResponseDto(SquadSlot slot);
 
   public partial List<SquadSlotResponseDto> SlotToResponseDtoList(List<SquadSlot> slots);

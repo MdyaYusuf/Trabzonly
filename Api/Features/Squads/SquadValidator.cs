@@ -120,6 +120,21 @@ public class SquadSlotRequestValidator : AbstractValidator<SquadSlotRequest>
 
     RuleFor(s => s.PlayerId)
       .GreaterThan(0).WithMessage("Oyuncu seçimi zorunludur.");
+
+    RuleFor(s => s.PositionRoleId)
+      .Null()
+      .When(s => SquadTactics.IsBenchSlotKey(s.SlotKey))
+      .WithMessage("Yedek kulübesi için pozisyon rolü seçilemez.");
+
+    RuleFor(s => s.PositionRoleId)
+      .NotNull()
+      .When(s => !SquadTactics.IsBenchSlotKey(s.SlotKey))
+      .WithMessage("İlk 11 mevkileri için pozisyon rolü zorunludur.");
+
+    RuleFor(s => s.PositionRoleId)
+      .GreaterThan(0)
+      .When(s => s.PositionRoleId.HasValue)
+      .WithMessage("Geçersiz pozisyon rolü.");
   }
 }
 

@@ -24,14 +24,18 @@ public class SquadService(
       .Include(s => s.User)
       .Include(s => s.Slots)
         .ThenInclude(slot => slot.Player)
-          .ThenInclude(player => player.Position);
+          .ThenInclude(player => player.Position)
+      .Include(s => s.Slots)
+        .ThenInclude(slot => slot.PositionRole);
 
   private static readonly Func<IQueryable<Squad>, IQueryable<Squad>> DefaultDetailInclude =
     query => query
       .Include(s => s.User)
       .Include(s => s.Slots)
         .ThenInclude(slot => slot.Player)
-          .ThenInclude(player => player.Position);
+          .ThenInclude(player => player.Position)
+      .Include(s => s.Slots)
+        .ThenInclude(slot => slot.PositionRole);
 
   public async Task<ReturnModel<PagedResponse<SquadPreviewDto>>> GetAllAsync(
     Expression<Func<Squad, bool>>? filter = null,
@@ -223,6 +227,7 @@ public class SquadService(
       request.CornerTakerPlayerId,
       request.FreeKickTakerPlayerId);
     await _businessRules.PlayersMustExistAndBeActiveAsync(request.Slots, cancellationToken);
+    await _businessRules.SlotRolesMustMatchCatalogPositionsAsync(request.Slots, cancellationToken);
 
     Squad squad = _mapper.CreateToEntity(request);
     squad.UserId = currentUserId;
@@ -262,6 +267,7 @@ public class SquadService(
       request.CornerTakerPlayerId,
       request.FreeKickTakerPlayerId);
     await _businessRules.PlayersMustExistAndBeActiveAsync(request.Slots, cancellationToken);
+    await _businessRules.SlotRolesMustMatchCatalogPositionsAsync(request.Slots, cancellationToken);
 
     Squad squad = await _businessRules.GetSquadIfExistAsync(
       request.Id,
@@ -383,7 +389,8 @@ public class SquadService(
           SquadId = squadId,
           SlotKey = slotRequest.SlotKey,
           SortOrder = slotRequest.SortOrder,
-          PlayerId = slotRequest.PlayerId
+          PlayerId = slotRequest.PlayerId,
+          PositionRoleId = slotRequest.PositionRoleId
         },
         cancellationToken);
     }

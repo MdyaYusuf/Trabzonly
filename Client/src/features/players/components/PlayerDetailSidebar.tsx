@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import playerService from '../playerService'
 import type { PlayerResponseDto, PlayerPositionGroup } from '../playerTypes'
 import { formatMarketValue } from '../utils/formatMarketValue'
-import { positionGroupFromAbbreviation } from '../utils/mapPlayerToCardData'
+import { positionGroupFromZone } from '../utils/mapPlayerToCardData'
 import type { PositionGroup } from '../utils/playerDirectoryTypes'
 import { PlayerCareerArchive } from './PlayerCareerArchive'
 import { PlayerPollCard } from './PlayerPollCard'
@@ -89,7 +89,7 @@ function positionGroupLabel(group: PositionGroup): string {
 }
 
 export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
-  const group = positionGroupFromAbbreviation(player.positionAbbreviation)
+  const group = positionGroupFromZone(player.positionZone)
   const [peers, setPeers] = useState<PlayerResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -225,7 +225,7 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
 
       <PlayerCareerArchive
         playerId={player.id}
-        positionAbbreviation={player.positionAbbreviation}
+        positionZone={player.positionZone}
       />
 
       <Link

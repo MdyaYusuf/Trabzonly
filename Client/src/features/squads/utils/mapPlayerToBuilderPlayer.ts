@@ -1,3 +1,4 @@
+import { PositionZone } from '@/features/positions/positionTypes'
 import type { PlayerResponseDto } from '@/features/players/playerTypes'
 import type { BuilderPlayer, BuilderPosGroup } from './squadBuilderTypes'
 
@@ -34,36 +35,16 @@ function shortNameFromFull(name: string): string {
   return `${parts[0][0]}. ${parts[parts.length - 1]}`
 }
 
-function posGroupFromAbbreviation(
-  abbreviation: string,
-): Exclude<BuilderPosGroup, 'ALL'> {
-  const key = abbreviation.trim().toUpperCase()
-
-  if (key === 'GK') {
+function posGroupFromZone(zone: PositionZone): Exclude<BuilderPosGroup, 'ALL'> {
+  if (zone === PositionZone.Goalkeeper) {
     return 'GK'
   }
 
-  if (
-    key === 'CB' ||
-    key === 'LCB' ||
-    key === 'RCB' ||
-    key === 'LB' ||
-    key === 'RB' ||
-    key === 'LWB' ||
-    key === 'RWB' ||
-    key === 'DF'
-  ) {
+  if (zone === PositionZone.Defence) {
     return 'DF'
   }
 
-  if (
-    key === 'ST' ||
-    key === 'CF' ||
-    key === 'LW' ||
-    key === 'RW' ||
-    key === 'SS' ||
-    key === 'FW'
-  ) {
+  if (zone === PositionZone.Attack) {
     return 'FW'
   }
 
@@ -79,7 +60,7 @@ export function mapPlayerToBuilderPlayer(player: PlayerResponseDto): BuilderPlay
     name: player.name,
     shortName: shortNameFromFull(player.name),
     number: player.shirtNumber != null ? String(player.shirtNumber) : '—',
-    posGroup: posGroupFromAbbreviation(player.positionAbbreviation),
+    posGroup: posGroupFromZone(player.positionZone),
     roleHint: `${player.positionName} • ${player.nationality}`,
     age: player.age,
     marketValueM,

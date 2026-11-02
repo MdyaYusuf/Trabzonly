@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Trabzonly.Api.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20261102155227_InitialCreate")]
+    [Migration("20261102165041_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -1081,6 +1081,9 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PositionRoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SlotKey")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -1099,6 +1102,8 @@ namespace Trabzonly.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PlayerId");
+
+                    b.HasIndex("PositionRoleId");
 
                     b.HasIndex("SquadId", "PlayerId")
                         .IsUnique();
@@ -1606,6 +1611,11 @@ namespace Trabzonly.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Api.Features.Positions.PositionRole", "PositionRole")
+                        .WithMany()
+                        .HasForeignKey("PositionRoleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Api.Features.Squads.Squad", "Squad")
                         .WithMany("Slots")
                         .HasForeignKey("SquadId")
@@ -1613,6 +1623,8 @@ namespace Trabzonly.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Player");
+
+                    b.Navigation("PositionRole");
 
                     b.Navigation("Squad");
                 });

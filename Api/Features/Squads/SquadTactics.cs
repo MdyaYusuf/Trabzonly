@@ -46,4 +46,28 @@ public static class SquadTactics
   {
     return slotKey.StartsWith("BENCH_", StringComparison.OrdinalIgnoreCase);
   }
+
+  public static string? GetCatalogAbbreviationForSlot(string slotKey)
+  {
+    string key = slotKey.Trim().ToUpperInvariant();
+
+    return key switch
+    {
+      "GK" => "GK",
+      "LB" => "LB",
+      "RB" => "RB",
+      "LCB" or "CB" or "RCB" => "CB",
+      "LWB" => "LWB",
+      "RWB" => "RWB",
+      "CDM" or "LDM" or "RDM" => "DM",
+      "LCM" or "CM" or "RCM" => "CM",
+      "LM" => "LM",
+      "RM" => "RM",
+      "CAM" => "AM",
+      "LW" => "LW",
+      "RW" => "RW",
+      "ST" or "ST2" => "ST",
+      _ => null
+    };
+  }
 }

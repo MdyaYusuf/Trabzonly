@@ -11,7 +11,10 @@ public sealed record SquadSlotResponseDto(
   string PositionAbbreviation,
   int? PlayerShirtNumber,
   int Age,
-  decimal? MarketValue);
+  decimal? MarketValue,
+  int? PositionRoleId = null,
+  string? PositionRoleName = null,
+  string? PositionRoleDescription = null);
 
 public sealed record SquadResponseDto(
   Guid Id,
@@ -74,7 +77,8 @@ public sealed record SquadRatingResponseDto(
 public sealed record SquadSlotRequest(
   string SlotKey,
   int SortOrder,
-  int PlayerId);
+  int PlayerId,
+  int? PositionRoleId = null);
 
 public sealed record CreateSquadRequest(
   string Title,

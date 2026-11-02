@@ -10,6 +10,9 @@ export interface SquadSlotResponseDto {
   playerShirtNumber?: number | null
   age: number
   marketValue?: number | null
+  positionRoleId?: number | null
+  positionRoleName?: string | null
+  positionRoleDescription?: string | null
 }
 
 export interface SquadResponseDto {
@@ -78,6 +81,7 @@ export interface SquadSlotRequest {
   slotKey: string
   sortOrder: number
   playerId: number
+  positionRoleId?: number | null
 }
 
 export interface CreateSquadRequest {

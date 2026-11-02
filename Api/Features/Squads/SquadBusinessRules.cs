@@ -1,11 +1,14 @@
 using Api.Core.Exceptions;
 using Api.Features.Players;
+using Api.Features.Positions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Squads;
 
 public class SquadBusinessRules(
   ISquadRepository _squadRepository,
-  IPlayerRepository _playerRepository)
+  IPlayerRepository _playerRepository,
+  IPositionRoleRepository _positionRoleRepository)
 {
   public async Task<Squad> GetSquadIfExistAsync(
     Guid id,
@@ -156,6 +159,55 @@ public class SquadBusinessRules(
       if (!player.IsActive)
       {
         throw new BusinessException($"'{player.Name}' aktif olmadığı için kadroya eklenemez.");
+      }
+    }
+  }
+
+  public async Task SlotRolesMustMatchCatalogPositionsAsync(
+    IReadOnlyList<SquadSlotRequest> slots,
+    CancellationToken cancellationToken = default)
+  {
+    List<SquadSlotRequest> starterSlots = slots
+      .Where(s => !SquadTactics.IsBenchSlotKey(s.SlotKey))
+      .ToList();
+
+    foreach (SquadSlotRequest slot in starterSlots)
+    {
+      if (!slot.PositionRoleId.HasValue)
+      {
+        throw new BusinessException($"'{slot.SlotKey}' mevkiisi için pozisyon rolü zorunludur.");
+      }
+
+      string? catalogAbbreviation = SquadTactics.GetCatalogAbbreviationForSlot(slot.SlotKey);
+
+      if (string.IsNullOrWhiteSpace(catalogAbbreviation))
+      {
+        throw new BusinessException($"'{slot.SlotKey}' mevkiisi için katalog pozisyonu bulunamadı.");
+      }
+
+      PositionRole? role = await _positionRoleRepository.GetByIdAsync(
+        slot.PositionRoleId.Value,
+        include: query => query.Include(r => r.Position),
+        enableTracking: false,
+        cancellationToken: cancellationToken);
+
+      if (role == null)
+      {
+        throw new NotFoundException($"{slot.PositionRoleId.Value} numaralı pozisyon rolü bulunamadı.");
+      }
+
+      if (!string.Equals(role.Position.Abbreviation, catalogAbbreviation, StringComparison.OrdinalIgnoreCase))
+      {
+        throw new BusinessException(
+          $"'{slot.SlotKey}' mevkiisi için seçilen rol ({role.Name}) bu mevkie ait değil.");
+      }
+    }
+
+    foreach (SquadSlotRequest slot in slots.Where(s => SquadTactics.IsBenchSlotKey(s.SlotKey)))
+    {
+      if (slot.PositionRoleId.HasValue)
+      {
+        throw new BusinessException("Yedek kulübesi için pozisyon rolü seçilemez.");
       }
     }
   }

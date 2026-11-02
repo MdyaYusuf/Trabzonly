@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Api.Core.Entities;
 using Api.Features.Players;
+using Api.Features.Positions;
 
 namespace Api.Features.Squads;
 
@@ -20,4 +21,7 @@ public class SquadSlot : Entity<Guid>
 
   public int PlayerId { get; set; }
   public virtual Player Player { get; set; } = default!;
+
+  public int? PositionRoleId { get; set; }
+  public virtual PositionRole? PositionRole { get; set; }
 }

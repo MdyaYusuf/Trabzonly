@@ -662,6 +662,7 @@ namespace Trabzonly.Api.Migrations
                     SortOrder = table.Column<int>(type: "int", nullable: false),
                     SquadId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PlayerId = table.Column<int>(type: "int", nullable: false),
+                    PositionRoleId = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -672,6 +673,12 @@ namespace Trabzonly.Api.Migrations
                         name: "FK_SquadSlots_Players_PlayerId",
                         column: x => x.PlayerId,
                         principalTable: "Players",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SquadSlots_PositionRoles_PositionRoleId",
+                        column: x => x.PositionRoleId,
+                        principalTable: "PositionRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1004,6 +1011,11 @@ namespace Trabzonly.Api.Migrations
                 column: "PlayerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SquadSlots_PositionRoleId",
+                table: "SquadSlots",
+                column: "PositionRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SquadSlots_SquadId_PlayerId",
                 table: "SquadSlots",
                 columns: new[] { "SquadId", "PlayerId" },
@@ -1079,9 +1091,6 @@ namespace Trabzonly.Api.Migrations
                 name: "PollVotes");
 
             migrationBuilder.DropTable(
-                name: "PositionRoles");
-
-            migrationBuilder.DropTable(
                 name: "PostReactions");
 
             migrationBuilder.DropTable(
@@ -1107,6 +1116,9 @@ namespace Trabzonly.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "PollOptions");
+
+            migrationBuilder.DropTable(
+                name: "PositionRoles");
 
             migrationBuilder.DropTable(
                 name: "Quizzes");

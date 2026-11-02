@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
+import type { PositionZone } from '@/features/positions/positionTypes'
 import playerStatsService from '../../stats/playerStatsService'
 import type { PlayerStatsResponseDto } from '../../stats/playerStatsTypes'
-import { positionGroupFromAbbreviation } from '../utils/mapPlayerToCardData'
+import { positionGroupFromZone } from '../utils/mapPlayerToCardData'
 import type { PositionGroup } from '../utils/playerDirectoryTypes'
 
 type PlayerCareerArchiveProps = {
   playerId: number
-  positionAbbreviation: string
+  positionZone: PositionZone
 }
 
 function formatCareerRecord(stats: PlayerStatsResponseDto, group: PositionGroup): string {
@@ -23,11 +24,11 @@ function formatCareerRecord(stats: PlayerStatsResponseDto, group: PositionGroup)
 
 export function PlayerCareerArchive({
   playerId,
-  positionAbbreviation,
+  positionZone,
 }: PlayerCareerArchiveProps) {
   const [entries, setEntries] = useState<PlayerStatsResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const group = positionGroupFromAbbreviation(positionAbbreviation)
+  const group = positionGroupFromZone(positionZone)
 
   useEffect(() => {
     let cancelled = false

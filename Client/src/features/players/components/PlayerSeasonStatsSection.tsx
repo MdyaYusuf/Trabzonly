@@ -1,5 +1,5 @@
 import type { PlayerResponseDto } from '../playerTypes'
-import { positionGroupFromAbbreviation } from '../utils/mapPlayerToCardData'
+import { positionGroupFromZone } from '../utils/mapPlayerToCardData'
 
 type PlayerSeasonStatsSectionProps = {
   player: PlayerResponseDto
@@ -7,7 +7,7 @@ type PlayerSeasonStatsSectionProps = {
 
 export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionProps) {
   const stats = player.currentSeasonStats
-  const group = positionGroupFromAbbreviation(player.positionAbbreviation)
+  const group = positionGroupFromZone(player.positionZone)
   const seasonLabel = stats?.seasonName?.trim() || 'Güncel Sezon'
   const teamLabel = stats?.team?.trim() || player.currentTeam
   const appearances = stats?.appearances ?? 0
