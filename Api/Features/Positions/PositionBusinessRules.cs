@@ -1,8 +1,11 @@
 using Api.Core.Exceptions;
+using Api.Features.Players;
 
 namespace Api.Features.Positions;
 
-public class PositionBusinessRules(IPositionRepository _positionRepository)
+public class PositionBusinessRules(
+  IPositionRepository _positionRepository,
+  IPlayerRepository _playerRepository)
 {
   public async Task<Position> GetPositionIfExistAsync(
     int id,
@@ -76,6 +79,40 @@ public class PositionBusinessRules(IPositionRepository _positionRepository)
     if (exists)
     {
       throw new BusinessException("Bu ada sahip bir pozisyon zaten mevcut.");
+    }
+  }
+
+  public async Task PositionCannotBeDeletedWhenHasPlayersAsync(
+    int positionId,
+    CancellationToken cancellationToken = default)
+  {
+    bool hasPlayers = await _playerRepository.AnyAsync(p => p.PositionId == positionId, cancellationToken);
+
+    if (hasPlayers)
+    {
+      throw new BusinessException(
+        "Bu pozisyona bağlı oyuncular varken silinemez. Önce oyuncuları başka bir pozisyona taşıyın.");
+    }
+  }
+
+  public void RequestedRolesMustBelongToPosition(
+    Position position,
+    IReadOnlyList<PositionRoleRequest> roles)
+  {
+    HashSet<int> existingIds = position.Roles.Select(r => r.Id).ToHashSet();
+
+    foreach (PositionRoleRequest role in roles)
+    {
+      if (!role.Id.HasValue)
+      {
+        continue;
+      }
+
+      if (!existingIds.Contains(role.Id.Value))
+      {
+        throw new BusinessException(
+          $"{role.Id.Value} numaralı rol bu pozisyona ait değil.");
+      }
     }
   }
 }

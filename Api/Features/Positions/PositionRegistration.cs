@@ -7,6 +7,7 @@ public static class PositionRegistration
   public static IServiceCollection AddPositionDependencies(this IServiceCollection services)
   {
     services.AddScoped<IPositionRepository, EfPositionRepository>();
+    services.AddScoped<IPositionRoleRepository, EfPositionRoleRepository>();
     services.AddScoped<PositionBusinessRules>();
     services.AddScoped<IPositionService, PositionService>();
     services.AddSingleton<PositionMapper>();

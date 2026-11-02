@@ -2,11 +2,13 @@ using System.Linq.Expressions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Positions;
 
 public class PositionService(
   IPositionRepository _positionRepository,
+  IPositionRoleRepository _positionRoleRepository,
   PositionMapper _mapper,
   PositionBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
@@ -27,8 +29,8 @@ public class PositionService(
       pageNumber,
       pageSize,
       filter,
-      include,
-      orderBy,
+      include: include ?? IncludeRoles,
+      orderBy: orderBy ?? (query => query.OrderBy(p => p.Zone).ThenBy(p => p.Name)),
       enableTracking,
       withDeleted,
       cancellationToken);
@@ -45,6 +47,28 @@ public class PositionService(
     };
   }
 
+  public async Task<ReturnModel<List<PositionResponseDto>>> GetAdminListAsync(
+    PositionAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    List<Position> positions = await _positionRepository.GetAllAsync(
+      filter: BuildAdminListFilter(query),
+      include: IncludeRoles,
+      orderBy: BuildAdminListOrderBy(query.Sort),
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    List<PositionResponseDto> responseDtos = _mapper.EntityToResponseDtoList(positions);
+
+    return new ReturnModel<List<PositionResponseDto>>()
+    {
+      Success = true,
+      Message = "Pozisyon yönetim listesi başarılı bir şekilde getirildi.",
+      Data = responseDtos,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<PositionResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<Position>, IQueryable<Position>>? include = null,
@@ -53,7 +77,7 @@ public class PositionService(
   {
     Position position = await _businessRules.GetPositionIfExistAsync(
       id,
-      include,
+      include: include ?? IncludeRoles,
       enableTracking,
       cancellationToken);
 
@@ -86,6 +110,7 @@ public class PositionService(
     await _businessRules.PositionAbbreviationCannotBeDuplicatedWhenInserted(request.Abbreviation, cancellationToken);
 
     Position position = _mapper.CreateToEntity(request);
+    ApplyRoles(position, request.Roles);
 
     await _positionRepository.AddAsync(position, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -117,9 +142,16 @@ public class PositionService(
     await _businessRules.PositionNameCannotBeDuplicatedWhenUpdated(request.Id, request.Name, cancellationToken);
     await _businessRules.PositionAbbreviationCannotBeDuplicatedWhenUpdated(request.Id, request.Abbreviation, cancellationToken);
 
-    Position position = await _businessRules.GetPositionIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+    Position position = await _businessRules.GetPositionIfExistAsync(
+      request.Id,
+      include: IncludeRoles,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    _businessRules.RequestedRolesMustBelongToPosition(position, request.Roles);
 
     _mapper.UpdateEntityFromRequest(request, position);
+    ReplaceRoles(position, request.Roles);
 
     _positionRepository.Update(position);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -141,6 +173,8 @@ public class PositionService(
 
     Position position = await _businessRules.GetPositionIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
+    await _businessRules.PositionCannotBeDeletedWhenHasPlayersAsync(id, cancellationToken);
+
     _positionRepository.Delete(position);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -149,6 +183,105 @@ public class PositionService(
       Success = true,
       Message = "Pozisyon başarılı bir şekilde silindi.",
       StatusCode = 200
+    };
+  }
+
+  private void ApplyRoles(Position position, List<PositionRoleRequest> roles)
+  {
+    foreach (PositionRoleRequest roleRequest in roles.OrderBy(r => r.SortOrder).ThenBy(r => r.Name))
+    {
+      position.Roles.Add(CreateRoleFromRequest(roleRequest));
+    }
+  }
+
+  private void ReplaceRoles(Position position, List<PositionRoleRequest> roles)
+  {
+    HashSet<int> keepIds = roles
+      .Where(r => r.Id.HasValue)
+      .Select(r => r.Id!.Value)
+      .ToHashSet();
+
+    List<PositionRole> rolesToRemove = position.Roles
+      .Where(r => !keepIds.Contains(r.Id))
+      .ToList();
+
+    if (rolesToRemove.Count > 0)
+    {
+      _positionRoleRepository.DeleteRange(rolesToRemove);
+
+      foreach (PositionRole role in rolesToRemove)
+      {
+        position.Roles.Remove(role);
+      }
+    }
+
+    foreach (PositionRoleRequest roleRequest in roles.OrderBy(r => r.SortOrder).ThenBy(r => r.Name))
+    {
+      if (!roleRequest.Id.HasValue)
+      {
+        position.Roles.Add(CreateRoleFromRequest(roleRequest));
+        continue;
+      }
+
+      PositionRole? existing = position.Roles.FirstOrDefault(r => r.Id == roleRequest.Id.Value);
+
+      if (existing == null)
+      {
+        continue;
+      }
+
+      existing.Name = roleRequest.Name.Trim();
+      existing.Description = roleRequest.Description.Trim();
+      existing.SortOrder = roleRequest.SortOrder;
+      _positionRoleRepository.Update(existing);
+    }
+  }
+
+  private static PositionRole CreateRoleFromRequest(PositionRoleRequest roleRequest)
+  {
+    return new PositionRole
+    {
+      Name = roleRequest.Name.Trim(),
+      Description = roleRequest.Description.Trim(),
+      SortOrder = roleRequest.SortOrder
+    };
+  }
+
+  private static IQueryable<Position> IncludeRoles(IQueryable<Position> query)
+  {
+    return query.Include(p => p.Roles);
+  }
+
+  private static Expression<Func<Position, bool>> BuildAdminListFilter(
+    PositionAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    PositionZone? zone = query.Zone;
+
+    return position =>
+      (!zone.HasValue || position.Zone == zone.Value) &&
+      (string.IsNullOrEmpty(search) ||
+        position.Name.Contains(search) ||
+        position.Abbreviation.Contains(search));
+  }
+
+  private static Func<IQueryable<Position>, IOrderedQueryable<Position>> BuildAdminListOrderBy(
+    string? sort)
+  {
+    string normalized = sort?.Trim().ToLowerInvariant() ?? PositionSortOptions.ZoneAsc;
+
+    return normalized switch
+    {
+      PositionSortOptions.NameAsc => query => query
+        .OrderBy(p => p.Name)
+        .ThenBy(p => p.Abbreviation),
+      PositionSortOptions.AbbreviationAsc => query => query
+        .OrderBy(p => p.Abbreviation)
+        .ThenBy(p => p.Name),
+      _ => query => query
+        .OrderBy(p => p.Zone)
+        .ThenBy(p => p.Name)
+        .ThenBy(p => p.Abbreviation)
     };
   }
 }

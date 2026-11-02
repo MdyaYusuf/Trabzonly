@@ -22,6 +22,19 @@ public class PositionsController(IPositionService _positionService) : CustomBase
     return CreateActionResult(result);
   }
 
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAllForAdmin(
+    [FromQuery] PositionAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _positionService.GetAdminListAsync(
+      query: query,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
     int id,

@@ -15,7 +15,9 @@ public class Position : Entity<int>
 
   public required string Name { get; set; }
   public required string Abbreviation { get; set; }
+  public PositionZone Zone { get; set; }
 
   // Navigation properties
   public virtual ICollection<Player> Players { get; set; } = new List<Player>();
+  public virtual ICollection<PositionRole> Roles { get; set; } = new List<PositionRole>();
 }

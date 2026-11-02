@@ -15,6 +15,10 @@ public interface IPositionService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<PositionResponseDto>>> GetAdminListAsync(
+    PositionAdminListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<PositionResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<Position>, IQueryable<Position>>? include = null,

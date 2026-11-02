@@ -35,6 +35,7 @@ public class BaseDbContext : DbContext
   public DbSet<Category> Categories { get; set; }
   public DbSet<Player> Players { get; set; }
   public DbSet<Position> Positions { get; set; }
+  public DbSet<PositionRole> PositionRoles { get; set; }
   public DbSet<Season> Seasons { get; set; }
   public DbSet<PlayerStats> PlayerStats { get; set; }
   public DbSet<Injury> Injuries { get; set; }

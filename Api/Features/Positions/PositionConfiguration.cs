@@ -31,7 +31,13 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
       .HasMaxLength(10)
       .IsRequired();
 
+    builder.Property(p => p.Zone)
+      .HasConversion<int>()
+      .IsRequired();
+
     builder.HasIndex(p => p.Abbreviation)
       .IsUnique();
+
+    builder.HasIndex(p => p.Zone);
   }
 }
