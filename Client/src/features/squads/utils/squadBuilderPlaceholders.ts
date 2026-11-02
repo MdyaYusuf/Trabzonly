@@ -6,6 +6,8 @@ import type {
   BuilderSlotId,
   DefenseLineOption,
   FormationConfig,
+  FormationRowShift,
+  FormationRowSpread,
   TempoOption,
 } from './squadBuilderTypes'
 
@@ -33,13 +35,91 @@ export const BENCH_SLOT_IDS: BenchSlotId[] = [
 function formation(
   id: BuilderFormationId,
   rows: FormationConfig['rows'],
+  rowSpreads?: FormationConfig['rowSpreads'],
+  rowShifts?: FormationConfig['rowShifts'],
 ): FormationConfig {
   return {
     id,
     label: id,
     lineLabel: id,
     rows,
+    rowSpreads,
+    rowShifts,
   }
+}
+
+export function pitchRowGridClass(
+  count: number,
+  spread?: FormationRowSpread,
+): string {
+  if (count === 1) {
+    return 'flex w-full justify-center'
+  }
+
+  if (count === 2) {
+    if (spread === 'wide') {
+      // Same horizontal anchors as a 3-slot row (e.g. LW–CAM–RW on 4-2-3-1).
+      return 'grid w-full grid-cols-3 items-center px-4 [&>:first-child]:col-start-1 [&>:last-child]:col-start-3'
+    }
+
+    if (spread === 'edge') {
+      return 'flex w-full items-center justify-between px-4 sm:px-6'
+    }
+
+    if (spread === 'narrow') {
+      return 'mx-auto grid w-[58%] grid-cols-2 items-center sm:w-[52%]'
+    }
+
+    return 'grid w-full grid-cols-2 items-center px-16'
+  }
+
+  if (count === 3) {
+    if (spread === 'narrow') {
+      return 'mx-auto grid w-[68%] grid-cols-3 items-center sm:w-[60%]'
+    }
+
+    if (spread === 'relaxed') {
+      return 'mx-auto grid w-[86%] grid-cols-3 items-center sm:w-[78%]'
+    }
+
+    return 'grid w-full grid-cols-3 items-center px-4'
+  }
+
+  if (count === 5) {
+    return 'grid w-full grid-cols-5 items-center px-1'
+  }
+
+  return 'grid w-full grid-cols-4 items-center px-3'
+}
+
+export function pitchRowShiftClass(shift?: FormationRowShift): string {
+  if (shift === 'forward') {
+    return '-translate-y-5 sm:-translate-y-7'
+  }
+
+  if (shift === 'back') {
+    return 'translate-y-5 sm:translate-y-7'
+  }
+
+  if (shift === 'back-more') {
+    return 'translate-y-10 sm:translate-y-12'
+  }
+
+  return ''
+}
+
+/** Slight forward nudge for wide full-backs / wide mids vs their central partners. */
+export function pitchSlotNudgeClass(slotId: BuilderSlotId): string {
+  if (
+    slotId === 'LB' ||
+    slotId === 'RB' ||
+    slotId === 'LM' ||
+    slotId === 'RM'
+  ) {
+    return '-translate-y-5 sm:-translate-y-6'
+  }
+
+  return ''
 }
 
 export const formationConfigs: FormationConfig[] = [
@@ -62,80 +142,97 @@ export const formationConfigs: FormationConfig[] = [
     ],
     [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
   ]),
-  formation('4-3-3', [
-    [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
+  formation(
+    '4-3-3',
     [
-      { id: 'LW', label: 'LW', roleLabel: 'Sol Kanat' },
-      { id: 'RW', label: 'RW', roleLabel: 'Sağ Kanat' },
+      [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
+      [
+        { id: 'LW', label: 'LW', roleLabel: 'Sol Kanat' },
+        { id: 'RW', label: 'RW', roleLabel: 'Sağ Kanat' },
+      ],
+      [
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+      ],
+      [{ id: 'CDM', label: 'CDM', roleLabel: 'Ön Libero' }],
+      [
+        { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+        { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
+    [undefined, 'wide', 'narrow', undefined, undefined, undefined],
+  ),
+  formation(
+    '4-1-2-1-2',
     [
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'CM', label: 'CM', roleLabel: 'Merkez' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+      [
+        { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
+        { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
+      ],
+      [{ id: 'CAM', label: 'CAM', roleLabel: '10 Numara' }],
+      [
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+      ],
+      [{ id: 'CDM', label: 'CDM', roleLabel: 'Ön Libero' }],
+      [
+        { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+        { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
+    ['narrow', undefined, 'narrow', undefined, undefined, undefined],
+  ),
+  formation(
+    '4-1-4-1',
     [
-      { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-      { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
+      [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
+      [
+        { id: 'LM', label: 'LM', roleLabel: 'Sol Kanat' },
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+        { id: 'RM', label: 'RM', roleLabel: 'Sağ Kanat' },
+      ],
+      [{ id: 'CDM', label: 'CDM', roleLabel: 'Ön Libero' }],
+      [
+        { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+        { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
-  formation('4-3-1-2', [
+    undefined,
+    [undefined, 'back-more', 'back', undefined, undefined],
+  ),
+  formation(
+    '4-4-2',
     [
-      { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
-      { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
+      [
+        { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
+        { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
+      ],
+      [
+        { id: 'LM', label: 'LM', roleLabel: 'Sol Kanat' },
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+        { id: 'RM', label: 'RM', roleLabel: 'Sağ Kanat' },
+      ],
+      [
+        { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+        { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
-    [{ id: 'CAM', label: 'CAM', roleLabel: '10 Numara' }],
-    [
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'CM', label: 'CM', roleLabel: 'Merkez' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-    ],
-    [
-      { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-      { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
-    ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
-  formation('4-1-4-1', [
-    [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
-    [
-      { id: 'LM', label: 'LM', roleLabel: 'Sol Kanat' },
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-      { id: 'RM', label: 'RM', roleLabel: 'Sağ Kanat' },
-    ],
-    [{ id: 'CDM', label: 'CDM', roleLabel: 'Ön Libero' }],
-    [
-      { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-      { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
-    ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
-  formation('4-4-2', [
-    [
-      { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
-      { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
-    ],
-    [
-      { id: 'LM', label: 'LM', roleLabel: 'Sol Kanat' },
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-      { id: 'RM', label: 'RM', roleLabel: 'Sağ Kanat' },
-    ],
-    [
-      { id: 'LB', label: 'LB', roleLabel: 'Sol Bek' },
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-      { id: 'RB', label: 'RB', roleLabel: 'Sağ Bek' },
-    ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
+    ['narrow', undefined, undefined, undefined],
+  ),
   formation('4-4-1-1', [
     [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
     [{ id: 'CAM', label: 'CAM', roleLabel: '10 Numara' }],
@@ -170,101 +267,101 @@ export const formationConfigs: FormationConfig[] = [
     ],
     [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
   ]),
-  formation('3-5-2', [
+  formation(
+    '3-5-2',
     [
-      { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
-      { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
+      [
+        { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
+        { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
+      ],
+      [
+        { id: 'LM', label: 'LM', roleLabel: 'Sol Kanat' },
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'CM', label: 'CM', roleLabel: 'Merkez' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+        { id: 'RM', label: 'RM', roleLabel: 'Sağ Kanat' },
+      ],
+      [
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'CB', label: 'CB', roleLabel: 'Libero' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
+    ['narrow', undefined, 'relaxed', undefined],
+  ),
+  formation(
+    '3-4-1-2',
     [
-      { id: 'LWB', label: 'LWB', roleLabel: 'Sol Kanat Bek' },
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'CM', label: 'CM', roleLabel: 'Merkez' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-      { id: 'RWB', label: 'RWB', roleLabel: 'Sağ Kanat Bek' },
+      [
+        { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
+        { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
+      ],
+      [{ id: 'CAM', label: 'CAM', roleLabel: '10 Numara' }],
+      [
+        { id: 'LM', label: 'LM', roleLabel: 'Sol Kanat' },
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+        { id: 'RM', label: 'RM', roleLabel: 'Sağ Kanat' },
+      ],
+      [
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'CB', label: 'CB', roleLabel: 'Libero' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
+    ['narrow', undefined, undefined, 'relaxed', undefined],
+  ),
+  formation(
+    '3-4-2-1',
     [
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'CB', label: 'CB', roleLabel: 'Libero' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+      [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
+      [
+        { id: 'LCAM', label: 'LCAM', roleLabel: 'Sol 10' },
+        { id: 'RCAM', label: 'RCAM', roleLabel: 'Sağ 10' },
+      ],
+      [
+        { id: 'LM', label: 'LM', roleLabel: 'Sol Kanat' },
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+        { id: 'RM', label: 'RM', roleLabel: 'Sağ Kanat' },
+      ],
+      [
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'CB', label: 'CB', roleLabel: 'Libero' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
-  formation('3-4-3', [
-    [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
+    [undefined, 'narrow', undefined, 'relaxed', undefined],
+  ),
+  formation(
+    '5-3-2',
     [
-      { id: 'LW', label: 'LW', roleLabel: 'Sol Kanat' },
-      { id: 'RW', label: 'RW', roleLabel: 'Sağ Kanat' },
+      [
+        { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
+        { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
+      ],
+      [
+        { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
+        { id: 'CM', label: 'CM', roleLabel: 'Merkez' },
+        { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
+      ],
+      [
+        { id: 'LWB', label: 'LWB', roleLabel: 'Sol Kanat Bek' },
+        { id: 'RWB', label: 'RWB', roleLabel: 'Sağ Kanat Bek' },
+      ],
+      [
+        { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
+        { id: 'CB', label: 'CB', roleLabel: 'Libero' },
+        { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
+      ],
+      [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
     ],
-    [
-      { id: 'LWB', label: 'LWB', roleLabel: 'Sol Kanat Bek' },
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-      { id: 'RWB', label: 'RWB', roleLabel: 'Sağ Kanat Bek' },
-    ],
-    [
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'CB', label: 'CB', roleLabel: 'Libero' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-    ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
-  formation('3-4-1-2', [
-    [
-      { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
-      { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
-    ],
-    [{ id: 'CAM', label: 'CAM', roleLabel: '10 Numara' }],
-    [
-      { id: 'LWB', label: 'LWB', roleLabel: 'Sol Kanat Bek' },
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-      { id: 'RWB', label: 'RWB', roleLabel: 'Sağ Kanat Bek' },
-    ],
-    [
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'CB', label: 'CB', roleLabel: 'Libero' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-    ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
-  formation('3-4-2-1', [
-    [{ id: 'ST', label: 'ST', roleLabel: 'Santrfor' }],
-    [
-      { id: 'LW', label: 'LW', roleLabel: 'Sol 10' },
-      { id: 'RW', label: 'RW', roleLabel: 'Sağ 10' },
-    ],
-    [
-      { id: 'LWB', label: 'LWB', roleLabel: 'Sol Kanat Bek' },
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-      { id: 'RWB', label: 'RWB', roleLabel: 'Sağ Kanat Bek' },
-    ],
-    [
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'CB', label: 'CB', roleLabel: 'Libero' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-    ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
-  formation('5-3-2', [
-    [
-      { id: 'ST', label: 'ST', roleLabel: 'Santrfor' },
-      { id: 'ST2', label: 'ST', roleLabel: 'İkinci Forvet' },
-    ],
-    [
-      { id: 'LCM', label: 'LCM', roleLabel: 'İç Orta' },
-      { id: 'CM', label: 'CM', roleLabel: 'Merkez' },
-      { id: 'RCM', label: 'RCM', roleLabel: 'İç Orta' },
-    ],
-    [
-      { id: 'LWB', label: 'LWB', roleLabel: 'Sol Kanat Bek' },
-      { id: 'LCB', label: 'LCB', roleLabel: 'Stoper' },
-      { id: 'CB', label: 'CB', roleLabel: 'Libero' },
-      { id: 'RCB', label: 'RCB', roleLabel: 'Stoper' },
-      { id: 'RWB', label: 'RWB', roleLabel: 'Sağ Kanat Bek' },
-    ],
-    [{ id: 'GK', label: 'GK', roleLabel: 'Kaleci' }],
-  ]),
+    ['narrow', 'narrow', 'edge', 'narrow', undefined],
+    [undefined, 'back-more', 'back', undefined, undefined],
+  ),
 ]
 
 export function getFormationConfig(id: BuilderFormationId): FormationConfig {

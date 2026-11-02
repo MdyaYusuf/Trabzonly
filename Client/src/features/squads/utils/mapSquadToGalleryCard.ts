@@ -1,7 +1,24 @@
 import type { SquadPreviewDto, SquadSlotResponseDto } from '../squadTypes'
 import type { BuilderFormationId } from './squadBuilderTypes'
 import { formationConfigs } from './squadBuilderPlaceholders'
-import type { PitchPlayer, SquadGalleryCardData } from './squadsGalleryTypes'
+import type {
+  PitchColumn,
+  PitchPlayer,
+  SquadGalleryCardData,
+} from './squadsGalleryTypes'
+
+const AVATAR_GRADIENTS = [
+  'from-[#5a0e27] to-[#1A040B]',
+  'from-[#12648e] to-[#1A040B]',
+  'from-[#3a0014] to-[#12648e]',
+  'from-[#8ccefd] to-[#5a0e27]',
+  'from-[#544245] to-[#1A040B]',
+  'from-[#75B7E5] to-[#1A040B]',
+] as const
+
+function avatarGradientForPlayerId(playerId: number): string {
+  return AVATAR_GRADIENTS[playerId % AVATAR_GRADIENTS.length]
+}
 
 function formatRelativeTime(isoDate: string): string {
   const created = new Date(isoDate).getTime()
@@ -63,10 +80,23 @@ function isBenchSlotKey(slotKey: string): boolean {
   return slotKey.toUpperCase().startsWith('BENCH_')
 }
 
+function toPitchPlayer(
+  slot: SquadSlotResponseDto,
+  slotId: string,
+): PitchPlayer {
+  return {
+    number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
+    name: shortPlayerName(slot.playerName),
+    slotId,
+    isGk: slotId.toUpperCase() === 'GK',
+    avatarGradient: avatarGradientForPlayerId(slot.playerId),
+  }
+}
+
 function mapSlotsToPitchColumns(
   formation: string,
   slots: SquadSlotResponseDto[],
-): PitchPlayer[][] {
+): PitchColumn[] {
   const starterSlots = slots.filter((slot) => !isBenchSlotKey(slot.slotKey))
   const formationId = resolveFormationId(formation)
   const slotByKey = new Map(
@@ -75,11 +105,9 @@ function mapSlotsToPitchColumns(
 
   if (!formationId) {
     return [
-      starterSlots.map((slot, index) => ({
-        number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
-        name: shortPlayerName(slot.playerName),
-        tone: index % 2 === 0 ? 'bordo' : 'mavi',
-      })),
+      {
+        players: starterSlots.map((slot) => toPitchPlayer(slot, slot.slotKey)),
+      },
     ]
   }
 
@@ -91,25 +119,25 @@ function mapSlotsToPitchColumns(
 
   // Builder rows are attack → defense; gallery columns are left → right (GK → ST).
   const columnRows = [...config.rows].reverse()
+  const columnSpreads = config.rowSpreads
+    ? [...config.rowSpreads].reverse()
+    : undefined
 
   return columnRows.map((row, columnIndex) => {
-    const tone: PitchPlayer['tone'] = columnIndex % 2 === 0 ? 'bordo' : 'mavi'
-
-    return row.flatMap((slotDef) => {
+    const players = row.flatMap((slotDef) => {
       const slot = slotByKey.get(slotDef.id.toUpperCase())
 
       if (!slot) {
         return []
       }
 
-      return [
-        {
-          number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
-          name: shortPlayerName(slot.playerName),
-          tone,
-        },
-      ]
+      return [toPitchPlayer(slot, slotDef.id)]
     })
+
+    return {
+      players,
+      spread: columnSpreads?.[columnIndex],
+    }
   })
 }
 

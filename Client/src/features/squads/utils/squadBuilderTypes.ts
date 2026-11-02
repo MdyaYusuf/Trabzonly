@@ -1,13 +1,12 @@
 export type BuilderFormationId =
   | '4-2-3-1'
   | '4-3-3'
-  | '4-3-1-2'
+  | '4-1-2-1-2'
   | '4-1-4-1'
   | '4-4-2'
   | '4-4-1-1'
   | '4-5-1'
   | '3-5-2'
-  | '3-4-3'
   | '3-4-1-2'
   | '3-4-2-1'
   | '5-3-2'
@@ -32,7 +31,9 @@ export type BuilderSlotId =
   | 'LM'
   | 'RM'
   | 'LW'
+  | 'LCAM'
   | 'CAM'
+  | 'RCAM'
   | 'RW'
   | 'ST'
   | 'ST2'
@@ -70,11 +71,21 @@ export type FormationSlot = {
   roleLabel: string
 }
 
+/** Horizontal spacing hint for a pitch row (2-slot rows especially). */
+export type FormationRowSpread = 'wide' | 'edge' | 'narrow' | 'relaxed'
+
+/** Vertical nudge along the pitch (attack is top / forward). */
+export type FormationRowShift = 'forward' | 'back' | 'back-more'
+
 export type FormationConfig = {
   id: BuilderFormationId
   label: string
   lineLabel: string
   rows: FormationSlot[][]
+  /** Optional per-row spread; index matches `rows`. */
+  rowSpreads?: Array<FormationRowSpread | undefined>
+  /** Optional per-row vertical nudge; index matches `rows`. */
+  rowShifts?: Array<FormationRowShift | undefined>
 }
 
 export type AttackStyleOption = 'Baskılı' | 'Dengeli' | 'Kontra'

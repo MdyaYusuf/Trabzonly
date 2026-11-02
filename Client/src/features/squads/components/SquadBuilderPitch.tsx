@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
+import { useEffect, useMemo, useState, type DragEvent } from 'react'
 import type { PositionRoleResponseDto } from '@/features/positions/positionTypes'
 import type {
   BuilderPlayer,
@@ -11,7 +11,14 @@ import {
   readSquadPlayerDragData,
   setSquadPlayerDragData,
 } from '../utils/squadBuilderDnD'
+import {
+  pitchRowGridClass,
+  pitchRowShiftClass,
+  pitchSlotNudgeClass,
+} from '../utils/squadBuilderPlaceholders'
 import { CaptainArmband } from './CaptainArmband'
+import { SquadPitchSlotCaption } from './SquadPitchSlotCaption'
+import { SquadPlayerPickerMenu } from './SquadPlayerPickerMenu'
 
 type SquadBuilderPitchProps = {
   formation: FormationConfig
@@ -26,137 +33,6 @@ type SquadBuilderPitchProps = {
   onDropPlayer: (targetSlotId: BuilderSlotId, playerId: string, sourceSlotId?: string) => void
   onClearSlot: (slotId: BuilderSlotId) => void
   onRoleChange: (slotId: BuilderSlotId, roleId: number) => void
-}
-
-function SlotPlayerPicker({
-  slot,
-  candidates,
-  openUpward,
-  onPick,
-  onClose,
-}: {
-  slot: FormationSlot
-  candidates: BuilderPlayer[]
-  openUpward: boolean
-  onPick: (playerId: string) => void
-  onClose: () => void
-}) {
-  const rootRef = useRef<HTMLDivElement>(null)
-  const [search, setSearch] = useState('')
-
-  useEffect(() => {
-    function handlePointerDown(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        onClose()
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [onClose])
-
-  const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase()
-
-    if (!query) {
-      return candidates
-    }
-
-    return candidates.filter((player) => {
-      return (
-        player.name.toLowerCase().includes(query) ||
-        player.shortName.toLowerCase().includes(query) ||
-        player.number.includes(query)
-      )
-    })
-  }, [candidates, search])
-
-  return (
-    <div
-      ref={rootRef}
-      className={
-        openUpward
-          ? 'absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 bg-surface-container-lowest p-2 shadow-xl ring-1 ring-outline-variant/40'
-          : 'absolute top-full left-1/2 z-50 mt-2 w-56 -translate-x-1/2 bg-surface-container-lowest p-2 shadow-xl ring-1 ring-outline-variant/40'
-      }
-      role="dialog"
-      aria-label={`${slot.label} oyuncu seç`}
-    >
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="font-kicker text-[10px] font-bold tracking-widest text-primary uppercase">
-          {slot.label} · Seç
-        </span>
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex h-6 w-6 items-center justify-center text-on-surface-variant hover:text-primary"
-          aria-label="Kapat"
-        >
-          <span className="material-symbols-outlined text-[18px]">close</span>
-        </button>
-      </div>
-      <label className="relative mb-2 block">
-        <span className="material-symbols-outlined pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-[16px] text-on-surface-variant">
-          search
-        </span>
-        <input
-          autoFocus
-          type="search"
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value)
-          }}
-          placeholder="İsim veya no…"
-          className="font-body w-full bg-surface-container py-1.5 pr-2 pl-8 text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
-        />
-      </label>
-      <div className="flex max-h-56 flex-col gap-1 overflow-y-auto">
-        {filtered.map((player) => (
-          <button
-            key={player.id}
-            type="button"
-            onClick={() => {
-              onPick(player.id)
-            }}
-            className="flex items-center gap-2 bg-surface-container-low px-2 py-1.5 text-left transition-colors hover:bg-surface-container"
-          >
-            <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${player.avatarGradient}`}
-            >
-              {player.initials}
-            </div>
-            <div className="min-w-0 flex-1 overflow-hidden">
-              <span className="font-headline block truncate text-[12px] font-bold text-on-surface">
-                {player.name}
-              </span>
-              <span
-                className="font-kicker block truncate text-[9px] text-on-surface-variant uppercase"
-                title={`#${player.number} · ${player.roleHint}`}
-              >
-                #{player.number} · {player.roleHint}
-              </span>
-            </div>
-          </button>
-        ))}
-        {filtered.length === 0 ? (
-          <p className="font-body px-1 py-2 text-center text-[11px] text-on-surface-variant">
-            Uygun oyuncu yok.
-          </p>
-        ) : null}
-      </div>
-    </div>
-  )
 }
 
 function SlotCard({
@@ -174,6 +50,7 @@ function SlotCard({
   onPick,
   onClear,
   onRoleChange,
+  onRoleMenuOpenChange,
   onDragOverSlot,
   onDragLeaveSlot,
   onDropOnSlot,
@@ -192,6 +69,7 @@ function SlotCard({
   onPick: (playerId: string) => void
   onClear: () => void
   onRoleChange: (roleId: number) => void
+  onRoleMenuOpenChange: (open: boolean) => void
   onDragOverSlot: (event: DragEvent) => void
   onDragLeaveSlot: () => void
   onDropOnSlot: (event: DragEvent) => void
@@ -210,31 +88,26 @@ function SlotCard({
         <button
           type="button"
           onClick={onOpenPicker}
-          className={`group flex flex-col items-center transition-transform hover:scale-105 ${
+          className={`group flex cursor-pointer flex-col items-center transition-transform hover:scale-105 ${
             isDropTarget ? 'scale-105' : ''
           }`}
         >
           <div
-            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-dashed shadow-lg ${
+            className={`flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-2 border-dashed shadow-lg ${
               isDropTarget || isPickerOpen
                 ? 'border-secondary-container bg-secondary-container/30'
                 : 'border-white/50 bg-black/20'
             }`}
           >
-            <span className="material-symbols-outlined text-[28px] text-white/70">add</span>
-          </div>
-          <div className="mt-1 bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
-            <span className="font-headline block text-[12px] font-bold text-primary">
+            <span className="font-kicker text-[13px] font-bold tracking-[0.08em] text-white/80 uppercase">
               {slot.label}
             </span>
-            <span className="font-kicker block text-[9px] font-bold text-on-surface-variant uppercase">
-              Boş Slot
-            </span>
           </div>
+          <SquadPitchSlotCaption empty name="Boş Pozisyon" isGk={isGk} />
         </button>
         {isPickerOpen ? (
-          <SlotPlayerPicker
-            slot={slot}
+          <SquadPlayerPickerMenu
+            title={`${slot.label} · Oyuncu seç`}
             candidates={candidates}
             openUpward={openPickerUpward}
             onPick={onPick}
@@ -247,7 +120,7 @@ function SlotCard({
 
   return (
     <div
-      className={`group relative flex flex-col items-center transition-transform hover:scale-105 ${
+      className={`group relative flex cursor-pointer flex-col items-center transition-transform hover:scale-105 active:cursor-grabbing ${
         isDropTarget ? 'scale-105' : ''
       }`}
       draggable
@@ -258,7 +131,7 @@ function SlotCard({
             playerId: player.id,
             sourceSlotId: slot.id,
           },
-          player.initials,
+          slot.label,
         )
       }}
       onDragOver={onDragOverSlot}
@@ -266,16 +139,19 @@ function SlotCard({
       onDrop={onDropOnSlot}
     >
       <div
-        className={`relative h-14 w-14 cursor-grab rounded-full p-1 shadow-lg ring-2 active:cursor-grabbing ${
+        className={`relative h-14 w-14 cursor-pointer rounded-full p-1 shadow-lg ring-2 ${
           isGk
             ? 'bg-tertiary ring-tertiary-fixed group-hover:ring-white'
             : 'bg-primary-container ring-white/60 group-hover:ring-secondary-container'
         } ${isDropTarget ? 'ring-secondary-container' : ''}`}
+        title={player.name}
       >
         <div
-          className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold text-white ${player.avatarGradient}`}
+          className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br ${player.avatarGradient}`}
         >
-          {player.initials}
+          <span className="font-kicker text-[13px] font-bold tracking-[0.08em] text-white uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">
+            {slot.label}
+          </span>
         </div>
         <span
           className={`font-kicker absolute -top-1 -left-1 flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold shadow ${
@@ -299,85 +175,19 @@ function SlotCard({
           <span className="material-symbols-outlined text-[14px]">close</span>
         </button>
       </div>
-      <div className="mt-1 max-w-[7.5rem] bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
-        <span className="font-headline block text-[12px] leading-tight font-bold text-primary">
-          {player.shortName}
-        </span>
-        <span
-          className={`font-kicker block text-[9px] font-bold uppercase ${
-            isGk ? 'text-tertiary' : 'text-secondary'
-          }`}
-        >
-          {slot.label}
-        </span>
-        {roleOptions.length > 0 ? (
-          <label className="mt-0.5 block">
-            <span className="sr-only">{slot.label} rolü</span>
-            <select
-              value={selectedRoleId ?? ''}
-              title={selectedRole?.description ?? 'Rol seç'}
-              onClick={(event) => {
-                event.stopPropagation()
-              }}
-              onMouseDown={(event) => {
-                event.stopPropagation()
-              }}
-              onChange={(event) => {
-                event.stopPropagation()
-                const nextId = Number(event.target.value)
-
-                if (!Number.isFinite(nextId) || nextId <= 0) {
-                  return
-                }
-
-                onRoleChange(nextId)
-              }}
-              className={`font-kicker w-full max-w-full truncate border-0 bg-transparent py-0 text-center text-[9px] font-bold uppercase focus:outline-none focus:ring-1 focus:ring-primary ${
-                isGk ? 'text-tertiary' : 'text-secondary'
-              }`}
-            >
-              <option value="" disabled>
-                Rol seç
-              </option>
-              {roleOptions.map((role) => (
-                <option key={role.id} value={role.id} title={role.description}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : (
-          <span
-            className={`font-kicker block text-[9px] font-bold uppercase ${
-              isGk ? 'text-tertiary' : 'text-secondary'
-            }`}
-          >
-            {slot.roleLabel}
-          </span>
-        )}
-      </div>
+      <SquadPitchSlotCaption
+        name={player.shortName}
+        roleLabel={selectedRole?.name ?? slot.roleLabel}
+        roleDescription={selectedRole?.description}
+        isGk={isGk}
+        roleOptions={roleOptions}
+        selectedRoleId={selectedRoleId}
+        openRoleMenuUpward={openPickerUpward}
+        onRoleChange={onRoleChange}
+        onRoleMenuOpenChange={onRoleMenuOpenChange}
+      />
     </div>
   )
-}
-
-function rowGridClass(count: number) {
-  if (count === 1) {
-    return 'flex w-full justify-center'
-  }
-
-  if (count === 2) {
-    return 'grid w-full grid-cols-2 items-center px-16'
-  }
-
-  if (count === 3) {
-    return 'grid w-full grid-cols-3 items-center px-4'
-  }
-
-  if (count === 5) {
-    return 'grid w-full grid-cols-5 items-center px-1'
-  }
-
-  return 'grid w-full grid-cols-4 items-center px-3'
 }
 
 export function SquadBuilderPitch({
@@ -395,10 +205,12 @@ export function SquadBuilderPitch({
   onRoleChange,
 }: SquadBuilderPitchProps) {
   const [openPickerSlotId, setOpenPickerSlotId] = useState<BuilderSlotId | null>(null)
+  const [openRoleMenuSlotId, setOpenRoleMenuSlotId] = useState<BuilderSlotId | null>(null)
   const [dropTargetSlotId, setDropTargetSlotId] = useState<BuilderSlotId | null>(null)
 
   useEffect(() => {
     setOpenPickerSlotId(null)
+    setOpenRoleMenuSlotId(null)
     setDropTargetSlotId(null)
   }, [formation.id])
 
@@ -439,14 +251,11 @@ export function SquadBuilderPitch({
           <rect height="912" width="672" x="24" y="24" />
           <line x1="24" x2="696" y1="480" y2="480" />
           <circle cx="360" cy="480" r="72" />
-          <circle cx="360" cy="480" fill="white" fillOpacity="0.6" r="4" />
           <rect height="150" width="360" x="180" y="24" />
           <rect height="56" width="180" x="270" y="24" />
-          <circle cx="360" cy="115" fill="white" fillOpacity="0.6" r="3" />
           <path d="M 300 174 A 60 60 0 0 0 420 174" />
           <rect height="150" width="360" x="180" y="786" />
           <rect height="56" width="180" x="270" y="880" />
-          <circle cx="360" cy="845" fill="white" fillOpacity="0.6" r="3" />
           <path d="M 300 786 A 60 60 0 0 1 420 786" />
           <path d="M 24 44 A 20 20 0 0 0 44 24" />
           <path d="M 696 44 A 20 20 0 0 1 676 24" />
@@ -470,26 +279,32 @@ export function SquadBuilderPitch({
           const isLast = rowIndex === formation.rows.length - 1
           const openPickerUpward = rowIndex >= upwardPickerFromRow
 
+          const rowHasOverlay =
+            (openPickerSlotId != null &&
+              row.some((slot) => slot.id === openPickerSlotId)) ||
+            (openRoleMenuSlotId != null &&
+              row.some((slot) => slot.id === openRoleMenuSlotId))
+
           return (
             <div
               key={`row-${rowIndex}`}
-              className={`${rowGridClass(row.length)} ${isFirst ? 'pt-6 sm:pt-8' : ''} ${isLast ? 'pb-2' : ''} ${
-                openPickerSlotId && row.some((slot) => slot.id === openPickerSlotId)
-                  ? 'relative z-40'
-                  : 'relative z-20'
+              className={`${pitchRowGridClass(row.length, formation.rowSpreads?.[rowIndex])} ${pitchRowShiftClass(formation.rowShifts?.[rowIndex])} ${isFirst ? 'pt-6 sm:pt-8' : ''} ${isLast ? 'pb-2' : ''} ${
+                rowHasOverlay ? 'relative z-40' : 'relative z-20'
               }`}
             >
               {row.map((slot) => {
                 const playerId = assignments[slot.id]
                 const player = playerId ? playersById.get(playerId) : undefined
+                const slotElevated =
+                  openPickerSlotId === slot.id || openRoleMenuSlotId === slot.id
 
                 return (
                   <div
                     key={slot.id}
                     className={
-                      openPickerSlotId === slot.id
-                        ? 'relative z-50 flex justify-center'
-                        : 'relative z-10 flex justify-center'
+                      slotElevated
+                        ? `relative z-50 flex justify-center ${pitchSlotNudgeClass(slot.id)}`
+                        : `relative z-10 flex justify-center ${pitchSlotNudgeClass(slot.id)}`
                     }
                   >
                     <SlotCard
@@ -503,6 +318,7 @@ export function SquadBuilderPitch({
                       openPickerUpward={openPickerUpward}
                       isCaptain={Boolean(playerId && playerId === captainPlayerId)}
                       onOpenPicker={() => {
+                        setOpenRoleMenuSlotId(null)
                         setOpenPickerSlotId(slot.id)
                       }}
                       onClosePicker={() => {
@@ -517,6 +333,17 @@ export function SquadBuilderPitch({
                       }}
                       onRoleChange={(roleId) => {
                         onRoleChange(slot.id, roleId)
+                      }}
+                      onRoleMenuOpenChange={(open) => {
+                        if (open) {
+                          setOpenPickerSlotId(null)
+                          setOpenRoleMenuSlotId(slot.id)
+                          return
+                        }
+
+                        setOpenRoleMenuSlotId((current) =>
+                          current === slot.id ? null : current,
+                        )
                       }}
                       onDragOverSlot={(event) => {
                         event.preventDefault()

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Trabzonly.Api.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20261102165041_InitialCreate")]
+    [Migration("20261102193537_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

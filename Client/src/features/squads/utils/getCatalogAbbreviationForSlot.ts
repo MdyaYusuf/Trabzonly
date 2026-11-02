@@ -33,7 +33,9 @@ export function getCatalogAbbreviationForSlot(
       return 'LM'
     case 'RM':
       return 'RM'
+    case 'LCAM':
     case 'CAM':
+    case 'RCAM':
       return 'AM'
     case 'LW':
       return 'LW'

@@ -816,6 +816,11 @@ export function SquadBuilderPage() {
               onFreeKickTakerChange={setFreeKickTakerPlayerId}
             />
 
+            <p className="font-body max-w-3xl text-[10px] leading-snug text-on-surface-variant/70">
+              Boş pozisyonlara tıklayarak mevkiye uygun oyuncu seçebilir veya havuzdan sürükleyip
+              bırakabilirsiniz. Yedek kulübenizi de doldurmayı unutmayınız.
+            </p>
+
             <SquadBuilderPitch
               formation={formation}
               assignments={starterAssignments}
@@ -856,7 +861,18 @@ export function SquadBuilderPage() {
             <SquadBuilderBench
               assignments={benchAssignments}
               playersById={playersById}
+              availablePlayers={players.filter((player) => !assignedPlayerIds.has(player.id))}
               onClearSlot={handleClearBenchSlot}
+              onAssignToSlot={(slotId, playerId) => {
+                if (assignedPlayerIds.has(playerId)) {
+                  return
+                }
+
+                setBenchAssignments((prev) => ({
+                  ...prev,
+                  [slotId]: playerId,
+                }))
+              }}
               onDropPlayer={handleDropOnBenchSlot}
             />
 

@@ -132,11 +132,11 @@ export function QuizResultHero({
                     className="text-primary transition-[stroke-dashoffset] duration-700"
                   />
                 </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="font-headline text-stat-counter font-extrabold text-primary tabular-nums">
+                <div className="absolute inset-[18px] flex flex-col items-center justify-center gap-0.5 overflow-hidden">
+                  <span className="font-headline text-[2rem] leading-none font-extrabold tracking-tight text-primary tabular-nums sm:text-[2.125rem]">
                     %{percent}
                   </span>
-                  <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+                  <span className="font-kicker text-[10px] leading-none text-on-surface-variant uppercase">
                     Başarı
                   </span>
                 </div>

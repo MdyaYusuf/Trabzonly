@@ -1,13 +1,20 @@
+import type { FormationRowSpread } from './squadBuilderTypes'
+
 export const PAGE_SIZE = 6
 
 export type GallerySortTab = 'newest' | 'topRated'
 
-export type PitchPlayerTone = 'bordo' | 'mavi'
-
 export type PitchPlayer = {
   number: string
   name: string
-  tone: PitchPlayerTone
+  slotId?: string
+  isGk?: boolean
+  avatarGradient: string
+}
+
+export type PitchColumn = {
+  players: PitchPlayer[]
+  spread?: FormationRowSpread
 }
 
 export type SquadGalleryCardData = {
@@ -24,7 +31,7 @@ export type SquadGalleryCardData = {
   ratingCount: number
   commentCount: number
   viewCount: number
-  columns: PitchPlayer[][]
+  columns: PitchColumn[]
 }
 
 export const sortTabs: { id: GallerySortTab; label: string }[] = [

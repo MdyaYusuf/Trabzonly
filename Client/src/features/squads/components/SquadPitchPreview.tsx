@@ -1,8 +1,82 @@
-import type { PitchPlayer } from '../utils/squadsGalleryTypes'
+import type { FormationRowSpread } from '../utils/squadBuilderTypes'
+import type { PitchColumn, PitchPlayer } from '../utils/squadsGalleryTypes'
 
 type SquadPitchPreviewProps = {
   formationLabel: string
-  columns: PitchPlayer[][]
+  columns: PitchColumn[]
+}
+
+function columnLayoutClass(
+  playerCount: number,
+  spread?: FormationRowSpread,
+): string {
+  if (playerCount <= 1) {
+    return 'flex flex-col items-center'
+  }
+
+  if (spread === 'wide' || spread === 'edge') {
+    return 'flex h-full w-full flex-col justify-between py-0.5'
+  }
+
+  if (spread === 'narrow') {
+    return 'flex h-[56%] w-full flex-col justify-around self-center'
+  }
+
+  if (spread === 'relaxed') {
+    return 'flex h-[82%] w-full flex-col justify-around self-center'
+  }
+
+  return 'flex h-full w-full flex-col justify-around py-1'
+}
+
+function previewSlotNudgeClass(slotId?: string): string {
+  if (
+    slotId === 'LB' ||
+    slotId === 'RB' ||
+    slotId === 'LM' ||
+    slotId === 'RM'
+  ) {
+    return 'translate-x-2.5'
+  }
+
+  return ''
+}
+
+function PlayerDot({
+  player,
+  isEdge,
+}: {
+  player: PitchPlayer
+  isEdge: boolean
+}) {
+  const sizeClass = isEdge ? 'h-6 w-6 text-[9px]' : 'h-5 w-5 text-[8px]'
+
+  return (
+    <div
+      className={`flex flex-col items-center ${previewSlotNudgeClass(player.slotId)}`}
+    >
+      <div
+        className={`rounded-full p-px shadow-md ring-1 ${
+          player.isGk
+            ? 'bg-tertiary ring-tertiary-fixed/80'
+            : 'bg-primary-container/80 ring-white/50'
+        }`}
+      >
+        <span
+          className={`flex items-center justify-center rounded-full bg-gradient-to-br font-bold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)] ${sizeClass} ${player.avatarGradient}`}
+        >
+          {player.number}
+        </span>
+      </div>
+      <span
+        className={`mt-0.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] ${
+          isEdge ? 'text-[9px] font-bold' : 'text-[8px]'
+        }`}
+      >
+        {player.name}
+      </span>
+    </div>
+  )
 }
 
 export function SquadPitchPreview({ formationLabel, columns }: SquadPitchPreviewProps) {
@@ -23,7 +97,6 @@ export function SquadPitchPreview({ formationLabel, columns }: SquadPitchPreview
         <rect fill="none" height="220" stroke="#FFFFFF" strokeWidth="1.2" width="370" x="15" y="10" />
         <line stroke="#FFFFFF" strokeWidth="1.2" x1="200" x2="200" y1="10" y2="230" />
         <circle cx="200" cy="120" fill="none" r="36" stroke="#FFFFFF" strokeWidth="1.2" />
-        <circle cx="200" cy="120" fill="#FFFFFF" r="2.5" />
         <rect fill="none" height="120" stroke="#FFFFFF" strokeWidth="1.2" width="60" x="15" y="60" />
         <rect fill="none" height="70" stroke="#FFFFFF" strokeWidth="1.2" width="22" x="15" y="85" />
         <rect fill="none" height="120" stroke="#FFFFFF" strokeWidth="1.2" width="60" x="325" y="60" />
@@ -46,37 +119,15 @@ export function SquadPitchPreview({ formationLabel, columns }: SquadPitchPreview
           return (
             <div
               key={`col-${columnIndex}`}
-              className={
-                column.length === 1
-                  ? 'flex flex-col items-center'
-                  : 'flex h-full flex-col justify-around py-1'
-              }
+              className={columnLayoutClass(column.players.length, column.spread)}
             >
-              {column.map((player) => {
-                const isBordo = player.tone === 'bordo'
-                const sizeClass = isEdge ? 'h-5 w-5 text-[9px]' : 'h-4 w-4 text-[8px]'
-
-                return (
-                  <div key={`${player.number}-${player.name}`} className="flex flex-col items-center">
-                    <span
-                      className={`flex items-center justify-center rounded-full font-bold shadow-sm ${sizeClass} ${
-                        isBordo
-                          ? 'bg-[#5A0E27] text-white'
-                          : 'bg-[#75B7E5] text-[#1A040B]'
-                      }`}
-                    >
-                      {player.number}
-                    </span>
-                    <span
-                      className={`mt-0.5 bg-black/40 px-0.5 text-white ${
-                        isEdge ? 'bg-black/50 text-[9px] font-bold' : 'text-[8px]'
-                      }`}
-                    >
-                      {player.name}
-                    </span>
-                  </div>
-                )
-              })}
+              {column.players.map((player) => (
+                <PlayerDot
+                  key={`${player.slotId ?? player.number}-${player.name}`}
+                  player={player}
+                  isEdge={isEdge}
+                />
+              ))}
             </div>
           )
         })}

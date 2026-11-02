@@ -1,26 +1,40 @@
-import { useState, type DragEvent } from 'react'
+import { useMemo, useState, type DragEvent } from 'react'
 import type { BenchSlotId, BuilderPlayer } from '../utils/squadBuilderTypes'
 import { BENCH_SLOT_IDS } from '../utils/squadBuilderPlaceholders'
 import {
   readSquadPlayerDragData,
   setSquadPlayerDragData,
 } from '../utils/squadBuilderDnD'
+import { SquadPlayerPickerMenu } from './SquadPlayerPickerMenu'
 
 type SquadBuilderBenchProps = {
   assignments: Partial<Record<BenchSlotId, string>>
   playersById: Map<string, BuilderPlayer>
+  availablePlayers: BuilderPlayer[]
   onClearSlot: (slotId: BenchSlotId) => void
+  onAssignToSlot: (slotId: BenchSlotId, playerId: string) => void
   onDropPlayer: (targetSlotId: BenchSlotId, playerId: string, sourceSlotId?: string) => void
 }
 
 export function SquadBuilderBench({
   assignments,
   playersById,
+  availablePlayers,
   onClearSlot,
+  onAssignToSlot,
   onDropPlayer,
 }: SquadBuilderBenchProps) {
   const [dropTargetSlotId, setDropTargetSlotId] = useState<BenchSlotId | null>(null)
+  const [openPickerSlotId, setOpenPickerSlotId] = useState<BenchSlotId | null>(null)
   const filled = BENCH_SLOT_IDS.filter((slotId) => Boolean(assignments[slotId])).length
+
+  const candidates = useMemo(
+    () =>
+      [...availablePlayers].sort(
+        (a, b) => Number(a.number) - Number(b.number) || a.name.localeCompare(b.name, 'tr'),
+      ),
+    [availablePlayers],
+  )
 
   return (
     <div className="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm">
@@ -37,7 +51,8 @@ export function SquadBuilderBench({
       </div>
 
       <p className="font-body text-body-sm text-on-surface-variant">
-        10 yedek zorunludur. Havuzdan sürükleyip bırakın.
+        10 yedek zorunludur. Boş yedeğe tıklayıp seçim yaparak veya oyuncu havuzundan sürükleyerek
+        kulübenizi doldurunuz.
       </p>
 
       <div className="grid grid-cols-2 gap-space-xs sm:grid-cols-5">
@@ -45,6 +60,8 @@ export function SquadBuilderBench({
           const playerId = assignments[slotId]
           const player = playerId ? playersById.get(playerId) : undefined
           const isDropTarget = dropTargetSlotId === slotId
+          const isPickerOpen = openPickerSlotId === slotId
+          const openPickerUpward = index >= 5
 
           const dropHandlers = {
             onDragOver: (event: DragEvent) => {
@@ -86,8 +103,8 @@ export function SquadBuilderBench({
                 {...dropHandlers}
                 className={
                   isDropTarget
-                    ? 'group relative flex h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary bg-primary-container/20 p-2 shadow-sm ring-2 ring-primary active:cursor-grabbing'
-                    : 'group relative flex h-[6.5rem] cursor-grab flex-col items-center gap-1 overflow-hidden border border-primary/40 bg-primary-container/10 p-2 shadow-sm active:cursor-grabbing'
+                    ? 'group relative z-10 flex h-[6.5rem] cursor-pointer flex-col items-center gap-1 overflow-hidden border border-primary bg-primary-container/20 p-2 shadow-sm ring-2 ring-primary active:cursor-grabbing'
+                    : 'group relative z-10 flex h-[6.5rem] cursor-pointer flex-col items-center gap-1 overflow-hidden border border-primary/40 bg-primary-container/10 p-2 shadow-sm active:cursor-grabbing'
                 }
               >
                 <span className="font-kicker text-[10px] font-bold text-primary uppercase">
@@ -113,7 +130,7 @@ export function SquadBuilderBench({
                   onClick={() => {
                     onClearSlot(slotId)
                   }}
-                  className="absolute top-0.5 right-0.5 hidden h-5 w-5 items-center justify-center rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
+                  className="absolute top-0.5 right-0.5 hidden h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
                 >
                   <span className="material-symbols-outlined text-[12px] leading-none">close</span>
                 </button>
@@ -124,18 +141,49 @@ export function SquadBuilderBench({
           return (
             <div
               key={slotId}
-              {...dropHandlers}
               className={
-                isDropTarget
-                  ? 'flex h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-primary bg-transparent p-2 ring-2 ring-primary'
-                  : 'flex h-[6.5rem] flex-col items-center justify-center gap-0.5 border border-dashed border-outline-variant/40 bg-transparent p-2 opacity-70 transition-colors'
+                isPickerOpen
+                  ? 'relative z-50 flex h-[6.5rem] flex-col'
+                  : 'relative z-10 flex h-[6.5rem] flex-col'
               }
+              {...dropHandlers}
             >
-              <span className="font-kicker text-[10px] font-bold text-on-surface-variant/80 uppercase">
-                Y{index + 1}
-              </span>
-              <span className="material-symbols-outlined text-[18px] text-outline">person_add</span>
-              <span className="font-label text-[10px] text-on-surface-variant/80 uppercase">Boş</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenPickerSlotId(slotId)
+                }}
+                className={
+                  isDropTarget || isPickerOpen
+                    ? 'flex h-full w-full cursor-pointer flex-col items-center justify-center gap-0.5 border border-dashed border-primary bg-transparent p-2 ring-2 ring-primary'
+                    : 'flex h-full w-full cursor-pointer flex-col items-center justify-center gap-0.5 border border-dashed border-outline-variant/40 bg-transparent p-2 opacity-70 transition-colors hover:border-primary/50 hover:opacity-100'
+                }
+              >
+                <span className="font-kicker text-[10px] font-bold text-on-surface-variant/80 uppercase">
+                  Y{index + 1}
+                </span>
+                <span className="material-symbols-outlined text-[18px] text-outline">
+                  person_add
+                </span>
+                <span className="font-label text-[10px] text-on-surface-variant/80 uppercase">
+                  Boş
+                </span>
+              </button>
+              {isPickerOpen ? (
+                <SquadPlayerPickerMenu
+                  title={`Y${index + 1} · Oyuncu seç`}
+                  candidates={candidates}
+                  openUpward={openPickerUpward}
+                  emptyLabel="Seçilebilecek oyuncu kalmadı."
+                  onPick={(pickedId) => {
+                    onAssignToSlot(slotId, pickedId)
+                    setOpenPickerSlotId(null)
+                  }}
+                  onClose={() => {
+                    setOpenPickerSlotId(null)
+                  }}
+                />
+              ) : null}
             </div>
           )
         })}

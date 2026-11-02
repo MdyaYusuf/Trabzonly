@@ -132,21 +132,18 @@ export function SquadBuilderPlayerPool({
 
         <div className="mt-1 flex items-center gap-2 bg-secondary-fixed/50 px-space-sm py-space-xs">
           <span
-            className={`material-symbols-outlined text-[18px] ${
-              isComplete ? 'text-[#2e7d32]' : 'text-secondary'
-            }`}
+            className={`material-symbols-outlined text-[18px] ${isComplete ? 'text-[#2e7d32]' : 'text-secondary'
+              }`}
           >
             {isComplete ? 'check_circle' : 'info'}
           </span>
           <p className="font-body text-[12px] leading-tight text-on-secondary-fixed">
-            İlk 11: <strong className="font-bold text-primary">{starterFilled}/11</strong>
-            {' · '}
+            As Kadro: <strong className="font-bold text-primary">{starterFilled}/11</strong>
+            {' '}
             Yedek: <strong className="font-bold text-primary">{benchFilled}/10</strong>
             {isComplete ? (
               <span className="text-on-secondary-fixed"> — Kadro hazır</span>
-            ) : (
-              <span className="text-on-surface-variant"> — Sürükle veya seç</span>
-            )}
+            ) : null}
           </p>
         </div>
       </div>

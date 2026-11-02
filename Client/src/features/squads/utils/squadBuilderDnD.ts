@@ -10,23 +10,23 @@ export type SquadPlayerDragPayload = {
 export function setSquadPlayerDragData(
   dataTransfer: DataTransfer,
   payload: SquadPlayerDragPayload,
-  initials?: string,
+  badgeLabel?: string,
 ): void {
   dataTransfer.setData(SQUAD_PLAYER_DND_TYPE, JSON.stringify(payload))
   dataTransfer.setData('text/plain', payload.playerId)
   dataTransfer.effectAllowed = 'move'
 
-  if (initials) {
-    setSquadAvatarDragImage(dataTransfer, initials)
+  if (badgeLabel) {
+    setSquadAvatarDragImage(dataTransfer, badgeLabel)
   }
 }
 
 export function setSquadAvatarDragImage(
   dataTransfer: DataTransfer,
-  initials: string,
+  badgeLabel: string,
 ): void {
   const ghost = document.createElement('div')
-  ghost.textContent = initials.slice(0, 2).toUpperCase()
+  ghost.textContent = badgeLabel.trim().toUpperCase().slice(0, 4)
   ghost.setAttribute('aria-hidden', 'true')
   Object.assign(ghost.style, {
     position: 'fixed',
@@ -40,7 +40,8 @@ export function setSquadAvatarDragImage(
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    font: '700 13px/1 "Lexend Deca", sans-serif',
+    font: '700 12px/1 "Lexend Deca", sans-serif',
+    letterSpacing: '0.06em',
     boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
     pointerEvents: 'none',
     zIndex: '9999',

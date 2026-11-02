@@ -50,7 +50,7 @@ function InstructionCard({ item }: { item: SquadInstructionRow }) {
 
   return (
     <div
-      className={`flex gap-space-sm border border-outline-variant/25 bg-surface-container-low p-space-sm transition-colors hover:border-primary/30 hover:bg-surface-container ${
+      className={`flex gap-space-md border border-outline-variant/25 bg-surface-container-low p-space-sm transition-colors hover:border-primary/30 hover:bg-surface-container ${
         isSetPieces ? 'items-center' : 'items-start'
       }`}
     >
@@ -62,26 +62,26 @@ function InstructionCard({ item }: { item: SquadInstructionRow }) {
         </span>
       </span>
       <div className="min-w-0 flex-1">
-        <span className="font-kicker text-[10px] font-bold tracking-wider text-on-surface-variant uppercase">
+        <span className="font-kicker text-[11px] font-bold tracking-wider text-secondary uppercase">
           {item.title}
         </span>
         {isSetPieces ? (
-          <div className="mt-1.5 flex flex-col gap-1">
-            <p className="font-headline text-[15px] leading-snug text-on-surface">
-              <span className="font-kicker text-[11px] font-bold text-secondary uppercase">
+          <div className="mt-1 flex flex-col gap-0.5">
+            <p className="font-headline text-[13px] leading-snug text-on-surface">
+              <span className="font-kicker text-[11px] font-bold text-secondary">
                 Korner:{' '}
               </span>
               <span className="font-bold text-on-surface">{cornerName || '—'}</span>
             </p>
-            <p className="font-headline text-[15px] leading-snug text-on-surface">
-              <span className="font-kicker text-[11px] font-bold text-secondary uppercase">
+            <p className="font-headline text-[13px] leading-snug text-on-surface">
+              <span className="font-kicker text-[11px] font-bold text-secondary">
                 Serbest Vuruş:{' '}
               </span>
               <span className="font-bold text-on-surface">{freeKickName || '—'}</span>
             </p>
           </div>
         ) : (
-          <p className="font-headline mt-0.5 text-[15px] leading-snug font-bold text-on-surface">
+          <p className="font-headline mt-0.5 text-[13px] leading-snug font-bold text-on-surface">
             {item.value}
           </p>
         )}
@@ -99,11 +99,11 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
             <span className="material-symbols-outlined text-[20px]">grid_view</span>
             Taktik Talimatlar
           </h2>
-          <span className="font-kicker text-[10px] tracking-wider text-on-surface-variant uppercase">
+          <span className="font-kicker text-[13px] font-bold tracking-wider text-secondary uppercase">
             {squad.formation}
           </span>
         </div>
-        <p className="font-body text-body-sm text-on-surface-variant">
+        <p className="font-body text-[13px] leading-snug text-on-surface-variant">
           Bu kadronun saha içi planı ve duran top sorumluları.
         </p>
         <div className="grid grid-cols-1 gap-space-xs sm:grid-cols-2 lg:grid-cols-1">
