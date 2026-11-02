@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Api.Core.Helpers;
 using Api.Core.Repositories;
 using Api.Core.Responses;
+using Api.Features.Positions;
 using Api.Features.Seasons;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -508,21 +509,21 @@ public class PlayerService(
   private static Expression<Func<Player, bool>> BuildListFilter(PlayerListQueryRequest query)
   {
     string? search = query.Search?.Trim();
-    string[]? abbreviations = PlayerPositionGroups.GetAbbreviations(query.PositionGroup);
+    PositionZone? zone = PlayerPositionGroups.GetZone(query.PositionGroup);
 
     return player =>
       player.IsActive &&
       (string.IsNullOrEmpty(search) ||
         player.Name.Contains(search) ||
         (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&
-      (abbreviations == null || abbreviations.Contains(player.Position.Abbreviation));
+      (!zone.HasValue || player.Position.Zone == zone.Value);
   }
 
   private static Expression<Func<Player, bool>> BuildAdminListFilter(
     PlayerAdminListQueryRequest query)
   {
     string? search = query.Search?.Trim();
-    string[]? abbreviations = PlayerPositionGroups.GetAbbreviations(query.PositionGroup);
+    PositionZone? zone = PlayerPositionGroups.GetZone(query.PositionGroup);
     bool? isActive = query.IsActive;
 
     return player =>
@@ -530,7 +531,7 @@ public class PlayerService(
       (string.IsNullOrEmpty(search) ||
         player.Name.Contains(search) ||
         (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&
-      (abbreviations == null || abbreviations.Contains(player.Position.Abbreviation));
+      (!zone.HasValue || player.Position.Zone == zone.Value);
   }
 
   private static Func<IQueryable<Player>, IOrderedQueryable<Player>> BuildListOrderBy(
@@ -604,7 +605,8 @@ public class PlayerService(
       {
         CommentCount = commentCounts.GetValueOrDefault(player.Id),
         CurrentSeasonStats = seasonStats,
-        PositionAbbreviation = player.Position?.Abbreviation ?? mapped.PositionAbbreviation
+        PositionAbbreviation = player.Position?.Abbreviation ?? mapped.PositionAbbreviation,
+        PositionZone = player.Position?.Zone ?? mapped.PositionZone
       };
     }).ToList();
   }

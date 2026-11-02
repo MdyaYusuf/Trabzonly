@@ -1,3 +1,5 @@
+import type { PositionZone } from '@/features/positions/positionTypes'
+
 // Responses
 export interface PlayerSeasonStatsDto {
   appearances: number
@@ -33,6 +35,7 @@ export interface PlayerResponseDto {
   positionId: number
   positionName: string
   positionAbbreviation: string
+  positionZone: PositionZone
   commentCount: number
   createdDate: string
   updatedDate?: string | null
@@ -65,6 +68,8 @@ export interface PlayerPreviewDto {
   averageRating: number
   ratingCount: number
   positionName: string
+  positionAbbreviation: string
+  positionZone: PositionZone
 }
 
 export interface PlayerRatingResponseDto {

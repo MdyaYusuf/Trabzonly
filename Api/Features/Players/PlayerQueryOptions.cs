@@ -1,3 +1,5 @@
+using Api.Features.Positions;
+
 namespace Api.Features.Players;
 
 public static class PlayerPositionGroups
@@ -8,12 +10,7 @@ public static class PlayerPositionGroups
   public const string Midfield = "mid";
   public const string Forward = "fwd";
 
-  public static readonly string[] GoalkeeperAbbreviations = ["GK"];
-  public static readonly string[] DefenceAbbreviations = ["CB", "LB", "RB"];
-  public static readonly string[] MidfieldAbbreviations = ["DM", "CM", "AM"];
-  public static readonly string[] ForwardAbbreviations = ["LW", "RW", "ST"];
-
-  public static string[]? GetAbbreviations(string? positionGroup)
+  public static PositionZone? GetZone(string? positionGroup)
   {
     if (string.IsNullOrWhiteSpace(positionGroup) || positionGroup == All)
     {
@@ -22,10 +19,10 @@ public static class PlayerPositionGroups
 
     return positionGroup.ToLowerInvariant() switch
     {
-      Goalkeeper => GoalkeeperAbbreviations,
-      Defence => DefenceAbbreviations,
-      Midfield => MidfieldAbbreviations,
-      Forward => ForwardAbbreviations,
+      Goalkeeper => PositionZone.Goalkeeper,
+      Defence => PositionZone.Defence,
+      Midfield => PositionZone.Midfield,
+      Forward => PositionZone.Attack,
       _ => null
     };
   }

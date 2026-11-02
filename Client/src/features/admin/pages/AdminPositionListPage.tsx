@@ -1,143 +1,141 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import positionService from '@/features/positions/positionService'
+import type { PositionZone } from '@/features/positions/positionTypes'
+import { AdminPositionDeleteModal } from '../components/AdminPositionDeleteModal'
 import { AdminPositionListFilters } from '../components/AdminPositionListFilters'
-import { AdminPositionListFooter } from '../components/AdminPositionListFooter'
 import { AdminPositionListHeader } from '../components/AdminPositionListHeader'
 import { AdminPositionTable } from '../components/AdminPositionTable'
-import {
-  adminPositionDistribution,
-  adminPositionListRows,
-} from '../utils/adminPositionPlaceholders'
-import type { AdminPositionSort, AdminPositionZone } from '../utils/adminPositionTypes'
+import { mapPositionResponseToListRow } from '../utils/adminPositionDraftUtils'
+import type {
+  AdminPositionListRow,
+  AdminPositionSort,
+  AdminPositionZoneFilter,
+} from '../utils/adminPositionTypes'
 
 export function AdminPositionListPage() {
   const [search, setSearch] = useState('')
-  const [zoneFilter, setZoneFilter] = useState<AdminPositionZone>('all')
-  const [sort, setSort] = useState<AdminPositionSort>('players-desc')
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [zoneFilter, setZoneFilter] = useState<AdminPositionZoneFilter>('all')
+  const [sort, setSort] = useState<AdminPositionSort>('zone-asc')
+  const [rows, setRows] = useState<AdminPositionListRow[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<AdminPositionListRow | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [listVersion, setListVersion] = useState(0)
 
-  const counts = useMemo(() => {
-    return {
-      all: adminPositionListRows.length,
-      attack: adminPositionListRows.filter((row) => row.zone === 'attack').length,
-      midfield: adminPositionListRows.filter((row) => row.zone === 'midfield').length,
-      defence: adminPositionListRows.filter((row) => row.zone === 'defence').length,
-      goalkeeper: adminPositionListRows.filter((row) => row.zone === 'goalkeeper').length,
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timer)
     }
-  }, [])
+  }, [search])
 
-  const filtered = useMemo(() => {
-    let result = [...adminPositionListRows]
+  useEffect(() => {
+    let cancelled = false
 
-    if (zoneFilter !== 'all') {
-      result = result.filter((row) => row.zone === zoneFilter)
-    }
+    async function loadPositions() {
+      setIsLoading(true)
 
-    const query = search.trim().toLowerCase()
+      const zone: PositionZone | undefined =
+        zoneFilter === 'all' ? undefined : zoneFilter
 
-    if (query) {
-      result = result.filter(
-        (row) =>
-          row.name.toLowerCase().includes(query) ||
-          row.abbreviation.toLowerCase().includes(query) ||
-          row.roleLabel.toLowerCase().includes(query) ||
-          row.zoneLabel.toLowerCase().includes(query),
-      )
-    }
+      const result = await positionService.getAllForAdmin({
+        search: debouncedSearch || undefined,
+        zone,
+        sort,
+      })
 
-    result.sort((a, b) => {
-      if (sort === 'players-asc') {
-        return a.playerCount - b.playerCount
+      if (cancelled) {
+        return
       }
 
-      if (sort === 'alpha') {
-        return a.name.localeCompare(b.name, 'tr')
+      if (result.success && result.data) {
+        setRows(result.data.map(mapPositionResponseToListRow))
+      } else {
+        setRows([])
       }
 
-      if (sort === 'zone') {
-        if (a.zoneOrder !== b.zoneOrder) {
-          return a.zoneOrder - b.zoneOrder
-        }
+      setIsLoading(false)
+    }
 
-        return a.name.localeCompare(b.name, 'tr')
-      }
+    void loadPositions()
 
-      return b.playerCount - a.playerCount
-    })
-
-    return result
-  }, [search, zoneFilter, sort])
+    return () => {
+      cancelled = true
+    }
+  }, [debouncedSearch, zoneFilter, sort, listVersion])
 
   function clearFilters() {
     setSearch('')
+    setDebouncedSearch('')
     setZoneFilter('all')
-    setSort('players-desc')
+    setSort('zone-asc')
   }
 
-  function toggleId(id: string) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deletingId != null) {
+      return
+    }
 
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
+    const deletedId = deleteTarget.id
+    setDeletingId(deletedId)
 
-      return next
-    })
-  }
+    const result = await positionService.remove(deletedId)
 
-  function toggleAll() {
-    const ids = filtered.map((row) => row.id)
-    const allSelected = ids.every((id) => selectedIds.has(id))
+    if (result.success) {
+      setDeleteTarget(null)
+      setListVersion((prev) => prev + 1)
+    }
 
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-
-      if (allSelected) {
-        for (const id of ids) {
-          next.delete(id)
-        }
-      } else {
-        for (const id of ids) {
-          next.add(id)
-        }
-      }
-
-      return next
-    })
+    setDeletingId(null)
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-      <AdminPositionListHeader
-        totalPositions={adminPositionListRows.length}
-        activeRoles={adminPositionListRows.length}
-        registeredPlayers={adminPositionDistribution.totalPlayers}
-      />
+    <div className="flex flex-col">
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <AdminPositionListHeader />
 
-      <AdminPositionListFilters
-        search={search}
-        zoneFilter={zoneFilter}
-        sort={sort}
-        counts={counts}
-        onSearchChange={setSearch}
-        onZoneChange={setZoneFilter}
-        onSortChange={setSort}
-      />
+        <AdminPositionListFilters
+          search={search}
+          zoneFilter={zoneFilter}
+          sort={sort}
+          onSearchChange={setSearch}
+          onZoneChange={setZoneFilter}
+          onSortChange={setSort}
+          onClear={clearFilters}
+        />
 
-      <AdminPositionTable
-        positions={filtered}
-        selectedIds={selectedIds}
-        onToggle={toggleId}
-        onToggleAll={toggleAll}
-        onClearFilters={clearFilters}
-      />
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            Pozisyonlar yükleniyor...
+          </p>
+        ) : (
+          <AdminPositionTable
+            positions={rows}
+            deletingId={deletingId}
+            onDelete={setDeleteTarget}
+          />
+        )}
+      </main>
 
-      <AdminPositionListFooter
-        visibleCount={filtered.length}
-        totalCount={filtered.length}
+      <AdminPositionDeleteModal
+        open={Boolean(deleteTarget)}
+        positionName={deleteTarget?.name ?? 'Pozisyon'}
+        isDeleting={deletingId != null}
+        onCancel={() => {
+          if (deletingId != null) {
+            return
+          }
+
+          setDeleteTarget(null)
+        }}
+        onConfirm={() => {
+          void handleConfirmDelete()
+        }}
       />
-    </main>
+    </div>
   )
 }

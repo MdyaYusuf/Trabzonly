@@ -1,50 +1,32 @@
-export type AdminPositionZone = 'all' | 'attack' | 'midfield' | 'defence' | 'goalkeeper'
+import type { PositionSortOption, PositionZone } from '@/features/positions/positionTypes'
 
-export type AdminPositionSort =
-  | 'players-desc'
-  | 'players-asc'
-  | 'alpha'
-  | 'zone'
+export type AdminPositionZoneFilter = 'all' | PositionZone
+
+export type AdminPositionSort = PositionSortOption
 
 export type AdminPositionListRow = {
-  id: string
+  id: number
   name: string
-  roleLabel: string
   abbreviation: string
-  zone: Exclude<AdminPositionZone, 'all'>
+  zone: PositionZone
   zoneLabel: string
-  playerCount: number
-  playerCountLabel: string
-  samplePlayers: string
-  statusLabel: string
-  icon: string
-  zoneOrder: number
+  roleNames: string[]
 }
 
-export type AdminPositionLinkedPlayer = {
-  id: string
-  numberLabel: string
+export type AdminPositionRoleDraft = {
+  clientKey: string
+  id: number | null
   name: string
-  roleNote: string
-  preferenceLabel: string
+  description: string
+  sortOrder: number
 }
 
 export type AdminPositionFormDraft = {
-  id: string
-  recordCode: string
+  id: number | null
   name: string
   abbreviation: string
-  zone: 'goalkeeper' | 'defence' | 'midfield' | 'attack'
-  zoneSelectLabel: string
-  description: string
-  isActive: boolean
-  federationNote: string
-  previewNumber: string
-  previewPlayerName: string
-  previewRoleLine: string
-  formationLabel: string
-  linkedPlayers: AdminPositionLinkedPlayer[]
-  depthLabel: string
-  depthNote: string
-  lastUpdated: string
+  zone: PositionZone
+  roles: AdminPositionRoleDraft[]
+  createdDate?: string | null
+  updatedDate?: string | null
 }

@@ -1,3 +1,4 @@
+using Api.Features.Positions;
 using Microsoft.AspNetCore.Http;
 
 namespace Api.Features.Players;
@@ -36,6 +37,7 @@ public sealed record PlayerResponseDto(
   int PositionId,
   string PositionName,
   string PositionAbbreviation = "",
+  PositionZone PositionZone = PositionZone.Midfield,
   int CommentCount = 0,
   DateTime CreatedDate = default,
   DateTime? UpdatedDate = null,
@@ -58,7 +60,9 @@ public sealed record PlayerPreviewDto(
   int? ShirtNumber,
   decimal AverageRating,
   int RatingCount,
-  string PositionName);
+  string PositionName,
+  string PositionAbbreviation = "",
+  PositionZone PositionZone = PositionZone.Midfield);
 
 public sealed record PlayerRatingResponseDto(
   int PlayerId,

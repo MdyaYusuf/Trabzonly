@@ -53,6 +53,7 @@ namespace Trabzonly.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Abbreviation = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Zone = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -104,6 +105,7 @@ namespace Trabzonly.Api.Migrations
                     Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -146,6 +148,30 @@ namespace Trabzonly.Api.Migrations
                         principalTable: "Positions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PositionRoles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    PositionId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PositionRoles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PositionRoles_Positions_PositionId",
+                        column: x => x.PositionId,
+                        principalTable: "Positions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -859,10 +885,26 @@ namespace Trabzonly.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_PositionRoles_PositionId_Name",
+                table: "PositionRoles",
+                columns: new[] { "PositionId", "Name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PositionRoles_PositionId_SortOrder",
+                table: "PositionRoles",
+                columns: new[] { "PositionId", "SortOrder" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Positions_Abbreviation",
                 table: "Positions",
                 column: "Abbreviation",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Positions_Zone",
+                table: "Positions",
+                column: "Zone");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PostReactions_PostId",
@@ -1035,6 +1077,9 @@ namespace Trabzonly.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "PollVotes");
+
+            migrationBuilder.DropTable(
+                name: "PositionRoles");
 
             migrationBuilder.DropTable(
                 name: "PostReactions");

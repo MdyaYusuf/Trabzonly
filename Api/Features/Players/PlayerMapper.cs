@@ -10,6 +10,7 @@ public partial class PlayerMapper
 
   [MapProperty("Position.Name", "PositionName")]
   [MapProperty("Position.Abbreviation", "PositionAbbreviation")]
+  [MapProperty("Position.Zone", "PositionZone")]
   [MapperIgnoreTarget(nameof(PlayerResponseDto.CommentCount))]
   [MapperIgnoreTarget(nameof(PlayerResponseDto.CurrentSeasonStats))]
   [MapperIgnoreTarget(nameof(PlayerResponseDto.CurrentUserScore))]
@@ -18,6 +19,8 @@ public partial class PlayerMapper
   public partial CreatedPlayerResponseDto EntityToCreatedResponseDto(Player entity);
 
   [MapProperty("Position.Name", "PositionName")]
+  [MapProperty("Position.Abbreviation", "PositionAbbreviation")]
+  [MapProperty("Position.Zone", "PositionZone")]
   public partial PlayerPreviewDto EntityToPreviewDto(Player entity);
   public partial List<PlayerPreviewDto> EntityToPreviewDtoList(List<Player> entities);
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Trabzonly.Api.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20261027224317_InitialCreate")]
+    [Migration("20261102155227_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -509,12 +509,60 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("UpdatedDate");
 
+                    b.Property<int>("Zone")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Abbreviation")
                         .IsUnique();
 
+                    b.HasIndex("Zone");
+
                     b.ToTable("Positions", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.Positions.PositionRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<int>("PositionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PositionId", "Name")
+                        .IsUnique();
+
+                    b.HasIndex("PositionId", "SortOrder");
+
+                    b.ToTable("PositionRoles", (string)null);
                 });
 
             modelBuilder.Entity("Api.Features.Posts.Post", b =>
@@ -868,6 +916,11 @@ namespace Trabzonly.Api.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1390,6 +1443,17 @@ namespace Trabzonly.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Api.Features.Positions.PositionRole", b =>
+                {
+                    b.HasOne("Api.Features.Positions.Position", "Position")
+                        .WithMany("Roles")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Position");
+                });
+
             modelBuilder.Entity("Api.Features.Posts.Post", b =>
                 {
                     b.HasOne("Api.Features.Categories.Category", "Category")
@@ -1642,6 +1706,8 @@ namespace Trabzonly.Api.Migrations
             modelBuilder.Entity("Api.Features.Positions.Position", b =>
                 {
                     b.Navigation("Players");
+
+                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("Api.Features.Posts.Post", b =>

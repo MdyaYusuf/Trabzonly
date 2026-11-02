@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
 using Api.Features.Players;
+using Api.Features.Positions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -276,7 +277,7 @@ public class PlayerStatsService(
   {
     string? search = query.Search?.Trim();
     string? team = query.Team?.Trim();
-    string[]? abbreviations = PlayerPositionGroups.GetAbbreviations(query.PositionGroup);
+    PositionZone? zone = PlayerPositionGroups.GetZone(query.PositionGroup);
     int? seasonId = query.SeasonId;
     int? playerId = query.PlayerId;
 
@@ -284,7 +285,7 @@ public class PlayerStatsService(
       (!seasonId.HasValue || stats.SeasonId == seasonId.Value) &&
       (!playerId.HasValue || stats.PlayerId == playerId.Value) &&
       (string.IsNullOrEmpty(team) || stats.Team.Contains(team)) &&
-      (abbreviations == null || abbreviations.Contains(stats.Player.Position.Abbreviation)) &&
+      (!zone.HasValue || stats.Player.Position.Zone == zone.Value) &&
       (string.IsNullOrEmpty(search) ||
         stats.Player.Name.Contains(search) ||
         (stats.Player.ShirtNumber.HasValue &&
