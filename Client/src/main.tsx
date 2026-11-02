@@ -122,6 +122,10 @@ const router = createBrowserRouter([
             element: <SquadBuilderPage />,
           },
           {
+            path: 'kadrolar/:squadId/duzenle',
+            element: <SquadBuilderPage />,
+          },
+          {
             path: 'kadrolar/:squadId',
             element: <SquadDetailPage />,
           },

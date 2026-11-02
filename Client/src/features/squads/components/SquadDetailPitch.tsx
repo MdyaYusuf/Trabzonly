@@ -90,8 +90,9 @@ function DetailSlotCard({
           className={`font-kicker block text-[9px] font-bold uppercase ${
             isGk ? 'text-tertiary' : 'text-secondary'
           }`}
+          title={player.roleDescription ?? undefined}
         >
-          {slot.label} • {slot.roleLabel}
+          {slot.label} • {player.roleLabel}
         </span>
       </div>
     </div>

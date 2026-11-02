@@ -144,6 +144,8 @@ function mapStartersToPitchPlayers(
         return
       }
 
+      const selectedRoleName = slot.positionRoleName?.trim()
+
       players.push({
         id: slot.slotKey,
         slotId: slotDef.id,
@@ -152,7 +154,10 @@ function mapStartersToPitchPlayers(
         fullName: slot.playerName,
         number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
         positionLabel: slotDef.label,
-        roleLabel: slotDef.roleLabel,
+        roleLabel: selectedRoleName && selectedRoleName.length > 0
+          ? selectedRoleName
+          : slotDef.roleLabel,
+        roleDescription: slot.positionRoleDescription ?? null,
         isCaptain: slot.playerId === captainPlayerId,
         isGk: slotDef.id === 'GK',
         avatarInitials: initialsFromPlayerName(slot.playerName),

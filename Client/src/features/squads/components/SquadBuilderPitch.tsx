@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
+import type { PositionRoleResponseDto } from '@/features/positions/positionTypes'
 import type {
   BuilderPlayer,
   BuilderSlotId,
@@ -15,6 +16,8 @@ import { CaptainArmband } from './CaptainArmband'
 type SquadBuilderPitchProps = {
   formation: FormationConfig
   assignments: Partial<Record<BuilderSlotId, string>>
+  roleAssignments: Partial<Record<BuilderSlotId, number>>
+  rolesBySlotId: Map<BuilderSlotId, PositionRoleResponseDto[]>
   players: BuilderPlayer[]
   playersById: Map<string, BuilderPlayer>
   assignedPlayerIds: Set<string>
@@ -22,6 +25,7 @@ type SquadBuilderPitchProps = {
   onAssignToSlot: (slotId: BuilderSlotId, playerId: string) => void
   onDropPlayer: (targetSlotId: BuilderSlotId, playerId: string, sourceSlotId?: string) => void
   onClearSlot: (slotId: BuilderSlotId) => void
+  onRoleChange: (slotId: BuilderSlotId, roleId: number) => void
 }
 
 function SlotPlayerPicker({
@@ -159,6 +163,8 @@ function SlotCard({
   slot,
   player,
   candidates,
+  roleOptions,
+  selectedRoleId,
   isPickerOpen,
   isDropTarget,
   openPickerUpward,
@@ -167,6 +173,7 @@ function SlotCard({
   onClosePicker,
   onPick,
   onClear,
+  onRoleChange,
   onDragOverSlot,
   onDragLeaveSlot,
   onDropOnSlot,
@@ -174,6 +181,8 @@ function SlotCard({
   slot: FormationSlot
   player?: BuilderPlayer
   candidates: BuilderPlayer[]
+  roleOptions: PositionRoleResponseDto[]
+  selectedRoleId?: number
   isPickerOpen: boolean
   isDropTarget: boolean
   openPickerUpward: boolean
@@ -182,11 +191,13 @@ function SlotCard({
   onClosePicker: () => void
   onPick: (playerId: string) => void
   onClear: () => void
+  onRoleChange: (roleId: number) => void
   onDragOverSlot: (event: DragEvent) => void
   onDragLeaveSlot: () => void
   onDropOnSlot: (event: DragEvent) => void
 }) {
   const isGk = slot.id === 'GK'
+  const selectedRole = roleOptions.find((role) => role.id === selectedRoleId)
 
   if (!player) {
     return (
@@ -288,7 +299,7 @@ function SlotCard({
           <span className="material-symbols-outlined text-[14px]">close</span>
         </button>
       </div>
-      <div className="mt-1 bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
+      <div className="mt-1 max-w-[7.5rem] bg-surface-container-lowest/95 px-2 py-0.5 text-center shadow-sm">
         <span className="font-headline block text-[12px] leading-tight font-bold text-primary">
           {player.shortName}
         </span>
@@ -297,8 +308,53 @@ function SlotCard({
             isGk ? 'text-tertiary' : 'text-secondary'
           }`}
         >
-          {slot.label} • {slot.roleLabel}
+          {slot.label}
         </span>
+        {roleOptions.length > 0 ? (
+          <label className="mt-0.5 block">
+            <span className="sr-only">{slot.label} rolü</span>
+            <select
+              value={selectedRoleId ?? ''}
+              title={selectedRole?.description ?? 'Rol seç'}
+              onClick={(event) => {
+                event.stopPropagation()
+              }}
+              onMouseDown={(event) => {
+                event.stopPropagation()
+              }}
+              onChange={(event) => {
+                event.stopPropagation()
+                const nextId = Number(event.target.value)
+
+                if (!Number.isFinite(nextId) || nextId <= 0) {
+                  return
+                }
+
+                onRoleChange(nextId)
+              }}
+              className={`font-kicker w-full max-w-full truncate border-0 bg-transparent py-0 text-center text-[9px] font-bold uppercase focus:outline-none focus:ring-1 focus:ring-primary ${
+                isGk ? 'text-tertiary' : 'text-secondary'
+              }`}
+            >
+              <option value="" disabled>
+                Rol seç
+              </option>
+              {roleOptions.map((role) => (
+                <option key={role.id} value={role.id} title={role.description}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <span
+            className={`font-kicker block text-[9px] font-bold uppercase ${
+              isGk ? 'text-tertiary' : 'text-secondary'
+            }`}
+          >
+            {slot.roleLabel}
+          </span>
+        )}
       </div>
     </div>
   )
@@ -327,6 +383,8 @@ function rowGridClass(count: number) {
 export function SquadBuilderPitch({
   formation,
   assignments,
+  roleAssignments,
+  rolesBySlotId,
   players,
   playersById,
   assignedPlayerIds,
@@ -334,6 +392,7 @@ export function SquadBuilderPitch({
   onAssignToSlot,
   onDropPlayer,
   onClearSlot,
+  onRoleChange,
 }: SquadBuilderPitchProps) {
   const [openPickerSlotId, setOpenPickerSlotId] = useState<BuilderSlotId | null>(null)
   const [dropTargetSlotId, setDropTargetSlotId] = useState<BuilderSlotId | null>(null)
@@ -437,6 +496,8 @@ export function SquadBuilderPitch({
                       slot={slot}
                       player={player}
                       candidates={candidatesBySlot.get(slot.id) ?? []}
+                      roleOptions={rolesBySlotId.get(slot.id) ?? []}
+                      selectedRoleId={roleAssignments[slot.id]}
                       isPickerOpen={openPickerSlotId === slot.id}
                       isDropTarget={dropTargetSlotId === slot.id}
                       openPickerUpward={openPickerUpward}
@@ -453,6 +514,9 @@ export function SquadBuilderPitch({
                       }}
                       onClear={() => {
                         onClearSlot(slot.id)
+                      }}
+                      onRoleChange={(roleId) => {
+                        onRoleChange(slot.id, roleId)
                       }}
                       onDragOverSlot={(event) => {
                         event.preventDefault()

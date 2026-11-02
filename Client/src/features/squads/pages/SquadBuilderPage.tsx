@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAppSelector } from '@/core/store/hooks'
 import playerService from '@/features/players/playerService'
+import positionService from '@/features/positions/positionService'
+import type { PositionRoleResponseDto } from '@/features/positions/positionTypes'
 import { SquadBuilderBench } from '../components/SquadBuilderBench'
 import { SquadBuilderNotes } from '../components/SquadBuilderNotes'
 import { SquadBuilderPitch } from '../components/SquadBuilderPitch'
@@ -12,7 +14,13 @@ import { SquadBuilderSidebarStats } from '../components/SquadBuilderSidebarStats
 import { SquadBuilderTactics } from '../components/SquadBuilderTactics'
 import { SquadBuilderToolbar } from '../components/SquadBuilderToolbar'
 import squadService from '../squadService'
-import type { CreateSquadRequest, SquadSlotRequest } from '../squadTypes'
+import type {
+  CreateSquadRequest,
+  SquadResponseDto,
+  SquadSlotRequest,
+  UpdateSquadRequest,
+} from '../squadTypes'
+import { getCatalogAbbreviationForSlot } from '../utils/getCatalogAbbreviationForSlot'
 import { mapPlayerToBuilderPlayer } from '../utils/mapPlayerToBuilderPlayer'
 import {
   BENCH_SLOT_IDS,
@@ -37,14 +45,48 @@ import type {
   TempoOption,
 } from '../utils/squadBuilderTypes'
 
+function isBuilderFormationId(value: string): value is BuilderFormationId {
+  return getFormationConfig(value as BuilderFormationId).id === value
+}
+
+function isAttackStyleOption(value: string): value is AttackStyleOption {
+  return (attackStyleOptions as readonly string[]).includes(value)
+}
+
+function isDefenseLineOption(value: string): value is DefenseLineOption {
+  return (defenseLineOptions as readonly string[]).includes(value)
+}
+
+function isTempoOption(value: string): value is TempoOption {
+  return (tempoOptions as readonly string[]).includes(value)
+}
+
+function defaultRoleIdForSlot(
+  slotId: BuilderSlotId,
+  rolesBySlotId: Map<BuilderSlotId, PositionRoleResponseDto[]>,
+): number | undefined {
+  const roles = rolesBySlotId.get(slotId)
+
+  if (!roles || roles.length === 0) {
+    return undefined
+  }
+
+  return roles[0]?.id
+}
+
 export function SquadBuilderPage() {
   const navigate = useNavigate()
+  const { squadId: editSquadId } = useParams<{ squadId?: string }>()
+  const isEditMode = Boolean(editSquadId)
   const { isAuthenticated } = useAppSelector((state) => state.auth)
 
   const [title, setTitle] = useState('')
   const [formationId, setFormationId] = useState<BuilderFormationId>('4-2-3-1')
   const [starterAssignments, setStarterAssignments] = useState<
     Partial<Record<BuilderSlotId, string>>
+  >({})
+  const [roleAssignments, setRoleAssignments] = useState<
+    Partial<Record<BuilderSlotId, number>>
   >({})
   const [benchAssignments, setBenchAssignments] = useState<Partial<Record<BenchSlotId, string>>>(
     {},
@@ -59,7 +101,11 @@ export function SquadBuilderPage() {
   const [freeKickTakerPlayerId, setFreeKickTakerPlayerId] = useState('')
   const [notes, setNotes] = useState('')
   const [players, setPlayers] = useState<BuilderPlayer[]>([])
+  const [rolesByAbbreviation, setRolesByAbbreviation] = useState<
+    Map<string, PositionRoleResponseDto[]>
+  >(() => new Map())
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(true)
+  const [isLoadingSquad, setIsLoadingSquad] = useState(isEditMode)
   const [modalOpen, setModalOpen] = useState(false)
   const [publishedSquadId, setPublishedSquadId] = useState<string | null>(null)
   const [isPublishing, setIsPublishing] = useState(false)
@@ -73,6 +119,23 @@ export function SquadBuilderPage() {
     }
     return map
   }, [players])
+
+  const rolesBySlotId = useMemo(() => {
+    const map = new Map<BuilderSlotId, PositionRoleResponseDto[]>()
+
+    for (const slotId of slotIdsForFormation(formationId)) {
+      const abbreviation = getCatalogAbbreviationForSlot(slotId)
+
+      if (!abbreviation) {
+        map.set(slotId, [])
+        continue
+      }
+
+      map.set(slotId, rolesByAbbreviation.get(abbreviation) ?? [])
+    }
+
+    return map
+  }, [formationId, rolesByAbbreviation])
 
   const stats = useMemo(
     () => computeSquadStats(starterAssignments, benchAssignments, playersById),
@@ -112,6 +175,17 @@ export function SquadBuilderPage() {
     return ids
   }, [allAssignments])
 
+  const starterSlotsHaveRoles = useMemo(() => {
+    return slotIdsForFormation(formationId).every((slotId) => {
+      if (!starterAssignments[slotId]) {
+        return false
+      }
+
+      const roleId = roleAssignments[slotId]
+      return typeof roleId === 'number' && roleId > 0
+    })
+  }, [formationId, starterAssignments, roleAssignments])
+
   function findSlotForPlayer(playerId: string): AssignmentSlotId | null {
     for (const [slotId, assignedId] of Object.entries(starterAssignments)) {
       if (assignedId === playerId) {
@@ -126,6 +200,82 @@ export function SquadBuilderPage() {
     }
 
     return null
+  }
+
+  function ensureRoleForSlot(
+    slotId: BuilderSlotId,
+    currentRoles: Partial<Record<BuilderSlotId, number>>,
+  ): Partial<Record<BuilderSlotId, number>> {
+    if (currentRoles[slotId]) {
+      return currentRoles
+    }
+
+    const defaultRoleId = defaultRoleIdForSlot(slotId, rolesBySlotId)
+
+    if (!defaultRoleId) {
+      return currentRoles
+    }
+
+    return {
+      ...currentRoles,
+      [slotId]: defaultRoleId,
+    }
+  }
+
+  function applySquadToBuilder(squad: SquadResponseDto) {
+    const formationValue = squad.formation.trim()
+
+    if (!isBuilderFormationId(formationValue)) {
+      showToast('Bu kadronun dizilişi builderda desteklenmiyor.')
+      return
+    }
+
+    const nextStarters: Partial<Record<BuilderSlotId, string>> = {}
+    const nextRoles: Partial<Record<BuilderSlotId, number>> = {}
+    const nextBench: Partial<Record<BenchSlotId, string>> = {}
+    const validStarterSlots = new Set(slotIdsForFormation(formationValue))
+
+    for (const slot of squad.slots ?? []) {
+      const key = slot.slotKey.trim().toUpperCase()
+
+      if (isBenchSlotId(key)) {
+        nextBench[key as BenchSlotId] = String(slot.playerId)
+        continue
+      }
+
+      if (!validStarterSlots.has(key as BuilderSlotId)) {
+        continue
+      }
+
+      const starterKey = key as BuilderSlotId
+      nextStarters[starterKey] = String(slot.playerId)
+
+      if (slot.positionRoleId != null && slot.positionRoleId > 0) {
+        nextRoles[starterKey] = slot.positionRoleId
+      }
+    }
+
+    setTitle(squad.title)
+    setFormationId(formationValue)
+    setStarterAssignments(nextStarters)
+    setRoleAssignments(nextRoles)
+    setBenchAssignments(nextBench)
+    setNotes(squad.notes ?? '')
+    setCaptainPlayerId(String(squad.captainPlayerId))
+    setCornerTakerPlayerId(String(squad.cornerTakerPlayerId))
+    setFreeKickTakerPlayerId(String(squad.freeKickTakerPlayerId))
+
+    if (isAttackStyleOption(squad.attackStyle)) {
+      setAttackStyle(squad.attackStyle)
+    }
+
+    if (isDefenseLineOption(squad.defenseLine)) {
+      setDefenseLine(squad.defenseLine)
+    }
+
+    if (isTempoOption(squad.tempo)) {
+      setTempo(squad.tempo)
+    }
   }
 
   useEffect(() => {
@@ -145,34 +295,128 @@ export function SquadBuilderPage() {
   useEffect(() => {
     let cancelled = false
 
-    async function loadPlayers() {
+    async function loadCatalog() {
       setIsLoadingPlayers(true)
 
-      const result = await playerService.getAll({
-        pageNumber: 1,
-        pageSize: 100,
-        sort: 'number-asc',
-      })
+      const [playersResult, positionsResult] = await Promise.all([
+        playerService.getAll({
+          pageNumber: 1,
+          pageSize: 100,
+          sort: 'number-asc',
+        }),
+        positionService.getAll({
+          pageNumber: 1,
+          pageSize: 100,
+        }),
+      ])
 
       if (cancelled) {
         return
       }
 
-      if (result.success && result.data) {
-        setPlayers(result.data.items.map(mapPlayerToBuilderPlayer))
+      if (playersResult.success && playersResult.data) {
+        setPlayers(playersResult.data.items.map(mapPlayerToBuilderPlayer))
       } else {
         setPlayers([])
+      }
+
+      if (positionsResult.success && positionsResult.data) {
+        const nextRoles = new Map<string, PositionRoleResponseDto[]>()
+
+        for (const position of positionsResult.data.items) {
+          const abbreviation = position.abbreviation.trim().toUpperCase()
+          const roles = [...(position.roles ?? [])].sort(
+            (a, b) => a.sortOrder - b.sortOrder || a.id - b.id,
+          )
+          nextRoles.set(abbreviation, roles)
+        }
+
+        setRolesByAbbreviation(nextRoles)
+      } else {
+        setRolesByAbbreviation(new Map())
       }
 
       setIsLoadingPlayers(false)
     }
 
-    void loadPlayers()
+    void loadCatalog()
 
     return () => {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    if (!editSquadId) {
+      setIsLoadingSquad(false)
+      return
+    }
+
+    let cancelled = false
+
+    async function loadSquadForEdit() {
+      setIsLoadingSquad(true)
+
+      const result = await squadService.getById(editSquadId!)
+
+      if (cancelled) {
+        return
+      }
+
+      if (!result.success || !result.data) {
+        showToast(result.message || 'Kadro yüklenemedi.')
+        setIsLoadingSquad(false)
+        navigate('/kadrolar/olustur', { replace: true })
+        return
+      }
+
+      applySquadToBuilder(result.data)
+      setIsLoadingSquad(false)
+    }
+
+    void loadSquadForEdit()
+
+    return () => {
+      cancelled = true
+    }
+  }, [editSquadId, navigate])
+
+  useEffect(() => {
+    setRoleAssignments((prev) => {
+      let changed = false
+      const next = { ...prev }
+
+      for (const slotId of slotIdsForFormation(formationId)) {
+        if (!starterAssignments[slotId]) {
+          if (next[slotId] != null) {
+            delete next[slotId]
+            changed = true
+          }
+          continue
+        }
+
+        const roleOptions = rolesBySlotId.get(slotId) ?? []
+        const currentRoleId = next[slotId]
+        const roleStillValid = roleOptions.some((role) => role.id === currentRoleId)
+
+        if (roleStillValid) {
+          continue
+        }
+
+        const fallback = roleOptions[0]?.id
+
+        if (fallback) {
+          next[slotId] = fallback
+          changed = true
+        } else if (currentRoleId != null) {
+          delete next[slotId]
+          changed = true
+        }
+      }
+
+      return changed ? next : prev
+    })
+  }, [formationId, starterAssignments, rolesBySlotId])
 
   function showToast(message: string) {
     setFeedbackToast(message)
@@ -183,20 +427,29 @@ export function SquadBuilderPage() {
 
   function handleFormationChange(nextId: BuilderFormationId) {
     const nextSlots = new Set(slotIdsForFormation(nextId))
-    const kept: Partial<Record<BuilderSlotId, string>> = {}
+    const keptPlayers: Partial<Record<BuilderSlotId, string>> = {}
+    const keptRoles: Partial<Record<BuilderSlotId, number>> = {}
 
     for (const [slotId, playerId] of Object.entries(starterAssignments)) {
       if (nextSlots.has(slotId as BuilderSlotId) && playerId) {
-        kept[slotId as BuilderSlotId] = playerId
+        keptPlayers[slotId as BuilderSlotId] = playerId
+      }
+    }
+
+    for (const [slotId, roleId] of Object.entries(roleAssignments)) {
+      if (nextSlots.has(slotId as BuilderSlotId) && roleId) {
+        keptRoles[slotId as BuilderSlotId] = roleId
       }
     }
 
     setFormationId(nextId)
-    setStarterAssignments(kept)
+    setStarterAssignments(keptPlayers)
+    setRoleAssignments(keptRoles)
   }
 
   function handleClear() {
     setStarterAssignments({})
+    setRoleAssignments({})
     setBenchAssignments({})
     setCaptainPlayerId('')
     setCornerTakerPlayerId('')
@@ -205,6 +458,11 @@ export function SquadBuilderPage() {
 
   function handleClearStarterSlot(slotId: BuilderSlotId) {
     setStarterAssignments((prev) => {
+      const next = { ...prev }
+      delete next[slotId]
+      return next
+    })
+    setRoleAssignments((prev) => {
       const next = { ...prev }
       delete next[slotId]
       return next
@@ -219,6 +477,13 @@ export function SquadBuilderPage() {
     })
   }
 
+  function handleRoleChange(slotId: BuilderSlotId, roleId: number) {
+    setRoleAssignments((prev) => ({
+      ...prev,
+      [slotId]: roleId,
+    }))
+  }
+
   function handleAssignToStarterSlot(slotId: BuilderSlotId, playerId: string) {
     if (assignedPlayerIds.has(playerId)) {
       return
@@ -228,6 +493,7 @@ export function SquadBuilderPage() {
       ...prev,
       [slotId]: playerId,
     }))
+    setRoleAssignments((prev) => ensureRoleForSlot(slotId, prev))
   }
 
   function handleDropOnStarterSlot(
@@ -243,6 +509,7 @@ export function SquadBuilderPage() {
     }
 
     const targetPlayerId = starterAssignments[targetSlotId]
+    const targetRoleId = roleAssignments[targetSlotId]
 
     if (source && !isBenchSlotId(source)) {
       setStarterAssignments((prev) => {
@@ -258,6 +525,30 @@ export function SquadBuilderPage() {
         next[targetSlotId] = playerId
         return next
       })
+      setRoleAssignments((prev) => {
+        const next = { ...prev }
+        const sourceRole = next[source]
+
+        if (targetRoleId) {
+          next[source] = targetRoleId
+        } else {
+          delete next[source]
+        }
+
+        if (sourceRole) {
+          next[targetSlotId] = sourceRole
+        } else {
+          const fallback = defaultRoleIdForSlot(targetSlotId, rolesBySlotId)
+
+          if (fallback) {
+            next[targetSlotId] = fallback
+          } else {
+            delete next[targetSlotId]
+          }
+        }
+
+        return next
+      })
       return
     }
 
@@ -266,6 +557,7 @@ export function SquadBuilderPage() {
         ...prev,
         [targetSlotId]: playerId,
       }))
+      setRoleAssignments((prev) => ensureRoleForSlot(targetSlotId, prev))
       setBenchAssignments((prev) => {
         const next = { ...prev }
 
@@ -284,6 +576,7 @@ export function SquadBuilderPage() {
       ...prev,
       [targetSlotId]: playerId,
     }))
+    setRoleAssignments((prev) => ensureRoleForSlot(targetSlotId, prev))
   }
 
   function handleDropOnBenchSlot(
@@ -333,6 +626,16 @@ export function SquadBuilderPage() {
 
         return next
       })
+      setRoleAssignments((prev) => {
+        const next = { ...prev }
+
+        if (targetPlayerId) {
+          return ensureRoleForSlot(source, next)
+        }
+
+        delete next[source]
+        return next
+      })
       return
     }
 
@@ -355,6 +658,7 @@ export function SquadBuilderPage() {
         ...prev,
         [emptyStarter]: playerId,
       }))
+      setRoleAssignments((prev) => ensureRoleForSlot(emptyStarter, prev))
       return
     }
 
@@ -374,6 +678,7 @@ export function SquadBuilderPage() {
   const canPublish =
     stats.starterFilled === 11 &&
     stats.benchFilled === 10 &&
+    starterSlotsHaveRoles &&
     Boolean(captainPlayerId) &&
     Boolean(cornerTakerPlayerId) &&
     Boolean(freeKickTakerPlayerId) &&
@@ -399,6 +704,7 @@ export function SquadBuilderPage() {
         slotKey,
         sortOrder: index,
         playerId: Number(starterAssignments[slotKey]),
+        positionRoleId: roleAssignments[slotKey] ?? null,
       }),
     )
 
@@ -406,9 +712,10 @@ export function SquadBuilderPage() {
       slotKey,
       sortOrder: 11 + index,
       playerId: Number(benchAssignments[slotKey]),
+      positionRoleId: null,
     }))
 
-    const request: CreateSquadRequest = {
+    const baseRequest: CreateSquadRequest = {
       title: title.trim(),
       formation: formationId,
       notes: notes.trim(),
@@ -423,7 +730,26 @@ export function SquadBuilderPage() {
 
     setIsPublishing(true)
 
-    const result = await squadService.add(request)
+    if (isEditMode && editSquadId) {
+      const updateRequest: UpdateSquadRequest = {
+        ...baseRequest,
+        id: editSquadId,
+      }
+      const result = await squadService.update(updateRequest)
+
+      setIsPublishing(false)
+
+      if (!result.success) {
+        showToast(result.message || 'Kadro güncellenemedi.')
+        return
+      }
+
+      setPublishedSquadId(editSquadId)
+      setModalOpen(true)
+      return
+    }
+
+    const result = await squadService.add(baseRequest)
 
     setIsPublishing(false)
 
@@ -434,6 +760,18 @@ export function SquadBuilderPage() {
 
     setPublishedSquadId(result.data.id)
     setModalOpen(true)
+  }
+
+  if (isLoadingSquad) {
+    return (
+      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
+        <section className="mx-auto w-full max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
+          <p className="font-body bg-surface-container-lowest p-space-md text-body-md text-on-surface-variant shadow-sm">
+            Kadro yükleniyor…
+          </p>
+        </section>
+      </main>
+    )
   }
 
   return (
@@ -481,6 +819,8 @@ export function SquadBuilderPage() {
             <SquadBuilderPitch
               formation={formation}
               assignments={starterAssignments}
+              roleAssignments={roleAssignments}
+              rolesBySlotId={rolesBySlotId}
               players={players}
               playersById={playersById}
               assignedPlayerIds={assignedPlayerIds}
@@ -488,6 +828,7 @@ export function SquadBuilderPage() {
               onAssignToSlot={handleAssignToStarterSlot}
               onDropPlayer={handleDropOnStarterSlot}
               onClearSlot={handleClearStarterSlot}
+              onRoleChange={handleRoleChange}
             />
 
             <SquadBuilderNotes notes={notes} onNotesChange={setNotes} />

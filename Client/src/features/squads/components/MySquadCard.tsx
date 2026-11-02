@@ -247,7 +247,7 @@ export function MySquadCard({ squad, onDelete }: MySquadCardProps) {
                   Taktik Tahtasında Aç
                 </Link>
                 <Link
-                  to="/kadrolar/olustur"
+                  to={`/kadrolar/${squad.id}/duzenle`}
                   className="font-label bg-surface-container px-space-md py-space-xs text-label-md font-bold text-on-surface uppercase transition-colors hover:bg-primary hover:text-on-primary"
                 >
                   Düzenle
@@ -344,7 +344,7 @@ export function MySquadCard({ squad, onDelete }: MySquadCardProps) {
           </div>
           <div className="flex items-center gap-space-xs">
             <Link
-              to="/kadrolar/olustur"
+              to={`/kadrolar/${squad.id}/duzenle`}
               className="font-label flex items-center gap-1 bg-primary px-space-md py-1 text-label-md font-bold text-on-primary uppercase transition-colors hover:bg-primary-container"
             >
               <span className="material-symbols-outlined text-[16px]">edit</span>
@@ -455,7 +455,7 @@ export function MySquadCard({ squad, onDelete }: MySquadCardProps) {
         </div>
         <div className="flex items-center gap-space-xs">
           <Link
-            to="/kadrolar/olustur"
+            to={`/kadrolar/${squad.id}/duzenle`}
             className="font-label bg-surface-container-highest px-space-md py-1 text-label-md font-semibold text-on-surface uppercase transition-colors hover:bg-primary hover:text-on-primary"
           >
             Düzenle

@@ -7,6 +7,7 @@ export type SquadPitchPlayer = {
   number: string
   positionLabel: string
   roleLabel: string
+  roleDescription?: string | null
   isCaptain: boolean
   isGk: boolean
   avatarInitials: string
