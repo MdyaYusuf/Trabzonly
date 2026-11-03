@@ -7,8 +7,6 @@ type AdminPositionTableProps = {
   onDelete: (position: AdminPositionListRow) => void
 }
 
-const MAX_VISIBLE_ROLES = 3
-
 export function AdminPositionTable({
   positions,
   deletingId,
@@ -39,11 +37,6 @@ export function AdminPositionTable({
         <tbody>
           {positions.map((position) => {
             const isDeleting = deletingId === position.id
-            const visibleRoles = position.roleNames.slice(0, MAX_VISIBLE_ROLES)
-            const hiddenRoleCount = Math.max(
-              0,
-              position.roleNames.length - visibleRoles.length,
-            )
 
             return (
               <tr
@@ -68,7 +61,7 @@ export function AdminPositionTable({
                     <span className="font-body text-body-sm text-on-surface-variant">Rol yok</span>
                   ) : (
                     <div className="flex flex-wrap items-center gap-1">
-                      {visibleRoles.map((roleName) => (
+                      {position.roleNames.map((roleName) => (
                         <span
                           key={`${position.id}-${roleName}`}
                           className="font-kicker bg-surface-container-high px-space-xs py-0.5 text-kicker text-on-surface-variant uppercase"
@@ -76,11 +69,6 @@ export function AdminPositionTable({
                           {roleName}
                         </span>
                       ))}
-                      {hiddenRoleCount > 0 ? (
-                        <span className="font-label text-label-md text-on-surface-variant">
-                          +{hiddenRoleCount}
-                        </span>
-                      ) : null}
                     </div>
                   )}
                 </td>

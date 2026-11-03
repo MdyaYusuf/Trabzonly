@@ -82,8 +82,7 @@ export function AdminPositionListFilters({
             className={selectClass}
           >
             <option value="zone-asc">Sırala: Saha Bölgesi</option>
-            <option value="name-asc">Sırala: Pozisyon Adı (A - Z)</option>
-            <option value="abbreviation-asc">Sırala: Kısaltma (A - Z)</option>
+            <option value="name-asc">Sırala: Pozisyon Adı</option>
           </select>
 
           <button

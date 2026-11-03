@@ -1,8 +1,8 @@
-import type { PositionSortOption, PositionZone } from '@/features/positions/positionTypes'
+import type { PositionZone } from '@/features/positions/positionTypes'
 
 export type AdminPositionZoneFilter = 'all' | PositionZone
 
-export type AdminPositionSort = PositionSortOption
+export type AdminPositionSort = 'name-asc' | 'zone-asc'
 
 export type AdminPositionListRow = {
   id: number

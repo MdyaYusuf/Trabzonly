@@ -261,24 +261,44 @@ export function AdminPositionFormFields({
       {mode === 'edit' ? (
         <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
           <SectionHeading section="Bölüm 03" title="Sistem Bilgileri" />
-          <div className="grid grid-cols-1 gap-space-md md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
             <div>
-              <p className="font-label text-label-md text-on-surface-variant uppercase">
-                Oluşturulma
-              </p>
-              <p className="font-body mt-1 text-body-md text-on-surface">
-                {created.date}
-                {created.time ? ` · ${created.time}` : ''}
-              </p>
+              <FieldLabel>Oluşturulma</FieldLabel>
+              <div className="flex flex-col gap-space-sm border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    calendar_month
+                  </span>
+                  <span className="text-on-surface-variant">Tarih:</span>
+                  <span className="font-bold tabular-nums">{created.date}</span>
+                </p>
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    schedule
+                  </span>
+                  <span className="text-on-surface-variant">Saat:</span>
+                  <span className="font-bold tabular-nums">{created.time ?? '—'}</span>
+                </p>
+              </div>
             </div>
             <div>
-              <p className="font-label text-label-md text-on-surface-variant uppercase">
-                Son Güncelleme
-              </p>
-              <p className="font-body mt-1 text-body-md text-on-surface">
-                {updated.date}
-                {updated.time ? ` · ${updated.time}` : ''}
-              </p>
+              <FieldLabel>Son Güncelleme</FieldLabel>
+              <div className="flex flex-col gap-space-sm border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    calendar_month
+                  </span>
+                  <span className="text-on-surface-variant">Tarih:</span>
+                  <span className="font-bold tabular-nums">{updated.date}</span>
+                </p>
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    schedule
+                  </span>
+                  <span className="text-on-surface-variant">Saat:</span>
+                  <span className="font-bold tabular-nums">{updated.time ?? '—'}</span>
+                </p>
+              </div>
             </div>
           </div>
         </section>
