@@ -22,6 +22,29 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
     return CreateActionResult(result);
   }
 
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAllForAdmin(
+    [FromQuery] CategoryAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _categoryService.GetAdminListAsync(
+      query: query,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage/summary")]
+  public async Task<IActionResult> GetAdminSummary(
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _categoryService.GetAdminSummaryAsync(cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
     int id,

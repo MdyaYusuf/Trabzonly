@@ -1,217 +1,208 @@
-import type { AdminCategoryAccent, AdminCategoryFormDraft } from '../utils/adminCategoryTypes'
-import { buildCategorySlugFromName } from '../utils/adminCategoryPlaceholders'
+import type { ReactNode } from 'react'
+import type { AdminCategoryFormDraft } from '../utils/adminCategoryTypes'
 
 type AdminCategoryFormFieldsProps = {
   draft: AdminCategoryFormDraft
+  mode: 'create' | 'edit'
   onChange: <K extends keyof AdminCategoryFormDraft>(
     key: K,
     value: AdminCategoryFormDraft[K],
   ) => void
 }
 
+function SectionHeading({
+  section,
+  title,
+}: {
+  section: string
+  title: string
+}) {
+  return (
+    <div className="mb-space-md flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/40 pb-space-sm">
+      <h2 className="font-headline text-headline-sm font-bold text-primary uppercase">{title}</h2>
+      <span className="font-kicker text-kicker tracking-widest text-on-surface-variant uppercase">
+        {section}
+      </span>
+    </div>
+  )
+}
+
+function FieldLabel({
+  children,
+  required,
+  htmlFor,
+}: {
+  children: ReactNode
+  required?: boolean
+  htmlFor?: string
+}) {
+  return (
+    <label htmlFor={htmlFor} className="font-label mb-1 block text-label-md text-on-surface-variant">
+      {children}
+      {required ? <span className="text-error"> *</span> : null}
+    </label>
+  )
+}
+
+function formatDateParts(value?: string | null): { date: string; time: string | null } {
+  if (!value) {
+    return { date: '—', time: null }
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return { date: value, time: null }
+  }
+
+  return {
+    date: date.toLocaleDateString('tr-TR'),
+    time: date.toLocaleTimeString('tr-TR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }),
+  }
+}
+
 const inputClass =
   'font-body w-full border border-outline-variant/50 bg-surface px-space-md py-space-sm text-body-md text-on-surface outline-none focus:border-primary'
 
-const iconOptions = [
-  { id: 'grid_view', label: 'Pano & Taktik Düzeni' },
-  { id: 'sports_soccer', label: 'Maç & Top' },
-  { id: 'scoreboard', label: 'Skorboard' },
-  { id: 'campaign', label: 'Tribün Kampanya' },
-  { id: 'school', label: 'Altyapı' },
-  { id: 'archive', label: 'Arşiv' },
-]
-
-export function AdminCategoryFormFields({ draft, onChange }: AdminCategoryFormFieldsProps) {
+export function AdminCategoryFormFields({
+  draft,
+  mode,
+  onChange,
+}: AdminCategoryFormFieldsProps) {
+  const created = formatDateParts(draft.createdDate)
+  const updated = formatDateParts(draft.updatedDate)
   const descriptionLength = draft.description.length
-
-  function refreshSlug() {
-    onChange('slug', buildCategorySlugFromName(draft.name))
-  }
 
   return (
     <div className="flex flex-col gap-space-md">
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div className="mb-space-sm">
-          <label htmlFor="categoryName" className="font-label text-label-md text-on-surface-variant">
-            Kategori Adı <span className="text-error">*</span>
-          </label>
-          <span className="font-kicker ml-space-sm text-kicker text-error uppercase">
-            Zorunlu Alan
-          </span>
-        </div>
-        <input
-          id="categoryName"
-          className={inputClass}
-          value={draft.name}
-          onChange={(event) => {
-            onChange('name', event.target.value)
-          }}
-        />
-        <p className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-          Kategori adı sitede ana menülerde, gönderi başlıklarında ve filtreleme çiplerinde
-          görünecektir.
-        </p>
-      </section>
-
-      <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div className="mb-space-sm flex flex-wrap items-center justify-between gap-space-sm">
-          <label htmlFor="categorySlug" className="font-label text-label-md text-on-surface-variant">
-            Kategori Bağlantısı (Slug)
-          </label>
-          <button
-            type="button"
-            onClick={refreshSlug}
-            className="font-label inline-flex items-center gap-1 text-label-md text-secondary uppercase transition-colors hover:text-primary"
-          >
-            <span className="material-symbols-outlined text-[16px]">autorenew</span>
-            Otomatik Yenile
-          </button>
-        </div>
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-stretch">
-          <span className="font-body flex items-center bg-surface-container-high px-space-md py-space-sm text-body-sm text-on-surface-variant">
-            trabzonly.org/gonderiler/kategori/
-          </span>
-          <input
-            id="categorySlug"
-            className={inputClass}
-            value={draft.slug}
-            onChange={(event) => {
-              onChange('slug', event.target.value)
-            }}
-          />
-        </div>
-        <p className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-          Kalıcı bağlantı yapısı için Türkçe karakter içermeyen SEO uyumlu URL yolu.
-        </p>
-      </section>
-
-      <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div className="mb-space-sm flex items-center justify-between gap-space-sm">
-          <label
-            htmlFor="categoryDescription"
-            className="font-label text-label-md text-on-surface-variant"
-          >
-            Açıklama <span className="text-error">*</span>
-          </label>
-          <span className="font-label text-label-md text-on-surface-variant">
-            {descriptionLength} / 500 Karakter
-          </span>
-        </div>
-        <textarea
-          id="categoryDescription"
-          rows={5}
-          maxLength={500}
-          className={`${inputClass} resize-y`}
-          value={draft.description}
-          onChange={(event) => {
-            onChange('description', event.target.value)
-          }}
-        />
-        <p className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-          Kategori sayfasının üst kısmında ve arama motoru meta açıklamalarında kullanılır.
-        </p>
-      </section>
-
-      <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <h2 className="font-headline mb-space-md text-headline-sm font-bold text-primary uppercase">
-          Editoryal İkon & Renk Vurgusu
-        </h2>
-        <div className="flex flex-col gap-space-md sm:flex-row sm:items-start">
-          <div
-            className={`flex h-16 w-16 shrink-0 items-center justify-center ${
-              draft.accent === 'mavi'
-                ? 'bg-secondary-container text-on-secondary-container'
-                : 'bg-primary-container text-on-primary'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[32px]">{draft.icon}</span>
+        <SectionHeading section="Bölüm 01" title="Temel Kategori Tanımı" />
+        <div className="flex flex-col gap-space-md">
+          <div>
+            <FieldLabel htmlFor="categoryName" required>
+              Kategori Adı
+            </FieldLabel>
+            <input
+              id="categoryName"
+              className={inputClass}
+              maxLength={100}
+              value={draft.name}
+              onChange={(event) => {
+                onChange('name', event.target.value)
+              }}
+              placeholder="Örn. Taktik & Analiz"
+            />
           </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-space-sm">
-            <p className="font-label text-label-md text-on-surface">
-              Seçili İkon: <strong>{draft.iconLabel}</strong>
-            </p>
-            <div className="flex flex-wrap gap-1">
-              {iconOptions.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => {
-                    onChange('icon', option.id)
-                    onChange('iconLabel', option.label)
-                  }}
-                  className={`font-label px-space-sm py-1 text-label-md uppercase transition-colors ${
-                    draft.icon === option.id
-                      ? 'bg-primary text-on-primary'
-                      : 'border border-outline-variant/50 text-on-surface-variant hover:border-primary'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-space-sm">
-              {(
-                [
-                  { id: 'bordo', label: 'BORDO' },
-                  { id: 'mavi', label: 'MAVİ' },
-                ] as Array<{ id: AdminCategoryAccent; label: string }>
-              ).map((tone) => {
-                const isActive = draft.accent === tone.id
 
-                return (
-                  <button
-                    key={tone.id}
-                    type="button"
-                    onClick={() => {
-                      onChange('accent', tone.id)
-                    }}
-                    className={`font-kicker px-space-md py-space-sm text-kicker uppercase transition-colors ${
-                      isActive
-                        ? tone.id === 'bordo'
-                          ? 'bg-primary text-on-primary'
-                          : 'bg-secondary text-on-secondary'
-                        : 'border border-outline-variant/50 text-on-surface-variant'
-                    }`}
-                  >
-                    {tone.label}
-                  </button>
-                )
-              })}
+          <div>
+            <div className="mb-1 flex items-center justify-between gap-space-sm">
+              <FieldLabel htmlFor="categoryDescription">Açıklama</FieldLabel>
+              <span className="font-label text-label-md text-on-surface-variant">
+                {descriptionLength} / 500
+              </span>
             </div>
+            <textarea
+              id="categoryDescription"
+              rows={4}
+              maxLength={500}
+              className={`${inputClass} resize-y`}
+              value={draft.description}
+              onChange={(event) => {
+                onChange('description', event.target.value)
+              }}
+              placeholder="Kategori için kısa açıklama"
+            />
           </div>
         </div>
       </section>
 
-      <section className="flex items-start justify-between gap-space-md border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <div>
-          <h2 className="font-headline text-headline-sm font-bold text-primary uppercase">
-            Kategori Statüsü (Yayında)
-          </h2>
-          <p className="font-body mt-space-xs text-body-sm text-on-surface-variant">
-            {draft.isPublished
-              ? 'Kategori Aktif — Gönderi oluştururken yazarlar bu kategoriyi seçebilir ve sitede herkese açık olarak listelenir.'
-              : 'Kategori Pasif — Yazar seçiminde gizli kalır ve kamu listelerinde görünmez.'}
-          </p>
-        </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={draft.isPublished}
-          aria-label="Kategori Statüsünü Değiştir"
-          onClick={() => {
-            onChange('isPublished', !draft.isPublished)
-          }}
-          className={`relative h-7 w-12 shrink-0 transition-colors ${
-            draft.isPublished ? 'bg-primary' : 'bg-outline-variant'
-          }`}
-        >
-          <span
-            className={`absolute top-0.5 h-6 w-6 bg-surface-container-lowest transition-transform ${
-              draft.isPublished ? 'left-5' : 'left-0.5'
-            }`}
-          />
-        </button>
-      </section>
+      {mode === 'edit' ? (
+        <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
+          <SectionHeading section="Bölüm 02" title="Durum" />
+          <div className="flex items-start justify-between gap-space-md border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
+            <div>
+              <p className="font-label text-label-md font-bold text-on-surface uppercase">
+                Aktif Kategori
+              </p>
+              <p className="font-body mt-1 text-body-sm text-on-surface-variant">
+                {draft.isActive
+                  ? 'Kategori aktif. Gönderi oluştururken seçilebilir.'
+                  : 'Kategori pasif. Yazar seçiminde gizli kalır.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={draft.isActive}
+              aria-label="Kategori durumunu değiştir"
+              onClick={() => {
+                onChange('isActive', !draft.isActive)
+              }}
+              className={`relative h-7 w-12 shrink-0 cursor-pointer transition-colors ${
+                draft.isActive ? 'bg-primary' : 'bg-outline-variant'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-6 w-6 bg-surface-container-lowest transition-transform ${
+                  draft.isActive ? 'left-5' : 'left-0.5'
+                }`}
+              />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {mode === 'edit' ? (
+        <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
+          <SectionHeading section="Bölüm 03" title="Kayıt Bilgisi" />
+          <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
+            <div>
+              <FieldLabel>Oluşturulma</FieldLabel>
+              <div className="flex flex-col gap-space-sm border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    calendar_month
+                  </span>
+                  <span className="text-on-surface-variant">Tarih:</span>
+                  <span className="font-bold tabular-nums">{created.date}</span>
+                </p>
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    schedule
+                  </span>
+                  <span className="text-on-surface-variant">Saat:</span>
+                  <span className="font-bold tabular-nums">{created.time ?? '—'}</span>
+                </p>
+              </div>
+            </div>
+            <div>
+              <FieldLabel>Son Güncelleme</FieldLabel>
+              <div className="flex flex-col gap-space-sm border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    calendar_month
+                  </span>
+                  <span className="text-on-surface-variant">Tarih:</span>
+                  <span className="font-bold tabular-nums">{updated.date}</span>
+                </p>
+                <p className="font-label flex items-center gap-space-sm text-label-md text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-secondary">
+                    schedule
+                  </span>
+                  <span className="text-on-surface-variant">Saat:</span>
+                  <span className="font-bold tabular-nums">{updated.time ?? '—'}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
     </div>
   )
 }

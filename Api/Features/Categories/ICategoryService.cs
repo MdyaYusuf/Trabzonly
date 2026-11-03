@@ -14,6 +14,13 @@ public interface ICategoryService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<CategoryAdminListItemDto>>> GetAdminListAsync(
+    CategoryAdminListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<CategoryAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CategoryResponseDto>> GetByIdAsync(
     int id,
     bool enableTracking = false,

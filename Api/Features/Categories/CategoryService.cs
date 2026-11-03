@@ -44,6 +44,47 @@ public class CategoryService(
     };
   }
 
+  public async Task<ReturnModel<List<CategoryAdminListItemDto>>> GetAdminListAsync(
+    CategoryAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    List<CategoryAdminListItemDto> items = await _categoryRepository.GetAdminListAsync(
+      filter: BuildAdminListFilter(query),
+      sort: query.Sort,
+      cancellationToken: cancellationToken);
+
+    return new ReturnModel<List<CategoryAdminListItemDto>>()
+    {
+      Success = true,
+      Message = "Kategori yönetim listesi başarılı bir şekilde getirildi.",
+      Data = items,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<CategoryAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default)
+  {
+    List<Category> categories = await _categoryRepository.GetAllAsync(
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    int totalCount = categories.Count;
+    int activeCount = categories.Count(category => category.IsActive);
+    int inactiveCount = totalCount - activeCount;
+
+    return new ReturnModel<CategoryAdminSummaryDto>()
+    {
+      Success = true,
+      Message = "Kategori yönetim özeti başarılı bir şekilde getirildi.",
+      Data = new CategoryAdminSummaryDto(
+        TotalCount: totalCount,
+        ActiveCount: activeCount,
+        InactiveCount: inactiveCount),
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<CategoryResponseDto>> GetByIdAsync(
     int id,
     bool enableTracking = false,
@@ -79,6 +120,7 @@ public class CategoryService(
     await _businessRules.CategoryNameMustBeUniqueAsync(request.Name, cancellationToken);
 
     Category category = _mapper.CreateToEntity(request);
+    category.IsActive = true;
 
     await _categoryRepository.AddAsync(category, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -128,6 +170,8 @@ public class CategoryService(
   {
     Category category = await _businessRules.GetCategoryIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
+    await _businessRules.CategoryCannotBeDeletedWhenHasPostsAsync(id, cancellationToken);
+
     _categoryRepository.Delete(category);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -137,5 +181,18 @@ public class CategoryService(
       Message = "Kategori başarılı bir şekilde silindi.",
       StatusCode = 200
     };
+  }
+
+  private static Expression<Func<Category, bool>> BuildAdminListFilter(
+    CategoryAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    bool? isActive = query.IsActive;
+
+    return category =>
+      (!isActive.HasValue || category.IsActive == isActive.Value) &&
+      (string.IsNullOrEmpty(search) ||
+       category.Name.Contains(search) ||
+       (category.Description != null && category.Description.Contains(search)));
   }
 }
