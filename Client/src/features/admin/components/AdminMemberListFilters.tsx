@@ -1,117 +1,125 @@
-import type { AdminMemberStatusFilter } from '../utils/adminMemberTypes'
+import type {
+  AdminMemberRoleOption,
+  AdminMemberSort,
+  AdminMemberStatusFilter,
+} from '../utils/adminMemberTypes'
 
 type AdminMemberListFiltersProps = {
   search: string
-  role: string
-  status: string
-  quickView: AdminMemberStatusFilter
-  counts: Record<AdminMemberStatusFilter, number>
+  roleId: number | 'all'
+  statusFilter: AdminMemberStatusFilter
+  sort: AdminMemberSort
+  roles: AdminMemberRoleOption[]
   onSearchChange: (value: string) => void
-  onRoleChange: (value: string) => void
-  onStatusChange: (value: string) => void
-  onQuickViewChange: (value: AdminMemberStatusFilter) => void
+  onRoleChange: (value: number | 'all') => void
+  onStatusChange: (value: AdminMemberStatusFilter) => void
+  onSortChange: (value: AdminMemberSort) => void
   onClear: () => void
 }
 
 export function AdminMemberListFilters({
   search,
-  role,
-  status,
-  quickView,
-  counts,
+  roleId,
+  statusFilter,
+  sort,
+  roles,
   onSearchChange,
   onRoleChange,
   onStatusChange,
-  onQuickViewChange,
+  onSortChange,
   onClear,
 }: AdminMemberListFiltersProps) {
-  const tabs: Array<{ id: AdminMemberStatusFilter; label: string }> = [
-    { id: 'all', label: `Tümü (${counts.all.toLocaleString('tr-TR')})` },
-    { id: 'active', label: `Aktif (${counts.active.toLocaleString('tr-TR')})` },
-    { id: 'passive', label: `Pasif (${counts.passive.toLocaleString('tr-TR')})` },
-    { id: 'admins', label: `Yöneticiler (${counts.admins})` },
+  const statusTabs: Array<{ id: AdminMemberStatusFilter; label: string }> = [
+    { id: 'all', label: 'Tümü' },
+    { id: 'active', label: 'Aktif' },
+    { id: 'passive', label: 'Pasif' },
   ]
+
+  const selectClass =
+    'font-label cursor-pointer border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md text-on-surface outline-none focus:border-primary'
 
   return (
     <section className="flex flex-col gap-space-md border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-      <div className="flex flex-col gap-space-sm xl:flex-row xl:items-center">
-        <label className="relative min-w-0 flex-1">
-          <span className="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-on-surface-variant">
-            search
-          </span>
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => {
-              onSearchChange(event.target.value)
-            }}
-            placeholder="Kullanıcı adı, e-posta veya ID"
-            className="font-body w-full border border-outline-variant/50 bg-surface py-space-sm pr-space-md pl-10 text-body-md text-on-surface outline-none focus:border-primary"
-          />
-        </label>
-
-        <select
-          value={role}
-          onChange={(event) => {
-            onRoleChange(event.target.value)
-          }}
-          className="font-label border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md outline-none focus:border-primary"
-        >
-          <option value="all">Rol: Tümü (Yönetici, Editör, Üye)</option>
-          <option value="admin">Yönetici</option>
-          <option value="moderator">Moderatör</option>
-          <option value="editor">Editör</option>
-          <option value="member">Üye</option>
-        </select>
-
-        <select
-          value={status}
-          onChange={(event) => {
-            onStatusChange(event.target.value)
-          }}
-          className="font-label border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md outline-none focus:border-primary"
-        >
-          <option value="all">Durum: Tümü (Aktif, Pasif, Askıda)</option>
-          <option value="active">Aktif</option>
-          <option value="passive">Pasif</option>
-          <option value="suspended">Askıda</option>
-        </select>
-      </div>
-
-      <button
-        type="button"
-        onClick={onClear}
-        className="font-label inline-flex w-fit items-center gap-1 text-label-md text-on-surface-variant uppercase transition-colors hover:text-primary"
-      >
-        <span className="material-symbols-outlined text-[16px]">filter_alt_off</span>
-        Filtreleri Temizle
-      </button>
-
-      <div className="flex flex-col gap-space-sm lg:flex-row lg:items-center">
-        <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-          Hızlı Görünüm:
+      <label className="relative min-w-0 w-full">
+        <span className="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-on-surface-variant">
+          search
         </span>
-        <div className="flex flex-wrap gap-1">
-          {tabs.map((tab) => {
-            const isActive = quickView === tab.id
+        <input
+          type="search"
+          value={search}
+          onChange={(event) => {
+            onSearchChange(event.target.value)
+          }}
+          placeholder="Kullanıcı adı, e-posta veya ID ara…"
+          className="font-body w-full border border-outline-variant/50 bg-surface py-space-sm pr-space-md pl-10 text-body-md text-on-surface outline-none focus:border-primary"
+        />
+      </label>
 
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  onQuickViewChange(tab.id)
-                }}
-                className={`font-label px-space-md py-space-sm text-label-md uppercase transition-colors ${
-                  isActive
-                    ? 'bg-primary text-on-primary'
-                    : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
-                }`}
-              >
-                {tab.label}
-              </button>
-            )
-          })}
+      <div className="flex flex-col gap-space-sm lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-space-sm">
+          <div className="flex flex-wrap gap-1">
+            {statusTabs.map((tab) => {
+              const isActive = statusFilter === tab.id
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    onStatusChange(tab.id)
+                  }}
+                  className={`font-label cursor-pointer px-space-md py-space-sm text-label-md uppercase transition-colors ${
+                    isActive
+                      ? 'bg-primary text-on-primary'
+                      : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
+
+          <select
+            value={roleId === 'all' ? 'all' : String(roleId)}
+            onChange={(event) => {
+              const value = event.target.value
+
+              if (value === 'all') {
+                onRoleChange('all')
+                return
+              }
+
+              onRoleChange(Number(value))
+            }}
+            className={selectClass}
+          >
+            <option value="all">Rol: Tümü</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={sort}
+            onChange={(event) => {
+              onSortChange(event.target.value as AdminMemberSort)
+            }}
+            className={selectClass}
+          >
+            <option value="created-desc">Sırala: Yeniden Eskiye</option>
+            <option value="name-asc">Sırala: Kullanıcı Adı</option>
+          </select>
+
+          <button
+            type="button"
+            onClick={onClear}
+            className="font-label cursor-pointer border border-outline-variant/50 px-space-md py-space-sm text-label-md text-on-surface-variant uppercase transition-colors hover:border-primary hover:text-primary"
+          >
+            Filtreleri Temizle
+          </button>
         </div>
       </div>
     </section>

@@ -1,141 +1,249 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import roleService from '@/features/roles/roleService'
+import userService from '@/features/users/userService'
+import { AdminMemberActiveModal } from '../components/AdminMemberActiveModal'
+import { AdminMemberDeleteModal } from '../components/AdminMemberDeleteModal'
 import { AdminMemberListFilters } from '../components/AdminMemberListFilters'
 import { AdminMemberListHeader } from '../components/AdminMemberListHeader'
 import { AdminMemberPagination } from '../components/AdminMemberPagination'
 import { AdminMemberTable } from '../components/AdminMemberTable'
-import { adminMemberListRows } from '../utils/adminMemberPlaceholders'
-import type { AdminMemberStatusFilter } from '../utils/adminMemberTypes'
+import { mapUserAdminItemToListRow } from '../utils/adminMemberDraftUtils'
+import type {
+  AdminMemberListRow,
+  AdminMemberRoleOption,
+  AdminMemberSort,
+  AdminMemberStatusFilter,
+} from '../utils/adminMemberTypes'
 
-const PAGE_SIZE = 6
+const DEFAULT_PAGE_SIZE = 10
 
 export function AdminMemberListPage() {
   const [search, setSearch] = useState('')
-  const [role, setRole] = useState('all')
-  const [status, setStatus] = useState('all')
-  const [quickView, setQuickView] = useState<AdminMemberStatusFilter>('all')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [roleId, setRoleId] = useState<number | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<AdminMemberStatusFilter>('all')
+  const [sort, setSort] = useState<AdminMemberSort>('created-desc')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const [rows, setRows] = useState<AdminMemberListRow[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [roles, setRoles] = useState<AdminMemberRoleOption[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<AdminMemberListRow | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [activeTarget, setActiveTarget] = useState<AdminMemberListRow | null>(null)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [listVersion, setListVersion] = useState(0)
 
-  const counts = useMemo(() => {
-    return {
-      all: 14850,
-      active: 13920,
-      passive: 930,
-      admins: 18,
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, roleId, statusFilter, sort, pageSize])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadRoles() {
+      const result = await roleService.getAll({ pageNumber: 1, pageSize: 100 })
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setRoles(
+          result.data.items.map((role) => ({
+            id: role.id,
+            name: role.name,
+          })),
+        )
+      } else {
+        setRoles([])
+      }
+    }
+
+    void loadRoles()
+
+    return () => {
+      cancelled = true
     }
   }, [])
 
-  const filtered = useMemo(() => {
-    let result = [...adminMemberListRows]
+  useEffect(() => {
+    let cancelled = false
 
-    if (role !== 'all') {
-      result = result.filter((row) => row.role === role)
+    async function loadMembers() {
+      setIsLoading(true)
+
+      const isActive =
+        statusFilter === 'all' ? undefined : statusFilter === 'active'
+
+      const result = await userService.getAllForAdmin({
+        pageNumber: page,
+        pageSize,
+        search: debouncedSearch || undefined,
+        roleId: roleId === 'all' ? undefined : roleId,
+        isActive,
+        sort,
+      })
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setRows(result.data.items.map(mapUserAdminItemToListRow))
+        setTotalCount(result.data.totalCount)
+
+        if (result.data.items.length === 0 && result.data.totalCount > 0 && page > 1) {
+          setPage((prev) => Math.max(1, prev - 1))
+        }
+      } else {
+        setRows([])
+        setTotalCount(0)
+      }
+
+      setIsLoading(false)
     }
 
-    if (status !== 'all') {
-      result = result.filter((row) => row.status === status)
+    void loadMembers()
+
+    return () => {
+      cancelled = true
     }
-
-    if (quickView === 'active') {
-      result = result.filter((row) => row.status === 'active')
-    } else if (quickView === 'passive') {
-      result = result.filter((row) => row.status === 'passive' || row.status === 'suspended')
-    } else if (quickView === 'admins') {
-      result = result.filter((row) => row.role === 'admin' || row.role === 'moderator')
-    }
-
-    const query = search.trim().toLowerCase()
-
-    if (query) {
-      result = result.filter(
-        (row) =>
-          row.username.toLowerCase().includes(query) ||
-          row.email.toLowerCase().includes(query) ||
-          row.memberCode.toLowerCase().includes(query) ||
-          row.id.includes(query),
-      )
-    }
-
-    return result
-  }, [search, role, status, quickView])
-
-  const totalPages = Math.max(1, Math.ceil(Math.max(filtered.length, 1) / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pageStart = (currentPage - 1) * PAGE_SIZE
-  const pageRows = filtered.slice(pageStart, pageStart + PAGE_SIZE)
-
-  function resetPage() {
-    setPage(1)
-  }
+  }, [page, pageSize, debouncedSearch, roleId, statusFilter, sort, listVersion])
 
   function clearFilters() {
     setSearch('')
-    setRole('all')
-    setStatus('all')
-    setQuickView('all')
+    setDebouncedSearch('')
+    setRoleId('all')
+    setStatusFilter('all')
+    setSort('created-desc')
     setPage(1)
   }
 
-  const displayTotal =
-    filtered.length === adminMemberListRows.length &&
-    role === 'all' &&
-    status === 'all' &&
-    quickView === 'all' &&
-    !search.trim()
-      ? 14850
-      : filtered.length
+  async function handleConfirmToggleActive() {
+    if (!activeTarget || activeTarget.isAdmin || togglingId != null) {
+      return
+    }
+
+    const targetId = activeTarget.id
+    setTogglingId(targetId)
+
+    const result = await userService.adminSetActive(targetId, {
+      isActive: !activeTarget.isActive,
+    })
+
+    if (result.success) {
+      setActiveTarget(null)
+      setListVersion((prev) => prev + 1)
+    }
+
+    setTogglingId(null)
+  }
+
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deletingId != null) {
+      return
+    }
+
+    const deletedId = deleteTarget.id
+    setDeletingId(deletedId)
+
+    const result = await userService.remove(deletedId)
+
+    if (result.success) {
+      setDeleteTarget(null)
+      setListVersion((prev) => prev + 1)
+    }
+
+    setDeletingId(null)
+  }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-      <AdminMemberListHeader />
+    <div className="flex flex-col">
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <AdminMemberListHeader />
 
-      <AdminMemberListFilters
-        search={search}
-        role={role}
-        status={status}
-        quickView={quickView}
-        counts={counts}
-        onSearchChange={(value) => {
-          setSearch(value)
-          resetPage()
-        }}
-        onRoleChange={(value) => {
-          setRole(value)
-          resetPage()
-        }}
-        onStatusChange={(value) => {
-          setStatus(value)
-          resetPage()
-        }}
-        onQuickViewChange={(value) => {
-          setQuickView(value)
-          resetPage()
-        }}
-        onClear={clearFilters}
-      />
+        <AdminMemberListFilters
+          search={search}
+          roleId={roleId}
+          statusFilter={statusFilter}
+          sort={sort}
+          roles={roles}
+          onSearchChange={setSearch}
+          onRoleChange={setRoleId}
+          onStatusChange={setStatusFilter}
+          onSortChange={setSort}
+          onClear={clearFilters}
+        />
 
-      <AdminMemberTable rows={pageRows} />
-
-      <AdminMemberPagination
-        page={currentPage}
-        pageSize={PAGE_SIZE}
-        total={displayTotal}
-        onPageChange={setPage}
-      />
-
-      <section className="flex gap-space-sm border border-outline-variant/40 bg-surface-container-low p-space-md">
-        <span className="material-symbols-outlined text-secondary">security</span>
-        <div>
-          <h2 className="font-label text-label-md font-bold text-on-surface uppercase">
-            Kullanıcı Gizliliği ve KVKK Protokolü
-          </h2>
-          <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-            Üye şifreleri tek yönlü kriptografik algoritmalarla şifrelenmiş (hash) olup yönetim
-            konsolunda asla düz metin olarak görüntülenemez ve dışa aktarılamaz. E-posta ve kayıt
-            logları 6698 sayılı KVKK ve kulüp taraftar topluluğu veri güvenlik ilkelerine tam uyumlu
-            biçimde korunmaktadır.
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            Üyeler yükleniyor...
           </p>
-        </div>
-      </section>
-    </main>
+        ) : (
+          <AdminMemberTable
+            rows={rows}
+            togglingId={togglingId}
+            deletingId={deletingId}
+            onToggleActive={setActiveTarget}
+            onDelete={setDeleteTarget}
+          />
+        )}
+
+        {!isLoading && totalCount > 0 ? (
+          <AdminMemberPagination
+            page={page}
+            pageSize={pageSize}
+            total={totalCount}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        ) : null}
+      </main>
+
+      <AdminMemberActiveModal
+        open={activeTarget != null}
+        username={activeTarget?.username ?? 'Üye'}
+        currentlyActive={activeTarget?.isActive ?? true}
+        isSubmitting={togglingId != null}
+        onCancel={() => {
+          if (togglingId != null) {
+            return
+          }
+
+          setActiveTarget(null)
+        }}
+        onConfirm={() => {
+          void handleConfirmToggleActive()
+        }}
+      />
+
+      <AdminMemberDeleteModal
+        open={deleteTarget != null}
+        username={deleteTarget?.username ?? 'Üye'}
+        isDeleting={deletingId != null}
+        onCancel={() => {
+          if (deletingId != null) {
+            return
+          }
+
+          setDeleteTarget(null)
+        }}
+        onConfirm={() => {
+          void handleConfirmDelete()
+        }}
+      />
+    </div>
   )
 }

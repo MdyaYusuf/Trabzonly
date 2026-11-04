@@ -117,6 +117,45 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
     }
   }
 
+  public async Task<bool> UserHasAdminRoleAsync(User user, CancellationToken cancellationToken = default)
+  {
+    return await _roleRepository.AnyAsync(
+      role => role.Id == user.RoleId && role.Name == "Admin",
+      cancellationToken);
+  }
+
+  public async Task AdminCannotDemoteOrDeactivateAdminAsync(
+    User targetUser,
+    int requestedRoleId,
+    bool requestedIsActive,
+    CancellationToken cancellationToken = default)
+  {
+    bool targetIsAdmin = await UserHasAdminRoleAsync(targetUser, cancellationToken);
+
+    if (!targetIsAdmin)
+    {
+      return;
+    }
+
+    if (!requestedIsActive)
+    {
+      throw new BusinessException("Yönetici hesapları pasife alınamaz.");
+    }
+
+    if (requestedRoleId != targetUser.RoleId)
+    {
+      throw new BusinessException("Yönetici hesaplarının rolü değiştirilemez.");
+    }
+  }
+
+  public void AdminRoleRequired(string userRole)
+  {
+    if (userRole != "Admin")
+    {
+      throw new ForbiddenException("Bu işlem için yönetici yetkisi gereklidir.");
+    }
+  }
+
   public void PasswordResetTokenMustBeValid(User? user, string rawToken)
   {
     if (user == null

@@ -8,11 +8,39 @@ export interface UserResponseDto {
   profileImageUrl?: string | null
   isActive: boolean
   createdDate: string
+  updatedDate?: string | null
   roleId: number
   roleName: string
   followerCount?: number
   followingCount?: number
   isFollowedByCurrentUser?: boolean | null
+}
+
+export interface UserAdminListItemDto {
+  id: string
+  username: string
+  email: string
+  profileImageUrl?: string | null
+  isActive: boolean
+  createdDate: string
+  roleId: number
+  roleName: string
+  postCount: number
+  squadCount: number
+}
+
+export interface UserAdminDetailDto {
+  id: string
+  username: string
+  email: string
+  bio?: string | null
+  displayTag?: string | null
+  profileImageUrl?: string | null
+  isActive: boolean
+  createdDate: string
+  updatedDate?: string | null
+  roleId: number
+  roleName: string
 }
 
 export interface UserPreviewDto {
@@ -54,11 +82,35 @@ export interface UserFollowResponseDto {
   isFollowedByCurrentUser: boolean
 }
 
+export type UserAdminSortOption = 'created-desc' | 'name-asc'
+
+export interface UserAdminListQuery {
+  pageNumber?: number
+  pageSize?: number
+  search?: string
+  roleId?: number
+  isActive?: boolean
+  sort?: UserAdminSortOption
+}
+
 // Requests
 export interface UpdateUserRequest {
   bio?: string | null
   displayTag?: string | null
   imageFile?: File | null
+}
+
+export interface AdminUpdateUserRequest {
+  username: string
+  bio?: string | null
+  displayTag: string
+  roleId: number
+  isActive: boolean
+  clearProfileImage?: boolean
+}
+
+export interface AdminSetUserActiveRequest {
+  isActive: boolean
 }
 
 export interface ChangePasswordRequest {

@@ -18,6 +18,30 @@ public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
   }
 }
 
+public class AdminUpdateUserRequestValidator : AbstractValidator<AdminUpdateUserRequest>
+{
+  public AdminUpdateUserRequestValidator()
+  {
+    RuleFor(u => u.Username)
+      .NotEmpty().WithMessage("Kullanıcı adı boş olamaz.")
+      .MinimumLength(3).WithMessage("Kullanıcı adı en az 3 karakter olmalıdır.")
+      .MaximumLength(50).WithMessage("Kullanıcı adı en fazla 50 karakter olabilir.");
+
+    RuleFor(u => u.Bio)
+      .MaximumLength(User.BioMaxLength)
+      .WithMessage($"Bio en fazla {User.BioMaxLength} karakter olabilir.");
+
+    RuleFor(u => u.DisplayTag)
+      .NotEmpty().WithMessage("Görünen etiket seçilmelidir.")
+      .MaximumLength(50).WithMessage("Görünen etiket en fazla 50 karakter olabilir.")
+      .Must(UserDisplayTags.IsAllowed)
+      .WithMessage("Seçilen görünen etiket geçersiz.");
+
+    RuleFor(u => u.RoleId)
+      .GreaterThan(0).WithMessage("Geçersiz rol.");
+  }
+}
+
 public class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRequest>
 {
   public ChangePasswordRequestValidator()

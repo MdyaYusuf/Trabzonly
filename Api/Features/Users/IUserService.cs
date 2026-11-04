@@ -54,6 +54,28 @@ public interface IUserService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<UserAdminListItemDto>>> GetAdminListAsync(
+    UserAdminListQueryRequest query,
+    string userRole,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<UserAdminDetailDto>> GetAdminDetailAsync(
+    Guid id,
+    string userRole,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> AdminUpdateAsync(
+    Guid id,
+    AdminUpdateUserRequest request,
+    string userRole,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> AdminSetActiveAsync(
+    Guid id,
+    AdminSetUserActiveRequest request,
+    string userRole,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
     Guid currentUserId,

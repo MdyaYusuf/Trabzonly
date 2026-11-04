@@ -16,6 +16,7 @@ public class UserService(
   UserBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
   IValidator<UpdateUserRequest> _updateValidator,
+  IValidator<AdminUpdateUserRequest> _adminUpdateValidator,
   IValidator<ChangePasswordRequest> _changePasswordValidator) : IUserService
 {
   public async Task<ReturnModel<PagedResponse<UserResponseDto>>> GetAllAsync(
@@ -316,6 +317,162 @@ public class UserService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<UserAdminListItemDto>>> GetAdminListAsync(
+    UserAdminListQueryRequest query,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.AdminRoleRequired(userRole);
+
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
+
+    var (items, totalCount) = await _userRepository.GetAdminPagedListAsync(
+      filter: BuildAdminListFilter(query),
+      sort: query.Sort,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+
+    var pagedResponse = new PagedResponse<UserAdminListItemDto>(
+      items,
+      totalCount,
+      pageNumber,
+      pageSize);
+
+    return new ReturnModel<PagedResponse<UserAdminListItemDto>>()
+    {
+      Success = true,
+      Message = "Üye yönetim listesi başarılı bir şekilde getirildi.",
+      Data = pagedResponse,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<UserAdminDetailDto>> GetAdminDetailAsync(
+    Guid id,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.AdminRoleRequired(userRole);
+
+    UserAdminDetailDto? detail = await _userRepository.GetAdminDetailAsync(id, cancellationToken);
+
+    if (detail == null)
+    {
+      throw new NotFoundException($"{id} numaralı kullanıcı bulunamadı.");
+    }
+
+    return new ReturnModel<UserAdminDetailDto>()
+    {
+      Success = true,
+      Message = "Üye yönetim detayı başarılı bir şekilde getirildi.",
+      Data = detail,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<NoData>> AdminUpdateAsync(
+    Guid id,
+    AdminUpdateUserRequest request,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.AdminRoleRequired(userRole);
+
+    var validationResult = await _adminUpdateValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    await _businessRules.RoleMustExistAsync(request.RoleId, cancellationToken);
+
+    User user = await _businessRules.GetUserIfExistAsync(
+      id,
+      include: query => query.Include(u => u.Role),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    await _businessRules.AdminCannotDemoteOrDeactivateAdminAsync(
+      user,
+      request.RoleId,
+      request.IsActive,
+      cancellationToken);
+
+    string username = request.Username.Trim();
+    _businessRules.UsernameCannotBeRestrictedWord(username);
+    await _businessRules.UsernameMustBeUniqueAsync(username, id, cancellationToken);
+
+    user.Username = username;
+    user.Bio = string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio.Trim();
+    user.DisplayTag = request.DisplayTag.Trim();
+    user.RoleId = request.RoleId;
+    user.IsActive = request.IsActive;
+
+    if (!request.IsActive)
+    {
+      RevokeUserSessions(user);
+    }
+
+    if (request.ClearProfileImage)
+    {
+      FileHelper.DeleteImageFromDisk(user.ProfileImageUrl);
+      user.ProfileImageUrl = null;
+    }
+
+    _userRepository.Update(user);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      Message = "Üye bilgileri başarılı bir şekilde güncellendi.",
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<NoData>> AdminSetActiveAsync(
+    Guid id,
+    AdminSetUserActiveRequest request,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.AdminRoleRequired(userRole);
+
+    User user = await _businessRules.GetUserIfExistAsync(
+      id,
+      include: query => query.Include(u => u.Role),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    await _businessRules.AdminCannotDemoteOrDeactivateAdminAsync(
+      user,
+      user.RoleId,
+      request.IsActive,
+      cancellationToken);
+
+    user.IsActive = request.IsActive;
+
+    if (!request.IsActive)
+    {
+      RevokeUserSessions(user);
+    }
+
+    _userRepository.Update(user);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      Message = request.IsActive
+        ? "Üye hesabı başarıyla aktifleştirildi."
+        : "Üye hesabı başarıyla pasife alındı.",
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<NoData>> UpdateAsync(
     UpdateUserRequest request,
     Guid currentUserId,
@@ -499,5 +656,29 @@ public class UserService(
     {
       response.IsFollowedByCurrentUser = null;
     }
+  }
+
+  private static void RevokeUserSessions(User user)
+  {
+    user.RefreshToken = null;
+    user.RefreshTokenExpiration = null;
+    user.PasswordResetToken = null;
+    user.PasswordResetTokenExpiration = null;
+  }
+
+  private static Expression<Func<User, bool>> BuildAdminListFilter(
+    UserAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    int? roleId = query.RoleId;
+    bool? isActive = query.IsActive;
+
+    return user =>
+      (!roleId.HasValue || user.RoleId == roleId.Value) &&
+      (!isActive.HasValue || user.IsActive == isActive.Value) &&
+      (string.IsNullOrEmpty(search) ||
+       user.Username.Contains(search) ||
+       user.Email.Contains(search) ||
+       user.Id.ToString().Contains(search));
   }
 }

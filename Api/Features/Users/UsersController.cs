@@ -26,6 +26,66 @@ public class UsersController(IUserService _userService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAllForAdmin(
+    [FromQuery] UserAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _userService.GetAdminListAsync(
+      query: query,
+      userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage/{id:guid}")]
+  public async Task<IActionResult> GetAdminDetail(
+    Guid id,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _userService.GetAdminDetailAsync(
+      id: id,
+      userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpPut("manage/{id:guid}")]
+  public async Task<IActionResult> AdminUpdate(
+    Guid id,
+    [FromBody] AdminUpdateUserRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _userService.AdminUpdateAsync(
+      id: id,
+      request: request,
+      userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpPut("manage/{id:guid}/active")]
+  public async Task<IActionResult> AdminSetActive(
+    Guid id,
+    [FromBody] AdminSetUserActiveRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _userService.AdminSetActiveAsync(
+      id: id,
+      request: request,
+      userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("me")]
   public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
   {

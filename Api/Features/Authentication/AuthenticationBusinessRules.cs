@@ -25,6 +25,11 @@ public class AuthenticationBusinessRules
     {
       throw new AuthorizationException("Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.");
     }
+
+    if (!user.IsActive)
+    {
+      throw new AuthorizationException("Hesabınız pasif durumdadır. Lütfen yönetici ile iletişime geçin.");
+    }
   }
 
   public void RefreshTokenUserMustExist(User? user)
