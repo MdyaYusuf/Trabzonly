@@ -1,59 +1,23 @@
-export type AdminRoleKindFilter = 'all' | 'system' | 'community'
+import type { RoleSortOption } from '@/features/roles/roleTypes'
 
-export type AdminRoleKind = 'system' | 'community'
+export type AdminRoleKindFilter = 'all' | 'system' | 'custom'
 
-export type AdminRoleColor = 'bordo' | 'mavi' | 'amber' | 'gri'
+export type AdminRoleSort = RoleSortOption
 
 export type AdminRoleListRow = {
-  id: string
+  id: number
   name: string
-  kind: AdminRoleKind
-  kindLabel: string
-  description: string
-  accessTitle: string
-  accessDetails: string[]
   memberCount: number
-  memberCountLabel: string
-  createdAt: string
-  createdNote: string
+  isSystem: boolean
   statusLabel: string
-  isLocked: boolean
-  icon: string
-  iconTone: string
-}
-
-export type AdminRolePermission = {
-  id: string
-  label: string
-  description: string
-  enabled: boolean
-}
-
-export type AdminRolePermissionGroup = {
-  id: string
-  title: string
-  icon: string
-  permissions: AdminRolePermission[]
+  createdDate: string
 }
 
 export type AdminRoleFormDraft = {
-  id: string
-  recordCode: string
+  id: number | null
   name: string
-  code: string
-  description: string
-  color: AdminRoleColor
-  isDefaultRegistrationRole: boolean
-  isSystemRole: boolean
-  permissionGroups: AdminRolePermissionGroup[]
-  assignedMembers: number
-  lastAssignedMember: string
-  lastAssignedMeta: string
-  criticalityLabel: string
-  twoFactorLabel: string
-  protocolVersion: string
-  lastUpdated: string
-  previewUsername: string
-  previewAdminName: string
-  previewAdminRole: string
+  isSystem: boolean
+  memberCount: number
+  createdDate?: string | null
+  updatedDate?: string | null
 }

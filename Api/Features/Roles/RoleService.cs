@@ -97,6 +97,47 @@ public class RoleService(
     };
   }
 
+  public async Task<ReturnModel<List<RoleAdminListItemDto>>> GetAdminListAsync(
+    RoleAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    List<RoleAdminListItemDto> items = await _roleRepository.GetAdminListAsync(
+      filter: BuildAdminListFilter(query),
+      sort: query.Sort,
+      cancellationToken: cancellationToken);
+
+    return new ReturnModel<List<RoleAdminListItemDto>>()
+    {
+      Success = true,
+      Message = "Rol yönetim listesi başarılı bir şekilde getirildi.",
+      Data = items,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<RoleAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default)
+  {
+    List<Role> roles = await _roleRepository.GetAllAsync(
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    int totalCount = roles.Count;
+    int systemCount = roles.Count(role => role.IsSystem);
+    int customCount = totalCount - systemCount;
+
+    return new ReturnModel<RoleAdminSummaryDto>()
+    {
+      Success = true,
+      Message = "Rol yönetim özeti başarılı bir şekilde getirildi.",
+      Data = new RoleAdminSummaryDto(
+        TotalCount: totalCount,
+        SystemCount: systemCount,
+        CustomCount: customCount),
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<RoleResponseDto>> AddAsync(
     CreateRoleRequest request,
     string userRole,
@@ -114,6 +155,7 @@ public class RoleService(
     await _businessRules.NameMustBeUniqueAsync(request.Name, cancellationToken);
 
     Role role = _mapper.CreateToEntity(request);
+    role.IsSystem = false;
 
     await _roleRepository.AddAsync(role, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -145,7 +187,7 @@ public class RoleService(
 
     Role role = await _businessRules.GetRoleIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
-    _businessRules.CoreRolesCannotBeModifiedOrDeleted(role);
+    _businessRules.SystemRolesCannotBeModifiedOrDeleted(role);
     await _businessRules.RoleNameCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Name, cancellationToken);
 
     _mapper.UpdateEntityFromRequest(request, role);
@@ -169,7 +211,8 @@ public class RoleService(
     Role role = await _businessRules.GetRoleIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
     _businessRules.AdminRoleRequired(userRole);
-    _businessRules.CoreRolesCannotBeModifiedOrDeleted(role);
+    _businessRules.SystemRolesCannotBeModifiedOrDeleted(role);
+    await _businessRules.RoleCannotBeDeletedWhenHasUsersAsync(id, cancellationToken);
 
     _roleRepository.Delete(role);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -180,5 +223,16 @@ public class RoleService(
       Message = "Rol başarılı bir şekilde silindi.",
       StatusCode = 200
     };
+  }
+
+  private static Expression<Func<Role, bool>> BuildAdminListFilter(
+    RoleAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    bool? isSystem = query.IsSystem;
+
+    return role =>
+      (!isSystem.HasValue || role.IsSystem == isSystem.Value) &&
+      (string.IsNullOrEmpty(search) || role.Name.Contains(search));
   }
 }

@@ -24,6 +24,29 @@ public class RolesController(IRoleService _roleService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAllForAdmin(
+    [FromQuery] RoleAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _roleService.GetAdminListAsync(
+      query: query,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage/summary")]
+  public async Task<IActionResult> GetAdminSummary(
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _roleService.GetAdminSummaryAsync(cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
   {

@@ -1,81 +1,173 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import roleService from '@/features/roles/roleService'
+import type { RoleAdminSummaryDto } from '@/features/roles/roleTypes'
+import { AdminRoleDeleteModal } from '../components/AdminRoleDeleteModal'
 import { AdminRoleListFilters } from '../components/AdminRoleListFilters'
 import { AdminRoleListHeader } from '../components/AdminRoleListHeader'
 import { AdminRoleTable } from '../components/AdminRoleTable'
-import { adminRoleListRows } from '../utils/adminRolePlaceholders'
-import type { AdminRoleKindFilter } from '../utils/adminRoleTypes'
+import { mapRoleAdminItemToListRow } from '../utils/adminRoleDraftUtils'
+import type {
+  AdminRoleKindFilter,
+  AdminRoleListRow,
+  AdminRoleSort,
+} from '../utils/adminRoleTypes'
 
 export function AdminRoleListPage() {
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [kindFilter, setKindFilter] = useState<AdminRoleKindFilter>('all')
+  const [sort, setSort] = useState<AdminRoleSort>('name-asc')
+  const [rows, setRows] = useState<AdminRoleListRow[]>([])
+  const [summary, setSummary] = useState<RoleAdminSummaryDto | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<AdminRoleListRow | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [listVersion, setListVersion] = useState(0)
 
-  const counts = useMemo(() => {
-    return {
-      all: adminRoleListRows.length,
-      system: adminRoleListRows.filter((row) => row.kind === 'system').length,
-      community: adminRoleListRows.filter((row) => row.kind === 'community').length,
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timer)
     }
-  }, [])
+  }, [search])
 
-  const filtered = useMemo(() => {
-    let result = [...adminRoleListRows]
+  useEffect(() => {
+    let cancelled = false
 
-    if (kindFilter !== 'all') {
-      result = result.filter((row) => row.kind === kindFilter)
+    async function loadSummary() {
+      const result = await roleService.getAdminSummary()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setSummary(result.data)
+      } else {
+        setSummary(null)
+      }
     }
 
-    const query = search.trim().toLowerCase()
+    void loadSummary()
 
-    if (query) {
-      result = result.filter(
-        (row) =>
-          row.name.toLowerCase().includes(query) ||
-          row.description.toLowerCase().includes(query) ||
-          row.kindLabel.toLowerCase().includes(query),
-      )
+    return () => {
+      cancelled = true
+    }
+  }, [listVersion])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadRoles() {
+      setIsLoading(true)
+
+      const isSystem =
+        kindFilter === 'all' ? undefined : kindFilter === 'system'
+
+      const result = await roleService.getAllForAdmin({
+        search: debouncedSearch || undefined,
+        isSystem,
+        sort,
+      })
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setRows(result.data.map(mapRoleAdminItemToListRow))
+      } else {
+        setRows([])
+      }
+
+      setIsLoading(false)
     }
 
-    return result
-  }, [search, kindFilter])
+    void loadRoles()
+
+    return () => {
+      cancelled = true
+    }
+  }, [debouncedSearch, kindFilter, sort, listVersion])
+
+  function clearFilters() {
+    setSearch('')
+    setDebouncedSearch('')
+    setKindFilter('all')
+    setSort('name-asc')
+  }
+
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deletingId != null) {
+      return
+    }
+
+    const deletedId = deleteTarget.id
+    setDeletingId(deletedId)
+
+    const result = await roleService.remove(deletedId)
+
+    if (result.success) {
+      setDeleteTarget(null)
+      setListVersion((prev) => prev + 1)
+    }
+
+    setDeletingId(null)
+  }
+
+  const counts = {
+    all: summary?.totalCount ?? 0,
+    system: summary?.systemCount ?? 0,
+    custom: summary?.customCount ?? 0,
+  }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-      <AdminRoleListHeader />
+    <div className="flex flex-col">
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <AdminRoleListHeader />
 
-      <AdminRoleListFilters
-        search={search}
-        kindFilter={kindFilter}
-        counts={counts}
-        onSearchChange={setSearch}
-        onKindChange={setKindFilter}
-      />
+        <AdminRoleListFilters
+          search={search}
+          kindFilter={kindFilter}
+          sort={sort}
+          counts={counts}
+          onSearchChange={setSearch}
+          onKindChange={setKindFilter}
+          onSortChange={setSort}
+          onClear={clearFilters}
+        />
 
-      <AdminRoleTable rows={filtered} />
-
-      <div className="flex flex-col gap-space-sm border border-outline-variant/40 bg-surface-container-lowest px-space-md py-space-sm sm:flex-row sm:items-center sm:justify-between">
-        <p className="font-label text-label-md text-on-surface-variant">
-          Toplam <strong className="text-primary">{filtered.length}</strong> rol listeleniyor. (2
-          Çekirdek, 2 Modüler)
-        </p>
-        <span className="font-label inline-flex h-8 w-8 items-center justify-center bg-primary text-label-md text-on-primary">
-          1
-        </span>
-      </div>
-
-      <section className="flex gap-space-sm border border-outline-variant/40 bg-surface-container-low p-space-md">
-        <span className="material-symbols-outlined text-secondary">gavel</span>
-        <div>
-          <h2 className="font-label text-label-md font-bold text-on-surface uppercase">
-            Güvenlik ve Rol Matrisi Protokolü
-          </h2>
-          <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-            Rol yetkilerinde yapılan değişiklikler oturumu açık üyelerin izin matrisine anlık
-            yansıtılır. Sistem rollerinin (<strong className="text-primary">Yönetici</strong>,{' '}
-            <strong className="text-primary">Üye</strong>) ana mimarisi çekirdek güvenlik protokolü
-            gereği silinemez.
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            Roller yükleniyor...
           </p>
-        </div>
-      </section>
-    </main>
+        ) : (
+          <AdminRoleTable
+            roles={rows}
+            deletingId={deletingId}
+            onDelete={setDeleteTarget}
+          />
+        )}
+      </main>
+
+      <AdminRoleDeleteModal
+        open={deleteTarget != null}
+        roleName={deleteTarget?.name ?? 'Rol'}
+        isDeleting={deletingId != null}
+        onCancel={() => {
+          if (deletingId != null) {
+            return
+          }
+
+          setDeleteTarget(null)
+        }}
+        onConfirm={() => {
+          void handleConfirmDelete()
+        }}
+      />
+    </div>
   )
 }

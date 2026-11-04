@@ -30,6 +30,13 @@ public interface IRoleService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<RoleAdminListItemDto>>> GetAdminListAsync(
+    RoleAdminListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<RoleAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<RoleResponseDto>> AddAsync(
     CreateRoleRequest request,
     string userRole,

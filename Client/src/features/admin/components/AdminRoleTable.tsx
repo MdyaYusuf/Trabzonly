@@ -2,15 +2,27 @@ import { Link } from 'react-router-dom'
 import type { AdminRoleListRow } from '../utils/adminRoleTypes'
 
 type AdminRoleTableProps = {
-  rows: AdminRoleListRow[]
+  roles: AdminRoleListRow[]
+  deletingId: number | null
+  onDelete: (role: AdminRoleListRow) => void
 }
 
-export function AdminRoleTable({ rows }: AdminRoleTableProps) {
-  if (rows.length === 0) {
+function formatCreatedDate(value: string): string {
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+
+  return date.toLocaleDateString('tr-TR')
+}
+
+export function AdminRoleTable({ roles, deletingId, onDelete }: AdminRoleTableProps) {
+  if (roles.length === 0) {
     return (
       <section className="border border-outline-variant/40 bg-surface-container-lowest px-space-md py-space-xl text-center">
         <p className="font-body text-body-md text-on-surface-variant">
-          Bu filtreler için rol bulunamadı. Lütfen arama veya tür kriterlerini güncelleyiniz.
+          Henüz rol eklenmedi veya eşleşme yok.
         </p>
       </section>
     )
@@ -18,121 +30,90 @@ export function AdminRoleTable({ rows }: AdminRoleTableProps) {
 
   return (
     <section className="overflow-x-auto border border-outline-variant/40 bg-surface-container-lowest">
-      <table className="w-full min-w-[1000px] border-collapse text-left">
+      <table className="w-full min-w-[720px] border-collapse text-left">
         <thead className="bg-surface-container-low">
           <tr className="font-kicker text-kicker text-on-surface-variant uppercase">
-            <th className="px-space-sm py-space-sm">Rol Tanımı & Detayı</th>
-            <th className="px-space-sm py-space-sm">Erişim Seviyesi / Yetki Özeti</th>
-            <th className="px-space-sm py-space-sm">Atanan Üye Sayısı</th>
-            <th className="px-space-sm py-space-sm">Oluşturulma Tarihi</th>
-            <th className="px-space-sm py-space-sm">Durum</th>
+            <th className="px-space-sm py-space-sm">Rol</th>
+            <th className="px-space-sm py-space-sm">Üye Sayısı</th>
+            <th className="px-space-sm py-space-sm">Tür</th>
+            <th className="px-space-sm py-space-sm">Oluşturulma</th>
             <th className="px-space-sm py-space-sm">İşlemler</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.id}
-              className="border-t border-outline-variant/30 transition-colors hover:bg-surface-container-low/60"
-            >
-              <td className="px-space-sm py-space-sm">
-                <div className="flex items-start gap-space-sm">
-                  <span
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center ${row.iconTone}`}
-                  >
-                    <span className="material-symbols-outlined text-[20px]">{row.icon}</span>
+          {roles.map((role) => {
+            const isDeleting = deletingId === role.id
+            const hasMembers = role.memberCount > 0
+            const canDelete = !role.isSystem && !hasMembers
+
+            return (
+              <tr
+                key={role.id}
+                className="border-t border-outline-variant/30 transition-colors hover:bg-surface-container-low/60"
+              >
+                <td className="px-space-sm py-space-sm">
+                  <span className="font-label text-label-md font-bold text-on-surface">
+                    {role.name}
                   </span>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-space-xs">
-                      <p className="font-label text-label-md font-bold text-on-surface">
-                        {row.name}
-                      </p>
-                      <span className="font-kicker bg-surface-container-high px-space-xs py-0.5 text-kicker text-on-surface-variant uppercase">
-                        {row.kindLabel}
-                      </span>
-                    </div>
-                    <p className="font-body mt-1 max-w-sm text-body-sm text-on-surface-variant">
-                      {row.description}
-                    </p>
-                  </div>
-                </div>
-              </td>
-              <td className="px-space-sm py-space-sm">
-                <p className="font-label text-label-md font-bold text-on-surface">
-                  {row.accessTitle}
-                </p>
-                {row.accessDetails.map((detail) => (
-                  <p
-                    key={detail}
-                    className="font-body mt-1 inline-flex items-center gap-1 text-body-sm text-on-surface-variant"
-                  >
-                    <span className="material-symbols-outlined text-[14px] text-secondary">
-                      check_circle
-                    </span>
-                    {detail}
-                  </p>
-                ))}
-              </td>
-              <td className="px-space-sm py-space-sm">
-                <p className="font-label text-label-md font-bold text-on-surface tabular-nums">
-                  {row.memberCountLabel}
-                </p>
-                <Link
-                  to="/yonetim/uyeler"
-                  className="font-label mt-1 inline-flex items-center gap-1 text-label-md text-primary uppercase hover:text-secondary"
-                >
-                  Üyeleri Gör
-                  <span className="material-symbols-outlined text-[14px]">north_east</span>
-                </Link>
-              </td>
-              <td className="px-space-sm py-space-sm">
-                <p className="font-label text-label-md text-on-surface">{row.createdAt}</p>
-                <p className="font-body text-body-sm text-on-surface-variant">{row.createdNote}</p>
-              </td>
-              <td className="px-space-sm py-space-sm">
-                <span
-                  className={`font-label inline-flex items-center gap-1 px-space-sm py-1 text-label-md uppercase ${
-                    row.isLocked
-                      ? 'bg-surface-container-high text-on-surface-variant'
-                      : 'bg-secondary-container text-on-secondary-container'
-                  }`}
-                >
-                  {row.isLocked ? (
-                    <span className="material-symbols-outlined text-[14px]">lock</span>
-                  ) : (
-                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                  )}
-                  {row.statusLabel}
-                </span>
-              </td>
-              <td className="px-space-sm py-space-sm">
-                <div className="flex items-center gap-1">
+                </td>
+                <td className="px-space-sm py-space-sm">
                   <Link
-                    to={`/yonetim/roller/${row.id}/duzenle`}
-                    className="font-label px-space-sm py-1 text-label-md text-primary uppercase hover:text-secondary"
+                    to="/yonetim/uyeler"
+                    className="font-label inline-flex items-center gap-1 bg-surface-container-high px-space-sm py-1 text-label-md tabular-nums text-on-surface transition-colors hover:text-primary"
                   >
-                    Düzenle
+                    <span className="material-symbols-outlined text-[16px]">group</span>
+                    {role.memberCount}
                   </Link>
-                  {row.isLocked ? (
-                    <span
-                      className="flex h-8 w-8 items-center justify-center text-on-surface-variant"
-                      title="Sistem rolü kilitli"
+                </td>
+                <td className="px-space-sm py-space-sm">
+                  <span
+                    className={`font-label inline-flex items-center gap-1 px-space-sm py-0.5 text-label-md uppercase ${
+                      role.isSystem
+                        ? 'bg-surface-container-high text-on-surface-variant'
+                        : 'bg-secondary-container/50 text-on-secondary-container'
+                    }`}
+                  >
+                    {role.isSystem ? (
+                      <span className="material-symbols-outlined text-[14px]">lock</span>
+                    ) : null}
+                    {role.statusLabel}
+                  </span>
+                </td>
+                <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums text-on-surface">
+                  {formatCreatedDate(role.createdDate)}
+                </td>
+                <td className="px-space-sm py-space-sm">
+                  <div className="flex items-center gap-1">
+                    <Link
+                      to={`/yonetim/roller/${role.id}/duzenle`}
+                      aria-label="Düzenle"
+                      className="flex h-8 w-8 cursor-pointer items-center justify-center text-secondary transition-colors hover:bg-secondary-container/40"
                     >
-                      <span className="material-symbols-outlined text-[18px]">lock</span>
-                    </span>
-                  ) : (
+                      <span className="material-symbols-outlined text-[18px]">edit</span>
+                    </Link>
                     <button
                       type="button"
                       aria-label="Sil"
-                      className="flex h-8 w-8 items-center justify-center text-on-surface-variant transition-colors hover:bg-error-container hover:text-error"
+                      disabled={!canDelete || isDeleting}
+                      title={
+                        role.isSystem
+                          ? 'Sistem rolleri silinemez.'
+                          : hasMembers
+                            ? 'Bu role bağlı üyeler varken silinemez.'
+                            : undefined
+                      }
+                      onClick={() => {
+                        onDelete(role)
+                      }}
+                      className="flex h-8 w-8 cursor-pointer items-center justify-center text-error transition-colors hover:bg-error-container disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <span className="material-symbols-outlined text-[18px]">delete</span>
                     </button>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </section>
