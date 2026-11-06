@@ -14,7 +14,6 @@ public class QuizCategory : Entity<int>
   public required string Name { get; set; }
   public string? Description { get; set; }
   public string? ImageUrl { get; set; }
-  public string? SeedKey { get; set; }
   public bool IsActive { get; set; } = true;
 
   public virtual ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();

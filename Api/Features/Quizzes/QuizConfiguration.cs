@@ -34,14 +34,6 @@ public class QuizConfiguration : IEntityTypeConfiguration<Quiz>
     builder.Property(q => q.QuizCategoryId)
       .IsRequired();
 
-    builder.Property(q => q.SeedKey)
-      .HasMaxLength(100)
-      .IsRequired(false);
-
-    builder.HasIndex(q => q.SeedKey)
-      .IsUnique()
-      .HasFilter("[SeedKey] IS NOT NULL");
-
     builder.HasIndex(q => q.QuizCategoryId);
 
     builder.HasOne(q => q.QuizCategory)

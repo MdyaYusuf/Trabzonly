@@ -757,10 +757,6 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("QuizCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SeedKey")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -773,10 +769,6 @@ namespace Trabzonly.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("QuizCategoryId");
-
-                    b.HasIndex("SeedKey")
-                        .IsUnique()
-                        .HasFilter("[SeedKey] IS NOT NULL");
 
                     b.ToTable("Quizzes", (string)null);
                 });
@@ -810,10 +802,6 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("SeedKey")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("UpdatedDate");
@@ -821,10 +809,6 @@ namespace Trabzonly.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
-
-                    b.HasIndex("SeedKey")
-                        .IsUnique()
-                        .HasFilter("[SeedKey] IS NOT NULL");
 
                     b.ToTable("QuizCategories", (string)null);
                 });

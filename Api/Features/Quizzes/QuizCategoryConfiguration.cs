@@ -35,14 +35,6 @@ public class QuizCategoryConfiguration : IEntityTypeConfiguration<QuizCategory>
       .HasMaxLength(500)
       .IsRequired(false);
 
-    builder.Property(c => c.SeedKey)
-      .HasMaxLength(100)
-      .IsRequired(false);
-
-    builder.HasIndex(c => c.SeedKey)
-      .IsUnique()
-      .HasFilter("[SeedKey] IS NOT NULL");
-
     builder.HasIndex(c => c.Name);
   }
 }

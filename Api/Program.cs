@@ -11,7 +11,6 @@ using Api.Features.Players;
 using Api.Features.Stats;
 using Api.Features.Positions;
 using Api.Features.Quizzes;
-using Api.Features.Quizzes.Seed;
 using Api.Features.Roles;
 using Api.Features.Seasons;
 using Api.Features.Users;
@@ -131,7 +130,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-await QuizSeeder.SeedAsync(app.Services);
 
 app.Run();
