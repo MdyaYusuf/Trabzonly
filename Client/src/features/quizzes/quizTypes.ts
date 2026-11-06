@@ -69,6 +69,33 @@ export interface CreatedQuizResponseDto {
   title: string
 }
 
+export interface QuizAdminListItemDto {
+  id: string
+  title: string
+  description?: string | null
+  quizCategoryId: number
+  categoryName: string
+  questionCount: number
+  isActive: boolean
+}
+
+export interface QuizAdminSummaryDto {
+  totalCount: number
+  activeCount: number
+  inactiveCount: number
+}
+
+export type QuizAdminSortOption = 'title-asc' | 'questions-asc' | 'questions-desc'
+
+export interface QuizAdminListQuery {
+  pageNumber?: number
+  pageSize?: number
+  search?: string
+  isActive?: boolean
+  quizCategoryId?: number
+  sort?: QuizAdminSortOption
+}
+
 /** Public list payload — never includes questions, answers, or isCorrect. */
 export interface QuizListItemDto {
   id: string

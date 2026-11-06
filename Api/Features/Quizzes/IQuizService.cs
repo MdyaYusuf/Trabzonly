@@ -33,6 +33,13 @@ public interface IQuizService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<QuizAdminListItemDto>>> GetAdminListAsync(
+    QuizAdminListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<QuizAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<QuizResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,

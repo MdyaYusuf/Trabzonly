@@ -131,17 +131,9 @@ export function AdminStatisticListFilters({
               placeholder="Takım"
               className="font-label w-40 border border-outline-variant/50 bg-surface px-space-md py-space-sm text-label-md text-on-surface outline-none focus:border-primary"
             />
-
-            <button
-              type="button"
-              onClick={onClear}
-              className="font-label cursor-pointer border border-outline-variant/50 px-space-md py-space-sm text-label-md text-on-surface-variant uppercase transition-colors hover:border-primary hover:text-primary"
-            >
-              Filtreleri Temizle
-            </button>
           </div>
 
-          <div className="flex flex-wrap gap-space-sm">
+          <div className="flex flex-wrap items-center gap-space-sm">
             <select
               value={sort}
               onChange={(event) => {
@@ -154,6 +146,14 @@ export function AdminStatisticListFilters({
               <option value="matches-desc">Sırala: Maç</option>
               <option value="minutes-desc">Sırala: Dakika</option>
             </select>
+
+            <button
+              type="button"
+              onClick={onClear}
+              className="font-label cursor-pointer border border-outline-variant/50 px-space-md py-space-sm text-label-md text-on-surface-variant uppercase transition-colors hover:border-primary hover:text-primary"
+            >
+              Filtreleri Temizle
+            </button>
           </div>
         </div>
 

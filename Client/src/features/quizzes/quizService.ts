@@ -1,5 +1,5 @@
 import { apiClient } from '../../core/api/apiClient'
-import type { ApiResponse, NoData } from '../../core/types/ApiResponse'
+import type { ApiResponse, NoData, PagedResponse } from '../../core/types/ApiResponse'
 import type {
   QuizResponseDto,
   QuizListItemDto,
@@ -14,6 +14,9 @@ import type {
   CheckQuizAnswerRequest,
   CheckQuizAnswerResponse,
   UserQuizResultResponseDto,
+  QuizAdminListItemDto,
+  QuizAdminListQuery,
+  QuizAdminSummaryDto,
 } from './quizTypes'
 
 const API_URL = '/quizzes'
@@ -72,9 +75,37 @@ const getMyStats = async (): Promise<ApiResponse<QuizUserStatsDto>> => {
   return await apiClient<QuizUserStatsDto>(`${API_URL}/stats/me`)
 }
 
-/** Admin-only full list including inactive quizzes and correct answers. */
-const getAllForAdmin = async (): Promise<ApiResponse<QuizResponseDto[]>> => {
-  return await apiClient<QuizResponseDto[]>(`${API_URL}/manage`)
+const getAllForAdmin = async (
+  query: QuizAdminListQuery = {},
+): Promise<ApiResponse<PagedResponse<QuizAdminListItemDto>>> => {
+  const queryParams = new URLSearchParams()
+
+  queryParams.set('pageNumber', String(query.pageNumber ?? 1))
+  queryParams.set('pageSize', String(query.pageSize ?? 10))
+
+  if (query.search?.trim()) {
+    queryParams.set('search', query.search.trim())
+  }
+
+  if (query.isActive !== undefined) {
+    queryParams.set('isActive', String(query.isActive))
+  }
+
+  if (query.quizCategoryId != null) {
+    queryParams.set('quizCategoryId', String(query.quizCategoryId))
+  }
+
+  if (query.sort) {
+    queryParams.set('sort', query.sort)
+  }
+
+  return await apiClient<PagedResponse<QuizAdminListItemDto>>(
+    `${API_URL}/manage?${queryParams}`,
+  )
+}
+
+const getAdminSummary = async (): Promise<ApiResponse<QuizAdminSummaryDto>> => {
+  return await apiClient<QuizAdminSummaryDto>(`${API_URL}/manage/summary`)
 }
 
 /** Admin-only full quiz by id (includes IsCorrect). */
@@ -119,6 +150,7 @@ const quizService = {
   getLeaderboard,
   getMyStats,
   getAllForAdmin,
+  getAdminSummary,
   getById,
   add,
   update,

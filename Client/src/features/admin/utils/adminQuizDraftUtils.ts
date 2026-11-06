@@ -1,6 +1,7 @@
 import type {
   CreateQuestionRequest,
   CreateQuizRequest,
+  QuizAdminListItemDto,
   QuizCategoryResponseDto,
   QuizResponseDto,
   UpdateQuizRequest,
@@ -57,9 +58,8 @@ export function createEmptyAdminQuizCreateDraft(
   }
 }
 
-export function mapQuizResponseToListRow(quiz: QuizResponseDto): AdminQuizListRow {
+export function mapQuizAdminItemToListRow(quiz: QuizAdminListItemDto): AdminQuizListRow {
   const status: AdminQuizStatus = quiz.isActive ? 'active' : 'passive'
-  const totalPoints = quiz.questions.reduce((sum, question) => sum + question.points, 0)
 
   return {
     id: quiz.id,
@@ -67,8 +67,7 @@ export function mapQuizResponseToListRow(quiz: QuizResponseDto): AdminQuizListRo
     quizCategoryId: quiz.quizCategoryId,
     categoryLabel: quiz.categoryName,
     description: quiz.description?.trim() || '—',
-    questionCount: quiz.questions.length,
-    totalPoints,
+    questionCount: quiz.questionCount,
     status,
     statusLabel: quiz.isActive ? 'Aktif' : 'Pasif',
   }
@@ -192,11 +191,4 @@ export function validateAdminQuizDraft(draft: {
   }
 
   return null
-}
-
-export function resolveCategoryName(
-  categories: QuizCategoryResponseDto[],
-  quizCategoryId: number,
-): string {
-  return categories.find((category) => category.id === quizCategoryId)?.name ?? 'Kategori'
 }

@@ -46,6 +46,35 @@ public sealed record QuizPreviewDto(
   string? CategoryImageUrl,
   bool IsActive);
 
+public sealed record QuizAdminListItemDto(
+  Guid Id,
+  string Title,
+  string? Description,
+  int QuizCategoryId,
+  string CategoryName,
+  int QuestionCount,
+  bool IsActive);
+
+public sealed record QuizAdminSummaryDto(
+  int TotalCount,
+  int ActiveCount,
+  int InactiveCount);
+
+public sealed record QuizAdminListQueryRequest(
+  string? Search = null,
+  bool? IsActive = null,
+  int? QuizCategoryId = null,
+  string? Sort = null,
+  int PageNumber = 1,
+  int PageSize = 10);
+
+public static class QuizAdminSortOptions
+{
+  public const string TitleAsc = "title-asc";
+  public const string QuestionsAsc = "questions-asc";
+  public const string QuestionsDesc = "questions-desc";
+}
+
 // Public list (no questions, no answers)
 public sealed record QuizListItemDto(
   Guid Id,

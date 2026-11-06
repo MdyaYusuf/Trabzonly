@@ -216,6 +216,58 @@ public class QuizService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<QuizAdminListItemDto>>> GetAdminListAsync(
+    QuizAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
+
+    var (items, totalCount) = await _quizRepository.GetAdminListAsync(
+      filter: BuildAdminListFilter(query),
+      sort: query.Sort,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+
+    var pagedResponse = new PagedResponse<QuizAdminListItemDto>(
+      items,
+      totalCount,
+      pageNumber,
+      pageSize);
+
+    return new ReturnModel<PagedResponse<QuizAdminListItemDto>>()
+    {
+      Success = true,
+      Message = "Quiz yönetim listesi başarılı bir şekilde getirildi.",
+      Data = pagedResponse,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<QuizAdminSummaryDto>> GetAdminSummaryAsync(
+    CancellationToken cancellationToken = default)
+  {
+    List<Quiz> quizzes = await _quizRepository.GetAllAsync(
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    int totalCount = quizzes.Count;
+    int activeCount = quizzes.Count(quiz => quiz.IsActive);
+    int inactiveCount = totalCount - activeCount;
+
+    return new ReturnModel<QuizAdminSummaryDto>()
+    {
+      Success = true,
+      Message = "Quiz yönetim özeti başarılı bir şekilde getirildi.",
+      Data = new QuizAdminSummaryDto(
+        TotalCount: totalCount,
+        ActiveCount: activeCount,
+        InactiveCount: inactiveCount),
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<QuizResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
@@ -594,5 +646,21 @@ public class QuizService(
         AverageCompletionTime: x.AverageCompletionTime,
         DistinctQuizCount: x.DistinctQuizCount))
       .ToList();
+  }
+
+  private static Expression<Func<Quiz, bool>> BuildAdminListFilter(
+    QuizAdminListQueryRequest query)
+  {
+    string? search = query.Search?.Trim();
+    bool? isActive = query.IsActive;
+    int? quizCategoryId = query.QuizCategoryId;
+
+    return quiz =>
+      (!isActive.HasValue || quiz.IsActive == isActive.Value) &&
+      (!quizCategoryId.HasValue || quiz.QuizCategoryId == quizCategoryId.Value) &&
+      (string.IsNullOrEmpty(search) ||
+       quiz.Title.Contains(search) ||
+       (quiz.Description != null && quiz.Description.Contains(search)) ||
+       quiz.QuizCategory.Name.Contains(search));
   }
 }

@@ -1,6 +1,10 @@
+import type { QuizAdminSortOption } from '@/features/quizzes/quizTypes'
+
 export type AdminQuizStatusFilter = 'all' | 'active' | 'passive'
 
 export type AdminQuizStatus = 'active' | 'passive'
+
+export type AdminQuizSort = QuizAdminSortOption
 
 export type AdminQuizListRow = {
   id: string
@@ -9,7 +13,6 @@ export type AdminQuizListRow = {
   categoryLabel: string
   description: string
   questionCount: number
-  totalPoints: number
   status: AdminQuizStatus
   statusLabel: string
 }

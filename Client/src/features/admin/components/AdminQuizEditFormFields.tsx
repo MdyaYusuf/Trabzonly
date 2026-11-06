@@ -36,10 +36,10 @@ export function AdminQuizEditFormFields({
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
         <div className="mb-space-md flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/40 pb-space-sm">
           <h2 className="font-headline text-headline-sm font-bold text-primary uppercase">
-            Temel Metaveri
+            Temel Quiz Bilgileri
           </h2>
           <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-            Zorunlu Alanlar
+            Bölüm 01
           </span>
         </div>
 
@@ -104,25 +104,47 @@ export function AdminQuizEditFormFields({
               ))}
             </select>
           </div>
+        </div>
+      </section>
 
-          <label className="flex items-center justify-between gap-space-md border border-outline-variant/40 bg-surface-container-low px-space-md py-space-sm">
-            <span>
-              <span className="font-label block text-label-md font-bold text-on-surface uppercase">
-                Aktif Durumu
-              </span>
-              <span className="font-kicker mt-1 inline-block text-kicker text-secondary uppercase">
-                {draft.isActive ? 'Yayında' : 'Pasif'}
-              </span>
-            </span>
-            <input
-              type="checkbox"
-              className="h-5 w-5 accent-primary"
-              checked={draft.isActive}
-              onChange={(event) => {
-                onChange('isActive', event.target.checked)
-              }}
+      <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
+        <div className="mb-space-md flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/40 pb-space-sm">
+          <h2 className="font-headline text-headline-sm font-bold text-primary uppercase">
+            Durum
+          </h2>
+          <span className="font-kicker text-kicker text-on-surface-variant uppercase">
+            Bölüm 02
+          </span>
+        </div>
+        <div className="flex items-start justify-between gap-space-md border border-outline-variant/30 bg-surface-container-low px-space-md py-space-sm">
+          <div>
+            <p className="font-label text-label-md font-bold text-on-surface uppercase">
+              {draft.isActive ? 'Aktif Quiz' : 'Pasif Quiz'}
+            </p>
+            <p className="font-body mt-1 text-body-sm text-on-surface-variant">
+              {draft.isActive
+                ? 'Quiz aktif. Taraftar listesinde görünür ve çözülebilir.'
+                : 'Quiz pasif. Taraftar listesinde gizlidir.'}
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={draft.isActive}
+            aria-label="Quiz durumunu değiştir"
+            onClick={() => {
+              onChange('isActive', !draft.isActive)
+            }}
+            className={`relative h-7 w-12 shrink-0 cursor-pointer transition-colors ${
+              draft.isActive ? 'bg-primary' : 'bg-outline-variant'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-6 w-6 bg-surface-container-lowest transition-transform ${
+                draft.isActive ? 'left-5' : 'left-0.5'
+              }`}
             />
-          </label>
+          </button>
         </div>
       </section>
 

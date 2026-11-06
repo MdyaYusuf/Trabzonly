@@ -98,7 +98,7 @@ export function AdminRoleListFilters({
           to="/yonetim/roller/yeni"
           className="font-label inline-flex h-11 min-w-[11.5rem] shrink-0 cursor-pointer items-center justify-center gap-space-xs self-center bg-gradient-to-r from-primary-container via-[#7a1235] to-primary px-space-lg text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
         >
-          <span className="material-symbols-outlined text-[20px]">add</span>
+          <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
           Rol Ekle
         </Link>
       </div>

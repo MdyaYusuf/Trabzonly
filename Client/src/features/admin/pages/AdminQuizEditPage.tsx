@@ -1,15 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import quizCategoryService from '@/features/quizzes/quizCategoryService'
 import quizService from '@/features/quizzes/quizService'
 import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
+import { AdminQuizDeleteModal } from '../components/AdminQuizDeleteModal'
 import { AdminQuizEditFormFields } from '../components/AdminQuizEditFormFields'
-import { AdminQuizEditSidebar } from '../components/AdminQuizEditSidebar'
 import {
   createEmptyAdminQuestion,
   mapEditDraftToRequest,
   mapQuizResponseToEditDraft,
-  resolveCategoryName,
   validateAdminQuizDraft,
 } from '../utils/adminQuizDraftUtils'
 import type { AdminQuizEditDraft, AdminQuizQuestion } from '../utils/adminQuizTypes'
@@ -23,6 +22,7 @@ export function AdminQuizEditPage() {
   const [loadError, setLoadError] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -69,11 +69,6 @@ export function AdminQuizEditPage() {
       cancelled = true
     }
   }, [quizId])
-
-  const categoryName = useMemo(
-    () => resolveCategoryName(categories, draft?.quizCategoryId ?? 0),
-    [categories, draft?.quizCategoryId],
-  )
 
   function updateField<K extends keyof AdminQuizEditDraft>(
     key: K,
@@ -233,17 +228,13 @@ export function AdminQuizEditPage() {
 
     if (result.success) {
       navigate('/yonetim/quizler')
+    } else {
+      setFormError(result.message || 'Quiz güncellenemedi.')
     }
   }
 
-  async function handleDelete() {
+  async function handleConfirmDelete() {
     if (!draft || isDeleting) {
-      return
-    }
-
-    const confirmed = window.confirm('Bu quizi silmek istediğine emin misin?')
-
-    if (!confirmed) {
       return
     }
 
@@ -251,17 +242,25 @@ export function AdminQuizEditPage() {
 
     const result = await quizService.remove(draft.id)
 
-    setIsDeleting(false)
-
     if (result.success) {
       navigate('/yonetim/quizler')
+      return
     }
+
+    setFormError(result.message || 'Quiz silinemedi.')
+    setIsDeleting(false)
+    setDeleteOpen(false)
   }
+
+  const actionButtonClass =
+    'font-label inline-flex h-10 w-[8.75rem] cursor-pointer items-center justify-center gap-1 border px-space-md text-label-md uppercase'
 
   if (isLoading) {
     return (
-      <main className="mx-auto max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
-        <p className="font-body text-body-md text-on-surface-variant">Quiz yükleniyor...</p>
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+          Quiz yükleniyor...
+        </p>
       </main>
     )
   }
@@ -277,111 +276,93 @@ export function AdminQuizEditPage() {
     )
   }
 
+  const actionButtons = (
+    <div className="flex flex-wrap items-center justify-end gap-space-sm">
+      <button
+        type="button"
+        disabled={isSaving}
+        onClick={() => {
+          void handleSave()
+        }}
+        className={`${actionButtonClass} border-transparent bg-primary-container font-bold tracking-wider text-on-primary transition-all hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50`}
+      >
+        <span className="material-symbols-outlined text-[18px]">save</span>
+        Kaydet
+      </button>
+      <button
+        type="button"
+        onClick={handleCancel}
+        className={`${actionButtonClass} border-outline-variant transition-colors hover:border-primary hover:text-primary`}
+      >
+        <span className="material-symbols-outlined text-[18px]">close</span>
+        İptal
+      </button>
+      <button
+        type="button"
+        disabled={isDeleting}
+        onClick={() => {
+          setDeleteOpen(true)
+        }}
+        className={`${actionButtonClass} border-error text-error transition-colors hover:bg-error-container disabled:cursor-not-allowed disabled:opacity-40`}
+      >
+        <span className="material-symbols-outlined text-[18px]">delete</span>
+        Sil
+      </button>
+    </div>
+  )
+
   return (
     <div className="flex min-h-full flex-col">
       <main className="mx-auto flex w-full max-w-[1360px] flex-1 flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
         <header className="flex flex-col gap-space-md lg:flex-row lg:items-start lg:justify-between">
           <div className="flex max-w-3xl flex-col gap-space-xs">
-            <nav
-              aria-label="Breadcrumb"
-              className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
-            >
-              <Link to="/yonetim" className="transition-colors hover:text-primary">
-                Yönetim Masası
-              </Link>
-              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-              <Link to="/yonetim/quizler" className="transition-colors hover:text-primary">
-                Quizler
-              </Link>
-              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-              <span className="font-bold text-primary uppercase">Düzenle</span>
-            </nav>
             <h1 className="font-headline text-headline-lg font-extrabold tracking-tight text-primary uppercase">
               Quiz Düzenle
             </h1>
             <p className="font-body text-body-md text-on-surface-variant">
-              Metaveri ve soruları güncelle. Sorular kaydedildiğinde komple yenilenir.
+              Quiz bilgilerini, durumunu ve sorularını güncelleyin.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-space-sm">
-            <button
-              type="button"
-              disabled={isDeleting}
-              onClick={() => {
-                void handleDelete()
-              }}
-              className="font-label inline-flex items-center gap-1 border border-error px-space-md py-space-sm text-label-md text-error uppercase transition-colors hover:bg-error-container disabled:opacity-50"
-            >
-              Sil
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="font-label border border-outline-variant px-space-md py-space-sm text-label-md uppercase"
-            >
-              İptal
-            </button>
-            <button
-              type="button"
-              disabled={isSaving}
-              onClick={() => {
-                void handleSave()
-              }}
-              className="font-label inline-flex items-center gap-1 bg-primary-container px-space-md py-space-sm text-label-md font-bold tracking-wider text-on-primary uppercase disabled:opacity-50"
-            >
-              {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
-            </button>
-          </div>
+          {actionButtons}
         </header>
 
         {formError ? (
-          <p className="font-body border border-error/40 bg-error-container/30 px-space-md py-space-sm text-body-sm text-error">
+          <p className="font-body border border-error/40 bg-error-container px-space-md py-space-sm text-body-md text-on-error-container">
             {formError}
           </p>
         ) : null}
 
-        <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <AdminQuizEditFormFields
-              draft={draft}
-              categories={categories}
-              onChange={updateField}
-              onUpdateQuestion={updateQuestion}
-              onSetCorrectOption={setCorrectOption}
-              onUpdateOptionText={updateOptionText}
-              onAddQuestion={addQuestion}
-              onRemoveQuestion={removeQuestion}
-              onToggleExpand={toggleExpand}
-            />
-          </div>
-          <div className="lg:col-span-5">
-            <AdminQuizEditSidebar draft={draft} categoryName={categoryName} />
-          </div>
-        </div>
+        <AdminQuizEditFormFields
+          draft={draft}
+          categories={categories}
+          onChange={updateField}
+          onUpdateQuestion={updateQuestion}
+          onSetCorrectOption={setCorrectOption}
+          onUpdateOptionText={updateOptionText}
+          onAddQuestion={addQuestion}
+          onRemoveQuestion={removeQuestion}
+          onToggleExpand={toggleExpand}
+        />
+
+        {actionButtons}
       </main>
 
-      <footer className="sticky bottom-0 border-t border-outline-variant/50 bg-surface-container-lowest px-4 py-space-md sm:px-6 lg:px-12">
-        <div className="mx-auto flex w-full max-w-[1360px] justify-end gap-space-sm">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="font-label border border-outline-variant px-space-md py-space-sm text-label-md uppercase"
-          >
-            İptal
-          </button>
-          <button
-            type="button"
-            disabled={isSaving}
-            onClick={() => {
-              void handleSave()
-            }}
-            className="font-label inline-flex items-center gap-1 bg-primary-container px-space-md py-space-sm text-label-md font-bold tracking-wider text-on-primary uppercase disabled:opacity-50"
-          >
-            {isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
-          </button>
-        </div>
-      </footer>
+      <AdminQuizDeleteModal
+        open={deleteOpen}
+        quizTitle={draft.title.trim() || 'Quiz'}
+        isDeleting={isDeleting}
+        onCancel={() => {
+          if (isDeleting) {
+            return
+          }
+
+          setDeleteOpen(false)
+        }}
+        onConfirm={() => {
+          void handleConfirmDelete()
+        }}
+      />
     </div>
   )
 }

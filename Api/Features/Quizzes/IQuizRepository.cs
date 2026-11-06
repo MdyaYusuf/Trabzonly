@@ -1,9 +1,17 @@
+using System.Linq.Expressions;
 using Api.Core.Repositories;
 
 namespace Api.Features.Quizzes;
 
 public interface IQuizRepository : IRepository<Quiz, Guid>
 {
+  Task<(List<QuizAdminListItemDto> Items, int TotalCount)> GetAdminListAsync(
+    Expression<Func<Quiz, bool>>? filter = null,
+    string? sort = null,
+    int pageNumber = 1,
+    int pageSize = 10,
+    CancellationToken cancellationToken = default);
+
   Task<List<Quiz>> GetMostTakenQuizzesAsync(
     int count,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,

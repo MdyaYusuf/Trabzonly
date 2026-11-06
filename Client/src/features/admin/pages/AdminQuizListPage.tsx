@@ -1,184 +1,242 @@
 import { useEffect, useMemo, useState } from 'react'
 import quizCategoryService from '@/features/quizzes/quizCategoryService'
 import quizService from '@/features/quizzes/quizService'
-import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
+import type { QuizAdminSummaryDto, QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
+import { AdminQuizDeleteModal } from '../components/AdminQuizDeleteModal'
 import { AdminQuizListFilters } from '../components/AdminQuizListFilters'
 import { AdminQuizListHeader } from '../components/AdminQuizListHeader'
 import { AdminQuizPagination } from '../components/AdminQuizPagination'
 import { AdminQuizTable } from '../components/AdminQuizTable'
 import {
   buildAdminQuizCategoryFilterOptions,
-  mapQuizResponseToListRow,
+  mapQuizAdminItemToListRow,
 } from '../utils/adminQuizDraftUtils'
-import type { AdminQuizListRow, AdminQuizStatusFilter } from '../utils/adminQuizTypes'
+import type {
+  AdminQuizListRow,
+  AdminQuizSort,
+  AdminQuizStatusFilter,
+} from '../utils/adminQuizTypes'
 
-const PAGE_SIZE = 8
+const DEFAULT_PAGE_SIZE = 10
 
 export function AdminQuizListPage() {
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<AdminQuizStatusFilter>('all')
   const [category, setCategory] = useState('all')
+  const [sort, setSort] = useState<AdminQuizSort>('title-asc')
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [rows, setRows] = useState<AdminQuizListRow[]>([])
+  const [totalCount, setTotalCount] = useState(0)
   const [categories, setCategories] = useState<QuizCategoryResponseDto[]>([])
+  const [summary, setSummary] = useState<QuizAdminSummaryDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [deleteTarget, setDeleteTarget] = useState<AdminQuizListRow | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-
-  async function loadQuizzes() {
-    setIsLoading(true)
-
-    const [quizResult, categoryResult] = await Promise.all([
-      quizService.getAllForAdmin(),
-      quizCategoryService.getAllForAdmin(),
-    ])
-
-    if (quizResult.success && quizResult.data) {
-      setRows(quizResult.data.map(mapQuizResponseToListRow))
-    } else {
-      setRows([])
-    }
-
-    if (categoryResult.success && categoryResult.data) {
-      setCategories(categoryResult.data)
-    } else {
-      setCategories([])
-    }
-
-    setIsLoading(false)
-  }
+  const [listVersion, setListVersion] = useState(0)
 
   useEffect(() => {
-    void loadQuizzes()
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, statusFilter, category, sort, pageSize])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadCategories() {
+      const result = await quizCategoryService.getAllForAdmin()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setCategories(result.data)
+      } else {
+        setCategories([])
+      }
+    }
+
+    void loadCategories()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadSummary() {
+      const result = await quizService.getAdminSummary()
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setSummary(result.data)
+      } else {
+        setSummary(null)
+      }
+    }
+
+    void loadSummary()
+
+    return () => {
+      cancelled = true
+    }
+  }, [listVersion])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadQuizzes() {
+      setIsLoading(true)
+
+      const isActive =
+        statusFilter === 'all' ? undefined : statusFilter === 'active'
+
+      const result = await quizService.getAllForAdmin({
+        pageNumber: page,
+        pageSize,
+        search: debouncedSearch || undefined,
+        isActive,
+        quizCategoryId: category === 'all' ? undefined : Number(category),
+        sort,
+      })
+
+      if (cancelled) {
+        return
+      }
+
+      if (result.success && result.data) {
+        setRows(result.data.items.map(mapQuizAdminItemToListRow))
+        setTotalCount(result.data.totalCount)
+
+        if (result.data.items.length === 0 && result.data.totalCount > 0 && page > 1) {
+          setPage((prev) => Math.max(1, prev - 1))
+        }
+      } else {
+        setRows([])
+        setTotalCount(0)
+      }
+
+      setIsLoading(false)
+    }
+
+    void loadQuizzes()
+
+    return () => {
+      cancelled = true
+    }
+  }, [page, pageSize, debouncedSearch, statusFilter, category, sort, listVersion])
 
   const categoryOptions = useMemo(
     () => buildAdminQuizCategoryFilterOptions(categories),
     [categories],
   )
 
-  const counts = useMemo(() => {
-    return {
-      all: rows.length,
-      active: rows.filter((row) => row.status === 'active').length,
-      passive: rows.filter((row) => row.status === 'passive').length,
-    }
-  }, [rows])
-
-  const filtered = useMemo(() => {
-    let result = [...rows]
-
-    if (statusFilter !== 'all') {
-      result = result.filter((row) => row.status === statusFilter)
-    }
-
-    if (category !== 'all') {
-      const categoryValue = Number(category)
-      result = result.filter((row) => row.quizCategoryId === categoryValue)
-    }
-
-    const query = search.trim().toLowerCase()
-
-    if (query) {
-      result = result.filter(
-        (row) =>
-          row.title.toLowerCase().includes(query) ||
-          row.categoryLabel.toLowerCase().includes(query) ||
-          row.description.toLowerCase().includes(query),
-      )
-    }
-
-    return result
-  }, [rows, search, statusFilter, category])
-
-  const totalPages = Math.max(1, Math.ceil(Math.max(filtered.length, 1) / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pageStart = (currentPage - 1) * PAGE_SIZE
-  const pageRows = filtered.slice(pageStart, pageStart + PAGE_SIZE)
-
-  function resetPage() {
-    setPage(1)
-  }
-
   function clearFilters() {
     setSearch('')
+    setDebouncedSearch('')
     setStatusFilter('all')
     setCategory('all')
+    setSort('title-asc')
     setPage(1)
   }
 
-  async function handleDelete(id: string) {
-    if (deletingId) {
+  async function handleConfirmDelete() {
+    if (!deleteTarget || deletingId != null) {
       return
     }
 
-    const confirmed = window.confirm('Bu quizi silmek istediğine emin misin?')
+    const deletedId = deleteTarget.id
+    setDeletingId(deletedId)
 
-    if (!confirmed) {
-      return
-    }
-
-    setDeletingId(id)
-
-    const result = await quizService.remove(id)
+    const result = await quizService.remove(deletedId)
 
     if (result.success) {
-      setRows((prev) => prev.filter((row) => row.id !== id))
+      setDeleteTarget(null)
+      setListVersion((prev) => prev + 1)
     }
 
     setDeletingId(null)
   }
 
+  const counts = {
+    all: summary?.totalCount ?? totalCount,
+    active: summary?.activeCount ?? 0,
+    passive: summary?.inactiveCount ?? 0,
+  }
+
   return (
-    <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-      <AdminQuizListHeader
-        totalCount={counts.all}
-        activeCount={counts.active}
-        passiveCount={counts.passive}
-      />
+    <div className="flex flex-col">
+      <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
+        <AdminQuizListHeader />
 
-      <AdminQuizListFilters
-        search={search}
-        statusFilter={statusFilter}
-        category={category}
-        categoryOptions={categoryOptions}
-        counts={counts}
-        onSearchChange={(value) => {
-          setSearch(value)
-          resetPage()
-        }}
-        onStatusChange={(value) => {
-          setStatusFilter(value)
-          resetPage()
-        }}
-        onCategoryChange={(value) => {
-          setCategory(value)
-          resetPage()
-        }}
-        onClear={clearFilters}
-      />
-
-      {isLoading ? (
-        <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-          Quizler yükleniyor...
-        </p>
-      ) : (
-        <AdminQuizTable
-          rows={pageRows}
-          deletingId={deletingId}
-          onDelete={(id) => {
-            void handleDelete(id)
-          }}
+        <AdminQuizListFilters
+          search={search}
+          statusFilter={statusFilter}
+          category={category}
+          sort={sort}
+          categoryOptions={categoryOptions}
+          counts={counts}
+          onSearchChange={setSearch}
+          onStatusChange={setStatusFilter}
+          onCategoryChange={setCategory}
+          onSortChange={setSort}
+          onClear={clearFilters}
         />
-      )}
 
-      {!isLoading && filtered.length > PAGE_SIZE ? (
-        <AdminQuizPagination
-          page={currentPage}
-          pageSize={PAGE_SIZE}
-          total={filtered.length}
-          onPageChange={setPage}
-        />
-      ) : null}
-    </main>
+        {isLoading ? (
+          <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+            Quizler yükleniyor...
+          </p>
+        ) : (
+          <AdminQuizTable
+            rows={rows}
+            deletingId={deletingId}
+            onDelete={setDeleteTarget}
+          />
+        )}
+
+        {!isLoading && totalCount > 0 ? (
+          <AdminQuizPagination
+            page={page}
+            pageSize={pageSize}
+            total={totalCount}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        ) : null}
+      </main>
+
+      <AdminQuizDeleteModal
+        open={deleteTarget != null}
+        quizTitle={deleteTarget?.title ?? 'Quiz'}
+        isDeleting={deletingId != null}
+        onCancel={() => {
+          if (deletingId != null) {
+            return
+          }
+
+          setDeleteTarget(null)
+        }}
+        onConfirm={() => {
+          void handleConfirmDelete()
+        }}
+      />
+    </div>
   )
 }

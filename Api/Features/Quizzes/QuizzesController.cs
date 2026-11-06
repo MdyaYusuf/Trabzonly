@@ -58,9 +58,22 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   [Authorize(Roles = "Admin")]
   [HttpGet("manage")]
   public async Task<IActionResult> GetAllForAdmin(
-    CancellationToken cancellationToken)
+    [FromQuery] QuizAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
   {
-    var result = await _quizService.GetAllAsync(cancellationToken: cancellationToken);
+    var result = await _quizService.GetAdminListAsync(
+      query: query,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage/summary")]
+  public async Task<IActionResult> GetAdminSummary(
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _quizService.GetAdminSummaryAsync(cancellationToken);
 
     return CreateActionResult(result);
   }

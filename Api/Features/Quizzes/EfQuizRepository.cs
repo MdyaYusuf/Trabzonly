@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Api.Core.Repositories;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,60 @@ public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, Guid>, IQu
   public EfQuizRepository(BaseDbContext context) : base(context)
   {
 
+  }
+
+  public async Task<(List<QuizAdminListItemDto> Items, int TotalCount)> GetAdminListAsync(
+    Expression<Func<Quiz, bool>>? filter = null,
+    string? sort = null,
+    int pageNumber = 1,
+    int pageSize = 10,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<Quiz> query = _context.Set<Quiz>().AsNoTracking();
+
+    if (filter != null)
+    {
+      query = query.Where(filter);
+    }
+
+    int totalCount = await query.CountAsync(cancellationToken);
+
+    query = ApplyAdminSort(query, sort);
+
+    List<QuizAdminListItemDto> items = await query
+      .Skip((pageNumber - 1) * pageSize)
+      .Take(pageSize)
+      .Select(quiz => new QuizAdminListItemDto(
+        quiz.Id,
+        quiz.Title,
+        quiz.Description,
+        quiz.QuizCategoryId,
+        quiz.QuizCategory.Name,
+        quiz.Questions.Count,
+        quiz.IsActive))
+      .ToListAsync(cancellationToken);
+
+    return (items, totalCount);
+  }
+
+  private static IQueryable<Quiz> ApplyAdminSort(
+    IQueryable<Quiz> query,
+    string? sort)
+  {
+    string normalized = sort?.Trim().ToLowerInvariant() ?? QuizAdminSortOptions.TitleAsc;
+
+    return normalized switch
+    {
+      QuizAdminSortOptions.QuestionsAsc => query
+        .OrderBy(quiz => quiz.Questions.Count)
+        .ThenBy(quiz => quiz.Title),
+      QuizAdminSortOptions.QuestionsDesc => query
+        .OrderByDescending(quiz => quiz.Questions.Count)
+        .ThenBy(quiz => quiz.Title),
+      _ => query
+        .OrderBy(quiz => quiz.Title)
+        .ThenBy(quiz => quiz.Id)
+    };
   }
 
   public async Task<List<Quiz>> GetMostTakenQuizzesAsync(
