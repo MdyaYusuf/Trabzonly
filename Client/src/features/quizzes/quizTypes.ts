@@ -79,12 +79,6 @@ export interface QuizAdminListItemDto {
   isActive: boolean
 }
 
-export interface QuizAdminSummaryDto {
-  totalCount: number
-  activeCount: number
-  inactiveCount: number
-}
-
 export type QuizAdminSortOption = 'title-asc' | 'questions-asc' | 'questions-desc'
 
 export interface QuizAdminListQuery {

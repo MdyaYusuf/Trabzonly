@@ -42,16 +42,6 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
-  [Authorize(Roles = "Admin")]
-  [HttpGet("manage/summary")]
-  public async Task<IActionResult> GetAdminSummary(
-    CancellationToken cancellationToken = default)
-  {
-    var result = await _playerService.GetAdminSummaryAsync(cancellationToken);
-
-    return CreateActionResult(result);
-  }
-
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
     int id,

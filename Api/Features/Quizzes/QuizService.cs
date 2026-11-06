@@ -245,29 +245,6 @@ public class QuizService(
     };
   }
 
-  public async Task<ReturnModel<QuizAdminSummaryDto>> GetAdminSummaryAsync(
-    CancellationToken cancellationToken = default)
-  {
-    List<Quiz> quizzes = await _quizRepository.GetAllAsync(
-      enableTracking: false,
-      cancellationToken: cancellationToken);
-
-    int totalCount = quizzes.Count;
-    int activeCount = quizzes.Count(quiz => quiz.IsActive);
-    int inactiveCount = totalCount - activeCount;
-
-    return new ReturnModel<QuizAdminSummaryDto>()
-    {
-      Success = true,
-      Message = "Quiz yönetim özeti başarılı bir şekilde getirildi.",
-      Data = new QuizAdminSummaryDto(
-        TotalCount: totalCount,
-        ActiveCount: activeCount,
-        InactiveCount: inactiveCount),
-      StatusCode = 200
-    };
-  }
-
   public async Task<ReturnModel<QuizResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,

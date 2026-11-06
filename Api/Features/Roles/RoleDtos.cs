@@ -18,11 +18,6 @@ public sealed record RoleAdminListItemDto(
   DateTime CreatedDate,
   DateTime? UpdatedDate);
 
-public sealed record RoleAdminSummaryDto(
-  int TotalCount,
-  int SystemCount,
-  int CustomCount);
-
 // Requests
 public sealed record CreateRoleRequest(string Name);
 public sealed record UpdateRoleRequest(int Id, string Name);

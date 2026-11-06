@@ -16,12 +16,6 @@ export interface RoleAdminListItemDto {
   updatedDate?: string | null
 }
 
-export interface RoleAdminSummaryDto {
-  totalCount: number
-  systemCount: number
-  customCount: number
-}
-
 export type RoleSortOption = 'name-asc' | 'members-asc' | 'members-desc'
 
 export interface RoleAdminListQuery {

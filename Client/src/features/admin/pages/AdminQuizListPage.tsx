@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import quizCategoryService from '@/features/quizzes/quizCategoryService'
 import quizService from '@/features/quizzes/quizService'
-import type { QuizAdminSummaryDto, QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
+import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
 import { AdminQuizDeleteModal } from '../components/AdminQuizDeleteModal'
 import { AdminQuizListFilters } from '../components/AdminQuizListFilters'
 import { AdminQuizListHeader } from '../components/AdminQuizListHeader'
@@ -30,7 +30,6 @@ export function AdminQuizListPage() {
   const [rows, setRows] = useState<AdminQuizListRow[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [categories, setCategories] = useState<QuizCategoryResponseDto[]>([])
-  const [summary, setSummary] = useState<QuizAdminSummaryDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<AdminQuizListRow | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -73,30 +72,6 @@ export function AdminQuizListPage() {
       cancelled = true
     }
   }, [])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function loadSummary() {
-      const result = await quizService.getAdminSummary()
-
-      if (cancelled) {
-        return
-      }
-
-      if (result.success && result.data) {
-        setSummary(result.data)
-      } else {
-        setSummary(null)
-      }
-    }
-
-    void loadSummary()
-
-    return () => {
-      cancelled = true
-    }
-  }, [listVersion])
 
   useEffect(() => {
     let cancelled = false
@@ -174,12 +149,6 @@ export function AdminQuizListPage() {
     setDeletingId(null)
   }
 
-  const counts = {
-    all: summary?.totalCount ?? totalCount,
-    active: summary?.activeCount ?? 0,
-    passive: summary?.inactiveCount ?? 0,
-  }
-
   return (
     <div className="flex flex-col">
       <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
@@ -191,7 +160,6 @@ export function AdminQuizListPage() {
           category={category}
           sort={sort}
           categoryOptions={categoryOptions}
-          counts={counts}
           onSearchChange={setSearch}
           onStatusChange={setStatusFilter}
           onCategoryChange={setCategory}

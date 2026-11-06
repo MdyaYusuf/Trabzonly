@@ -9,7 +9,6 @@ import type {
   CreateRoleRequest,
   RoleAdminListItemDto,
   RoleAdminListQuery,
-  RoleAdminSummaryDto,
   RoleResponseDto,
   UpdateRoleRequest,
 } from './roleTypes'
@@ -51,10 +50,6 @@ const getAllForAdmin = async (
   )
 }
 
-const getAdminSummary = async (): Promise<ApiResponse<RoleAdminSummaryDto>> => {
-  return await apiClient<RoleAdminSummaryDto>(`${API_URL}/manage/summary`)
-}
-
 const getById = async (id: number): Promise<ApiResponse<RoleResponseDto>> => {
   return await apiClient<RoleResponseDto>(`${API_URL}/${id}`)
 }
@@ -82,7 +77,6 @@ const remove = async (id: number): Promise<ApiResponse<NoData>> => {
 const roleService = {
   getAll,
   getAllForAdmin,
-  getAdminSummary,
   getById,
   add,
   update,

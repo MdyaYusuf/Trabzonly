@@ -8,7 +8,6 @@ import type {
 import type {
   CategoryAdminListItemDto,
   CategoryAdminListQuery,
-  CategoryAdminSummaryDto,
   CategoryResponseDto,
   CreateCategoryRequest,
   UpdateCategoryRequest,
@@ -50,10 +49,6 @@ const getAllForAdmin = async (
   )
 }
 
-const getAdminSummary = async (): Promise<ApiResponse<CategoryAdminSummaryDto>> => {
-  return await apiClient<CategoryAdminSummaryDto>(`${API_URL}/manage/summary`)
-}
-
 const getById = async (id: number): Promise<ApiResponse<CategoryResponseDto>> => {
   return await apiClient<CategoryResponseDto>(`${API_URL}/${id}`)
 }
@@ -83,7 +78,6 @@ const remove = async (id: number): Promise<ApiResponse<NoData>> => {
 const categoryService = {
   getAll,
   getAllForAdmin,
-  getAdminSummary,
   getById,
   add,
   update,

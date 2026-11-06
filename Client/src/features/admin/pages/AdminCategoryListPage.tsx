@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import categoryService from '@/features/categories/categoryService'
-import type { CategoryAdminSummaryDto } from '@/features/categories/categoryTypes'
 import { AdminCategoryDeleteModal } from '../components/AdminCategoryDeleteModal'
 import { AdminCategoryListFilters } from '../components/AdminCategoryListFilters'
 import { AdminCategoryListHeader } from '../components/AdminCategoryListHeader'
@@ -18,7 +17,6 @@ export function AdminCategoryListPage() {
   const [statusFilter, setStatusFilter] = useState<AdminCategoryStatusFilter>('all')
   const [sort, setSort] = useState<AdminCategorySort>('name-asc')
   const [rows, setRows] = useState<AdminCategoryListRow[]>([])
-  const [summary, setSummary] = useState<CategoryAdminSummaryDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<AdminCategoryListRow | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -33,30 +31,6 @@ export function AdminCategoryListPage() {
       window.clearTimeout(timer)
     }
   }, [search])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function loadSummary() {
-      const result = await categoryService.getAdminSummary()
-
-      if (cancelled) {
-        return
-      }
-
-      if (result.success && result.data) {
-        setSummary(result.data)
-      } else {
-        setSummary(null)
-      }
-    }
-
-    void loadSummary()
-
-    return () => {
-      cancelled = true
-    }
-  }, [listVersion])
 
   useEffect(() => {
     let cancelled = false
@@ -118,12 +92,6 @@ export function AdminCategoryListPage() {
     setDeletingId(null)
   }
 
-  const counts = {
-    all: summary?.totalCount ?? 0,
-    active: summary?.activeCount ?? 0,
-    inactive: summary?.inactiveCount ?? 0,
-  }
-
   return (
     <div className="flex flex-col">
       <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
@@ -133,7 +101,6 @@ export function AdminCategoryListPage() {
           search={search}
           statusFilter={statusFilter}
           sort={sort}
-          counts={counts}
           onSearchChange={setSearch}
           onStatusChange={setStatusFilter}
           onSortChange={setSort}

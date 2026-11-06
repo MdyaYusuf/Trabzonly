@@ -5,7 +5,6 @@ type AdminCategoryListFiltersProps = {
   search: string
   statusFilter: AdminCategoryStatusFilter
   sort: AdminCategorySort
-  counts: { all: number; active: number; inactive: number }
   onSearchChange: (value: string) => void
   onStatusChange: (value: AdminCategoryStatusFilter) => void
   onSortChange: (value: AdminCategorySort) => void
@@ -16,16 +15,15 @@ export function AdminCategoryListFilters({
   search,
   statusFilter,
   sort,
-  counts,
   onSearchChange,
   onStatusChange,
   onSortChange,
   onClear,
 }: AdminCategoryListFiltersProps) {
-  const statusTabs: Array<{ id: AdminCategoryStatusFilter; label: string; count: number }> = [
-    { id: 'all', label: 'Tümü', count: counts.all },
-    { id: 'active', label: 'Aktif', count: counts.active },
-    { id: 'inactive', label: 'Pasif', count: counts.inactive },
+  const statusTabs: Array<{ id: AdminCategoryStatusFilter; label: string }> = [
+    { id: 'all', label: 'Tümü' },
+    { id: 'active', label: 'Aktif' },
+    { id: 'inactive', label: 'Pasif' },
   ]
 
   const selectClass =
@@ -67,7 +65,7 @@ export function AdminCategoryListFilters({
                       : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
                   }`}
                 >
-                  {tab.label} ({tab.count})
+                  {tab.label}
                 </button>
               )
             })}

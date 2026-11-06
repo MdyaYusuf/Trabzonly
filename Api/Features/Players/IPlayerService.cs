@@ -23,9 +23,6 @@ public interface IPlayerService
     PlayerAdminListQueryRequest query,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<PlayerAdminSummaryDto>> GetAdminSummaryAsync(
-    CancellationToken cancellationToken = default);
-
   Task<ReturnModel<PlayerRosterOverviewDto>> GetRosterOverviewAsync(
     CancellationToken cancellationToken = default);
 

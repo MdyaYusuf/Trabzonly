@@ -100,12 +100,6 @@ export interface PlayerAdminListQuery {
   sort?: PlayerSortOption
 }
 
-export interface PlayerAdminSummaryDto {
-  totalCount: number
-  activeCount: number
-  inactiveCount: number
-}
-
 // Requests
 export interface CreatePlayerRequest {
   name: string

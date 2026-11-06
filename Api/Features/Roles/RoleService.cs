@@ -115,29 +115,6 @@ public class RoleService(
     };
   }
 
-  public async Task<ReturnModel<RoleAdminSummaryDto>> GetAdminSummaryAsync(
-    CancellationToken cancellationToken = default)
-  {
-    List<Role> roles = await _roleRepository.GetAllAsync(
-      enableTracking: false,
-      cancellationToken: cancellationToken);
-
-    int totalCount = roles.Count;
-    int systemCount = roles.Count(role => role.IsSystem);
-    int customCount = totalCount - systemCount;
-
-    return new ReturnModel<RoleAdminSummaryDto>()
-    {
-      Success = true,
-      Message = "Rol yönetim özeti başarılı bir şekilde getirildi.",
-      Data = new RoleAdminSummaryDto(
-        TotalCount: totalCount,
-        SystemCount: systemCount,
-        CustomCount: customCount),
-      StatusCode = 200
-    };
-  }
-
   public async Task<ReturnModel<RoleResponseDto>> AddAsync(
     CreateRoleRequest request,
     string userRole,

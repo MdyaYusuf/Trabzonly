@@ -126,7 +126,3 @@ public sealed record PlayerAdminListQueryRequest(
   int PageNumber = 1,
   int PageSize = 12);
 
-public sealed record PlayerAdminSummaryDto(
-  int TotalCount,
-  int ActiveCount,
-  int InactiveCount);

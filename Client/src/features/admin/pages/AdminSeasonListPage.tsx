@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import seasonService from '@/features/seasons/seasonService'
-import type { SeasonAdminSummaryDto } from '@/features/seasons/seasonTypes'
 import { AdminSeasonDeleteModal } from '../components/AdminSeasonDeleteModal'
 import { AdminSeasonListFilters } from '../components/AdminSeasonListFilters'
 import { AdminSeasonListHeader } from '../components/AdminSeasonListHeader'
@@ -24,7 +23,6 @@ export function AdminSeasonListPage() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [rows, setRows] = useState<AdminSeasonListRow[]>([])
   const [totalCount, setTotalCount] = useState(0)
-  const [summary, setSummary] = useState<SeasonAdminSummaryDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<AdminSeasonListRow | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -43,30 +41,6 @@ export function AdminSeasonListPage() {
   useEffect(() => {
     setPage(1)
   }, [debouncedSearch, statusFilter, sort, pageSize])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function loadSummary() {
-      const result = await seasonService.getAdminSummary()
-
-      if (cancelled) {
-        return
-      }
-
-      if (result.success && result.data) {
-        setSummary(result.data)
-      } else {
-        setSummary(null)
-      }
-    }
-
-    void loadSummary()
-
-    return () => {
-      cancelled = true
-    }
-  }, [listVersion])
 
   useEffect(() => {
     let cancelled = false
@@ -141,12 +115,6 @@ export function AdminSeasonListPage() {
     setDeletingId(null)
   }
 
-  const counts = {
-    all: summary?.totalCount ?? totalCount,
-    active: summary?.activeCount ?? 0,
-    inactive: summary?.inactiveCount ?? 0,
-  }
-
   return (
     <div className="flex flex-col">
       <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
@@ -156,7 +124,6 @@ export function AdminSeasonListPage() {
           search={search}
           statusFilter={statusFilter}
           sort={sort}
-          counts={counts}
           onSearchChange={setSearch}
           onStatusChange={setStatusFilter}
           onSortChange={setSort}

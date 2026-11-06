@@ -34,9 +34,6 @@ public interface IRoleService
     RoleAdminListQueryRequest query,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<RoleAdminSummaryDto>> GetAdminSummaryAsync(
-    CancellationToken cancellationToken = default);
-
   Task<ReturnModel<RoleResponseDto>> AddAsync(
     CreateRoleRequest request,
     string userRole,

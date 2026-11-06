@@ -7,7 +7,6 @@ type AdminQuizListFiltersProps = {
   category: string
   sort: AdminQuizSort
   categoryOptions: { value: string; label: string }[]
-  counts: { all: number; active: number; passive: number }
   onSearchChange: (value: string) => void
   onStatusChange: (value: AdminQuizStatusFilter) => void
   onCategoryChange: (value: string) => void
@@ -21,17 +20,16 @@ export function AdminQuizListFilters({
   category,
   sort,
   categoryOptions,
-  counts,
   onSearchChange,
   onStatusChange,
   onCategoryChange,
   onSortChange,
   onClear,
 }: AdminQuizListFiltersProps) {
-  const statusTabs: Array<{ id: AdminQuizStatusFilter; label: string; count: number }> = [
-    { id: 'all', label: 'Tümü', count: counts.all },
-    { id: 'active', label: 'Aktif', count: counts.active },
-    { id: 'passive', label: 'Pasif', count: counts.passive },
+  const statusTabs: Array<{ id: AdminQuizStatusFilter; label: string }> = [
+    { id: 'all', label: 'Tümü' },
+    { id: 'active', label: 'Aktif' },
+    { id: 'passive', label: 'Pasif' },
   ]
 
   const selectClass =
@@ -73,7 +71,7 @@ export function AdminQuizListFilters({
                       : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
                   }`}
                 >
-                  {tab.label} ({tab.count})
+                  {tab.label}
                 </button>
               )
             })}

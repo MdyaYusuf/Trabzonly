@@ -89,29 +89,6 @@ public class PlayerService(
       cancellationToken: cancellationToken);
   }
 
-  public async Task<ReturnModel<PlayerAdminSummaryDto>> GetAdminSummaryAsync(
-    CancellationToken cancellationToken = default)
-  {
-    List<Player> players = await _playerRepository.GetAllAsync(
-      enableTracking: false,
-      cancellationToken: cancellationToken);
-
-    int totalCount = players.Count;
-    int activeCount = players.Count(p => p.IsActive);
-    int inactiveCount = totalCount - activeCount;
-
-    return new ReturnModel<PlayerAdminSummaryDto>()
-    {
-      Success = true,
-      Message = "Oyuncu yönetim özeti başarılı bir şekilde getirildi.",
-      Data = new PlayerAdminSummaryDto(
-        TotalCount: totalCount,
-        ActiveCount: activeCount,
-        InactiveCount: inactiveCount),
-      StatusCode = 200
-    };
-  }
-
   public async Task<ReturnModel<PlayerRosterOverviewDto>> GetRosterOverviewAsync(
     CancellationToken cancellationToken = default)
   {

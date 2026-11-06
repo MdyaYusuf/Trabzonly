@@ -55,11 +55,6 @@ public sealed record QuizAdminListItemDto(
   int QuestionCount,
   bool IsActive);
 
-public sealed record QuizAdminSummaryDto(
-  int TotalCount,
-  int ActiveCount,
-  int InactiveCount);
-
 public sealed record QuizAdminListQueryRequest(
   string? Search = null,
   bool? IsActive = null,

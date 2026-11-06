@@ -20,11 +20,6 @@ public sealed record CategoryAdminListItemDto(
   DateTime CreatedDate,
   DateTime? UpdatedDate);
 
-public sealed record CategoryAdminSummaryDto(
-  int TotalCount,
-  int ActiveCount,
-  int InactiveCount);
-
 // Requests
 public sealed record CreateCategoryRequest(
   string Name,

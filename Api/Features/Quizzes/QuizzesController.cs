@@ -68,16 +68,6 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
     return CreateActionResult(result);
   }
 
-  [Authorize(Roles = "Admin")]
-  [HttpGet("manage/summary")]
-  public async Task<IActionResult> GetAdminSummary(
-    CancellationToken cancellationToken = default)
-  {
-    var result = await _quizService.GetAdminSummaryAsync(cancellationToken);
-
-    return CreateActionResult(result);
-  }
-
   [HttpGet("most-taken/{count:int}")]
   public async Task<IActionResult> GetMostTakenQuizzes(
     int count,

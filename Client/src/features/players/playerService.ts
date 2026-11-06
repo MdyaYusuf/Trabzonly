@@ -15,7 +15,6 @@ import type {
   PlayerRatingResponseDto,
   PlayerListQuery,
   PlayerAdminListQuery,
-  PlayerAdminSummaryDto,
 } from './playerTypes'
 
 const API_URL = '/players'
@@ -92,10 +91,6 @@ const getAllForAdmin = async (
   return await apiClient<PagedResponse<PlayerResponseDto>>(
     `${API_URL}/manage?${queryParams}`,
   )
-}
-
-const getAdminSummary = async (): Promise<ApiResponse<PlayerAdminSummaryDto>> => {
-  return await apiClient<PlayerAdminSummaryDto>(`${API_URL}/manage/summary`)
 }
 
 const getById = async (id: number): Promise<ApiResponse<PlayerResponseDto>> => {
@@ -178,7 +173,6 @@ const playerService = {
   getAll,
   getRosterOverview,
   getAllForAdmin,
-  getAdminSummary,
   getById,
   getTopValued,
   getMostCommented,

@@ -16,7 +16,6 @@ import type {
   UserQuizResultResponseDto,
   QuizAdminListItemDto,
   QuizAdminListQuery,
-  QuizAdminSummaryDto,
 } from './quizTypes'
 
 const API_URL = '/quizzes'
@@ -104,10 +103,6 @@ const getAllForAdmin = async (
   )
 }
 
-const getAdminSummary = async (): Promise<ApiResponse<QuizAdminSummaryDto>> => {
-  return await apiClient<QuizAdminSummaryDto>(`${API_URL}/manage/summary`)
-}
-
 /** Admin-only full quiz by id (includes IsCorrect). */
 const getById = async (id: string): Promise<ApiResponse<QuizResponseDto>> => {
   return await apiClient<QuizResponseDto>(`${API_URL}/${id}`)
@@ -150,7 +145,6 @@ const quizService = {
   getLeaderboard,
   getMyStats,
   getAllForAdmin,
-  getAdminSummary,
   getById,
   add,
   update,

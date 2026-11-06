@@ -8,7 +8,6 @@ type AdminPlayerListFiltersProps = {
   search: string
   statusFilter: AdminPlayerStatusFilter
   positionFilter: AdminPlayerPositionFilter
-  counts: { all: number; active: number; inactive: number }
   onSearchChange: (value: string) => void
   onStatusChange: (value: AdminPlayerStatusFilter) => void
   onPositionChange: (value: AdminPlayerPositionFilter) => void
@@ -19,16 +18,15 @@ export function AdminPlayerListFilters({
   search,
   statusFilter,
   positionFilter,
-  counts,
   onSearchChange,
   onStatusChange,
   onPositionChange,
   onClear,
 }: AdminPlayerListFiltersProps) {
-  const statusTabs: Array<{ id: AdminPlayerStatusFilter; label: string; count: number }> = [
-    { id: 'all', label: 'Tümü', count: counts.all },
-    { id: 'active', label: 'Aktif', count: counts.active },
-    { id: 'inactive', label: 'Pasif', count: counts.inactive },
+  const statusTabs: Array<{ id: AdminPlayerStatusFilter; label: string }> = [
+    { id: 'all', label: 'Tümü' },
+    { id: 'active', label: 'Aktif' },
+    { id: 'inactive', label: 'Pasif' },
   ]
 
   return (
@@ -67,7 +65,7 @@ export function AdminPlayerListFilters({
                       : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
                   }`}
                 >
-                  {tab.label} ({tab.count})
+                  {tab.label}
                 </button>
               )
             })}

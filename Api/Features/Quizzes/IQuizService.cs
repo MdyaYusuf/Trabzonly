@@ -37,9 +37,6 @@ public interface IQuizService
     QuizAdminListQueryRequest query,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<QuizAdminSummaryDto>> GetAdminSummaryAsync(
-    CancellationToken cancellationToken = default);
-
   Task<ReturnModel<QuizResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,

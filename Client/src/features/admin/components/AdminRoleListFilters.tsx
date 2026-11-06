@@ -5,7 +5,6 @@ type AdminRoleListFiltersProps = {
   search: string
   kindFilter: AdminRoleKindFilter
   sort: AdminRoleSort
-  counts: { all: number; system: number; custom: number }
   onSearchChange: (value: string) => void
   onKindChange: (value: AdminRoleKindFilter) => void
   onSortChange: (value: AdminRoleSort) => void
@@ -16,16 +15,15 @@ export function AdminRoleListFilters({
   search,
   kindFilter,
   sort,
-  counts,
   onSearchChange,
   onKindChange,
   onSortChange,
   onClear,
 }: AdminRoleListFiltersProps) {
-  const kindTabs: Array<{ id: AdminRoleKindFilter; label: string; count: number }> = [
-    { id: 'all', label: 'Tümü', count: counts.all },
-    { id: 'system', label: 'Sistem', count: counts.system },
-    { id: 'custom', label: 'Özel', count: counts.custom },
+  const kindTabs: Array<{ id: AdminRoleKindFilter; label: string }> = [
+    { id: 'all', label: 'Tümü' },
+    { id: 'system', label: 'Sistem' },
+    { id: 'custom', label: 'Özel' },
   ]
 
   const selectClass =
@@ -67,7 +65,7 @@ export function AdminRoleListFilters({
                       : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
                   }`}
                 >
-                  {tab.label} ({tab.count})
+                  {tab.label}
                 </button>
               )
             })}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import playerService from '@/features/players/playerService'
-import type { PlayerAdminSummaryDto } from '@/features/players/playerTypes'
 import { AdminPlayerDeleteModal } from '../components/AdminPlayerDeleteModal'
 import { AdminPlayerListFilters } from '../components/AdminPlayerListFilters'
 import { AdminPlayerListHeader } from '../components/AdminPlayerListHeader'
@@ -24,7 +23,6 @@ export function AdminPlayerListPage() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [rows, setRows] = useState<AdminPlayerListRow[]>([])
   const [totalCount, setTotalCount] = useState(0)
-  const [summary, setSummary] = useState<PlayerAdminSummaryDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<AdminPlayerListRow | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -43,30 +41,6 @@ export function AdminPlayerListPage() {
   useEffect(() => {
     setPage(1)
   }, [debouncedSearch, statusFilter, positionFilter, pageSize])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function loadSummary() {
-      const result = await playerService.getAdminSummary()
-
-      if (cancelled) {
-        return
-      }
-
-      if (result.success && result.data) {
-        setSummary(result.data)
-      } else {
-        setSummary(null)
-      }
-    }
-
-    void loadSummary()
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -132,21 +106,9 @@ export function AdminPlayerListPage() {
     if (result.success) {
       setDeleteTarget(null)
       setListVersion((prev) => prev + 1)
-
-      const summaryResult = await playerService.getAdminSummary()
-
-      if (summaryResult.success && summaryResult.data) {
-        setSummary(summaryResult.data)
-      }
     }
 
     setDeletingId(null)
-  }
-
-  const counts = {
-    all: summary?.totalCount ?? totalCount,
-    active: summary?.activeCount ?? 0,
-    inactive: summary?.inactiveCount ?? 0,
   }
 
   return (
@@ -158,7 +120,6 @@ export function AdminPlayerListPage() {
           search={search}
           statusFilter={statusFilter}
           positionFilter={positionFilter}
-          counts={counts}
           onSearchChange={setSearch}
           onStatusChange={setStatusFilter}
           onPositionChange={setPositionFilter}

@@ -62,29 +62,6 @@ public class CategoryService(
     };
   }
 
-  public async Task<ReturnModel<CategoryAdminSummaryDto>> GetAdminSummaryAsync(
-    CancellationToken cancellationToken = default)
-  {
-    List<Category> categories = await _categoryRepository.GetAllAsync(
-      enableTracking: false,
-      cancellationToken: cancellationToken);
-
-    int totalCount = categories.Count;
-    int activeCount = categories.Count(category => category.IsActive);
-    int inactiveCount = totalCount - activeCount;
-
-    return new ReturnModel<CategoryAdminSummaryDto>()
-    {
-      Success = true,
-      Message = "Kategori yönetim özeti başarılı bir şekilde getirildi.",
-      Data = new CategoryAdminSummaryDto(
-        TotalCount: totalCount,
-        ActiveCount: activeCount,
-        InactiveCount: inactiveCount),
-      StatusCode = 200
-    };
-  }
-
   public async Task<ReturnModel<CategoryResponseDto>> GetByIdAsync(
     int id,
     bool enableTracking = false,

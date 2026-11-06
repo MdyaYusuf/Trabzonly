@@ -18,12 +18,6 @@ export interface CategoryAdminListItemDto {
   updatedDate?: string | null
 }
 
-export interface CategoryAdminSummaryDto {
-  totalCount: number
-  activeCount: number
-  inactiveCount: number
-}
-
 export type CategorySortOption = 'name-asc' | 'posts-asc' | 'posts-desc'
 
 export interface CategoryAdminListQuery {
