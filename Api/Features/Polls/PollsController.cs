@@ -50,6 +50,28 @@ public class PollsController(IPollService _pollService) : CustomBaseController
   }
 
   [Authorize(Roles = "Admin")]
+  [HttpGet("manage")]
+  public async Task<IActionResult> GetAdminList(
+    [FromQuery] PollAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _pollService.GetAdminListAsync(query, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpGet("manage/{id:int}")]
+  public async Task<IActionResult> GetAdminById(
+    int id,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _pollService.GetAdminByIdAsync(id, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
   [HttpPost]
   public async Task<IActionResult> Add(
     [FromBody] CreatePollRequest request,
@@ -71,6 +93,20 @@ public class PollsController(IPollService _pollService) : CustomBaseController
   {
     var result = await _pollService.UpdateAsync(
       request: request,
+      userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpDelete("{id:int}")]
+  public async Task<IActionResult> Deactivate(
+    int id,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _pollService.DeactivateAsync(
+      id: id,
       userRole: GetUserRole(),
       cancellationToken: cancellationToken);
 

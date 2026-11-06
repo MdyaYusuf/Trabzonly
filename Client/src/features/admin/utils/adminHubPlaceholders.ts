@@ -12,7 +12,8 @@ export const adminShellProfile: AdminShellProfile = {
     { id: 'seasons', label: 'Sezonlar', to: '/yonetim/sezonlar', icon: 'calendar_month' },
     { id: 'positions', label: 'Pozisyonlar', to: '/yonetim/pozisyonlar', icon: 'schema' },
     { id: 'categories', label: 'Kategoriler', to: '/yonetim/kategoriler', icon: 'category' },
-    { id: 'quizzes', label: 'Quizler', to: '/yonetim/quizler', icon: 'fact_check' },
+    { id: 'polls', label: 'Anketler', to: '/yonetim/anketler', icon: 'ballot' },
+    { id: 'quizzes', label: 'Quizler', to: '/yonetim/quizler', icon: 'quiz' },
     { id: 'members', label: 'Üyeler', to: '/yonetim/uyeler', icon: 'people' },
     {
       id: 'roles',
@@ -80,11 +81,20 @@ export const adminHubProfile: AdminHubProfile = {
       to: '/yonetim/kategoriler',
     },
     {
+      id: 'polls',
+      title: 'Anketler',
+      description:
+        'Günün taraftar anketini ve oyuncu anketlerini oluştur, aktif yayını yönet.',
+      categoryLabel: 'Taraftar Etkileşimi',
+      icon: 'ballot',
+      to: '/yonetim/anketler',
+    },
+    {
       id: 'quizzes',
       title: 'Quizler',
       description: 'Trabzonspor tarih ve hafıza testleri oluştur, soruları düzenle ve yayınla.',
       categoryLabel: 'Trabzonspor Testleri',
-      icon: 'fact_check',
+      icon: 'quiz',
       to: '/yonetim/quizler',
     },
     {

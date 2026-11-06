@@ -111,6 +111,10 @@ export function AdminQuizCreatePage() {
 
   function addQuestion() {
     setDraft((prev) => {
+      if (prev.questions.length >= 10) {
+        return prev
+      }
+
       const nextNumber = prev.questions.length + 1
       const newQuestion = createEmptyAdminQuestion(nextNumber)
 
@@ -126,7 +130,7 @@ export function AdminQuizCreatePage() {
 
   function removeQuestion(questionId: string) {
     setDraft((prev) => {
-      if (prev.questions.length <= 1) {
+      if (prev.questions.length <= 10) {
         return prev
       }
 

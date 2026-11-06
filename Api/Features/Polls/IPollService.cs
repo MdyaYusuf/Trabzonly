@@ -10,6 +10,14 @@ public interface IPollService
     Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<PollAdminListItemDto>>> GetAdminListAsync(
+    PollAdminListQueryRequest query,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<PollAdminDetailDto>> GetAdminByIdAsync(
+    int id,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CreatedPollResponseDto>> AddAsync(
     CreatePollRequest request,
     string userRole,
@@ -17,6 +25,11 @@ public interface IPollService
 
   Task<ReturnModel<NoData>> UpdateAsync(
     UpdatePollRequest request,
+    string userRole,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> DeactivateAsync(
+    int id,
     string userRole,
     CancellationToken cancellationToken = default);
 

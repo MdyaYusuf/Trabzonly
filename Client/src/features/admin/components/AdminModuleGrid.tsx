@@ -7,7 +7,7 @@ type AdminModuleGridProps = {
 
 export function AdminModuleGrid({ modules }: AdminModuleGridProps) {
   return (
-    <section className="grid grid-cols-1 gap-gutter md:grid-cols-2 xl:grid-cols-3">
+    <section className="grid grid-cols-1 gap-space-md sm:grid-cols-2 xl:grid-cols-5">
       {modules.map((module) => (
         <AdminModuleCardView key={module.id} module={module} />
       ))}

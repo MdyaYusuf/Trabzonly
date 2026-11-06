@@ -1,3 +1,4 @@
+import { ADMIN_QUIZ_REQUIRED_QUESTION_COUNT } from '../utils/adminQuizDraftUtils'
 import type { AdminQuizQuestion } from '../utils/adminQuizTypes'
 
 type AdminQuizQuestionEditorProps = {
@@ -24,23 +25,30 @@ export function AdminQuizQuestionEditor({
 }: AdminQuizQuestionEditorProps) {
   return (
     <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-      <div className="mb-space-md flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/40 pb-space-sm">
-        <div className="flex flex-wrap items-center gap-space-sm">
-          <h2 className="font-headline text-headline-sm font-bold text-primary uppercase">
-            Sorular & Doğru Şık
-          </h2>
-          <span className="font-kicker bg-secondary-container px-space-sm py-1 text-kicker text-on-secondary-container uppercase">
-            {questions.length} Soru
-          </span>
+      <div className="mb-space-md border-b border-outline-variant/40 pb-space-sm">
+        <div className="flex flex-wrap items-center justify-between gap-space-sm">
+          <div className="flex flex-wrap items-center gap-space-sm">
+            <h2 className="font-headline text-headline-sm font-bold text-primary uppercase">
+              Sorular & Doğru Şık
+            </h2>
+            <span className="font-kicker bg-secondary-container px-space-sm py-1 text-kicker text-on-secondary-container uppercase">
+              {ADMIN_QUIZ_REQUIRED_QUESTION_COUNT} Soru
+            </span>
+          </div>
+          {questions.length < ADMIN_QUIZ_REQUIRED_QUESTION_COUNT ? (
+            <button
+              type="button"
+              onClick={onAddQuestion}
+              className="font-label inline-flex items-center gap-1 text-label-md text-primary uppercase transition-colors hover:text-secondary"
+            >
+              <span className="material-symbols-outlined text-[18px]">add_circle</span>
+              Soru Ekle
+            </button>
+          ) : null}
         </div>
-        <button
-          type="button"
-          onClick={onAddQuestion}
-          className="font-label inline-flex items-center gap-1 text-label-md text-primary uppercase transition-colors hover:text-secondary"
-        >
-          <span className="material-symbols-outlined text-[18px]">add_circle</span>
-          Soru Ekle
-        </button>
+        <p className="font-body mt-space-sm text-body-sm text-on-surface-variant">
+          Her quiz tam olarak {ADMIN_QUIZ_REQUIRED_QUESTION_COUNT} sorudan oluşmalıdır.
+        </p>
       </div>
 
       <div className="flex flex-col gap-space-md">
@@ -66,7 +74,7 @@ export function AdminQuizQuestionEditor({
                     onClick={() => {
                       onToggleExpand(question.id)
                     }}
-                    className="font-label inline-flex items-center gap-1 px-space-sm py-1 text-label-md uppercase text-on-surface-variant hover:text-primary"
+                    className="font-label inline-flex cursor-pointer items-center gap-1 px-space-sm py-1 text-label-md uppercase text-on-surface-variant hover:text-primary"
                   >
                     <span className="material-symbols-outlined text-[16px]">edit</span>
                     Genişlet
@@ -77,22 +85,23 @@ export function AdminQuizQuestionEditor({
                     onClick={() => {
                       onToggleExpand(question.id)
                     }}
-                    className="font-label inline-flex items-center gap-1 px-space-sm py-1 text-label-md uppercase text-on-surface-variant hover:text-primary"
+                    className="font-label inline-flex cursor-pointer items-center gap-1 px-space-sm py-1 text-label-md uppercase text-on-surface-variant hover:text-primary"
                   >
                     Daralt
                   </button>
                 )}
-                <button
-                  type="button"
-                  aria-label="Soruyu sil"
-                  disabled={questions.length <= 1}
-                  onClick={() => {
-                    onRemoveQuestion(question.id)
-                  }}
-                  className="flex h-8 w-8 items-center justify-center text-on-surface-variant hover:bg-error-container hover:text-error disabled:opacity-40"
-                >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
-                </button>
+                {questions.length > ADMIN_QUIZ_REQUIRED_QUESTION_COUNT ? (
+                  <button
+                    type="button"
+                    aria-label="Soruyu sil"
+                    onClick={() => {
+                      onRemoveQuestion(question.id)
+                    }}
+                    className="flex h-8 w-8 items-center justify-center text-on-surface-variant hover:bg-error-container hover:text-error"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                ) : null}
               </div>
             </div>
 
@@ -137,7 +146,7 @@ export function AdminQuizQuestionEditor({
                     {question.options.map((option) => (
                       <div
                         key={option.id}
-                        className={`flex flex-wrap items-center gap-space-sm border px-space-sm py-space-xs ${
+                        className={`flex cursor-pointer flex-wrap items-center gap-space-sm border px-space-sm py-space-xs ${
                           option.isCorrect
                             ? 'border-secondary bg-secondary-fixed/40'
                             : 'border-outline-variant/40 bg-surface'
@@ -147,7 +156,7 @@ export function AdminQuizQuestionEditor({
                           {option.label}
                         </span>
                         <input
-                          className="font-body min-w-0 flex-1 border-0 bg-transparent px-space-sm py-space-xs text-body-md outline-none"
+                          className="font-body min-w-0 flex-1 cursor-text border-0 bg-transparent px-space-sm py-space-xs text-body-md outline-none"
                           value={option.text}
                           onChange={(event) => {
                             onUpdateOptionText(question.id, option.id, event.target.value)
@@ -158,7 +167,7 @@ export function AdminQuizQuestionEditor({
                           onClick={() => {
                             onSetCorrectOption(question.id, option.id)
                           }}
-                          className={`font-label inline-flex items-center gap-1 px-space-sm py-1 text-label-md uppercase ${
+                          className={`font-label inline-flex cursor-pointer items-center gap-1 px-space-sm py-1 text-label-md uppercase ${
                             option.isCorrect
                               ? 'bg-secondary text-on-secondary'
                               : 'text-on-surface-variant hover:text-primary'
@@ -182,13 +191,15 @@ export function AdminQuizQuestionEditor({
           </article>
         ))}
 
-        <button
-          type="button"
-          onClick={onAddQuestion}
-          className="font-label border border-dashed border-outline-variant px-space-md py-space-md text-label-md text-on-surface-variant uppercase transition-colors hover:border-primary hover:text-primary"
-        >
-          + Yeni Soru Ekle (Soru {String(questions.length + 1).padStart(2, '0')})
-        </button>
+        {questions.length < ADMIN_QUIZ_REQUIRED_QUESTION_COUNT ? (
+          <button
+            type="button"
+            onClick={onAddQuestion}
+            className="font-label border border-dashed border-outline-variant px-space-md py-space-md text-label-md text-on-surface-variant uppercase transition-colors hover:border-primary hover:text-primary"
+          >
+            + Yeni Soru Ekle (Soru {String(questions.length + 1).padStart(2, '0')})
+          </button>
+        ) : null}
       </div>
     </section>
   )

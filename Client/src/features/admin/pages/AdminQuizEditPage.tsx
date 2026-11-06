@@ -152,7 +152,7 @@ export function AdminQuizEditPage() {
 
   function addQuestion() {
     setDraft((prev) => {
-      if (!prev) {
+      if (!prev || prev.questions.length >= 10) {
         return prev
       }
 
@@ -170,7 +170,7 @@ export function AdminQuizEditPage() {
 
   function removeQuestion(questionId: string) {
     setDraft((prev) => {
-      if (!prev || prev.questions.length <= 1) {
+      if (!prev || prev.questions.length <= 10) {
         return prev
       }
 

@@ -88,7 +88,7 @@ export function AdminQuizEditFormFields({
             </label>
             <select
               id="editCategory"
-              className={inputClass}
+              className={`${inputClass} cursor-pointer`}
               value={draft.quizCategoryId || ''}
               onChange={(event) => {
                 onChange('quizCategoryId', Number(event.target.value))

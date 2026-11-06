@@ -18,6 +18,35 @@ public sealed record PollResponseDto(
   int? CurrentUserOptionId,
   IReadOnlyList<PollOptionResponseDto> Options);
 
+public sealed record PollAdminListItemDto(
+  int Id,
+  string Question,
+  bool IsActive,
+  string Scope,
+  int? PlayerId,
+  string? PlayerName,
+  Guid? PostId,
+  string? PostTitle,
+  int OptionCount,
+  int TotalVotes,
+  DateTime CreatedDate,
+  DateTime? UpdatedDate);
+
+public sealed record PollAdminDetailDto(
+  int Id,
+  string Question,
+  bool IsActive,
+  string Scope,
+  int? PlayerId,
+  string? PlayerName,
+  Guid? PostId,
+  string? PostTitle,
+  int TotalVotes,
+  bool OptionsLocked,
+  DateTime CreatedDate,
+  DateTime? UpdatedDate,
+  IReadOnlyList<PollOptionResponseDto> Options);
+
 public sealed record CreatedPollResponseDto(
   int Id,
   string Question,
@@ -40,7 +69,16 @@ public sealed record CreatePollRequest(
 public sealed record UpdatePollRequest(
   int Id,
   string Question,
-  bool IsActive);
+  bool IsActive,
+  IReadOnlyList<CreatePollOptionRequest>? Options = null);
 
 public sealed record VotePollRequest(
   int OptionId);
+
+public sealed record PollAdminListQueryRequest(
+  string? Search = null,
+  bool? IsActive = null,
+  string? Scope = null,
+  string? Sort = null,
+  int PageNumber = 1,
+  int PageSize = 10);

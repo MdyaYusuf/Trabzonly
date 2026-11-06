@@ -68,6 +68,13 @@ const MODULES: ModuleCrumb[] = [
     editLabel: 'Quiz Düzenle',
   },
   {
+    listPath: '/yonetim/anketler',
+    listLabel: 'Anketler',
+    createSuffix: '/yeni',
+    createLabel: 'Yeni Anket',
+    editLabel: 'Anket Düzenle',
+  },
+  {
     listPath: '/yonetim/roller',
     listLabel: 'Roller',
     createSuffix: '/yeni',

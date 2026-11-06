@@ -18,7 +18,9 @@ public class CreateQuizRequestValidator : AbstractValidator<CreateQuizRequest>
       .GreaterThan(0).WithMessage("Geçersiz quiz kategorisi.");
 
     RuleFor(q => q.Questions)
-      .NotEmpty().WithMessage("Quiz en az bir soru içermelidir.");
+      .NotNull().WithMessage("Quiz soruları zorunludur.")
+      .Must(questions => questions != null && questions.Count == 10)
+      .WithMessage("Quiz tam olarak 10 soru içermelidir.");
 
     RuleForEach(q => q.Questions)
       .SetValidator(new CreateQuestionRequestValidator());
@@ -86,7 +88,8 @@ public class UpdateQuizRequestValidator : AbstractValidator<UpdateQuizRequest>
     When(q => q.Questions != null, () =>
     {
       RuleFor(q => q.Questions!)
-        .NotEmpty().WithMessage("Soru listesi boş olamaz.");
+        .Must(questions => questions.Count == 10)
+        .WithMessage("Quiz tam olarak 10 soru içermelidir.");
 
       RuleForEach(q => q.Questions!)
         .SetValidator(new CreateQuestionRequestValidator());

@@ -46,6 +46,8 @@ export function createEmptyAdminQuestion(number: number): AdminQuizQuestion {
   }
 }
 
+export const ADMIN_QUIZ_REQUIRED_QUESTION_COUNT = 10
+
 export function createEmptyAdminQuizCreateDraft(
   defaultCategoryId: number = 0,
 ): AdminQuizCreateDraft {
@@ -54,7 +56,11 @@ export function createEmptyAdminQuizCreateDraft(
     description: '',
     quizCategoryId: defaultCategoryId,
     isActive: true,
-    questions: [createEmptyAdminQuestion(1)],
+    questions: Array.from({ length: ADMIN_QUIZ_REQUIRED_QUESTION_COUNT }, (_, index) => {
+      const question = createEmptyAdminQuestion(index + 1)
+      question.expanded = index === 0
+      return question
+    }),
   }
 }
 
@@ -166,8 +172,8 @@ export function validateAdminQuizDraft(draft: {
     return 'Bir kategori seçin.'
   }
 
-  if (draft.questions.length === 0) {
-    return 'En az bir soru ekleyin.'
+  if (draft.questions.length !== ADMIN_QUIZ_REQUIRED_QUESTION_COUNT) {
+    return `Quiz tam olarak ${ADMIN_QUIZ_REQUIRED_QUESTION_COUNT} soru içermelidir.`
   }
 
   for (const question of draft.questions) {

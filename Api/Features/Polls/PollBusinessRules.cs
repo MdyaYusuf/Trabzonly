@@ -54,56 +54,41 @@ public class PollBusinessRules(IPollRepository _pollRepository)
     }
   }
 
-  public async Task PlayerPollMustBeUniqueWhenActiveAsync(
-    int playerId,
-    int? excludePollId = null,
-    CancellationToken cancellationToken = default)
+  public void AdminCreateScopeMustNotBePost(Guid? postId)
   {
-    bool exists = await _pollRepository.AnyAsync(
-      p => p.PlayerId == playerId &&
-           p.PostId == null &&
-           p.IsActive &&
-           (!excludePollId.HasValue || p.Id != excludePollId.Value),
-      cancellationToken);
-
-    if (exists)
+    if (postId.HasValue)
     {
-      throw new BusinessException("Bu oyuncu için zaten aktif bir anket var.");
+      throw new BusinessException("Yönetim panelinden gönderi anketi oluşturulamaz.");
     }
   }
 
-  public async Task PostPollMustBeUniqueWhenActiveAsync(
-    Guid postId,
-    int? excludePollId = null,
-    CancellationToken cancellationToken = default)
+  public void OptionsMustRemainUnchangedWhenVotesExist(bool hasVotes, bool optionsProvided)
   {
-    bool exists = await _pollRepository.AnyAsync(
-      p => p.PostId == postId &&
-           p.PlayerId == null &&
-           p.IsActive &&
-           (!excludePollId.HasValue || p.Id != excludePollId.Value),
-      cancellationToken);
-
-    if (exists)
+    if (hasVotes && optionsProvided)
     {
-      throw new BusinessException("Bu gönderi için zaten aktif bir anket var.");
+      throw new BusinessException("Oy alan anketlerin seçenekleri değiştirilemez.");
     }
   }
 
-  public async Task GlobalPollMustBeUniqueWhenActiveAsync(
-    int? excludePollId = null,
+  public async Task DeactivateOthersInScopeAsync(
+    int? playerId,
+    Guid? postId,
+    int? excludePollId,
     CancellationToken cancellationToken = default)
   {
-    bool exists = await _pollRepository.AnyAsync(
-      p => p.PlayerId == null &&
-           p.PostId == null &&
-           p.IsActive &&
-           (!excludePollId.HasValue || p.Id != excludePollId.Value),
-      cancellationToken);
+    List<Poll> activePeers = await _pollRepository.GetAllAsync(
+      filter: p =>
+        p.IsActive &&
+        p.PlayerId == playerId &&
+        p.PostId == postId &&
+        (!excludePollId.HasValue || p.Id != excludePollId.Value),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
 
-    if (exists)
+    foreach (Poll peer in activePeers)
     {
-      throw new BusinessException("Zaten aktif bir global anket var.");
+      peer.IsActive = false;
+      _pollRepository.Update(peer);
     }
   }
 }

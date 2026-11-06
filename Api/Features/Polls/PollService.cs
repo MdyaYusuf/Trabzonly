@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
 using FluentValidation;
@@ -7,6 +8,7 @@ namespace Api.Features.Polls;
 
 public class PollService(
   IPollRepository _pollRepository,
+  IPollOptionRepository _pollOptionRepository,
   IPollVoteRepository _pollVoteRepository,
   PollBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
@@ -63,6 +65,66 @@ public class PollService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<PollAdminListItemDto>>> GetAdminListAsync(
+    PollAdminListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 100);
+
+    var (polls, totalCount) = await _pollRepository.GetPagedListAsync(
+      pageNumber,
+      pageSize,
+      filter: BuildAdminListFilter(query),
+      include: q => q
+        .Include(p => p.Options)
+        .Include(p => p.Player)
+        .Include(p => p.Post),
+      orderBy: BuildAdminListOrderBy(query.Sort),
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    List<PollAdminListItemDto> items = polls
+      .Select(MapToAdminListItem)
+      .ToList();
+
+    var pagedResponse = new PagedResponse<PollAdminListItemDto>(
+      items,
+      totalCount,
+      pageNumber,
+      pageSize);
+
+    return new ReturnModel<PagedResponse<PollAdminListItemDto>>()
+    {
+      Success = true,
+      Message = "Anket yönetim listesi başarılı bir şekilde getirildi.",
+      Data = pagedResponse,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<PollAdminDetailDto>> GetAdminByIdAsync(
+    int id,
+    CancellationToken cancellationToken = default)
+  {
+    Poll poll = await _businessRules.GetPollIfExistAsync(
+      id,
+      include: query => query
+        .Include(p => p.Options)
+        .Include(p => p.Player)
+        .Include(p => p.Post),
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    return new ReturnModel<PollAdminDetailDto>()
+    {
+      Success = true,
+      Message = $"{id} numaralı anket başarılı bir şekilde getirildi.",
+      Data = MapToAdminDetail(poll),
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<CreatedPollResponseDto>> AddAsync(
     CreatePollRequest request,
     string userRole,
@@ -77,10 +139,11 @@ public class PollService(
 
     _businessRules.AdminRoleRequired(userRole);
     _businessRules.PollScopeMustBeValid(request.PlayerId, request.PostId);
+    _businessRules.AdminCreateScopeMustNotBePost(request.PostId);
 
     if (request.IsActive)
     {
-      await EnsureActiveScopeUniqueAsync(
+      await _businessRules.DeactivateOthersInScopeAsync(
         request.PlayerId,
         request.PostId,
         excludePollId: null,
@@ -95,10 +158,10 @@ public class PollService(
       IsActive = request.IsActive,
       Options = request.Options
         .OrderBy(o => o.SortOrder)
-        .Select(o => new PollOption
+        .Select((o, index) => new PollOption
         {
           Label = o.Label.Trim(),
-          SortOrder = o.SortOrder,
+          SortOrder = o.SortOrder > 0 ? o.SortOrder : index + 1,
           VoteCount = 0
         })
         .ToList()
@@ -137,12 +200,19 @@ public class PollService(
 
     Poll poll = await _businessRules.GetPollIfExistAsync(
       request.Id,
+      include: query => query.Include(p => p.Options),
       enableTracking: true,
       cancellationToken: cancellationToken);
 
+    int totalVotes = poll.Options.Sum(o => o.VoteCount);
+    bool hasVotes = totalVotes > 0;
+    bool optionsProvided = request.Options != null;
+
+    _businessRules.OptionsMustRemainUnchangedWhenVotesExist(hasVotes, optionsProvided);
+
     if (request.IsActive && !poll.IsActive)
     {
-      await EnsureActiveScopeUniqueAsync(
+      await _businessRules.DeactivateOthersInScopeAsync(
         poll.PlayerId,
         poll.PostId,
         excludePollId: poll.Id,
@@ -152,6 +222,27 @@ public class PollService(
     poll.Question = request.Question.Trim();
     poll.IsActive = request.IsActive;
 
+    if (optionsProvided && !hasVotes)
+    {
+      List<PollOption> existingOptions = poll.Options.ToList();
+
+      if (existingOptions.Count > 0)
+      {
+        _pollOptionRepository.DeleteRange(existingOptions);
+      }
+
+      poll.Options = request.Options!
+        .OrderBy(o => o.SortOrder)
+        .Select((o, index) => new PollOption
+        {
+          Label = o.Label.Trim(),
+          SortOrder = o.SortOrder > 0 ? o.SortOrder : index + 1,
+          VoteCount = 0,
+          PollId = poll.Id
+        })
+        .ToList();
+    }
+
     _pollRepository.Update(poll);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -159,6 +250,40 @@ public class PollService(
     {
       Success = true,
       Message = "Anket başarılı bir şekilde güncellendi.",
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<NoData>> DeactivateAsync(
+    int id,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.AdminRoleRequired(userRole);
+
+    Poll poll = await _businessRules.GetPollIfExistAsync(
+      id,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    if (!poll.IsActive)
+    {
+      return new ReturnModel<NoData>()
+      {
+        Success = true,
+        Message = "Anket zaten pasif.",
+        StatusCode = 200
+      };
+    }
+
+    poll.IsActive = false;
+    _pollRepository.Update(poll);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      Message = "Anket pasifleştirildi.",
       StatusCode = 200
     };
   }
@@ -227,33 +352,114 @@ public class PollService(
     };
   }
 
-  private async Task EnsureActiveScopeUniqueAsync(
-    int? playerId,
-    Guid? postId,
-    int? excludePollId,
-    CancellationToken cancellationToken)
+  private static Expression<Func<Poll, bool>>? BuildAdminListFilter(PollAdminListQueryRequest query)
   {
-    if (postId.HasValue)
+    string? search = query.Search?.Trim();
+    bool? isActive = query.IsActive;
+    string? scope = query.Scope?.Trim().ToLowerInvariant();
+
+    if (string.IsNullOrWhiteSpace(search) && isActive == null && string.IsNullOrWhiteSpace(scope))
     {
-      await _businessRules.PostPollMustBeUniqueWhenActiveAsync(
-        postId.Value,
-        excludePollId,
-        cancellationToken);
-      return;
+      return null;
     }
 
-    if (playerId.HasValue)
+    return p =>
+      (isActive == null || p.IsActive == isActive.Value) &&
+      (string.IsNullOrWhiteSpace(scope) ||
+        (scope == "global" && p.PlayerId == null && p.PostId == null) ||
+        (scope == "player" && p.PlayerId != null) ||
+        (scope == "post" && p.PostId != null)) &&
+      (string.IsNullOrWhiteSpace(search) ||
+        p.Question.Contains(search) ||
+        (p.Player != null && p.Player.Name.Contains(search)) ||
+        (p.Post != null && p.Post.Title.Contains(search)));
+  }
+
+  private static Func<IQueryable<Poll>, IOrderedQueryable<Poll>> BuildAdminListOrderBy(string? sort)
+  {
+    return (sort ?? "newest").Trim().ToLowerInvariant() switch
     {
-      await _businessRules.PlayerPollMustBeUniqueWhenActiveAsync(
-        playerId.Value,
-        excludePollId,
-        cancellationToken);
-      return;
+      "oldest" => q => q.OrderBy(p => p.CreatedDate).ThenBy(p => p.Id),
+      "votes-desc" => q => q
+        .OrderByDescending(p => p.Options.Sum(o => o.VoteCount))
+        .ThenByDescending(p => p.Id),
+      "votes-asc" => q => q
+        .OrderBy(p => p.Options.Sum(o => o.VoteCount))
+        .ThenBy(p => p.Id),
+      _ => q => q.OrderByDescending(p => p.CreatedDate).ThenByDescending(p => p.Id)
+    };
+  }
+
+  private static string ResolveScope(Poll poll)
+  {
+    if (poll.PlayerId.HasValue)
+    {
+      return "player";
     }
 
-    await _businessRules.GlobalPollMustBeUniqueWhenActiveAsync(
-      excludePollId,
-      cancellationToken);
+    if (poll.PostId.HasValue)
+    {
+      return "post";
+    }
+
+    return "global";
+  }
+
+  private static PollAdminListItemDto MapToAdminListItem(Poll poll)
+  {
+    int totalVotes = poll.Options.Sum(o => o.VoteCount);
+
+    return new PollAdminListItemDto(
+      poll.Id,
+      poll.Question,
+      poll.IsActive,
+      ResolveScope(poll),
+      poll.PlayerId,
+      poll.Player?.Name,
+      poll.PostId,
+      poll.Post?.Title,
+      poll.Options.Count,
+      totalVotes,
+      poll.CreatedDate,
+      poll.UpdatedDate);
+  }
+
+  private static PollAdminDetailDto MapToAdminDetail(Poll poll)
+  {
+    int totalVotes = poll.Options.Sum(o => o.VoteCount);
+
+    List<PollOptionResponseDto> options = poll.Options
+      .OrderBy(o => o.SortOrder)
+      .ThenBy(o => o.Id)
+      .Select(o =>
+      {
+        double percentage = totalVotes == 0
+          ? 0
+          : Math.Round(o.VoteCount * 100.0 / totalVotes, 1);
+
+        return new PollOptionResponseDto(
+          o.Id,
+          o.Label,
+          o.SortOrder,
+          o.VoteCount,
+          percentage);
+      })
+      .ToList();
+
+    return new PollAdminDetailDto(
+      poll.Id,
+      poll.Question,
+      poll.IsActive,
+      ResolveScope(poll),
+      poll.PlayerId,
+      poll.Player?.Name,
+      poll.PostId,
+      poll.Post?.Title,
+      totalVotes,
+      OptionsLocked: totalVotes > 0,
+      poll.CreatedDate,
+      poll.UpdatedDate,
+      options);
   }
 
   private static PollResponseDto MapToResponse(Poll poll, int? currentUserOptionId)
