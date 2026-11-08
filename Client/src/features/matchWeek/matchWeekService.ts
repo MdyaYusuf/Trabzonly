@@ -4,7 +4,10 @@ import type {
   ClubResponseDto,
   FixtureWeekResponseDto,
   LeagueStandingsResponseDto,
+  MatchWeekLeaderboardResponseDto,
+  MatchWeekPlayerRatingResponseDto,
   MatchWeekResponseDto,
+  RateMatchWeekPlayerRequest,
   SaveMatchWeekRequest,
   UpdateFixtureWeekRequest,
 } from './matchWeekTypes'
@@ -99,6 +102,25 @@ const startNewWeek = async (
   })
 }
 
+const ratePlayer = async (
+  playerId: number,
+  request: RateMatchWeekPlayerRequest,
+): Promise<ApiResponse<MatchWeekPlayerRatingResponseDto>> => {
+  return await apiClient<MatchWeekPlayerRatingResponseDto>(
+    `${MATCH_WEEKS_URL}/current/players/${playerId}/rating`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(request),
+    },
+  )
+}
+
+const getLeaderboard = async (): Promise<ApiResponse<MatchWeekLeaderboardResponseDto>> => {
+  return await apiClient<MatchWeekLeaderboardResponseDto>(
+    `${MATCH_WEEKS_URL}/current/leaderboard`,
+  )
+}
+
 const matchWeekService = {
   getClubs,
   getWeekFixtures,
@@ -108,6 +130,8 @@ const matchWeekService = {
   getCurrent,
   saveCurrent,
   startNewWeek,
+  ratePlayer,
+  getLeaderboard,
 }
 
 export default matchWeekService

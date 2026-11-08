@@ -121,3 +121,32 @@ export interface SaveMatchWeekRequest {
   awayScore?: number | null
   slots: MatchWeekSlotRequest[]
 }
+
+export interface RateMatchWeekPlayerRequest {
+  score: number
+}
+
+export interface MatchWeekPlayerRatingResponseDto {
+  matchWeekId: number
+  playerId: number
+  score: number
+  averageRating: number
+  ratingCount: number
+}
+
+export interface MatchWeekLeaderboardEntryDto {
+  rank: number
+  playerId: number
+  playerName: string
+  playerImageUrl?: string | null
+  shirtNumber?: number | null
+  slotKey: string
+  isStarter: boolean
+  averageRating: number
+  ratingCount: number
+}
+
+export interface MatchWeekLeaderboardResponseDto {
+  matchWeekId: number
+  entries: MatchWeekLeaderboardEntryDto[]
+}

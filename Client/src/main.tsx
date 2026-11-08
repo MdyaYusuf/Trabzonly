@@ -52,6 +52,7 @@ import { QuizListPage } from '@/features/quizzes/pages/QuizListPage'
 import { TakeQuizPage } from '@/features/quizzes/pages/TakeQuizPage'
 import { QuizResultPage } from '@/features/quizzes/pages/QuizResultPage'
 import { CommunityRulesPage } from '@/features/community/pages/CommunityRulesPage'
+import { MatchWeekPage } from '@/features/matchWeek/pages/MatchWeekPage'
 
 const router = createBrowserRouter([
   {
@@ -148,6 +149,10 @@ const router = createBrowserRouter([
           {
             path: 'quizler/:quizId',
             element: <TakeQuizPage />,
+          },
+          {
+            path: 'mac-haftasi',
+            element: <MatchWeekPage />,
           },
         ],
       },
