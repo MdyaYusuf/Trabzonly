@@ -8,6 +8,7 @@ const navItems = [
   { to: '/oyuncular', label: 'Oyuncular' },
   { to: '/gonderiler', label: 'Gönderiler' },
   { to: '/kadrolar', label: 'Kadrolar' },
+  { to: '/mac-haftasi', label: 'Maç Haftası' },
   { to: '/quizler', label: 'Quizler' },
 ] as const
 

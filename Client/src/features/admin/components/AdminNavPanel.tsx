@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { BrandLogo } from '@/core/components/BrandLogo'
 import { adminShellProfile } from '@/features/admin/utils/adminHubPlaceholders'
 
@@ -7,8 +7,24 @@ type AdminNavPanelProps = {
   className?: string
 }
 
+function isNavItemActive(
+  pathname: string,
+  routerIsActive: boolean,
+  activePathPrefix?: string,
+): boolean {
+  if (activePathPrefix) {
+    return (
+      pathname === activePathPrefix ||
+      pathname.startsWith(`${activePathPrefix}/`)
+    )
+  }
+
+  return routerIsActive
+}
+
 export function AdminNavPanel({ onNavigate, className }: AdminNavPanelProps) {
   const shell = adminShellProfile
+  const { pathname } = useLocation()
 
   return (
     <aside
@@ -42,26 +58,40 @@ export function AdminNavPanel({ onNavigate, className }: AdminNavPanelProps) {
             to={item.to}
             end={item.to === '/yonetim'}
             onClick={onNavigate}
-            className={({ isActive }) =>
-              `font-label flex items-center gap-space-sm px-space-sm py-space-sm text-label-md transition-colors ${
-                isActive
+            className={({ isActive }) => {
+              const active = isNavItemActive(
+                pathname,
+                isActive,
+                item.activePathPrefix,
+              )
+
+              return `font-label flex items-center gap-space-sm px-space-sm py-space-sm text-label-md transition-colors ${
+                active
                   ? 'border-l-4 border-secondary-container bg-white/15 font-bold text-on-primary'
                   : 'border-l-4 border-transparent text-on-primary/75 hover:bg-white/10 hover:text-on-primary'
               }`
-            }
+            }}
           >
-            {({ isActive }) => (
-              <>
-                <span
-                  className={`material-symbols-outlined text-[20px] ${
-                    isActive ? 'text-secondary-container' : 'text-on-primary/70'
-                  }`}
-                >
-                  {item.icon}
-                </span>
-                {item.label}
-              </>
-            )}
+            {({ isActive }) => {
+              const active = isNavItemActive(
+                pathname,
+                isActive,
+                item.activePathPrefix,
+              )
+
+              return (
+                <>
+                  <span
+                    className={`material-symbols-outlined text-[20px] ${
+                      active ? 'text-secondary-container' : 'text-on-primary/70'
+                    }`}
+                  >
+                    {item.icon}
+                  </span>
+                  {item.label}
+                </>
+              )
+            }}
           </NavLink>
         ))}
       </nav>

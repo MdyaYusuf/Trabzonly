@@ -55,6 +55,12 @@ export function SiteFooter() {
                 Taktik Tahtası &amp; 11&apos;ler
               </Link>
               <Link
+                to="/mac-haftasi"
+                className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
+              >
+                Maç Haftası &amp; Puan Durumu
+              </Link>
+              <Link
                 to="/quizler"
                 className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
               >

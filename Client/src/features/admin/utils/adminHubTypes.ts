@@ -3,6 +3,8 @@ export type AdminNavItem = {
   label: string
   to: string
   icon: string
+  /** When set, nav item stays active for any path under this prefix. */
+  activePathPrefix?: string
 }
 
 export type AdminModuleCard = {
