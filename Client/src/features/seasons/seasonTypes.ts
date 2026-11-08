@@ -5,6 +5,7 @@ export interface SeasonResponseDto {
   startDate: string
   endDate: string
   isActive: boolean
+  displayedFixtureWeek: number
   createdDate: string
   updatedDate?: string | null
 }

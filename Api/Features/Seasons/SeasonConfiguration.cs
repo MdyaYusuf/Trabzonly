@@ -36,5 +36,9 @@ public class SeasonConfiguration : IEntityTypeConfiguration<Season>
     builder.Property(s => s.IsActive)
       .IsRequired()
       .HasDefaultValue(false);
+
+    builder.Property(s => s.DisplayedFixtureWeek)
+      .IsRequired()
+      .HasDefaultValue(1);
   }
 }

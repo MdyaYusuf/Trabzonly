@@ -7,6 +7,7 @@ public sealed record SeasonResponseDto(
   DateTime StartDate,
   DateTime EndDate,
   bool IsActive,
+  int DisplayedFixtureWeek,
   DateTime CreatedDate,
   DateTime? UpdatedDate);
 

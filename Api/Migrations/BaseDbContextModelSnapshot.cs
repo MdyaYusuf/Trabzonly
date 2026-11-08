@@ -196,6 +196,316 @@ namespace Trabzonly.Api.Migrations
                     b.ToTable("Injuries", (string)null);
                 });
 
+            modelBuilder.Entity("Api.Features.MatchWeek.Club", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<bool>("IsTrabzonspor")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ShortName")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsTrabzonspor");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Clubs", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.Fixture", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AwayClubId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AwayScore")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<int>("HomeClubId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("HomeScore")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Kickoff")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SeasonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.Property<int>("WeekNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AwayClubId");
+
+                    b.HasIndex("HomeClubId");
+
+                    b.HasIndex("SeasonId", "WeekNumber");
+
+                    b.HasIndex("SeasonId", "HomeClubId", "AwayClubId", "WeekNumber")
+                        .IsUnique();
+
+                    b.ToTable("Fixtures", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.LeagueStanding", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClubId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<int>("Drawn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("GoalsAgainst")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("GoalsFor")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("Lost")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("Played")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("Points")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("Rank")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("SeasonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.Property<int>("Won")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClubId");
+
+                    b.HasIndex("SeasonId", "ClubId")
+                        .IsUnique();
+
+                    b.HasIndex("SeasonId", "Rank");
+
+                    b.ToTable("LeagueStandings", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.MatchWeek", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AwayScore")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<string>("Formation")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("HomeScore")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsHome")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("OpponentClubId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SeasonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OpponentClubId");
+
+                    b.HasIndex("SeasonId")
+                        .IsUnique();
+
+                    b.ToTable("MatchWeeks", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.MatchWeekPlayerRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<int>("MatchWeekId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlayerId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Score")
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("MatchWeekId", "PlayerId");
+
+                    b.HasIndex("MatchWeekId", "PlayerId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("MatchWeekPlayerRatings", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.MatchWeekSlot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<bool>("IsStarter")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MatchWeekId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlayerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SlotKey")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("MatchWeekId", "PlayerId")
+                        .IsUnique();
+
+                    b.HasIndex("MatchWeekId", "SlotKey")
+                        .IsUnique();
+
+                    b.HasIndex("MatchWeekId", "IsStarter", "SortOrder");
+
+                    b.ToTable("MatchWeekSlots", (string)null);
+                });
+
             modelBuilder.Entity("Api.Features.Metrics.Metric", b =>
                 {
                     b.Property<Guid>("Id")
@@ -900,6 +1210,11 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
+                    b.Property<int>("DisplayedFixtureWeek")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -1349,6 +1664,117 @@ namespace Trabzonly.Api.Migrations
                     b.Navigation("Season");
                 });
 
+            modelBuilder.Entity("Api.Features.MatchWeek.Fixture", b =>
+                {
+                    b.HasOne("Api.Features.MatchWeek.Club", "AwayClub")
+                        .WithMany("AwayFixtures")
+                        .HasForeignKey("AwayClubId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Api.Features.MatchWeek.Club", "HomeClub")
+                        .WithMany("HomeFixtures")
+                        .HasForeignKey("HomeClubId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Api.Features.Seasons.Season", "Season")
+                        .WithMany("Fixtures")
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AwayClub");
+
+                    b.Navigation("HomeClub");
+
+                    b.Navigation("Season");
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.LeagueStanding", b =>
+                {
+                    b.HasOne("Api.Features.MatchWeek.Club", "Club")
+                        .WithMany("Standings")
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Api.Features.Seasons.Season", "Season")
+                        .WithMany("LeagueStandings")
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Club");
+
+                    b.Navigation("Season");
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.MatchWeek", b =>
+                {
+                    b.HasOne("Api.Features.MatchWeek.Club", "OpponentClub")
+                        .WithMany("OpponentMatchWeeks")
+                        .HasForeignKey("OpponentClubId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Api.Features.Seasons.Season", "Season")
+                        .WithMany("MatchWeeks")
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OpponentClub");
+
+                    b.Navigation("Season");
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.MatchWeekPlayerRating", b =>
+                {
+                    b.HasOne("Api.Features.MatchWeek.MatchWeek", "MatchWeek")
+                        .WithMany("Ratings")
+                        .HasForeignKey("MatchWeekId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Api.Features.Players.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Api.Features.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MatchWeek");
+
+                    b.Navigation("Player");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.MatchWeekSlot", b =>
+                {
+                    b.HasOne("Api.Features.MatchWeek.MatchWeek", "MatchWeek")
+                        .WithMany("Slots")
+                        .HasForeignKey("MatchWeekId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Api.Features.Players.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MatchWeek");
+
+                    b.Navigation("Player");
+                });
+
             modelBuilder.Entity("Api.Features.Players.Player", b =>
                 {
                     b.HasOne("Api.Features.Positions.Position", "Position")
@@ -1676,6 +2102,24 @@ namespace Trabzonly.Api.Migrations
                     b.Navigation("Replies");
                 });
 
+            modelBuilder.Entity("Api.Features.MatchWeek.Club", b =>
+                {
+                    b.Navigation("AwayFixtures");
+
+                    b.Navigation("HomeFixtures");
+
+                    b.Navigation("OpponentMatchWeeks");
+
+                    b.Navigation("Standings");
+                });
+
+            modelBuilder.Entity("Api.Features.MatchWeek.MatchWeek", b =>
+                {
+                    b.Navigation("Ratings");
+
+                    b.Navigation("Slots");
+                });
+
             modelBuilder.Entity("Api.Features.Players.Player", b =>
                 {
                     b.Navigation("Comments");
@@ -1741,7 +2185,13 @@ namespace Trabzonly.Api.Migrations
 
             modelBuilder.Entity("Api.Features.Seasons.Season", b =>
                 {
+                    b.Navigation("Fixtures");
+
                     b.Navigation("Injuries");
+
+                    b.Navigation("LeagueStandings");
+
+                    b.Navigation("MatchWeeks");
 
                     b.Navigation("PlayerStats");
                 });

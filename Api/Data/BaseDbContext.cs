@@ -15,6 +15,7 @@ using Api.Features.Posts;
 using Api.Features.Squads;
 using Api.Features.Metrics;
 using Api.Features.Polls;
+using Api.Features.MatchWeek;
 
 namespace Api.Data;
 
@@ -52,6 +53,12 @@ public class BaseDbContext : DbContext
   public DbSet<Poll> Polls { get; set; }
   public DbSet<PollOption> PollOptions { get; set; }
   public DbSet<PollVote> PollVotes { get; set; }
+  public DbSet<Club> Clubs { get; set; }
+  public DbSet<Fixture> Fixtures { get; set; }
+  public DbSet<LeagueStanding> LeagueStandings { get; set; }
+  public DbSet<MatchWeek> MatchWeeks { get; set; }
+  public DbSet<MatchWeekSlot> MatchWeekSlots { get; set; }
+  public DbSet<MatchWeekPlayerRating> MatchWeekPlayerRatings { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
