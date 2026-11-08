@@ -37,3 +37,18 @@ public class UpdateSeasonRequestValidator : AbstractValidator<UpdateSeasonReques
       .GreaterThan(s => s.StartDate).WithMessage("Bitiş tarihi, başlangıç tarihinden sonra olmalıdır.");
   }
 }
+
+public class UpdateDisplayedFixtureWeekRequestValidator
+  : AbstractValidator<UpdateDisplayedFixtureWeekRequest>
+{
+  public UpdateDisplayedFixtureWeekRequestValidator()
+  {
+    RuleFor(s => s.SeasonId)
+      .GreaterThan(0)
+      .WithMessage("Geçersiz sezon ID.");
+
+    RuleFor(s => s.DisplayedFixtureWeek)
+      .InclusiveBetween(1, 34)
+      .WithMessage("Gösterilen hafta 1 ile 34 arasında olmalıdır.");
+  }
+}

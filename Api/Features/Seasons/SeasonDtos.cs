@@ -30,6 +30,10 @@ public sealed record UpdateSeasonRequest(
   DateTime EndDate,
   bool IsActive);
 
+public sealed record UpdateDisplayedFixtureWeekRequest(
+  int SeasonId,
+  int DisplayedFixtureWeek);
+
 public sealed record SeasonAdminListQueryRequest(
   string? Search = null,
   bool? IsActive = null,

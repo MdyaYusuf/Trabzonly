@@ -30,6 +30,7 @@ import { AdminRoleListPage } from '@/features/admin/pages/AdminRoleListPage'
 import { AdminRoleCreateEditPage } from '@/features/admin/pages/AdminRoleCreateEditPage'
 import { AdminPollListPage } from '@/features/admin/pages/AdminPollListPage'
 import { AdminPollCreateEditPage } from '@/features/admin/pages/AdminPollCreateEditPage'
+import { AdminMatchWeekFixturesPage } from '@/features/admin/pages/AdminMatchWeekFixturesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -257,6 +258,10 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/anketler/:pollId/duzenle',
             element: <AdminPollCreateEditPage mode="edit" />,
+          },
+          {
+            path: 'yonetim/mac-haftasi/fikstur',
+            element: <AdminMatchWeekFixturesPage />,
           },
           {
             path: 'yonetim/uyeler',

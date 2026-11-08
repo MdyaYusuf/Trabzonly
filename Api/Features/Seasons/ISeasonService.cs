@@ -28,6 +28,9 @@ public interface ISeasonService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<SeasonResponseDto>> GetActiveAsync(
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<SeasonResponseDto>> AddAsync(
     CreateSeasonRequest request,
     string userRole,
@@ -35,6 +38,11 @@ public interface ISeasonService
 
   Task<ReturnModel<NoData>> UpdateAsync(
     UpdateSeasonRequest request,
+    string userRole,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<SeasonResponseDto>> UpdateDisplayedFixtureWeekAsync(
+    UpdateDisplayedFixtureWeekRequest request,
     string userRole,
     CancellationToken cancellationToken = default);
 

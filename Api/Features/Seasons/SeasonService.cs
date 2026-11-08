@@ -11,7 +11,8 @@ public class SeasonService(
   SeasonBusinessRules _businessRules,
   IUnitOfWork _unitOfWork,
   IValidator<CreateSeasonRequest> _createValidator,
-  IValidator<UpdateSeasonRequest> _updateValidator) : ISeasonService
+  IValidator<UpdateSeasonRequest> _updateValidator,
+  IValidator<UpdateDisplayedFixtureWeekRequest> _updateDisplayedFixtureWeekValidator) : ISeasonService
 {
   public async Task<ReturnModel<PagedResponse<SeasonResponseDto>>> GetAllAsync(
     Expression<Func<Season, bool>>? filter = null,
@@ -106,6 +107,30 @@ public class SeasonService(
     };
   }
 
+  public async Task<ReturnModel<SeasonResponseDto>> GetActiveAsync(
+    CancellationToken cancellationToken = default)
+  {
+    Season? season = await _seasonRepository.GetAsync(
+      predicate: s => s.IsActive,
+      enableTracking: false,
+      cancellationToken: cancellationToken);
+
+    if (season == null)
+    {
+      throw new Api.Core.Exceptions.NotFoundException("Aktif sezon bulunamadı.");
+    }
+
+    SeasonResponseDto response = _mapper.EntityToResponseDto(season);
+
+    return new ReturnModel<SeasonResponseDto>()
+    {
+      Success = true,
+      Message = "Aktif sezon başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<SeasonResponseDto>> AddAsync(
     CreateSeasonRequest request,
     string userRole,
@@ -186,6 +211,44 @@ public class SeasonService(
     {
       Success = true,
       Message = "Sezon başarılı bir şekilde güncellendi.",
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<SeasonResponseDto>> UpdateDisplayedFixtureWeekAsync(
+    UpdateDisplayedFixtureWeekRequest request,
+    string userRole,
+    CancellationToken cancellationToken = default)
+  {
+    _businessRules.AdminRoleRequired(userRole);
+
+    var validationResult = await _updateDisplayedFixtureWeekValidator.ValidateAsync(
+      request,
+      cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    Season season = await _businessRules.GetSeasonIfExistAsync(
+      request.SeasonId,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    season.DisplayedFixtureWeek = request.DisplayedFixtureWeek;
+    season.UpdatedDate = DateTime.Now;
+
+    _seasonRepository.Update(season);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    SeasonResponseDto response = _mapper.EntityToResponseDto(season);
+
+    return new ReturnModel<SeasonResponseDto>()
+    {
+      Success = true,
+      Message = "Gösterilen fikstür haftası başarılı bir şekilde güncellendi.",
+      Data = response,
       StatusCode = 200
     };
   }

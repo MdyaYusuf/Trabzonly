@@ -118,6 +118,18 @@ export function resolveAdminBreadcrumb(pathname: string): AdminBreadcrumbState {
     }
   }
 
+  if (isExactListPath(pathname, '/yonetim/mac-haftasi/fikstur')) {
+    return {
+      backTo: '/yonetim',
+      backLabel: 'Genel bakışa dön',
+      segments: [
+        OVERVIEW,
+        { label: 'Maç Haftası' },
+        { label: 'Fikstür' },
+      ],
+    }
+  }
+
   for (const module of MODULES) {
     if (pathname === `${module.listPath}${module.createSuffix}`) {
       return {

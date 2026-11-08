@@ -13,6 +13,12 @@ export const adminShellProfile: AdminShellProfile = {
     { id: 'positions', label: 'Pozisyonlar', to: '/yonetim/pozisyonlar', icon: 'schema' },
     { id: 'categories', label: 'Kategoriler', to: '/yonetim/kategoriler', icon: 'category' },
     { id: 'polls', label: 'Anketler', to: '/yonetim/anketler', icon: 'ballot' },
+    {
+      id: 'match-week',
+      label: 'Maç Haftası',
+      to: '/yonetim/mac-haftasi/fikstur',
+      icon: 'sports_soccer',
+    },
     { id: 'quizzes', label: 'Quizler', to: '/yonetim/quizler', icon: 'quiz' },
     { id: 'members', label: 'Üyeler', to: '/yonetim/uyeler', icon: 'people' },
     {
@@ -88,6 +94,15 @@ export const adminHubProfile: AdminHubProfile = {
       categoryLabel: 'Taraftar Etkileşimi',
       icon: 'ballot',
       to: '/yonetim/anketler',
+    },
+    {
+      id: 'match-week',
+      title: 'Maç Haftası',
+      description:
+        'Lig fikstürünü ve gösterilen haftayı yönet. Skor güncellemeleri puan durumunu yeniler.',
+      categoryLabel: 'Lig & Fikstür',
+      icon: 'sports_soccer',
+      to: '/yonetim/mac-haftasi/fikstur',
     },
     {
       id: 'quizzes',

@@ -41,3 +41,8 @@ export interface UpdateSeasonRequest {
   endDate: string
   isActive: boolean
 }
+
+export interface UpdateDisplayedFixtureWeekRequest {
+  seasonId: number
+  displayedFixtureWeek: number
+}

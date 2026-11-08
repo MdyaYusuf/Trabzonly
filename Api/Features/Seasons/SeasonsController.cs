@@ -45,6 +45,14 @@ public class SeasonsController(ISeasonService _seasonService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
+  [HttpGet("active")]
+  public async Task<IActionResult> GetActive(CancellationToken cancellationToken = default)
+  {
+    var result = await _seasonService.GetActiveAsync(cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
     int id,
@@ -76,6 +84,20 @@ public class SeasonsController(ISeasonService _seasonService) : CustomBaseContro
     CancellationToken cancellationToken)
   {
     var result = await _seasonService.UpdateAsync(
+      request: request,
+      userRole: GetUserRole(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize(Roles = "Admin")]
+  [HttpPut("displayed-fixture-week")]
+  public async Task<IActionResult> UpdateDisplayedFixtureWeek(
+    [FromBody] UpdateDisplayedFixtureWeekRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _seasonService.UpdateDisplayedFixtureWeekAsync(
       request: request,
       userRole: GetUserRole(),
       cancellationToken: cancellationToken);

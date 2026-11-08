@@ -9,6 +9,7 @@ import type {
   SeasonResponseDto,
   CreateSeasonRequest,
   UpdateSeasonRequest,
+  UpdateDisplayedFixtureWeekRequest,
   SeasonAdminListQuery,
   SeasonAdminSummaryDto,
 } from './seasonTypes'
@@ -58,6 +59,10 @@ const getById = async (id: number): Promise<ApiResponse<SeasonResponseDto>> => {
   return await apiClient<SeasonResponseDto>(`${API_URL}/${id}`)
 }
 
+const getActive = async (): Promise<ApiResponse<SeasonResponseDto>> => {
+  return await apiClient<SeasonResponseDto>(`${API_URL}/active`)
+}
+
 const add = async (
   request: CreateSeasonRequest,
 ): Promise<ApiResponse<SeasonResponseDto>> => {
@@ -74,6 +79,15 @@ const update = async (request: UpdateSeasonRequest): Promise<ApiResponse<NoData>
   })
 }
 
+const updateDisplayedFixtureWeek = async (
+  request: UpdateDisplayedFixtureWeekRequest,
+): Promise<ApiResponse<SeasonResponseDto>> => {
+  return await apiClient<SeasonResponseDto>(`${API_URL}/displayed-fixture-week`, {
+    method: 'PUT',
+    body: JSON.stringify(request),
+  })
+}
+
 const remove = async (id: number): Promise<ApiResponse<NoData>> => {
   return await apiClient<NoData>(`${API_URL}/${id}`, {
     method: 'DELETE',
@@ -85,8 +99,10 @@ const seasonService = {
   getAllForAdmin,
   getAdminSummary,
   getById,
+  getActive,
   add,
   update,
+  updateDisplayedFixtureWeek,
   remove,
 }
 
