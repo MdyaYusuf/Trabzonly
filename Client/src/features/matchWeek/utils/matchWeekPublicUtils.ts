@@ -65,6 +65,23 @@ export function formatFixtureTime(iso: string): string {
   })
 }
 
+export function formatFixtureDateShort(iso: string): string {
+  return new Date(iso).toLocaleDateString('tr-TR', {
+    day: 'numeric',
+    month: 'short',
+  })
+}
+
+export function findTrabzonsporFixture(
+  fixtures: FixtureResponseDto[],
+): FixtureResponseDto | null {
+  return (
+    fixtures.find(
+      (fixture) => fixture.homeClub.isTrabzonspor || fixture.awayClub.isTrabzonspor,
+    ) ?? null
+  )
+}
+
 export function formatFixtureDateLabel(iso: string): string {
   return new Date(iso).toLocaleDateString('tr-TR', {
     weekday: 'long',

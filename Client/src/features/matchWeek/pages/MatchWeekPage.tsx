@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useAppSelector } from '@/core/store/hooks'
 import { authService } from '@/features/auth/authService'
 import seasonService from '@/features/seasons/seasonService'
-import { MatchWeekHeader } from '../components/MatchWeekHeader'
+import { MatchWeekBreadcrumb } from '../components/MatchWeekBreadcrumb'
+import { MatchWeekHero } from '../components/MatchWeekHero'
 import { MatchWeekPitch } from '../components/MatchWeekPitch'
 import { MatchWeekSidebar } from '../components/MatchWeekSidebar'
 import matchWeekService from '../matchWeekService'
@@ -12,6 +13,7 @@ import type {
   MatchWeekLeaderboardEntryDto,
   MatchWeekResponseDto,
 } from '../matchWeekTypes'
+import { findTrabzonsporFixture } from '../utils/matchWeekPublicUtils'
 
 export function MatchWeekPage() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
@@ -21,7 +23,11 @@ export function MatchWeekPage() {
   const [leaderboard, setLeaderboard] = useState<MatchWeekLeaderboardEntryDto[]>([])
   const [standings, setStandings] = useState<LeagueStandingResponseDto[]>([])
   const [fixtures, setFixtures] = useState<FixtureResponseDto[]>([])
+  const [displayedWeekTrabzonsporFixture, setDisplayedWeekTrabzonsporFixture] =
+    useState<FixtureResponseDto | null>(null)
   const [seasonId, setSeasonId] = useState<number | null>(null)
+  const [seasonName, setSeasonName] = useState<string | null>(null)
+  const [displayedWeek, setDisplayedWeek] = useState<number | null>(null)
   const [weekNumber, setWeekNumber] = useState(1)
 
   const [isLoadingBoard, setIsLoadingBoard] = useState(true)
@@ -44,33 +50,56 @@ export function MatchWeekPage() {
         return
       }
 
-      const [currentResult, leaderboardResult] = await Promise.all([
-        matchWeekService.getCurrent(),
-        matchWeekService.getLeaderboard(),
-      ])
+      try {
+        const currentResult = await matchWeekService.getCurrent()
+
+        if (cancelled) {
+          return
+        }
+
+        if (!currentResult.success || !currentResult.data) {
+          setMatchWeek(null)
+          setBoardError(currentResult.message || 'Maç haftası yüklenemedi.')
+        } else {
+          setMatchWeek(currentResult.data)
+          setBoardError(null)
+        }
+      } catch {
+        if (cancelled) {
+          return
+        }
+
+        setMatchWeek(null)
+        setBoardError('Maç haftası yüklenemedi.')
+      }
 
       if (cancelled) {
         return
       }
 
-      if (!currentResult.success || !currentResult.data) {
-        setMatchWeek(null)
-        setBoardError(currentResult.message || 'Maç haftası yüklenemedi.')
-        setIsLoadingBoard(false)
-        setIsLeaderboardLoading(false)
-        return
-      }
-
-      setMatchWeek(currentResult.data)
       setIsLoadingBoard(false)
 
-      if (leaderboardResult.success && leaderboardResult.data) {
-        setLeaderboard(leaderboardResult.data.entries)
-      } else {
-        setLeaderboard([])
+      try {
+        const leaderboardResult = await matchWeekService.getLeaderboard()
+
+        if (cancelled) {
+          return
+        }
+
+        if (leaderboardResult.success && leaderboardResult.data) {
+          setLeaderboard(leaderboardResult.data.entries)
+        } else {
+          setLeaderboard([])
+        }
+      } catch {
+        if (!cancelled) {
+          setLeaderboard([])
+        }
       }
 
-      setIsLeaderboardLoading(false)
+      if (!cancelled) {
+        setIsLeaderboardLoading(false)
+      }
     }
 
     void loadBoard()
@@ -86,38 +115,66 @@ export function MatchWeekPage() {
     async function loadSeasonContext() {
       setIsStandingsLoading(true)
 
-      const seasonResult = await seasonService.getActive()
+      try {
+        const seasonResult = await seasonService.getActive()
 
-      if (cancelled) {
-        return
+        if (cancelled) {
+          return
+        }
+
+        if (!seasonResult.success || !seasonResult.data) {
+          setSeasonId(null)
+          setSeasonName(null)
+          setDisplayedWeek(null)
+          setDisplayedWeekTrabzonsporFixture(null)
+          setStandings([])
+          setIsStandingsLoading(false)
+          return
+        }
+
+        const activeSeasonId = seasonResult.data.id
+        const week = seasonResult.data.displayedFixtureWeek
+
+        setSeasonId(activeSeasonId)
+        setSeasonName(seasonResult.data.name)
+        setDisplayedWeek(week)
+        setWeekNumber(week)
+
+        const [standingsResult, displayedWeekResult] = await Promise.all([
+          matchWeekService.getStandings(activeSeasonId),
+          matchWeekService.getWeekFixtures(week, activeSeasonId),
+        ])
+
+        if (cancelled) {
+          return
+        }
+
+        if (standingsResult.success && standingsResult.data) {
+          setStandings(standingsResult.data.standings)
+        } else {
+          setStandings([])
+        }
+
+        if (displayedWeekResult.success && displayedWeekResult.data) {
+          setDisplayedWeekTrabzonsporFixture(
+            findTrabzonsporFixture(displayedWeekResult.data.fixtures),
+          )
+        } else {
+          setDisplayedWeekTrabzonsporFixture(null)
+        }
+      } catch {
+        if (!cancelled) {
+          setSeasonId(null)
+          setSeasonName(null)
+          setDisplayedWeek(null)
+          setDisplayedWeekTrabzonsporFixture(null)
+          setStandings([])
+        }
       }
 
-      if (!seasonResult.success || !seasonResult.data) {
-        setSeasonId(null)
-        setStandings([])
+      if (!cancelled) {
         setIsStandingsLoading(false)
-        return
       }
-
-      const activeSeasonId = seasonResult.data.id
-      const displayedWeek = seasonResult.data.displayedFixtureWeek
-
-      setSeasonId(activeSeasonId)
-      setWeekNumber(displayedWeek)
-
-      const standingsResult = await matchWeekService.getStandings(activeSeasonId)
-
-      if (cancelled) {
-        return
-      }
-
-      if (standingsResult.success && standingsResult.data) {
-        setStandings(standingsResult.data.standings)
-      } else {
-        setStandings([])
-      }
-
-      setIsStandingsLoading(false)
     }
 
     void loadSeasonContext()
@@ -137,19 +194,30 @@ export function MatchWeekPage() {
     async function loadFixtures() {
       setIsFixturesLoading(true)
 
-      const result = await matchWeekService.getWeekFixtures(weekNumber, seasonId ?? undefined)
+      try {
+        const result = await matchWeekService.getWeekFixtures(
+          weekNumber,
+          seasonId ?? undefined,
+        )
 
-      if (cancelled) {
-        return
+        if (cancelled) {
+          return
+        }
+
+        if (result.success && result.data) {
+          setFixtures(result.data.fixtures)
+        } else {
+          setFixtures([])
+        }
+      } catch {
+        if (!cancelled) {
+          setFixtures([])
+        }
       }
 
-      if (result.success && result.data) {
-        setFixtures(result.data.fixtures)
-      } else {
-        setFixtures([])
+      if (!cancelled) {
+        setIsFixturesLoading(false)
       }
-
-      setIsFixturesLoading(false)
     }
 
     void loadFixtures()
@@ -161,10 +229,15 @@ export function MatchWeekPage() {
 
   async function refreshLeaderboard() {
     setIsLeaderboardLoading(true)
-    const result = await matchWeekService.getLeaderboard()
 
-    if (result.success && result.data) {
-      setLeaderboard(result.data.entries)
+    try {
+      const result = await matchWeekService.getLeaderboard()
+
+      if (result.success && result.data) {
+        setLeaderboard(result.data.entries)
+      }
+    } catch {
+      // Keep existing leaderboard if refresh fails.
     }
 
     setIsLeaderboardLoading(false)
@@ -201,40 +274,63 @@ export function MatchWeekPage() {
     void refreshLeaderboard()
   }
 
-  if (isLoadingBoard) {
-    return (
-      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-        <p className="font-body mx-auto max-w-[1360px] px-4 py-space-xl text-center text-body-md text-on-surface-variant sm:px-6 lg:px-12">
-          Maç haftası yükleniyor...
-        </p>
-      </main>
-    )
-  }
-
-  if (boardError || !matchWeek) {
-    return (
-      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-        <p className="font-body mx-auto max-w-[1360px] px-4 py-space-xl text-center text-body-md text-on-surface-variant sm:px-6 lg:px-12">
-          {boardError ?? 'Maç haftası bulunamadı.'}
-        </p>
-      </main>
-    )
-  }
+  const hasLineup = (matchWeek?.slots.length ?? 0) > 0
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-      <MatchWeekHeader matchWeek={matchWeek} />
+      <MatchWeekBreadcrumb />
+      <MatchWeekHero
+        seasonName={seasonName}
+        displayedWeek={displayedWeek}
+        playerOfTheWeek={leaderboard[0] ?? null}
+        trabzonsporFixture={displayedWeekTrabzonsporFixture}
+      />
 
       <section className="w-full bg-background py-space-xl">
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
-            <div className="lg:col-span-8">
-              <MatchWeekPitch
-                formation={matchWeek.formation}
-                slots={matchWeek.slots}
-                onPlayerRated={handlePlayerRated}
-              />
+            <div className="flex flex-col gap-space-md lg:col-span-8">
+              {isLoadingBoard ? (
+                <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                  Maç haftası kadrosu yükleniyor...
+                </p>
+              ) : null}
+
+              {!isLoadingBoard && boardError && !matchWeek ? (
+                <div className="border border-outline-variant/30 bg-surface-container-lowest p-space-lg text-center shadow-sm">
+                  <p className="font-headline text-headline-sm font-bold text-primary uppercase">
+                    Kadro yüklenemedi
+                  </p>
+                  <p className="font-body mt-space-sm text-body-md text-on-surface-variant">
+                    {boardError}
+                  </p>
+                </div>
+              ) : null}
+
+              {!isLoadingBoard && matchWeek && !hasLineup ? (
+                <div className="border border-outline-variant/30 bg-surface-container-lowest p-space-lg text-center shadow-sm">
+                  <span className="material-symbols-outlined text-[40px] text-secondary">
+                    sports_soccer
+                  </span>
+                  <p className="font-headline mt-space-sm text-headline-sm font-bold text-primary uppercase">
+                    Bu haftanın kadrosu henüz yok
+                  </p>
+                  <p className="font-body mt-space-sm text-body-md text-on-surface-variant">
+                    Haftanın kadrosu yayınladığında puanınızı verebilmeniz için diziliş ve
+                    oyuncu puanları görünecektir.
+                  </p>
+                </div>
+              ) : null}
+
+              {!isLoadingBoard && matchWeek && hasLineup ? (
+                <MatchWeekPitch
+                  formation={matchWeek.formation}
+                  slots={matchWeek.slots}
+                  onPlayerRated={handlePlayerRated}
+                />
+              ) : null}
             </div>
+
             <MatchWeekSidebar
               leaderboard={leaderboard}
               isLeaderboardLoading={isLeaderboardLoading}

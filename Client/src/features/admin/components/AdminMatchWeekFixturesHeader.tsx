@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom'
-
 export function AdminMatchWeekFixturesHeader() {
   return (
     <header className="flex max-w-3xl flex-col gap-space-xs">
@@ -10,12 +8,6 @@ export function AdminMatchWeekFixturesHeader() {
         Aktif sezon haftalarını düzenle, maç saatlerini ve skorları güncelle. Gösterilen hafta
         genel sitede varsayılan fikstür haftasını belirler.
       </p>
-      <Link
-        to="/yonetim/mac-haftasi/kadro"
-        className="font-label w-fit text-label-md text-primary uppercase underline-offset-2 hover:underline"
-      >
-        Maç haftası kadrosuna git
-      </Link>
     </header>
   )
 }

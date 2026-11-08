@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import matchWeekService from '@/features/matchWeek/matchWeekService'
 import type { ClubResponseDto, MatchWeekResponseDto } from '@/features/matchWeek/matchWeekTypes'
 import playerService from '@/features/players/playerService'
@@ -488,12 +487,6 @@ export function AdminMatchWeekLineupPage() {
               Canlı haftanın dizilişini, rakibini ve skoru yönet. Kaydet kadroyu günceller; Yeni
               hafta puanları her zaman sıfırlar.
             </p>
-            <Link
-              to="/yonetim/mac-haftasi/fikstur"
-              className="font-label w-fit text-label-md text-primary uppercase underline-offset-2 hover:underline"
-            >
-              Fikstür yönetimine git
-            </Link>
           </div>
 
           <div className="flex flex-wrap gap-space-sm">

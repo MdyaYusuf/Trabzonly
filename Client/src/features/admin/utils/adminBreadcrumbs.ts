@@ -122,11 +122,7 @@ export function resolveAdminBreadcrumb(pathname: string): AdminBreadcrumbState {
     return {
       backTo: '/yonetim',
       backLabel: 'Genel bakışa dön',
-      segments: [
-        OVERVIEW,
-        { label: 'Maç Haftası', to: '/yonetim/mac-haftasi/kadro' },
-        { label: 'Fikstür' },
-      ],
+      segments: [OVERVIEW, { label: 'Fikstür' }],
     }
   }
 
@@ -134,11 +130,7 @@ export function resolveAdminBreadcrumb(pathname: string): AdminBreadcrumbState {
     return {
       backTo: '/yonetim',
       backLabel: 'Genel bakışa dön',
-      segments: [
-        OVERVIEW,
-        { label: 'Maç Haftası' },
-        { label: 'Kadro' },
-      ],
+      segments: [OVERVIEW, { label: 'Maç Haftası' }],
     }
   }
 

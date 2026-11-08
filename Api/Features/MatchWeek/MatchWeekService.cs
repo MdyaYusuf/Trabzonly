@@ -153,9 +153,23 @@ public class MatchWeekService(
   public async Task<ReturnModel<MatchWeekLeaderboardResponseDto>> GetLeaderboardAsync(
     CancellationToken cancellationToken = default)
   {
-    MatchWeek matchWeek = await _businessRules.GetCurrentBoardIfExistAsync(
+    Season season = await _businessRules.GetActiveSeasonIfExistAsync(cancellationToken);
+
+    MatchWeek? matchWeek = await _businessRules.GetCurrentForSeasonAsync(
+      season.Id,
       enableTracking: false,
       cancellationToken: cancellationToken);
+
+    if (matchWeek == null)
+    {
+      return new ReturnModel<MatchWeekLeaderboardResponseDto>()
+      {
+        Success = true,
+        Message = "Maç haftası sıralaması başarılı bir şekilde getirildi.",
+        Data = new MatchWeekLeaderboardResponseDto(0, []),
+        StatusCode = 200
+      };
+    }
 
     HashSet<int> boardPlayerIds = matchWeek.Slots.Select(s => s.PlayerId).ToHashSet();
 

@@ -15,8 +15,8 @@ const TOTAL_WEEKS = 34
 
 function FixtureRow({ fixture }: { fixture: FixtureResponseDto }) {
   const hasScore = fixture.homeScore != null && fixture.awayScore != null
-  const homeName = fixture.homeClub.shortName?.trim() || fixture.homeClub.name
-  const awayName = fixture.awayClub.shortName?.trim() || fixture.awayClub.name
+  const homeName = fixture.homeClub.name
+  const awayName = fixture.awayClub.name
   const highlightHome = fixture.homeClub.isTrabzonspor
   const highlightAway = fixture.awayClub.isTrabzonspor
 
@@ -30,7 +30,7 @@ function FixtureRow({ fixture }: { fixture: FixtureResponseDto }) {
       >
         {homeName}
       </span>
-      <span className="font-headline min-w-[3.25rem] text-center text-xs font-bold tabular-nums text-on-surface">
+      <span className="font-headline min-w-[3.25rem] text-center text-xs font-extrabold tabular-nums text-secondary">
         {hasScore
           ? `${fixture.homeScore} – ${fixture.awayScore}`
           : fixture.kickoff

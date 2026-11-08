@@ -35,8 +35,6 @@ export function MatchWeekSidebar({
 
   return (
     <aside className="flex flex-col gap-space-md lg:col-span-4">
-      <MatchWeekLeaderboard entries={leaderboard} isLoading={isLeaderboardLoading} />
-
       <section className="border border-outline-variant/30 bg-surface-container-lowest p-space-md shadow-sm">
         <div
           className="mb-space-md grid grid-cols-2 border border-outline-variant/40"
@@ -86,6 +84,8 @@ export function MatchWeekSidebar({
           />
         )}
       </section>
+
+      <MatchWeekLeaderboard entries={leaderboard} isLoading={isLeaderboardLoading} />
     </aside>
   )
 }

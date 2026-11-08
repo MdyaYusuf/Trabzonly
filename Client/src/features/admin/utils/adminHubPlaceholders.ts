@@ -7,19 +7,24 @@ export const adminShellProfile: AdminShellProfile = {
   navItems: [
     { id: 'overview', label: 'Genel Bakış', to: '/yonetim', icon: 'dashboard' },
     { id: 'players', label: 'Oyuncular', to: '/yonetim/oyuncular', icon: 'groups' },
+    {
+      id: 'match-week',
+      label: 'Maç Haftası',
+      to: '/yonetim/mac-haftasi/kadro',
+      icon: 'sports_soccer',
+    },
+    {
+      id: 'fixtures',
+      label: 'Fikstür',
+      to: '/yonetim/mac-haftasi/fikstur',
+      icon: 'event',
+    },
     { id: 'stats', label: 'İstatistikler', to: '/yonetim/istatistikler', icon: 'bar_chart' },
     { id: 'injuries', label: 'Sakatlıklar', to: '/yonetim/sakatliklar', icon: 'healing' },
     { id: 'seasons', label: 'Sezonlar', to: '/yonetim/sezonlar', icon: 'calendar_month' },
     { id: 'positions', label: 'Pozisyonlar', to: '/yonetim/pozisyonlar', icon: 'schema' },
     { id: 'categories', label: 'Kategoriler', to: '/yonetim/kategoriler', icon: 'category' },
     { id: 'polls', label: 'Anketler', to: '/yonetim/anketler', icon: 'ballot' },
-    {
-      id: 'match-week',
-      label: 'Maç Haftası',
-      to: '/yonetim/mac-haftasi/kadro',
-      icon: 'sports_soccer',
-      activePathPrefix: '/yonetim/mac-haftasi',
-    },
     { id: 'quizzes', label: 'Quizler', to: '/yonetim/quizler', icon: 'quiz' },
     { id: 'members', label: 'Üyeler', to: '/yonetim/uyeler', icon: 'people' },
     {
@@ -43,6 +48,24 @@ export const adminHubProfile: AdminHubProfile = {
       categoryLabel: 'Trabzonspor Kadrosu',
       icon: 'groups',
       to: '/yonetim/oyuncular',
+    },
+    {
+      id: 'match-week',
+      title: 'Maç Haftası',
+      description:
+        'Canlı haftanın dizilişini yerleştir, rakibi ve skoru yönet. Kaydet ve Yeni hafta ile puanları kontrol et.',
+      categoryLabel: 'Maç Kadrosu',
+      icon: 'sports_soccer',
+      to: '/yonetim/mac-haftasi/kadro',
+    },
+    {
+      id: 'fixtures',
+      title: 'Fikstür',
+      description:
+        'Aktif sezon haftalarını düzenle, maç saatlerini ve skorları güncelle. Gösterilen haftayı ayarla.',
+      categoryLabel: 'Lig & Fikstür',
+      icon: 'event',
+      to: '/yonetim/mac-haftasi/fikstur',
     },
     {
       id: 'stats',
@@ -95,15 +118,6 @@ export const adminHubProfile: AdminHubProfile = {
       categoryLabel: 'Taraftar Etkileşimi',
       icon: 'ballot',
       to: '/yonetim/anketler',
-    },
-    {
-      id: 'match-week',
-      title: 'Maç Haftası',
-      description:
-        'Canlı hafta kadrosunu yerleştir, fikstür skorlarını güncelle ve gösterilen haftayı ayarla.',
-      categoryLabel: 'Lig & Fikstür',
-      icon: 'sports_soccer',
-      to: '/yonetim/mac-haftasi/kadro',
     },
     {
       id: 'quizzes',
