@@ -124,8 +124,20 @@ export function resolveAdminBreadcrumb(pathname: string): AdminBreadcrumbState {
       backLabel: 'Genel bakışa dön',
       segments: [
         OVERVIEW,
-        { label: 'Maç Haftası' },
+        { label: 'Maç Haftası', to: '/yonetim/mac-haftasi/kadro' },
         { label: 'Fikstür' },
+      ],
+    }
+  }
+
+  if (isExactListPath(pathname, '/yonetim/mac-haftasi/kadro')) {
+    return {
+      backTo: '/yonetim',
+      backLabel: 'Genel bakışa dön',
+      segments: [
+        OVERVIEW,
+        { label: 'Maç Haftası' },
+        { label: 'Kadro' },
       ],
     }
   }

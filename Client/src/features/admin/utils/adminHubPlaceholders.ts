@@ -16,7 +16,7 @@ export const adminShellProfile: AdminShellProfile = {
     {
       id: 'match-week',
       label: 'Maç Haftası',
-      to: '/yonetim/mac-haftasi/fikstur',
+      to: '/yonetim/mac-haftasi/kadro',
       icon: 'sports_soccer',
     },
     { id: 'quizzes', label: 'Quizler', to: '/yonetim/quizler', icon: 'quiz' },
@@ -99,10 +99,10 @@ export const adminHubProfile: AdminHubProfile = {
       id: 'match-week',
       title: 'Maç Haftası',
       description:
-        'Lig fikstürünü ve gösterilen haftayı yönet. Skor güncellemeleri puan durumunu yeniler.',
+        'Canlı haftanın kadrosunu ve fikstürünü yönet. Kaydet ve Yeni hafta ile puanları kontrol et.',
       categoryLabel: 'Lig & Fikstür',
       icon: 'sports_soccer',
-      to: '/yonetim/mac-haftasi/fikstur',
+      to: '/yonetim/mac-haftasi/kadro',
     },
     {
       id: 'quizzes',

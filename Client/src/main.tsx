@@ -31,6 +31,7 @@ import { AdminRoleCreateEditPage } from '@/features/admin/pages/AdminRoleCreateE
 import { AdminPollListPage } from '@/features/admin/pages/AdminPollListPage'
 import { AdminPollCreateEditPage } from '@/features/admin/pages/AdminPollCreateEditPage'
 import { AdminMatchWeekFixturesPage } from '@/features/admin/pages/AdminMatchWeekFixturesPage'
+import { AdminMatchWeekLineupPage } from '@/features/admin/pages/AdminMatchWeekLineupPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
@@ -262,6 +263,10 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/mac-haftasi/fikstur',
             element: <AdminMatchWeekFixturesPage />,
+          },
+          {
+            path: 'yonetim/mac-haftasi/kadro',
+            element: <AdminMatchWeekLineupPage />,
           },
           {
             path: 'yonetim/uyeler',

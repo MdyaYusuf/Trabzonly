@@ -4,12 +4,15 @@ import type {
   ClubResponseDto,
   FixtureWeekResponseDto,
   LeagueStandingsResponseDto,
+  MatchWeekResponseDto,
+  SaveMatchWeekRequest,
   UpdateFixtureWeekRequest,
 } from './matchWeekTypes'
 
 const FIXTURES_URL = '/fixtures'
 const CLUBS_URL = '/clubs'
 const STANDINGS_URL = '/league-standings'
+const MATCH_WEEKS_URL = '/match-weeks'
 
 const getClubs = async (): Promise<ApiResponse<ClubResponseDto[]>> => {
   return await apiClient<ClubResponseDto[]>(CLUBS_URL)
@@ -74,12 +77,37 @@ const getStandings = async (
   )
 }
 
+const getCurrent = async (): Promise<ApiResponse<MatchWeekResponseDto>> => {
+  return await apiClient<MatchWeekResponseDto>(`${MATCH_WEEKS_URL}/current`)
+}
+
+const saveCurrent = async (
+  request: SaveMatchWeekRequest,
+): Promise<ApiResponse<MatchWeekResponseDto>> => {
+  return await apiClient<MatchWeekResponseDto>(`${MATCH_WEEKS_URL}/current`, {
+    method: 'PUT',
+    body: JSON.stringify(request),
+  })
+}
+
+const startNewWeek = async (
+  request: SaveMatchWeekRequest,
+): Promise<ApiResponse<MatchWeekResponseDto>> => {
+  return await apiClient<MatchWeekResponseDto>(`${MATCH_WEEKS_URL}/current/new-week`, {
+    method: 'POST',
+    body: JSON.stringify(request),
+  })
+}
+
 const matchWeekService = {
   getClubs,
   getWeekFixtures,
   updateWeekFixtures,
   rebuildStandings,
   getStandings,
+  getCurrent,
+  saveCurrent,
+  startNewWeek,
 }
 
 export default matchWeekService
