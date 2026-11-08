@@ -57,3 +57,20 @@ public class SaveMatchWeekRequestValidator : AbstractValidator<SaveMatchWeekRequ
     return request.HomeScore.HasValue == request.AwayScore.HasValue;
   }
 }
+
+public class RateMatchWeekPlayerRequestValidator : AbstractValidator<RateMatchWeekPlayerRequest>
+{
+  public RateMatchWeekPlayerRequestValidator()
+  {
+    RuleFor(r => r.Score)
+      .InclusiveBetween(1m, 10m)
+      .WithMessage("Taraftar puanı 1 ile 10 arasında olmalıdır.")
+      .Must(BeHalfStep)
+      .WithMessage("Puan 0.5'lik adımlarla verilmelidir (ör. 7.0, 7.5, 8.0).");
+  }
+
+  private static bool BeHalfStep(decimal score)
+  {
+    return score * 2m == Math.Floor(score * 2m);
+  }
+}

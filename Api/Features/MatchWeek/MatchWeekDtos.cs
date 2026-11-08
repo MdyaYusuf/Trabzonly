@@ -83,7 +83,10 @@ public sealed record MatchWeekSlotResponseDto(
   int? ShirtNumber,
   string SlotKey,
   bool IsStarter,
-  int SortOrder);
+  int SortOrder,
+  decimal AverageRating,
+  int RatingCount,
+  decimal? CurrentUserScore);
 
 public sealed record MatchWeekResponseDto(
   int? Id,
@@ -108,3 +111,27 @@ public sealed record SaveMatchWeekRequest(
   int? HomeScore,
   int? AwayScore,
   IReadOnlyList<MatchWeekSlotRequest> Slots);
+
+public sealed record RateMatchWeekPlayerRequest(decimal Score);
+
+public sealed record MatchWeekPlayerRatingResponseDto(
+  int MatchWeekId,
+  int PlayerId,
+  decimal Score,
+  decimal AverageRating,
+  int RatingCount);
+
+public sealed record MatchWeekLeaderboardEntryDto(
+  int Rank,
+  int PlayerId,
+  string PlayerName,
+  string? PlayerImageUrl,
+  int? ShirtNumber,
+  string SlotKey,
+  bool IsStarter,
+  decimal AverageRating,
+  int RatingCount);
+
+public sealed record MatchWeekLeaderboardResponseDto(
+  int MatchWeekId,
+  IReadOnlyList<MatchWeekLeaderboardEntryDto> Entries);

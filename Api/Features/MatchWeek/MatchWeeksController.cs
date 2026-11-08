@@ -11,7 +11,9 @@ public class MatchWeeksController(IMatchWeekService _matchWeekService) : CustomB
   [HttpGet("current")]
   public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken = default)
   {
-    var result = await _matchWeekService.GetCurrentAsync(cancellationToken);
+    var result = await _matchWeekService.GetCurrentAsync(
+      currentUserId: TryGetUserId(),
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -40,6 +42,30 @@ public class MatchWeeksController(IMatchWeekService _matchWeekService) : CustomB
       request: request,
       userRole: GetUserRole(),
       cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize]
+  [HttpPut("current/players/{playerId:int}/rating")]
+  public async Task<IActionResult> RatePlayer(
+    int playerId,
+    [FromBody] RateMatchWeekPlayerRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    var result = await _matchWeekService.RatePlayerAsync(
+      playerId: playerId,
+      request: request,
+      currentUserId: GetUserId(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("current/leaderboard")]
+  public async Task<IActionResult> GetLeaderboard(CancellationToken cancellationToken = default)
+  {
+    var result = await _matchWeekService.GetLeaderboardAsync(cancellationToken);
 
     return CreateActionResult(result);
   }

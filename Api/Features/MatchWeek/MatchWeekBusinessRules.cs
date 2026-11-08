@@ -63,6 +63,48 @@ public class MatchWeekBusinessRules(
     }
   }
 
+  public async Task<MatchWeek> GetCurrentBoardIfExistAsync(
+    bool enableTracking,
+    CancellationToken cancellationToken = default)
+  {
+    Season season = await GetActiveSeasonIfExistAsync(cancellationToken);
+
+    MatchWeek? matchWeek = await GetCurrentForSeasonAsync(
+      season.Id,
+      enableTracking,
+      cancellationToken);
+
+    if (matchWeek == null)
+    {
+      throw new NotFoundException("Aktif sezon için maç haftası kadrosu bulunamadı.");
+    }
+
+    return matchWeek;
+  }
+
+  public void PlayerMustBeOnBoard(MatchWeek matchWeek, int playerId)
+  {
+    bool onBoard = matchWeek.Slots.Any(s => s.PlayerId == playerId);
+
+    if (!onBoard)
+    {
+      throw new BusinessException("Bu oyuncu mevcut maç haftası kadrosunda değil.");
+    }
+  }
+
+  public void ScoreMustBeValid(decimal score)
+  {
+    if (score < 1m || score > 10m)
+    {
+      throw new BusinessException("Taraftar puanı 1 ile 10 arasında olmalıdır.");
+    }
+
+    if (score * 2m != Math.Floor(score * 2m))
+    {
+      throw new BusinessException("Puan 0.5'lik adımlarla verilmelidir (ör. 7.0, 7.5, 8.0).");
+    }
+  }
+
   public void LineupMustBeValid(
     string formation,
     IReadOnlyList<MatchWeekSlotRequest> slots)
