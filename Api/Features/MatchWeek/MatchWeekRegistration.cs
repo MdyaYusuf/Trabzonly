@@ -14,10 +14,12 @@ public static class MatchWeekRegistration
     services.AddScoped<IMatchWeekPlayerRatingRepository, EfMatchWeekPlayerRatingRepository>();
 
     services.AddScoped<FixtureBusinessRules>();
+    services.AddScoped<MatchWeekBusinessRules>();
     services.AddScoped<StandingsSettler>();
     services.AddScoped<IClubService, ClubService>();
     services.AddScoped<IFixtureService, FixtureService>();
     services.AddScoped<ILeagueStandingService, LeagueStandingService>();
+    services.AddScoped<IMatchWeekService, MatchWeekService>();
 
     return services;
   }

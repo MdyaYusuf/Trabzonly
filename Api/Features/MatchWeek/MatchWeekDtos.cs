@@ -67,3 +67,44 @@ public sealed record LeagueStandingResponseDto(
 public sealed record LeagueStandingsResponseDto(
   int SeasonId,
   IReadOnlyList<LeagueStandingResponseDto> Standings);
+
+// Living MatchWeek board
+public sealed record MatchWeekClubDto(
+  int Id,
+  string Name,
+  string? ShortName,
+  bool IsTrabzonspor);
+
+public sealed record MatchWeekSlotResponseDto(
+  int Id,
+  int PlayerId,
+  string PlayerName,
+  string? PlayerImageUrl,
+  int? ShirtNumber,
+  string SlotKey,
+  bool IsStarter,
+  int SortOrder);
+
+public sealed record MatchWeekResponseDto(
+  int? Id,
+  int SeasonId,
+  string Formation,
+  MatchWeekClubDto? OpponentClub,
+  bool IsHome,
+  int? HomeScore,
+  int? AwayScore,
+  IReadOnlyList<MatchWeekSlotResponseDto> Slots,
+  DateTime? UpdatedDate);
+
+public sealed record MatchWeekSlotRequest(
+  string SlotKey,
+  int SortOrder,
+  int PlayerId);
+
+public sealed record SaveMatchWeekRequest(
+  string Formation,
+  int OpponentClubId,
+  bool IsHome,
+  int? HomeScore,
+  int? AwayScore,
+  IReadOnlyList<MatchWeekSlotRequest> Slots);
