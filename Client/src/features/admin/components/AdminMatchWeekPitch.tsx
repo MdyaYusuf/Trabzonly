@@ -205,6 +205,8 @@ export function AdminMatchWeekPitch({
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#183c24] via-[#1f4e2d] to-[#153520] opacity-95" />
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03)_50%,transparent_50%)] bg-[length:100%_48px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(117,183,229,0.12)_0%,transparent_70%)]" />
+
         <svg
           className="absolute inset-0 h-full w-full fill-none stroke-white/40"
           preserveAspectRatio="none"
@@ -217,8 +219,14 @@ export function AdminMatchWeekPitch({
           <circle cx="360" cy="480" r="72" />
           <rect height="150" width="360" x="180" y="24" />
           <rect height="56" width="180" x="270" y="24" />
+          <path d="M 300 174 A 60 60 0 0 0 420 174" />
           <rect height="150" width="360" x="180" y="786" />
           <rect height="56" width="180" x="270" y="880" />
+          <path d="M 300 786 A 60 60 0 0 1 420 786" />
+          <path d="M 24 44 A 20 20 0 0 0 44 24" />
+          <path d="M 696 44 A 20 20 0 0 1 676 24" />
+          <path d="M 24 916 A 20 20 0 0 1 44 936" />
+          <path d="M 696 916 A 20 20 0 0 0 676 936" />
         </svg>
       </div>
 

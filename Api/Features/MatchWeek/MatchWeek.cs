@@ -17,13 +17,6 @@ public class MatchWeek : Entity<int>
 
   public required string Formation { get; set; }
 
-  public int OpponentClubId { get; set; }
-  public virtual Club OpponentClub { get; set; } = default!;
-
-  public bool IsHome { get; set; } = true;
-  public int? HomeScore { get; set; }
-  public int? AwayScore { get; set; }
-
   public virtual ICollection<MatchWeekSlot> Slots { get; set; } = new List<MatchWeekSlot>();
   public virtual ICollection<MatchWeekPlayerRating> Ratings { get; set; } = new List<MatchWeekPlayerRating>();
 }

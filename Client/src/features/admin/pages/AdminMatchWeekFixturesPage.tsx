@@ -267,7 +267,7 @@ export function AdminMatchWeekFixturesPage() {
                     }}
                     className={`${buttonClass} border-primary bg-primary text-on-primary`}
                   >
-                    {isSavingDisplayedWeek ? 'Kaydediliyor…' : 'Haftayı Kaydet'}
+                    {isSavingDisplayedWeek ? 'Kaydediliyor…' : 'Gösterilen Haftayı Kaydet'}
                   </button>
                   <button
                     type="button"
@@ -277,14 +277,14 @@ export function AdminMatchWeekFixturesPage() {
                     }}
                     className={`${buttonClass} border-outline-variant/50 text-on-surface-variant hover:border-primary hover:text-primary`}
                   >
-                    {isRebuilding ? 'Yenileniyor…' : 'Puan Durumunu Yenile'}
+                    {isRebuilding ? 'Hesaplanıyor…' : 'Puan Tablosunu Yeniden Hesapla'}
                   </button>
                 </div>
               </div>
             </section>
 
             <section className="flex flex-col gap-space-md border border-outline-variant/40 bg-surface px-space-md py-space-md">
-              <div className="flex flex-wrap items-center justify-between gap-space-md">
+              <div className="flex flex-wrap items-center gap-space-md">
                 <div className="flex items-center gap-space-sm">
                   <button
                     type="button"
@@ -313,10 +313,10 @@ export function AdminMatchWeekFixturesPage() {
                   </button>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-space-sm">
+                <div className="ml-auto flex items-center gap-space-sm">
                   <label
                     htmlFor="week-jump"
-                    className="font-label text-label-md text-on-surface-variant"
+                    className="font-label shrink-0 text-label-md text-on-surface-variant"
                   >
                     Haftaya Git
                   </label>
@@ -327,7 +327,7 @@ export function AdminMatchWeekFixturesPage() {
                     onChange={(event) => {
                       goToWeek(Number(event.target.value))
                     }}
-                    className={`${inputClass} w-28 cursor-pointer`}
+                    className="font-body w-28 shrink-0 cursor-pointer border border-outline-variant/50 bg-surface px-space-sm py-space-xs text-body-md text-on-surface outline-none focus:border-primary"
                   >
                     {Array.from({ length: TOTAL_WEEKS }, (_, index) => index + 1).map((week) => (
                       <option key={week} value={week}>
@@ -341,9 +341,9 @@ export function AdminMatchWeekFixturesPage() {
                     onClick={() => {
                       void handleSaveWeek()
                     }}
-                    className={`${buttonClass} border-primary bg-primary text-on-primary`}
+                    className={`${buttonClass} shrink-0 border-primary bg-primary text-on-primary`}
                   >
-                    {isSavingWeek ? 'Kaydediliyor…' : 'Haftayı Kaydet'}
+                    {isSavingWeek ? 'Kaydediliyor…' : 'Kaydet'}
                   </button>
                   <button
                     type="button"
@@ -351,7 +351,7 @@ export function AdminMatchWeekFixturesPage() {
                     onClick={() => {
                       setWeekVersion((prev) => prev + 1)
                     }}
-                    className={`${buttonClass} border-outline-variant/50 text-on-surface-variant hover:border-primary hover:text-primary`}
+                    className={`${buttonClass} shrink-0 border-outline-variant/50 text-on-surface-variant hover:border-primary hover:text-primary`}
                   >
                     Yenile
                   </button>

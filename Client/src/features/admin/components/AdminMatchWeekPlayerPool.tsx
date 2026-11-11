@@ -72,58 +72,115 @@ export function AdminMatchWeekPlayerPool({
   })
 
   return (
-    <div className="flex w-full flex-col gap-space-md border border-outline-variant/40 bg-surface p-space-md">
+    <div className="flex w-full flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
       <div className="flex flex-col gap-space-xs">
         <div className="flex items-center justify-between gap-space-sm">
-          <span className="font-headline text-headline-sm font-bold text-primary uppercase">
-            Oyuncu Havuzu
-          </span>
-          <span className="font-label text-label-md text-on-surface-variant">
-            XI {starterFilled}/11 · Yedek {benchFilled}/{MATCH_WEEK_MAX_BENCH}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-headline flex items-center gap-2 text-headline-sm font-bold text-primary uppercase">
+              <span className="material-symbols-outlined text-[20px] text-secondary">
+                diversity_3
+              </span>
+              Oyuncu Havuzu
+            </span>
+            <span className="font-kicker bg-secondary-container px-2 py-0.5 text-[10px] font-bold text-on-secondary-container">
+              TRABZONSPOR A TAKIMI
+            </span>
+          </div>
+          <span className="font-label text-[12px] font-semibold text-on-surface-variant">
+            {players.length} Futbolcu
           </span>
         </div>
-        <input
-          type="search"
-          value={search}
-          onChange={(event) => {
-            onSearchChange(event.target.value)
-          }}
-          placeholder="İsim veya numara ara…"
-          className="font-body w-full border border-outline-variant/50 bg-surface px-space-md py-space-sm text-body-md text-on-surface outline-none focus:border-primary"
-        />
-        <div className="flex flex-wrap gap-1">
-          {posTabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                onPosFilterChange(tab.id)
-              }}
-              className={`font-label cursor-pointer px-space-sm py-1 text-label-md uppercase ${
-                posFilter === tab.id
-                  ? 'bg-primary text-on-primary'
-                  : 'border border-outline-variant/50 text-on-surface-variant hover:border-primary hover:text-primary'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+
+        <div className="relative mt-1 w-full">
+          <span className="material-symbols-outlined absolute top-2.5 left-3 text-[20px] text-on-surface-variant">
+            search
+          </span>
+          <input
+            className="font-body w-full bg-surface-container py-2 pr-space-md pl-10 text-body-sm text-on-surface placeholder-on-surface-variant/60 focus:ring-1 focus:ring-primary focus:outline-none"
+            placeholder="Oyuncu adı veya forma no ara…"
+            type="search"
+            value={search}
+            onChange={(event) => {
+              onSearchChange(event.target.value)
+            }}
+          />
+        </div>
+
+        <div className="flex items-center gap-1 overflow-x-auto pt-1">
+          {posTabs.map((tab) => {
+            const isActive = posFilter === tab.id
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  onPosFilterChange(tab.id)
+                }}
+                className={
+                  isActive
+                    ? 'font-kicker bg-primary px-3 py-1 text-kicker font-bold text-on-primary uppercase'
+                    : 'font-kicker bg-surface-container px-3 py-1 text-kicker font-bold text-on-surface uppercase transition-colors hover:bg-surface-container-high'
+                }
+              >
+                {tab.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      <div className="flex max-h-[28rem] flex-col gap-1 overflow-y-auto">
+      <div className="flex max-h-[300px] flex-col gap-2 overflow-y-auto pr-1">
         {filtered.map((player) => {
-          const slotLabel = slotLabelForPlayer(assignments, player.id)
-          const isAssigned = Boolean(slotLabel)
+          const assignedSlot = slotLabelForPlayer(assignments, player.id)
+          const isAssigned = Boolean(assignedSlot)
           const boardFull = startersComplete && benchFilled >= MATCH_WEEK_MAX_BENCH
           const canInteract = !isAssigned && !boardFull
 
+          if (isAssigned && assignedSlot) {
+            const locationLabel = isBenchSlotId(assignedSlot)
+              ? `Yedek (${assignedSlot.replace('BENCH_', 'Y')})`
+              : `Sahada (${assignedSlot})`
+
+            return (
+              <div
+                key={player.id}
+                className="flex cursor-not-allowed items-center justify-between bg-surface-container-highest/60 p-2.5 opacity-60"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold text-white grayscale ${player.avatarGradient}`}
+                  >
+                    {player.initials}
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-headline text-[14px] font-bold text-on-surface-variant line-through">
+                        {player.name}
+                      </span>
+                      <span className="font-kicker bg-surface-variant px-1.5 text-[10px] text-on-surface-variant">
+                        #{player.number}
+                      </span>
+                    </div>
+                    <span className="font-body text-[12px] text-on-surface-variant">
+                      {locationLabel}
+                    </span>
+                  </div>
+                </div>
+                <span className="font-kicker flex items-center gap-1 bg-primary-container px-2.5 py-1 text-[10px] font-bold text-on-primary uppercase">
+                  <span className="material-symbols-outlined text-[14px] text-tertiary-fixed-dim">
+                    check
+                  </span>
+                  KADRODA
+                </span>
+              </div>
+            )
+          }
+
           return (
-            <button
+            <div
               key={player.id}
-              type="button"
               draggable={canInteract}
-              disabled={!canInteract}
               onDragStart={(event) => {
                 if (!canInteract) {
                   event.preventDefault()
@@ -138,46 +195,56 @@ export function AdminMatchWeekPlayerPool({
                   player.initials,
                 )
               }}
-              onClick={() => {
-                if (!canInteract) {
-                  return
-                }
-
-                onAssign(player.id)
-              }}
-              className={`flex items-center gap-space-sm border px-space-sm py-space-xs text-left transition-colors ${
-                isAssigned
-                  ? 'cursor-default border-primary/30 bg-primary-container/10 opacity-70'
-                  : canInteract
-                    ? 'cursor-pointer border-outline-variant/40 hover:border-primary'
-                    : 'cursor-not-allowed border-outline-variant/40 opacity-50'
+              className={`group flex items-center justify-between bg-surface-container-low p-2.5 transition-colors ${
+                canInteract
+                  ? 'cursor-grab hover:bg-surface-container active:cursor-grabbing'
+                  : 'cursor-not-allowed opacity-50'
               }`}
             >
-              <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${player.avatarGradient}`}
+              <div className="flex min-w-0 items-center gap-3">
+                <div
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold text-white ${player.avatarGradient}`}
+                >
+                  {player.initials}
+                </div>
+                <div className="flex min-w-0 flex-col">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-headline text-[14px] font-bold text-on-surface transition-colors group-hover:text-primary">
+                      {player.name}
+                    </span>
+                    <span className="font-kicker bg-primary/10 px-1.5 text-[10px] font-bold text-primary">
+                      #{player.number}
+                    </span>
+                  </div>
+                  <span className="font-body text-[12px] text-on-surface-variant">
+                    {player.roleHint}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={!canInteract}
+                onClick={() => {
+                  if (!canInteract) {
+                    return
+                  }
+
+                  onAssign(player.id)
+                }}
+                className="font-kicker flex shrink-0 items-center gap-1 bg-surface-container px-3 py-1.5 text-kicker font-bold text-on-surface uppercase transition-all hover:bg-secondary hover:text-on-secondary disabled:pointer-events-none"
               >
-                {player.initials}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-headline truncate text-sm font-bold text-primary">
-                  {player.shortName}
-                </p>
-                <p className="font-label truncate text-[11px] text-on-surface-variant uppercase">
-                  #{player.number} · {player.roleHint}
-                </p>
-              </div>
-              {slotLabel ? (
-                <span className="font-kicker shrink-0 text-[10px] font-bold text-primary uppercase">
-                  {isBenchSlotId(slotLabel) ? slotLabel.replace('BENCH_', 'Y') : slotLabel}
-                </span>
-              ) : (
-                <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
-                  add
-                </span>
-              )}
-            </button>
+                <span className="material-symbols-outlined text-[15px]">add_circle</span>
+                SEÇ
+              </button>
+            </div>
           )
         })}
+
+        {filtered.length === 0 ? (
+          <p className="font-body py-space-md text-center text-body-sm text-on-surface-variant">
+            Bu filtrelere uygun oyuncu bulunamadı.
+          </p>
+        ) : null}
       </div>
     </div>
   )

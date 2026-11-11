@@ -40,13 +40,13 @@ export function AdminMatchWeekBench({
   )
 
   return (
-    <div className="flex flex-col gap-space-sm border border-outline-variant/40 bg-surface p-space-md">
+    <div className="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-space-xs">
         <h2 className="font-headline flex items-center gap-1.5 text-headline-sm font-bold text-primary uppercase">
           <span className="material-symbols-outlined text-[20px] text-secondary">
             airline_seat_recline_extra
           </span>
-          Yedek Kulübesi
+          Oyuna Sonradan Girenler
         </h2>
         <span className="font-label text-label-md font-bold text-on-surface-variant">
           {filled} / {MATCH_WEEK_MAX_BENCH}
@@ -54,7 +54,7 @@ export function AdminMatchWeekBench({
       </div>
 
       <p className="font-body text-body-sm text-on-surface-variant">
-        En fazla {MATCH_WEEK_MAX_BENCH} yedek. Boş bırakılabilir.
+        Boş bırakılabilir. Oyuna sonradan giren bütün oyuncuları ekleyebilirsiniz.
       </p>
 
       <div className="grid grid-cols-2 gap-space-xs sm:grid-cols-3 lg:grid-cols-6">
@@ -63,7 +63,6 @@ export function AdminMatchWeekBench({
           const player = playerId ? playersById.get(playerId) : undefined
           const isDropTarget = dropTargetSlotId === slotId
           const isPickerOpen = openPickerSlotId === slotId
-
           const dropHandlers = {
             onDragOver: (event: DragEvent) => {
               event.preventDefault()
@@ -122,22 +121,33 @@ export function AdminMatchWeekBench({
                 >
                   {player.shortName}
                 </span>
+                <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
+                  #{player.number} · {player.posGroup}
+                </span>
                 <button
                   type="button"
-                  title="Boşalt"
+                  title="Yedeği kaldır"
                   onClick={() => {
                     onClearSlot(slotId)
                   }}
-                  className="absolute top-1 right-1 hidden h-5 w-5 cursor-pointer items-center justify-center bg-error text-on-error group-hover:flex"
+                  className="absolute top-0.5 right-0.5 hidden h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
                 >
-                  <span className="material-symbols-outlined text-[12px]">close</span>
+                  <span className="material-symbols-outlined text-[12px] leading-none">close</span>
                 </button>
               </div>
             )
           }
 
           return (
-            <div key={slotId} className="relative z-10" {...dropHandlers}>
+            <div
+              key={slotId}
+              className={
+                isPickerOpen
+                  ? 'relative z-50 flex h-[6.5rem] flex-col'
+                  : 'relative z-10 flex h-[6.5rem] flex-col'
+              }
+              {...dropHandlers}
+            >
               <button
                 type="button"
                 onClick={() => {
@@ -145,22 +155,26 @@ export function AdminMatchWeekBench({
                 }}
                 className={
                   isDropTarget || isPickerOpen
-                    ? 'flex h-[6.5rem] w-full cursor-pointer flex-col items-center justify-center gap-1 border border-dashed border-primary bg-primary-container/10 p-2'
-                    : 'flex h-[6.5rem] w-full cursor-pointer flex-col items-center justify-center gap-1 border border-dashed border-outline-variant/60 p-2 hover:border-primary'
+                    ? 'flex h-full w-full cursor-pointer flex-col items-center justify-center gap-0.5 border border-dashed border-primary bg-transparent p-2 ring-2 ring-primary'
+                    : 'flex h-full w-full cursor-pointer flex-col items-center justify-center gap-0.5 border border-dashed border-outline-variant/40 bg-transparent p-2 opacity-70 transition-colors hover:border-primary/50 hover:opacity-100'
                 }
               >
-                <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
+                <span className="font-kicker text-[10px] font-bold text-on-surface-variant/80 uppercase">
                   Y{index + 1}
                 </span>
-                <span className="material-symbols-outlined text-[20px] text-on-surface-variant">
+                <span className="material-symbols-outlined text-[18px] text-outline">
                   person_add
+                </span>
+                <span className="font-label text-[10px] text-on-surface-variant/80 uppercase">
+                  Boş
                 </span>
               </button>
               {isPickerOpen ? (
                 <SquadPlayerPickerMenu
-                  title={`Yedek ${index + 1} · Oyuncu seç`}
+                  title={`Y${index + 1} · Oyuncu seç`}
                   candidates={candidates}
-                  openUpward={index >= 3}
+                  openUpward
+                  emptyLabel="Seçilebilecek oyuncu kalmadı."
                   onPick={(pickedId) => {
                     onAssignToSlot(slotId, pickedId)
                     setOpenPickerSlotId(null)

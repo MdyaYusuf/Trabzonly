@@ -27,26 +27,10 @@ public class MatchWeekConfiguration : IEntityTypeConfiguration<MatchWeek>
       .HasMaxLength(20)
       .IsRequired();
 
-    builder.Property(mw => mw.IsHome)
-      .HasDefaultValue(true)
-      .IsRequired();
-
-    builder.Property(mw => mw.HomeScore)
-      .IsRequired(false);
-
-    builder.Property(mw => mw.AwayScore)
-      .IsRequired(false);
-
     builder.HasOne(mw => mw.Season)
       .WithMany(s => s.MatchWeeks)
       .HasForeignKey(mw => mw.SeasonId)
       .OnDelete(DeleteBehavior.Cascade)
-      .IsRequired();
-
-    builder.HasOne(mw => mw.OpponentClub)
-      .WithMany(c => c.OpponentMatchWeeks)
-      .HasForeignKey(mw => mw.OpponentClubId)
-      .OnDelete(DeleteBehavior.Restrict)
       .IsRequired();
 
     builder.HasIndex(mw => mw.SeasonId)

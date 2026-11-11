@@ -241,7 +241,6 @@ public class MatchWeekService(
 
     _businessRules.LineupMustBeValid(request.Formation, request.Slots);
     await _businessRules.PlayersMustExistAndBeActiveAsync(request.Slots, cancellationToken);
-    await _businessRules.GetClubIfExistAsync(request.OpponentClubId, cancellationToken);
 
     Season season = await _businessRules.GetActiveSeasonIfExistAsync(cancellationToken);
 
@@ -257,11 +256,7 @@ public class MatchWeekService(
       matchWeek = new MatchWeek
       {
         SeasonId = season.Id,
-        Formation = request.Formation,
-        OpponentClubId = request.OpponentClubId,
-        IsHome = request.IsHome,
-        HomeScore = request.HomeScore,
-        AwayScore = request.AwayScore
+        Formation = request.Formation
       };
 
       await _matchWeekRepository.AddAsync(matchWeek, cancellationToken);
@@ -280,10 +275,6 @@ public class MatchWeekService(
       }
 
       matchWeek.Formation = request.Formation;
-      matchWeek.OpponentClubId = request.OpponentClubId;
-      matchWeek.IsHome = request.IsHome;
-      matchWeek.HomeScore = request.HomeScore;
-      matchWeek.AwayScore = request.AwayScore;
       matchWeek.UpdatedDate = DateTime.Now;
 
       _matchWeekRepository.Update(matchWeek);
@@ -458,10 +449,6 @@ public class MatchWeekService(
       Id: null,
       SeasonId: seasonId,
       Formation: MatchWeekTactics.DefaultFormation,
-      OpponentClub: null,
-      IsHome: true,
-      HomeScore: null,
-      AwayScore: null,
       Slots: [],
       UpdatedDate: null);
   }
@@ -487,16 +474,6 @@ public class MatchWeekService(
       matchWeek.Id,
       matchWeek.SeasonId,
       matchWeek.Formation,
-      matchWeek.OpponentClub == null
-        ? null
-        : new MatchWeekClubDto(
-          matchWeek.OpponentClub.Id,
-          matchWeek.OpponentClub.Name,
-          matchWeek.OpponentClub.ShortName,
-          matchWeek.OpponentClub.IsTrabzonspor),
-      matchWeek.IsHome,
-      matchWeek.HomeScore,
-      matchWeek.AwayScore,
       slots,
       matchWeek.UpdatedDate);
   }

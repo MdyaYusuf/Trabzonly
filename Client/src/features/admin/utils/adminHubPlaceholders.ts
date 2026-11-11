@@ -53,7 +53,7 @@ export const adminHubProfile: AdminHubProfile = {
       id: 'match-week',
       title: 'Maç Haftası',
       description:
-        'Canlı haftanın dizilişini yerleştir, rakibi ve skoru yönet. Kaydet ve Yeni hafta ile puanları kontrol et.',
+        'Canlı haftanın dizilişini yerleştir. Kaydet ve Yeni hafta ile puanları kontrol et.',
       categoryLabel: 'Maç Kadrosu',
       icon: 'sports_soccer',
       to: '/yonetim/mac-haftasi/kadro',

@@ -7,7 +7,6 @@ namespace Api.Features.MatchWeek;
 
 public class MatchWeekBusinessRules(
   IMatchWeekRepository _matchWeekRepository,
-  IClubRepository _clubRepository,
   IPlayerRepository _playerRepository,
   ISeasonRepository _seasonRepository)
 {
@@ -36,23 +35,6 @@ public class MatchWeekBusinessRules(
       include: WithBoardInclude(),
       enableTracking: enableTracking,
       cancellationToken: cancellationToken);
-  }
-
-  public async Task<Club> GetClubIfExistAsync(
-    int clubId,
-    CancellationToken cancellationToken = default)
-  {
-    Club? club = await _clubRepository.GetByIdAsync(
-      clubId,
-      enableTracking: false,
-      cancellationToken: cancellationToken);
-
-    if (club == null)
-    {
-      throw new NotFoundException($"{clubId} numaralı kulüp bulunamadı.");
-    }
-
-    return club;
   }
 
   public void AdminRoleRequired(string userRole)
@@ -240,7 +222,6 @@ public class MatchWeekBusinessRules(
   public static Func<IQueryable<MatchWeek>, IQueryable<MatchWeek>> WithBoardInclude()
   {
     return query => query
-      .Include(mw => mw.OpponentClub)
       .Include(mw => mw.Slots)
         .ThenInclude(s => s.Player);
   }

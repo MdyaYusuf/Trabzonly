@@ -18,5 +18,4 @@ public class Club : Entity<int>
   public virtual ICollection<Fixture> HomeFixtures { get; set; } = new List<Fixture>();
   public virtual ICollection<Fixture> AwayFixtures { get; set; } = new List<Fixture>();
   public virtual ICollection<LeagueStanding> Standings { get; set; } = new List<LeagueStanding>();
-  public virtual ICollection<MatchWeek> OpponentMatchWeeks { get; set; } = new List<MatchWeek>();
 }

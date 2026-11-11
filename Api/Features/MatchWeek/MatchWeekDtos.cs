@@ -69,12 +69,6 @@ public sealed record LeagueStandingsResponseDto(
   IReadOnlyList<LeagueStandingResponseDto> Standings);
 
 // Living MatchWeek board
-public sealed record MatchWeekClubDto(
-  int Id,
-  string Name,
-  string? ShortName,
-  bool IsTrabzonspor);
-
 public sealed record MatchWeekSlotResponseDto(
   int Id,
   int PlayerId,
@@ -92,10 +86,6 @@ public sealed record MatchWeekResponseDto(
   int? Id,
   int SeasonId,
   string Formation,
-  MatchWeekClubDto? OpponentClub,
-  bool IsHome,
-  int? HomeScore,
-  int? AwayScore,
   IReadOnlyList<MatchWeekSlotResponseDto> Slots,
   DateTime? UpdatedDate);
 
@@ -106,10 +96,6 @@ public sealed record MatchWeekSlotRequest(
 
 public sealed record SaveMatchWeekRequest(
   string Formation,
-  int OpponentClubId,
-  bool IsHome,
-  int? HomeScore,
-  int? AwayScore,
   IReadOnlyList<MatchWeekSlotRequest> Slots);
 
 public sealed record RateMatchWeekPlayerRequest(decimal Score);

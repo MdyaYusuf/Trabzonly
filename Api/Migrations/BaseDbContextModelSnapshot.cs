@@ -373,9 +373,6 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AwayScore")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
@@ -385,17 +382,6 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("HomeScore")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsHome")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<int>("OpponentClubId")
-                        .HasColumnType("int");
-
                     b.Property<int>("SeasonId")
                         .HasColumnType("int");
 
@@ -404,8 +390,6 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OpponentClubId");
 
                     b.HasIndex("SeasonId")
                         .IsUnique();
@@ -1712,19 +1696,11 @@ namespace Trabzonly.Api.Migrations
 
             modelBuilder.Entity("Api.Features.MatchWeek.MatchWeek", b =>
                 {
-                    b.HasOne("Api.Features.MatchWeek.Club", "OpponentClub")
-                        .WithMany("OpponentMatchWeeks")
-                        .HasForeignKey("OpponentClubId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Api.Features.Seasons.Season", "Season")
                         .WithMany("MatchWeeks")
                         .HasForeignKey("SeasonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("OpponentClub");
 
                     b.Navigation("Season");
                 });
@@ -2107,8 +2083,6 @@ namespace Trabzonly.Api.Migrations
                     b.Navigation("AwayFixtures");
 
                     b.Navigation("HomeFixtures");
-
-                    b.Navigation("OpponentMatchWeeks");
 
                     b.Navigation("Standings");
                 });

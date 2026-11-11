@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import matchWeekService from '@/features/matchWeek/matchWeekService'
-import type { ClubResponseDto, MatchWeekResponseDto } from '@/features/matchWeek/matchWeekTypes'
+import type { MatchWeekResponseDto } from '@/features/matchWeek/matchWeekTypes'
 import playerService from '@/features/players/playerService'
 import { mapPlayerToBuilderPlayer } from '@/features/squads/utils/mapPlayerToBuilderPlayer'
 import {
@@ -45,11 +45,6 @@ export function AdminMatchWeekLineupPage() {
   const [benchAssignments, setBenchAssignments] = useState<Partial<Record<BenchSlotId, string>>>(
     {},
   )
-  const [opponentClubId, setOpponentClubId] = useState('')
-  const [isHome, setIsHome] = useState(true)
-  const [homeScore, setHomeScore] = useState('')
-  const [awayScore, setAwayScore] = useState('')
-  const [clubs, setClubs] = useState<ClubResponseDto[]>([])
   const [players, setPlayers] = useState<BuilderPlayer[]>([])
   const [search, setSearch] = useState('')
   const [posFilter, setPosFilter] = useState<BuilderPosGroup>('ALL')
@@ -97,7 +92,7 @@ export function AdminMatchWeekLineupPage() {
 
   const starterFilled = countFilledStarters(formationId, starterAssignments)
   const benchFilled = countFilledBench(benchAssignments)
-  const canSave = starterFilled === 11 && opponentClubId !== ''
+  const canSave = starterFilled === 11
 
   useEffect(() => {
     let cancelled = false
@@ -106,8 +101,7 @@ export function AdminMatchWeekLineupPage() {
       setIsLoading(true)
       setError(null)
 
-      const [clubsResult, playersResult, matchWeekResult] = await Promise.all([
-        matchWeekService.getClubs(),
+      const [playersResult, matchWeekResult] = await Promise.all([
         playerService.getAllForAdmin({
           pageNumber: 1,
           pageSize: 200,
@@ -119,12 +113,6 @@ export function AdminMatchWeekLineupPage() {
 
       if (cancelled) {
         return
-      }
-
-      if (clubsResult.success && clubsResult.data) {
-        setClubs(clubsResult.data.filter((club) => !club.isTrabzonspor))
-      } else {
-        setClubs([])
       }
 
       if (playersResult.success && playersResult.data) {
@@ -164,13 +152,6 @@ export function AdminMatchWeekLineupPage() {
       setStarterAssignments({})
       setBenchAssignments({})
     }
-
-    setOpponentClubId(
-      matchWeek.opponentClub?.id != null ? String(matchWeek.opponentClub.id) : '',
-    )
-    setIsHome(matchWeek.isHome)
-    setHomeScore(matchWeek.homeScore == null ? '' : String(matchWeek.homeScore))
-    setAwayScore(matchWeek.awayScore == null ? '' : String(matchWeek.awayScore))
   }
 
   function showFeedback(message: string) {
@@ -382,40 +363,15 @@ export function AdminMatchWeekLineupPage() {
   }
 
   function buildRequest() {
-    const parsedOpponentId = Number(opponentClubId)
-    const homeScoreValue = homeScore.trim() === '' ? null : Number(homeScore)
-    const awayScoreValue = awayScore.trim() === '' ? null : Number(awayScore)
-
     return {
       formation: formationId,
-      opponentClubId: parsedOpponentId,
-      isHome,
-      homeScore: homeScoreValue,
-      awayScore: awayScoreValue,
       slots: buildMatchWeekSlotsRequest(formationId, starterAssignments, benchAssignments),
     }
   }
 
   function validateBeforeSave(): string | null {
     if (!canSave) {
-      return '11 kişilik ilk 11 ve rakip kulüp zorunludur.'
-    }
-
-    const homeEmpty = homeScore.trim() === ''
-    const awayEmpty = awayScore.trim() === ''
-
-    if (homeEmpty !== awayEmpty) {
-      return 'Ev sahibi ve deplasman skorları birlikte girilmeli veya birlikte boş bırakılmalıdır.'
-    }
-
-    if (!homeEmpty) {
-      if (!/^\d+$/.test(homeScore.trim()) || !/^\d+$/.test(awayScore.trim())) {
-        return 'Skorlar negatif olmayan tam sayı olmalıdır.'
-      }
-    }
-
-    if (!Number.isFinite(Number(opponentClubId)) || Number(opponentClubId) <= 0) {
-      return 'Geçerli bir rakip kulüp seçin.'
+      return '11 kişilik ilk 11 zorunludur.'
     }
 
     if (benchFilled > MATCH_WEEK_MAX_BENCH) {
@@ -440,9 +396,9 @@ export function AdminMatchWeekLineupPage() {
 
     if (result.success && result.data) {
       applyMatchWeek(result.data)
-      showFeedback(result.message || 'Kadro kaydedildi.')
+      showFeedback(result.message || 'Kadro güncellendi.')
     } else {
-      setError(result.message || 'Kadro kaydedilemedi.')
+      setError(result.message || 'Kadro güncellenemedi.')
     }
 
     setIsSaving(false)
@@ -474,6 +430,46 @@ export function AdminMatchWeekLineupPage() {
   }
 
   const isBusy = isLoading || isSaving || isStartingNewWeek
+  const canClear = starterFilled > 0 || benchFilled > 0
+
+  function handleClearLineup() {
+    setStarterAssignments({})
+    setBenchAssignments({})
+    setError(null)
+  }
+
+  const actionButtons = (
+    <div className="flex flex-wrap items-center justify-end gap-space-sm">
+      <button
+        type="button"
+        disabled={isBusy || !canClear}
+        onClick={handleClearLineup}
+        className={`${buttonClass} border-outline-variant text-on-surface transition-colors hover:border-primary hover:text-primary`}
+      >
+        Temizle
+      </button>
+      <button
+        type="button"
+        disabled={isBusy || !canSave}
+        onClick={() => {
+          void handleSave()
+        }}
+        className={`${buttonClass} border-primary bg-primary text-on-primary`}
+      >
+        {isSaving ? 'Güncelleniyor…' : 'Güncelle'}
+      </button>
+      <button
+        type="button"
+        disabled={isBusy || !canSave}
+        onClick={() => {
+          setNewWeekModalOpen(true)
+        }}
+        className={`${buttonClass} border-error text-error hover:bg-error/10`}
+      >
+        Yeni Hafta
+      </button>
+    </div>
+  )
 
   return (
     <div className="flex flex-col">
@@ -484,33 +480,12 @@ export function AdminMatchWeekLineupPage() {
               Maç Haftası Kadrosu
             </h1>
             <p className="font-body text-body-md text-on-surface-variant">
-              Canlı haftanın dizilişini, rakibini ve skoru yönet. Kaydet kadroyu günceller; Yeni
-              hafta puanları her zaman sıfırlar.
+              Canlı haftanın dizilişini yönet. Güncelle mevcut kadroyu yenilerken yeni hafta puanları
+              sıfırlar.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-space-sm">
-            <button
-              type="button"
-              disabled={isBusy || !canSave}
-              onClick={() => {
-                setNewWeekModalOpen(true)
-              }}
-              className={`${buttonClass} border-error text-error hover:bg-error/10`}
-            >
-              Yeni Hafta
-            </button>
-            <button
-              type="button"
-              disabled={isBusy || !canSave}
-              onClick={() => {
-                void handleSave()
-              }}
-              className={`${buttonClass} border-primary bg-primary text-on-primary`}
-            >
-              {isSaving ? 'Kaydediliyor…' : 'Kaydet'}
-            </button>
-          </div>
+          {actionButtons}
         </header>
 
         {error ? (
@@ -529,109 +504,6 @@ export function AdminMatchWeekLineupPage() {
           <p className="font-body text-body-md text-on-surface-variant">Kadro yükleniyor…</p>
         ) : (
           <>
-            <section className="grid gap-space-md border border-outline-variant/40 bg-surface p-space-md lg:grid-cols-[1fr_auto_auto_auto]">
-              <div>
-                <label
-                  htmlFor="match-week-opponent"
-                  className="font-label mb-1 block text-label-md text-on-surface-variant"
-                >
-                  Rakip
-                </label>
-                <select
-                  id="match-week-opponent"
-                  value={opponentClubId}
-                  disabled={isBusy}
-                  onChange={(event) => {
-                    setOpponentClubId(event.target.value)
-                  }}
-                  className={`${inputClass} cursor-pointer`}
-                >
-                  <option value="">Kulüp seç…</option>
-                  {clubs.map((club) => (
-                    <option key={club.id} value={club.id}>
-                      {club.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <span className="font-label mb-1 block text-label-md text-on-surface-variant">
-                  Saha
-                </span>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    disabled={isBusy}
-                    onClick={() => {
-                      setIsHome(true)
-                    }}
-                    className={`font-label cursor-pointer px-space-md py-space-sm text-label-md uppercase ${
-                      isHome
-                        ? 'bg-primary text-on-primary'
-                        : 'border border-outline-variant/50 text-on-surface-variant'
-                    }`}
-                  >
-                    Ev
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isBusy}
-                    onClick={() => {
-                      setIsHome(false)
-                    }}
-                    className={`font-label cursor-pointer px-space-md py-space-sm text-label-md uppercase ${
-                      !isHome
-                        ? 'bg-primary text-on-primary'
-                        : 'border border-outline-variant/50 text-on-surface-variant'
-                    }`}
-                  >
-                    Deplasman
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="match-week-home-score"
-                  className="font-label mb-1 block text-label-md text-on-surface-variant"
-                >
-                  Ev Skoru
-                </label>
-                <input
-                  id="match-week-home-score"
-                  type="text"
-                  inputMode="numeric"
-                  value={homeScore}
-                  disabled={isBusy}
-                  onChange={(event) => {
-                    setHomeScore(event.target.value)
-                  }}
-                  className={`${inputClass} w-24`}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="match-week-away-score"
-                  className="font-label mb-1 block text-label-md text-on-surface-variant"
-                >
-                  Dep Skoru
-                </label>
-                <input
-                  id="match-week-away-score"
-                  type="text"
-                  inputMode="numeric"
-                  value={awayScore}
-                  disabled={isBusy}
-                  onChange={(event) => {
-                    setAwayScore(event.target.value)
-                  }}
-                  className={`${inputClass} w-24`}
-                />
-              </div>
-            </section>
-
             <section className="flex flex-wrap items-center gap-space-sm">
               <label
                 htmlFor="match-week-formation"
@@ -654,13 +526,15 @@ export function AdminMatchWeekLineupPage() {
                   </option>
                 ))}
               </select>
-              <span className="font-label text-label-md text-on-surface-variant">
-                İlk 11: {starterFilled}/11 · Yedek: {benchFilled}/{MATCH_WEEK_MAX_BENCH}
-              </span>
             </section>
 
-            <div className="grid gap-space-lg xl:grid-cols-[minmax(0,1fr)_20rem]">
-              <div className="flex flex-col gap-space-md">
+            <div className="flex flex-col gap-gutter lg:flex-row lg:items-start">
+              <div className="flex min-w-0 flex-col gap-space-md lg:w-7/12 lg:shrink-0">
+                <p className="font-body max-w-3xl text-[10px] leading-snug text-on-surface-variant/70">
+                  Boş pozisyonlara tıklayarak mevkiye uygun oyuncu seçebilir veya havuzdan sürükleyip
+                  bırakabilirsiniz. Oyuna sonradan giren oyuncuları yedek kulübesine ekleyebilirsiniz.
+                </p>
+
                 <AdminMatchWeekPitch
                   formation={formation}
                   assignments={starterAssignments}
@@ -671,6 +545,21 @@ export function AdminMatchWeekLineupPage() {
                   onDropPlayer={handleDropOnStarterSlot}
                   onClearSlot={handleClearStarterSlot}
                 />
+              </div>
+
+              <div className="flex min-w-0 flex-1 flex-col gap-space-lg">
+                <AdminMatchWeekPlayerPool
+                  players={players}
+                  assignments={allAssignments}
+                  search={search}
+                  posFilter={posFilter}
+                  starterFilled={starterFilled}
+                  benchFilled={benchFilled}
+                  onSearchChange={setSearch}
+                  onPosFilterChange={setPosFilter}
+                  onAssign={handlePoolAssign}
+                />
+
                 <AdminMatchWeekBench
                   assignments={benchAssignments}
                   playersById={playersById}
@@ -680,19 +569,9 @@ export function AdminMatchWeekLineupPage() {
                   onDropPlayer={handleDropOnBenchSlot}
                 />
               </div>
-
-              <AdminMatchWeekPlayerPool
-                players={players}
-                assignments={allAssignments}
-                search={search}
-                posFilter={posFilter}
-                starterFilled={starterFilled}
-                benchFilled={benchFilled}
-                onSearchChange={setSearch}
-                onPosFilterChange={setPosFilter}
-                onAssign={handlePoolAssign}
-              />
             </div>
+
+            {actionButtons}
           </>
         )}
       </main>
