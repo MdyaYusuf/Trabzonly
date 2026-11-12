@@ -13,11 +13,6 @@ public interface IMatchWeekService
     string userRole,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<MatchWeekResponseDto>> StartNewWeekAsync(
-    SaveMatchWeekRequest request,
-    string userRole,
-    CancellationToken cancellationToken = default);
-
   Task<ReturnModel<MatchWeekPlayerRatingResponseDto>> RatePlayerAsync(
     int playerId,
     RateMatchWeekPlayerRequest request,

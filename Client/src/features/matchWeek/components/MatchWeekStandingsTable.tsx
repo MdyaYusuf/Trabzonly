@@ -23,7 +23,7 @@ export function MatchWeekStandingsTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[280px] border-collapse text-left">
+      <table className="w-full min-w-[320px] border-collapse text-left">
         <thead>
           <tr className="border-b border-outline-variant/40">
             <th className="font-kicker px-1 py-1.5 text-[10px] font-bold tracking-wider text-on-surface-variant uppercase">
@@ -34,6 +34,15 @@ export function MatchWeekStandingsTable({
             </th>
             <th className="font-kicker px-1 py-1.5 text-center text-[10px] font-bold tracking-wider text-on-surface-variant uppercase">
               O
+            </th>
+            <th className="font-kicker px-1 py-1.5 text-center text-[10px] font-bold tracking-wider text-on-surface-variant uppercase">
+              G
+            </th>
+            <th className="font-kicker px-1 py-1.5 text-center text-[10px] font-bold tracking-wider text-on-surface-variant uppercase">
+              B
+            </th>
+            <th className="font-kicker px-1 py-1.5 text-center text-[10px] font-bold tracking-wider text-on-surface-variant uppercase">
+              M
             </th>
             <th className="font-kicker px-1 py-1.5 text-center text-[10px] font-bold tracking-wider text-on-surface-variant uppercase">
               Av
@@ -57,17 +66,26 @@ export function MatchWeekStandingsTable({
                 {row.rank}
               </td>
               <td
-                className={`font-body max-w-[9rem] truncate px-1 py-1.5 text-xs ${
+                className={`font-body max-w-[10rem] truncate px-1 py-1.5 text-xs ${
                   row.isTrabzonspor
                     ? 'font-bold text-primary'
                     : 'text-on-surface'
                 }`}
                 title={row.clubName}
               >
-                {row.clubShortName?.trim() || row.clubName}
+                {row.clubName}
               </td>
               <td className="font-body px-1 py-1.5 text-center text-xs tabular-nums text-on-surface-variant">
                 {row.played}
+              </td>
+              <td className="font-body px-1 py-1.5 text-center text-xs tabular-nums text-on-surface-variant">
+                {row.won}
+              </td>
+              <td className="font-body px-1 py-1.5 text-center text-xs tabular-nums text-on-surface-variant">
+                {row.drawn}
+              </td>
+              <td className="font-body px-1 py-1.5 text-center text-xs tabular-nums text-on-surface-variant">
+                {row.lost}
               </td>
               <td className="font-body px-1 py-1.5 text-center text-xs tabular-nums text-on-surface-variant">
                 {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}

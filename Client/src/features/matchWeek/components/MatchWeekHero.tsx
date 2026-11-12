@@ -133,7 +133,7 @@ export function MatchWeekHero({
                     {shortNameFromFull(playerOfTheWeek.playerName)}
                   </span>
                   <span className="font-body mt-1 text-body-sm text-on-surface-variant">
-                    {playerOfTheWeek.averageRating.toFixed(1)} / 10 ·{' '}
+                    {playerOfTheWeek.averageRating.toFixed(1)} ortalama /{' '}
                     {playerOfTheWeek.ratingCount} oy
                   </span>
                 </Link>

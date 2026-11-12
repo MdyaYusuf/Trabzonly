@@ -80,6 +80,7 @@ export interface MatchWeekSlotResponseDto {
   playerName: string
   playerImageUrl?: string | null
   shirtNumber?: number | null
+  positionAbbreviation?: string | null
   slotKey: string
   isStarter: boolean
   sortOrder: number

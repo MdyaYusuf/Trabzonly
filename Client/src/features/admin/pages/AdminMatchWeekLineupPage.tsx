@@ -18,7 +18,6 @@ import type {
   BuilderSlotId,
 } from '@/features/squads/utils/squadBuilderTypes'
 import { AdminMatchWeekBench } from '../components/AdminMatchWeekBench'
-import { AdminMatchWeekNewWeekModal } from '../components/AdminMatchWeekNewWeekModal'
 import { AdminMatchWeekPitch } from '../components/AdminMatchWeekPitch'
 import { AdminMatchWeekPlayerPool } from '../components/AdminMatchWeekPlayerPool'
 import {
@@ -50,8 +49,6 @@ export function AdminMatchWeekLineupPage() {
   const [posFilter, setPosFilter] = useState<BuilderPosGroup>('ALL')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [isStartingNewWeek, setIsStartingNewWeek] = useState(false)
-  const [newWeekModalOpen, setNewWeekModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
@@ -396,40 +393,15 @@ export function AdminMatchWeekLineupPage() {
 
     if (result.success && result.data) {
       applyMatchWeek(result.data)
-      showFeedback(result.message || 'Kadro güncellendi.')
+      showFeedback(result.message || 'Yeni maç haftası kadrosu yayınlandı.')
     } else {
-      setError(result.message || 'Kadro güncellenemedi.')
+      setError(result.message || 'Kadro yayınlanamadı.')
     }
 
     setIsSaving(false)
   }
 
-  async function handleConfirmNewWeek() {
-    const validationError = validateBeforeSave()
-
-    if (validationError) {
-      setError(validationError)
-      setNewWeekModalOpen(false)
-      return
-    }
-
-    setIsStartingNewWeek(true)
-    setError(null)
-
-    const result = await matchWeekService.startNewWeek(buildRequest())
-
-    if (result.success && result.data) {
-      applyMatchWeek(result.data)
-      setNewWeekModalOpen(false)
-      showFeedback(result.message || 'Yeni hafta kaydedildi.')
-    } else {
-      setError(result.message || 'Yeni hafta kaydedilemedi.')
-    }
-
-    setIsStartingNewWeek(false)
-  }
-
-  const isBusy = isLoading || isSaving || isStartingNewWeek
+  const isBusy = isLoading || isSaving
   const canClear = starterFilled > 0 || benchFilled > 0
 
   function handleClearLineup() {
@@ -456,17 +428,7 @@ export function AdminMatchWeekLineupPage() {
         }}
         className={`${buttonClass} border-primary bg-primary text-on-primary`}
       >
-        {isSaving ? 'Güncelleniyor…' : 'Güncelle'}
-      </button>
-      <button
-        type="button"
-        disabled={isBusy || !canSave}
-        onClick={() => {
-          setNewWeekModalOpen(true)
-        }}
-        className={`${buttonClass} border-error text-error hover:bg-error/10`}
-      >
-        Yeni Hafta
+        {isSaving ? 'Kaydediliyor…' : 'Kaydet'}
       </button>
     </div>
   )
@@ -480,8 +442,8 @@ export function AdminMatchWeekLineupPage() {
               Maç Haftası Kadrosu
             </h1>
             <p className="font-body text-body-md text-on-surface-variant">
-              Canlı haftanın dizilişini yönet. Güncelle mevcut kadroyu yenilerken yeni hafta puanları
-              sıfırlar.
+              Canlı haftanın dizilişini yönet. Kaydet yeni bir maç haftası kadrosu yayınlar; önceki
+              haftanın puanları aynen kalır.
             </p>
           </div>
 
@@ -575,17 +537,6 @@ export function AdminMatchWeekLineupPage() {
           </>
         )}
       </main>
-
-      <AdminMatchWeekNewWeekModal
-        open={newWeekModalOpen}
-        isSubmitting={isStartingNewWeek}
-        onCancel={() => {
-          setNewWeekModalOpen(false)
-        }}
-        onConfirm={() => {
-          void handleConfirmNewWeek()
-        }}
-      />
     </div>
   )
 }

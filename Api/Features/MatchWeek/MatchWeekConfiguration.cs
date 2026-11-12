@@ -33,7 +33,6 @@ public class MatchWeekConfiguration : IEntityTypeConfiguration<MatchWeek>
       .OnDelete(DeleteBehavior.Cascade)
       .IsRequired();
 
-    builder.HasIndex(mw => mw.SeasonId)
-      .IsUnique();
+    builder.HasIndex(mw => mw.SeasonId);
   }
 }

@@ -16,6 +16,11 @@ public interface ILeagueStandingRepository : IRepository<LeagueStanding, int>
 
 public interface IMatchWeekRepository : IRepository<MatchWeek, int>
 {
+  Task<MatchWeek?> GetLatestForSeasonAsync(
+    int seasonId,
+    Func<IQueryable<MatchWeek>, IQueryable<MatchWeek>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default);
 }
 
 public interface IMatchWeekSlotRepository : IRepository<MatchWeekSlot, int>

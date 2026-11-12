@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { SquadPitchSlotCaption } from '@/features/squads/components/SquadPitchSlotCaption'
 import {
   getFormationConfig,
@@ -9,7 +10,6 @@ import type { BuilderFormationId, FormationSlot } from '@/features/squads/utils/
 import type { MatchWeekSlotResponseDto } from '../matchWeekTypes'
 import {
   avatarGradientForPlayerId,
-  findFormationSlot,
   shortNameFromFull,
   splitBoardSlots,
 } from '../utils/matchWeekPublicUtils'
@@ -36,6 +36,8 @@ function PitchSlotCard({
   onPlayerRated: MatchWeekPitchProps['onPlayerRated']
 }) {
   const isGk = slot.id === 'GK'
+  const [avatarHost, setAvatarHost] = useState<HTMLDivElement | null>(null)
+  const [clickHost, setClickHost] = useState<HTMLDivElement | null>(null)
 
   if (!player) {
     return (
@@ -51,28 +53,29 @@ function PitchSlotCard({
   }
 
   return (
-    <div className="group relative flex flex-col items-center">
+    <div
+      ref={setClickHost}
+      className="group relative flex cursor-pointer flex-col items-center"
+    >
       <div
-        className={`relative h-12 w-12 rounded-full p-0.5 shadow-lg ring-2 ${
-          isGk
+        ref={setAvatarHost}
+        className={`relative h-12 w-12 rounded-full p-0.5 shadow-lg ring-2 transition-transform group-hover:scale-105 ${isGk
             ? 'bg-tertiary ring-tertiary-fixed'
             : 'bg-primary-container ring-white/60'
-        }`}
+          }`}
       >
         <div
           className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br ${avatarGradientForPlayerId(player.playerId)}`}
-          title={player.playerName}
         >
           <span className="font-kicker text-[12px] font-bold tracking-[0.08em] text-white uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">
             {slot.label}
           </span>
         </div>
         <span
-          className={`font-kicker absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold shadow ${
-            isGk
+          className={`font-kicker pointer-events-none absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold shadow ${isGk
               ? 'bg-tertiary-container text-on-tertiary-container'
               : 'bg-primary text-on-primary'
-          }`}
+            }`}
         >
           #{player.shirtNumber ?? '—'}
         </span>
@@ -87,6 +90,9 @@ function PitchSlotCard({
         averageRating={player.averageRating}
         ratingCount={player.ratingCount}
         currentUserScore={player.currentUserScore}
+        placement="corner"
+        cornerHost={avatarHost}
+        clickHost={clickHost}
         onRated={(averageRating, ratingCount, score) => {
           onPlayerRated(player.playerId, averageRating, ratingCount, score)
         }}
@@ -169,45 +175,36 @@ export function MatchWeekPitch({ formation, slots, onPlayerRated }: MatchWeekPit
               airline_seat_recline_extra
             </span>
             <span className="font-kicker text-kicker font-bold tracking-widest text-on-surface-variant uppercase">
-              Yedek Kulübesi ({bench.length})
+              Oyuna Sonradan Girenler ({bench.length})
             </span>
           </div>
           <div className="grid grid-cols-2 gap-space-sm sm:grid-cols-3 lg:grid-cols-6">
-            {bench.map((player) => {
-              const formationSlot = findFormationSlot(formation, player.slotKey)
-
-              return (
-                <div
-                  key={`${player.playerId}-${player.slotKey}`}
-                  className="flex flex-col items-center gap-1 border border-outline-variant/30 bg-surface p-space-sm"
-                >
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br text-[11px] font-bold text-white ${avatarGradientForPlayerId(player.playerId)}`}
-                  >
-                    {shortNameFromFull(player.playerName).slice(0, 2)}
-                  </div>
-                  <span className="font-kicker text-[10px] text-on-surface-variant">
-                    #{player.shirtNumber ?? '—'}
-                  </span>
-                  <span className="font-headline text-center text-xs font-bold text-on-surface">
-                    {shortNameFromFull(player.playerName)}
-                  </span>
-                  <span className="font-kicker text-[10px] font-bold tracking-wider text-secondary uppercase">
-                    {formationSlot?.label ?? player.slotKey.replace('BENCH_', 'Y')}
-                  </span>
-                  <MatchWeekPlayerRateControl
-                    playerId={player.playerId}
-                    averageRating={player.averageRating}
-                    ratingCount={player.ratingCount}
-                    currentUserScore={player.currentUserScore}
-                    tone="onSurface"
-                    onRated={(averageRating, ratingCount, score) => {
-                      onPlayerRated(player.playerId, averageRating, ratingCount, score)
-                    }}
-                  />
-                </div>
-              )
-            })}
+            {bench.map((player) => (
+              <div
+                key={`${player.playerId}-${player.slotKey}`}
+                className="flex flex-col items-center gap-1 border border-outline-variant/30 bg-surface p-space-sm"
+              >
+                <span className="font-kicker text-[10px] text-on-surface-variant">
+                  #{player.shirtNumber ?? '—'}
+                </span>
+                <span className="font-headline text-center text-xs font-bold text-on-surface">
+                  {shortNameFromFull(player.playerName)}
+                </span>
+                <span className="font-kicker text-[10px] font-bold tracking-wider text-secondary uppercase">
+                  {player.positionAbbreviation?.trim() || '—'}
+                </span>
+                <MatchWeekPlayerRateControl
+                  playerId={player.playerId}
+                  averageRating={player.averageRating}
+                  ratingCount={player.ratingCount}
+                  currentUserScore={player.currentUserScore}
+                  tone="onSurface"
+                  onRated={(averageRating, ratingCount, score) => {
+                    onPlayerRated(player.playerId, averageRating, ratingCount, score)
+                  }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       ) : null}

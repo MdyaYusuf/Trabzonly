@@ -7,6 +7,7 @@ type SquadPitchSlotCaptionProps = {
   roleDescription?: string | null
   isGk?: boolean
   empty?: boolean
+  nameClassName?: string
   roleOptions?: PositionRoleResponseDto[]
   selectedRoleId?: number
   openRoleMenuUpward?: boolean
@@ -113,6 +114,7 @@ export function SquadPitchSlotCaption({
   roleDescription,
   isGk = false,
   empty = false,
+  nameClassName,
   roleOptions,
   selectedRoleId,
   openRoleMenuUpward = false,
@@ -142,8 +144,11 @@ export function SquadPitchSlotCaption({
   return (
     <div className="relative mt-1.5 flex w-[7.75rem] flex-col items-center text-center">
       <span
-        className={`font-headline block max-w-full text-[11px] leading-tight font-bold tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] ${
-          empty ? 'text-white/75' : 'text-white'
+        className={`font-headline block max-w-full leading-tight font-bold tracking-wide ${
+          nameClassName ??
+          `text-[12px] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] ${
+            empty ? 'text-white/75' : 'text-white'
+          }`
         }`}
       >
         {name}

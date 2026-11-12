@@ -1,6 +1,7 @@
 import type { MatchWeekLeaderboardEntryDto } from '../matchWeekTypes'
 import {
   avatarGradientForPlayerId,
+  initialsFromName,
   shortNameFromFull,
 } from '../utils/matchWeekPublicUtils'
 
@@ -42,14 +43,14 @@ export function MatchWeekLeaderboard({ entries, isLoading }: MatchWeekLeaderboar
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${avatarGradientForPlayerId(entry.playerId)}`}
               >
-                {shortNameFromFull(entry.playerName).slice(0, 2)}
+                {initialsFromName(entry.playerName)}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-headline truncate text-sm font-bold text-on-surface">
                   {shortNameFromFull(entry.playerName)}
                 </p>
                 <p className="font-kicker text-[10px] tracking-wider text-on-surface-variant uppercase">
-                  #{entry.shirtNumber ?? '—'} · {entry.ratingCount} oy
+                  #{entry.shirtNumber ?? '—'} / {entry.ratingCount} oy
                 </p>
               </div>
               <span className="font-headline shrink-0 text-sm font-bold tabular-nums text-primary">

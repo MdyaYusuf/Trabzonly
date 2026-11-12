@@ -391,8 +391,7 @@ namespace Trabzonly.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SeasonId")
-                        .IsUnique();
+                    b.HasIndex("SeasonId");
 
                     b.ToTable("MatchWeeks", (string)null);
                 });

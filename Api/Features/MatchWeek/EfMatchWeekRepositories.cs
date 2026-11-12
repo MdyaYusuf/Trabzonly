@@ -1,5 +1,6 @@
 using Api.Core.Repositories;
 using Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.MatchWeek;
 
@@ -28,6 +29,25 @@ public class EfMatchWeekRepository : EfBaseRepository<BaseDbContext, MatchWeek, 
 {
   public EfMatchWeekRepository(BaseDbContext context) : base(context)
   {
+  }
+
+  public async Task<MatchWeek?> GetLatestForSeasonAsync(
+    int seasonId,
+    Func<IQueryable<MatchWeek>, IQueryable<MatchWeek>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<MatchWeek> query = Query(enableTracking);
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    return await query
+      .Where(matchWeek => matchWeek.SeasonId == seasonId)
+      .OrderByDescending(matchWeek => matchWeek.Id)
+      .FirstOrDefaultAsync(cancellationToken);
   }
 }
 

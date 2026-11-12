@@ -61,23 +61,52 @@ public class MatchWeekService(
     string userRole,
     CancellationToken cancellationToken = default)
   {
-    return await UpsertAsync(
-      request: request,
-      userRole: userRole,
-      alwaysClearRatings: false,
-      cancellationToken: cancellationToken);
-  }
+    _businessRules.AdminRoleRequired(userRole);
 
-  public async Task<ReturnModel<MatchWeekResponseDto>> StartNewWeekAsync(
-    SaveMatchWeekRequest request,
-    string userRole,
-    CancellationToken cancellationToken = default)
-  {
-    return await UpsertAsync(
-      request: request,
-      userRole: userRole,
-      alwaysClearRatings: true,
-      cancellationToken: cancellationToken);
+    var validationResult = await _saveValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    _businessRules.LineupMustBeValid(request.Formation, request.Slots);
+    await _businessRules.PlayersMustExistAndBeActiveAsync(request.Slots, cancellationToken);
+
+    Season season = await _businessRules.GetActiveSeasonIfExistAsync(cancellationToken);
+
+    MatchWeek matchWeek = new MatchWeek
+    {
+      SeasonId = season.Id,
+      Formation = request.Formation
+    };
+
+    await _matchWeekRepository.AddAsync(matchWeek, cancellationToken);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    await ReplaceSlotsAsync(matchWeek.Id, request.Slots, cancellationToken);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    MatchWeek refreshed = await _matchWeekRepository.GetByIdAsync(
+      matchWeek.Id,
+      include: MatchWeekBusinessRules.WithBoardInclude(),
+      enableTracking: false,
+      cancellationToken: cancellationToken)
+      ?? throw new InvalidOperationException("Maç haftası kaydı yenilenemedi.");
+
+    Dictionary<int, PlayerRatingStats> ratingStats = await BuildRatingStatsAsync(
+      refreshed.Id,
+      refreshed.Slots.Select(s => s.PlayerId).ToHashSet(),
+      currentUserId: null,
+      cancellationToken);
+
+    return new ReturnModel<MatchWeekResponseDto>()
+    {
+      Success = true,
+      Message = "Yeni maç haftası kadrosu başarılı bir şekilde yayınlandı.",
+      Data = MapToResponse(refreshed, ratingStats),
+      StatusCode = 200
+    };
   }
 
   public async Task<ReturnModel<MatchWeekPlayerRatingResponseDto>> RatePlayerAsync(
@@ -224,152 +253,11 @@ public class MatchWeekService(
     };
   }
 
-  private async Task<ReturnModel<MatchWeekResponseDto>> UpsertAsync(
-    SaveMatchWeekRequest request,
-    string userRole,
-    bool alwaysClearRatings,
-    CancellationToken cancellationToken)
-  {
-    _businessRules.AdminRoleRequired(userRole);
-
-    var validationResult = await _saveValidator.ValidateAsync(request, cancellationToken);
-
-    if (!validationResult.IsValid)
-    {
-      throw new ValidationException(validationResult.Errors);
-    }
-
-    _businessRules.LineupMustBeValid(request.Formation, request.Slots);
-    await _businessRules.PlayersMustExistAndBeActiveAsync(request.Slots, cancellationToken);
-
-    Season season = await _businessRules.GetActiveSeasonIfExistAsync(cancellationToken);
-
-    MatchWeek? matchWeek = await _businessRules.GetCurrentForSeasonAsync(
-      season.Id,
-      enableTracking: true,
-      cancellationToken: cancellationToken);
-
-    bool shouldClearRatings = alwaysClearRatings;
-
-    if (matchWeek == null)
-    {
-      matchWeek = new MatchWeek
-      {
-        SeasonId = season.Id,
-        Formation = request.Formation
-      };
-
-      await _matchWeekRepository.AddAsync(matchWeek, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-      await ReplaceSlotsAsync(matchWeek.Id, request.Slots, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-    else
-    {
-      if (!alwaysClearRatings)
-      {
-        shouldClearRatings = MatchWeekBusinessRules.LineupSetChanged(
-          matchWeek.Slots,
-          request.Slots);
-      }
-
-      matchWeek.Formation = request.Formation;
-      matchWeek.UpdatedDate = DateTime.Now;
-
-      _matchWeekRepository.Update(matchWeek);
-
-      if (shouldClearRatings)
-      {
-        await ClearRatingsAsync(matchWeek.Id, cancellationToken);
-      }
-
-      await ReplaceSlotsAsync(
-        matchWeek.Id,
-        request.Slots,
-        existingSlots: matchWeek.Slots,
-        cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-
-    MatchWeek refreshed = await _matchWeekRepository.GetByIdAsync(
-      matchWeek.Id,
-      include: MatchWeekBusinessRules.WithBoardInclude(),
-      enableTracking: false,
-      cancellationToken: cancellationToken)
-      ?? throw new InvalidOperationException("Maç haftası kaydı yenilenemedi.");
-
-    Dictionary<int, PlayerRatingStats> ratingStats = await BuildRatingStatsAsync(
-      refreshed.Id,
-      refreshed.Slots.Select(s => s.PlayerId).ToHashSet(),
-      currentUserId: null,
-      cancellationToken);
-
-    string message = alwaysClearRatings
-      ? "Yeni maç haftası başarılı bir şekilde kaydedildi. Oyuncu puanları sıfırlandı."
-      : shouldClearRatings
-        ? "Maç haftası başarılı bir şekilde kaydedildi. Kadro değiştiği için oyuncu puanları sıfırlandı."
-        : "Maç haftası başarılı bir şekilde kaydedildi.";
-
-    return new ReturnModel<MatchWeekResponseDto>()
-    {
-      Success = true,
-      Message = message,
-      Data = MapToResponse(refreshed, ratingStats),
-      StatusCode = 200
-    };
-  }
-
-  private async Task ClearRatingsAsync(int matchWeekId, CancellationToken cancellationToken)
-  {
-    List<MatchWeekPlayerRating> ratings = await _matchWeekPlayerRatingRepository.GetAllAsync(
-      filter: r => r.MatchWeekId == matchWeekId,
-      enableTracking: true,
-      cancellationToken: cancellationToken);
-
-    if (ratings.Count > 0)
-    {
-      _matchWeekPlayerRatingRepository.DeleteRange(ratings);
-    }
-  }
-
   private async Task ReplaceSlotsAsync(
     int matchWeekId,
     IReadOnlyList<MatchWeekSlotRequest> slots,
     CancellationToken cancellationToken)
   {
-    await ReplaceSlotsAsync(
-      matchWeekId,
-      slots,
-      existingSlots: null,
-      cancellationToken);
-  }
-
-  private async Task ReplaceSlotsAsync(
-    int matchWeekId,
-    IReadOnlyList<MatchWeekSlotRequest> slots,
-    ICollection<MatchWeekSlot>? existingSlots,
-    CancellationToken cancellationToken)
-  {
-    List<MatchWeekSlot> currentSlots;
-
-    if (existingSlots != null)
-    {
-      currentSlots = existingSlots.ToList();
-    }
-    else
-    {
-      currentSlots = await _matchWeekSlotRepository.GetAllAsync(
-        filter: s => s.MatchWeekId == matchWeekId,
-        enableTracking: true,
-        cancellationToken: cancellationToken);
-    }
-
-    if (currentSlots.Count > 0)
-    {
-      _matchWeekSlotRepository.DeleteRange(currentSlots);
-    }
-
     foreach (MatchWeekSlotRequest slotRequest in slots
       .OrderBy(s => s.SortOrder)
       .ThenBy(s => s.SlotKey, StringComparer.OrdinalIgnoreCase))
@@ -488,6 +376,7 @@ public class MatchWeekService(
       slot.Player.Name,
       slot.Player.ImageUrl,
       slot.Player.ShirtNumber,
+      slot.Player.Position?.Abbreviation,
       slot.SlotKey,
       slot.IsStarter,
       slot.SortOrder,

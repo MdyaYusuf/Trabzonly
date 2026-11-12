@@ -30,8 +30,8 @@ public class MatchWeekBusinessRules(
     bool enableTracking,
     CancellationToken cancellationToken = default)
   {
-    return await _matchWeekRepository.GetAsync(
-      predicate: mw => mw.SeasonId == seasonId,
+    return await _matchWeekRepository.GetLatestForSeasonAsync(
+      seasonId,
       include: WithBoardInclude(),
       enableTracking: enableTracking,
       cancellationToken: cancellationToken);
@@ -204,25 +204,11 @@ public class MatchWeekBusinessRules(
     }
   }
 
-  public static bool LineupSetChanged(
-    IEnumerable<MatchWeekSlot> existingSlots,
-    IReadOnlyList<MatchWeekSlotRequest> requestedSlots)
-  {
-    HashSet<(int PlayerId, string SlotKey)> existing = existingSlots
-      .Select(s => (s.PlayerId, s.SlotKey.ToUpperInvariant()))
-      .ToHashSet();
-
-    HashSet<(int PlayerId, string SlotKey)> requested = requestedSlots
-      .Select(s => (s.PlayerId, s.SlotKey.ToUpperInvariant()))
-      .ToHashSet();
-
-    return !existing.SetEquals(requested);
-  }
-
   public static Func<IQueryable<MatchWeek>, IQueryable<MatchWeek>> WithBoardInclude()
   {
     return query => query
       .Include(mw => mw.Slots)
-        .ThenInclude(s => s.Player);
+        .ThenInclude(s => s.Player)
+          .ThenInclude(p => p.Position);
   }
 }

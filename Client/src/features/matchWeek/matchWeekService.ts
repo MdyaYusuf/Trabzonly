@@ -93,15 +93,6 @@ const saveCurrent = async (
   })
 }
 
-const startNewWeek = async (
-  request: SaveMatchWeekRequest,
-): Promise<ApiResponse<MatchWeekResponseDto>> => {
-  return await apiClient<MatchWeekResponseDto>(`${MATCH_WEEKS_URL}/current/new-week`, {
-    method: 'POST',
-    body: JSON.stringify(request),
-  })
-}
-
 const ratePlayer = async (
   playerId: number,
   request: RateMatchWeekPlayerRequest,
@@ -129,7 +120,6 @@ const matchWeekService = {
   getStandings,
   getCurrent,
   saveCurrent,
-  startNewWeek,
   ratePlayer,
   getLeaderboard,
 }

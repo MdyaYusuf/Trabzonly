@@ -32,20 +32,6 @@ public class MatchWeeksController(IMatchWeekService _matchWeekService) : CustomB
     return CreateActionResult(result);
   }
 
-  [Authorize(Roles = "Admin")]
-  [HttpPost("current/new-week")]
-  public async Task<IActionResult> StartNewWeek(
-    [FromBody] SaveMatchWeekRequest request,
-    CancellationToken cancellationToken = default)
-  {
-    var result = await _matchWeekService.StartNewWeekAsync(
-      request: request,
-      userRole: GetUserRole(),
-      cancellationToken: cancellationToken);
-
-    return CreateActionResult(result);
-  }
-
   [Authorize]
   [HttpPut("current/players/{playerId:int}/rating")]
   public async Task<IActionResult> RatePlayer(
