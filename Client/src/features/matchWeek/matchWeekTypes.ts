@@ -126,6 +126,7 @@ export interface MatchWeekLeaderboardEntryDto {
   playerName: string
   playerImageUrl?: string | null
   shirtNumber?: number | null
+  positionAbbreviation?: string | null
   slotKey: string
   isStarter: boolean
   averageRating: number

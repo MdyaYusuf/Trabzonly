@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { SquadCreateIcon } from '@/features/squads/components/SquadCreateIcon'
 import playerService from '../playerService'
 import { formatMarketValue } from '../utils/formatMarketValue'
 
@@ -127,14 +126,6 @@ export function PlayerDirectoryHero() {
                 </div>
               )}
             </div>
-
-            <Link
-              to="/kadrolar/olustur"
-              className="font-label flex w-full items-center justify-center gap-space-sm bg-primary-container px-space-lg py-space-sm text-label-md tracking-wider text-on-primary uppercase shadow-md transition-all duration-150 hover:bg-primary"
-            >
-              <SquadCreateIcon size={20} />
-              <span>+ Kadro Oluştur</span>
-            </Link>
           </div>
         </div>
       </div>

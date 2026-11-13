@@ -3,6 +3,7 @@ import { useAppSelector } from '@/core/store/hooks'
 import { authService } from '@/features/auth/authService'
 import seasonService from '@/features/seasons/seasonService'
 import { MatchWeekBreadcrumb } from '../components/MatchWeekBreadcrumb'
+import { MatchWeekCta } from '../components/MatchWeekCta'
 import { MatchWeekHero } from '../components/MatchWeekHero'
 import { MatchWeekPitch } from '../components/MatchWeekPitch'
 import { MatchWeekSidebar } from '../components/MatchWeekSidebar'
@@ -344,6 +345,8 @@ export function MatchWeekPage() {
           </div>
         </div>
       </section>
+
+      <MatchWeekCta />
     </main>
   )
 }

@@ -238,6 +238,7 @@ public class MatchWeekService(
         PlayerName: item.Slot.Player.Name,
         PlayerImageUrl: item.Slot.Player.ImageUrl,
         ShirtNumber: item.Slot.Player.ShirtNumber,
+        PositionAbbreviation: item.Slot.Player.Position?.Abbreviation,
         SlotKey: item.Slot.SlotKey,
         IsStarter: item.Slot.IsStarter,
         AverageRating: item.Stats.AverageRating,

@@ -114,6 +114,7 @@ public sealed record MatchWeekLeaderboardEntryDto(
   string PlayerName,
   string? PlayerImageUrl,
   int? ShirtNumber,
+  string? PositionAbbreviation,
   string SlotKey,
   bool IsStarter,
   decimal AverageRating,
