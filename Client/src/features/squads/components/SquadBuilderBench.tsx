@@ -1,6 +1,6 @@
 import { useMemo, useState, type DragEvent } from 'react'
 import type { BenchSlotId, BuilderPlayer } from '../utils/squadBuilderTypes'
-import { BENCH_SLOT_IDS } from '../utils/squadBuilderPlaceholders'
+import { BENCH_SLOT_IDS } from '../utils/squadBuilderConfig'
 import {
   readSquadPlayerDragData,
   setSquadPlayerDragData,

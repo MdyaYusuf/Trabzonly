@@ -1,5 +1,5 @@
 import type { SquadResponseDto, SquadSlotResponseDto } from '../squadTypes'
-import { getFormationConfig } from './squadBuilderPlaceholders'
+import { getFormationConfig } from './squadBuilderConfig'
 import type { BuilderFormationId } from './squadBuilderTypes'
 import type {
   SquadBenchPlayer,

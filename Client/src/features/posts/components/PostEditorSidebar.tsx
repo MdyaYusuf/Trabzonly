@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { editorGuidelines, featureTips } from '../utils/postEditorPlaceholders'
+import { editorGuidelines, featureTips } from '../utils/postEditorCopy'
 
 type PostEditorSidebarProps = {
   mode: 'create' | 'edit'

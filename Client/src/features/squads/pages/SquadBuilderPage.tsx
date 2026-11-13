@@ -32,7 +32,7 @@ import {
   isBenchSlotId,
   slotIdsForFormation,
   tempoOptions,
-} from '../utils/squadBuilderPlaceholders'
+} from '../utils/squadBuilderConfig'
 import type {
   AssignmentSlotId,
   AttackStyleOption,

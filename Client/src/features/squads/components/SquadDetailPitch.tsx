@@ -5,7 +5,7 @@ import {
   pitchRowGridClass,
   pitchRowShiftClass,
   pitchSlotNudgeClass,
-} from '../utils/squadBuilderPlaceholders'
+} from '../utils/squadBuilderConfig'
 import type { BuilderFormationId, FormationSlot } from '../utils/squadBuilderTypes'
 import type { SquadBenchPlayer, SquadPitchPlayer } from '../utils/squadDetailTypes'
 

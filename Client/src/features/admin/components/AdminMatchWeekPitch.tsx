@@ -10,7 +10,7 @@ import {
   pitchRowGridClass,
   pitchRowShiftClass,
   pitchSlotNudgeClass,
-} from '@/features/squads/utils/squadBuilderPlaceholders'
+} from '@/features/squads/utils/squadBuilderConfig'
 import type {
   BuilderPlayer,
   BuilderSlotId,

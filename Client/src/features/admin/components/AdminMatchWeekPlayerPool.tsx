@@ -3,7 +3,7 @@ import type {
   BuilderPlayer,
   BuilderPosGroup,
 } from '@/features/squads/utils/squadBuilderTypes'
-import { isBenchSlotId } from '@/features/squads/utils/squadBuilderPlaceholders'
+import { isBenchSlotId } from '@/features/squads/utils/squadBuilderConfig'
 import { setSquadPlayerDragData } from '@/features/squads/utils/squadBuilderDnD'
 import { MATCH_WEEK_MAX_BENCH } from '../utils/adminMatchWeekLineupUtils'
 

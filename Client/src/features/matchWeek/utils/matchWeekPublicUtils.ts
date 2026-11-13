@@ -1,6 +1,6 @@
 import type { FixtureResponseDto, MatchWeekSlotResponseDto } from '../matchWeekTypes'
 import type { BuilderSlotId, FormationSlot } from '@/features/squads/utils/squadBuilderTypes'
-import { getFormationConfig } from '@/features/squads/utils/squadBuilderPlaceholders'
+import { getFormationConfig } from '@/features/squads/utils/squadBuilderConfig'
 
 const GRADIENTS = [
   'from-[#5a0e27] to-[#1A040B]',

@@ -15,7 +15,7 @@ import {
   pitchRowGridClass,
   pitchRowShiftClass,
   pitchSlotNudgeClass,
-} from '../utils/squadBuilderPlaceholders'
+} from '../utils/squadBuilderConfig'
 import { CaptainArmband } from './CaptainArmband'
 import { SquadPitchSlotCaption } from './SquadPitchSlotCaption'
 import { SquadPlayerPickerMenu } from './SquadPlayerPickerMenu'

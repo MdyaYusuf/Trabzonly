@@ -5,7 +5,7 @@ import {
   pitchRowGridClass,
   pitchRowShiftClass,
   pitchSlotNudgeClass,
-} from '@/features/squads/utils/squadBuilderPlaceholders'
+} from '@/features/squads/utils/squadBuilderConfig'
 import type { BuilderFormationId, FormationSlot } from '@/features/squads/utils/squadBuilderTypes'
 import type { MatchWeekSlotResponseDto } from '../matchWeekTypes'
 import {

@@ -3,7 +3,7 @@ import {
   getFormationConfig,
   isBenchSlotId,
   slotIdsForFormation,
-} from '@/features/squads/utils/squadBuilderPlaceholders'
+} from '@/features/squads/utils/squadBuilderConfig'
 import type {
   BenchSlotId,
   BuilderFormationId,

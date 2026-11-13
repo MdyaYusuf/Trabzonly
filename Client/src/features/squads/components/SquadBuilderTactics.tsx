@@ -8,7 +8,7 @@ import {
   attackStyleOptions,
   defenseLineOptions,
   tempoOptions,
-} from '../utils/squadBuilderPlaceholders'
+} from '../utils/squadBuilderConfig'
 
 type SquadBuilderTacticsProps = {
   attackStyle: AttackStyleOption

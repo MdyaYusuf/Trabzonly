@@ -1,4 +1,4 @@
-import { NOTES_MAX_LENGTH } from '../utils/squadBuilderPlaceholders'
+import { NOTES_MAX_LENGTH } from '../utils/squadBuilderConfig'
 
 type SquadBuilderNotesProps = {
   notes: string

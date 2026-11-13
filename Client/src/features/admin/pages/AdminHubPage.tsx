@@ -1,6 +1,6 @@
 import { AdminHubHeader } from '../components/AdminHubHeader'
 import { AdminModuleGrid } from '../components/AdminModuleGrid'
-import { adminHubProfile } from '../utils/adminHubPlaceholders'
+import { adminHubProfile } from '../utils/adminHubConfig'
 
 export function AdminHubPage() {
   const profile = adminHubProfile

@@ -1,6 +1,6 @@
 import type { SquadPreviewDto, SquadSlotResponseDto } from '../squadTypes'
 import type { BuilderFormationId } from './squadBuilderTypes'
-import { formationConfigs } from './squadBuilderPlaceholders'
+import { formationConfigs } from './squadBuilderConfig'
 import type {
   PitchColumn,
   PitchPlayer,

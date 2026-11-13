@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { BrandLogo } from '@/core/components/BrandLogo'
-import { adminShellProfile } from '@/features/admin/utils/adminHubPlaceholders'
+import { adminShellProfile } from '@/features/admin/utils/adminHubConfig'
 
 type AdminNavPanelProps = {
   onNavigate?: () => void

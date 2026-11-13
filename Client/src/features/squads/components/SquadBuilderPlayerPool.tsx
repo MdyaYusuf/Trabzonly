@@ -3,7 +3,7 @@ import type {
   BuilderPlayer,
   BuilderPosGroup,
 } from '../utils/squadBuilderTypes'
-import { isBenchSlotId } from '../utils/squadBuilderPlaceholders'
+import { isBenchSlotId } from '../utils/squadBuilderConfig'
 import { setSquadPlayerDragData } from '../utils/squadBuilderDnD'
 
 type SquadBuilderPlayerPoolProps = {

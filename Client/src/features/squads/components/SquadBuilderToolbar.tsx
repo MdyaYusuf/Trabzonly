@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { PageBackButton } from '@/core/components/PageBackButton'
 import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
 import type { BuilderFormationId } from '../utils/squadBuilderTypes'
-import { formationConfigs } from '../utils/squadBuilderPlaceholders'
+import { formationConfigs } from '../utils/squadBuilderConfig'
 
 type SquadBuilderToolbarProps = {
   title: string
