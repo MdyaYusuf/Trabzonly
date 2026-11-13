@@ -222,14 +222,14 @@ public class SquadBusinessRules(
 
   public void ScoreMustBeValid(decimal score)
   {
-    if (score < 1m || score > 5m)
+    if (score < 1m || score > 10m)
     {
-      throw new BusinessException("Puan 1 ile 5 arasında olmalıdır.");
+      throw new BusinessException("Taraftar puanı 1 ile 10 arasında olmalıdır.");
     }
 
     if (score * 2m != Math.Floor(score * 2m))
     {
-      throw new BusinessException("Puan 0.5'lik adımlarla verilmelidir (ör. 3.0, 3.5, 4.0).");
+      throw new BusinessException("Puan 0.5'lik adımlarla verilmelidir (ör. 7.0, 7.5, 8.0).");
     }
   }
 }

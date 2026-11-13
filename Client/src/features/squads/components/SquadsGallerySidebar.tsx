@@ -169,7 +169,7 @@ export function SquadsGallerySidebar() {
                       className="font-kicker text-kicker text-on-surface-variant transition-colors hover:text-primary"
                     />
                     <span className="font-body text-body-sm text-on-surface-variant">
-                      {squad.averageRating.toFixed(1)} / 5.0 ortalama
+                      {squad.averageRating.toFixed(1)} / 10.0 ortalama
                     </span>
                   </div>
                 </Link>
@@ -246,7 +246,7 @@ export function SquadsGallerySidebar() {
                 </span>
                 <span className="font-body text-body-sm text-on-surface-variant">
                   {latestMySquad.ratingCount > 0
-                    ? `${latestMySquad.averageRating.toFixed(1)} / 5.0 ortalama`
+                    ? `${latestMySquad.averageRating.toFixed(1)} / 10.0 ortalama`
                     : 'Henüz puan yok'}
                 </span>
               </Link>

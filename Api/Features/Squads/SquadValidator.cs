@@ -143,8 +143,8 @@ public class RateSquadRequestValidator : AbstractValidator<RateSquadRequest>
   public RateSquadRequestValidator()
   {
     RuleFor(r => r.Score)
-      .InclusiveBetween(1m, 5m).WithMessage("Puan 1 ile 5 arasında olmalıdır.")
-      .Must(BeHalfStep).WithMessage("Puan 0.5'lik adımlarla verilmelidir (ör. 3.0, 3.5, 4.0).");
+      .InclusiveBetween(1m, 10m).WithMessage("Taraftar puanı 1 ile 10 arasında olmalıdır.")
+      .Must(BeHalfStep).WithMessage("Puan 0.5'lik adımlarla verilmelidir (ör. 7.0, 7.5, 8.0).");
   }
 
   private static bool BeHalfStep(decimal score)

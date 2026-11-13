@@ -18,19 +18,14 @@ type SquadDetailRatingBarProps = {
 }
 
 const STAR_COLOR = '#D39D3F'
+const STAR_COUNT = 10
 
-function toRatingScore(value: number | null | undefined): RatingScore {
+function toRatingScore(value: number | null | undefined): RatingScore | null {
   if (value == null) {
-    return '4.5'
+    return null
   }
 
-  const formatted = value.toFixed(1) as RatingScore
-
-  if (ratingScores.includes(formatted)) {
-    return formatted
-  }
-
-  return '4.5'
+  return snapToRatingScore(value)
 }
 
 function snapToRatingScore(raw: number): RatingScore {
@@ -71,8 +66,8 @@ function InteractiveRatingStars({
     <div
       className={
         disabled
-          ? 'flex items-center gap-1 opacity-60'
-          : 'flex items-center gap-1'
+          ? 'flex items-center gap-0.5 opacity-60'
+          : 'flex items-center gap-0.5'
       }
       role="radiogroup"
       aria-label="Puan seçimi"
@@ -80,7 +75,7 @@ function InteractiveRatingStars({
         setHoverValue(null)
       }}
     >
-      {Array.from({ length: 5 }, (_, index) => {
+      {Array.from({ length: STAR_COUNT }, (_, index) => {
         const starValue = index + 1
         const fill: 'full' | 'half' | 'empty' =
           displayValue >= starValue
@@ -91,10 +86,10 @@ function InteractiveRatingStars({
         const gradientId = `${reactId}-star-half-${index}`
 
         return (
-          <span key={index} className="relative inline-flex h-8 w-8">
+          <span key={index} className="relative inline-flex h-7 w-7">
             <svg
-              width="32"
-              height="32"
+              width="28"
+              height="28"
               viewBox="0 0 24 24"
               className="pointer-events-none absolute inset-0"
               aria-hidden="true"
@@ -122,7 +117,7 @@ function InteractiveRatingStars({
             <button
               type="button"
               disabled={disabled}
-              aria-label={`${scoreFromPointer(index, true)} yıldız`}
+              aria-label={`${scoreFromPointer(index, true)} puan`}
               className="absolute top-0 left-0 h-full w-1/2 cursor-pointer disabled:cursor-not-allowed"
               onMouseEnter={() => {
                 if (!disabled) {
@@ -136,7 +131,7 @@ function InteractiveRatingStars({
             <button
               type="button"
               disabled={disabled}
-              aria-label={`${scoreFromPointer(index, false)} yıldız`}
+              aria-label={`${scoreFromPointer(index, false)} puan`}
               className="absolute top-0 right-0 h-full w-1/2 cursor-pointer disabled:cursor-not-allowed"
               onMouseEnter={() => {
                 if (!disabled) {
@@ -167,7 +162,7 @@ export function SquadDetailRatingBar({
   const isOwner = currentUserId != null && currentUserId === authorUserId
   const canRate = isAuthenticated && !isOwner
 
-  const [selectedScore, setSelectedScore] = useState<RatingScore>(
+  const [selectedScore, setSelectedScore] = useState<RatingScore | null>(
     toRatingScore(currentUserScore),
   )
   const [isSaving, setIsSaving] = useState(false)
@@ -175,13 +170,18 @@ export function SquadDetailRatingBar({
 
   useEffect(() => {
     setSelectedScore(toRatingScore(currentUserScore))
-  }, [squadId])
+  }, [squadId, currentUserScore])
 
   useEffect(() => {
     if (currentUserScore != null) {
       setSelectedScore(toRatingScore(currentUserScore))
+      return
     }
-  }, [currentUserScore])
+
+    if (!isAuthenticated) {
+      setSelectedScore(null)
+    }
+  }, [currentUserScore, isAuthenticated])
 
   async function handleRate(score: RatingScore) {
     if (isSaving) {
@@ -198,7 +198,12 @@ export function SquadDetailRatingBar({
       return
     }
 
-    if (currentUserScore != null && Number(score) === Number(currentUserScore.toFixed(1))) {
+    const apiScore = Number(score)
+
+    if (
+      currentUserScore != null &&
+      Number(apiScore.toFixed(1)) === Number(currentUserScore.toFixed(1))
+    ) {
       setSelectedScore(score)
       return
     }
@@ -208,7 +213,7 @@ export function SquadDetailRatingBar({
     setSaved(false)
 
     const result = await squadService.rate(squadId, {
-      score: Number(score),
+      score: apiScore,
     })
 
     setIsSaving(false)
@@ -225,6 +230,9 @@ export function SquadDetailRatingBar({
     }, 2000)
   }
 
+  const displayYourScore =
+    canRate || currentUserScore != null ? (selectedScore ?? '—') : '—'
+
   return (
     <section className="w-full bg-surface-container-low py-space-md">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-sm px-4 sm:px-6 lg:px-12">
@@ -238,7 +246,7 @@ export function SquadDetailRatingBar({
             </div>
 
             <InteractiveRatingStars
-              value={Number(selectedScore)}
+              value={selectedScore != null ? Number(selectedScore) : 0}
               disabled={isSaving}
               onChange={(score) => {
                 void handleRate(score)
@@ -251,7 +259,7 @@ export function SquadDetailRatingBar({
                   Senin puanın
                 </span>
                 <span className="font-headline text-[18px] leading-none font-bold tabular-nums text-primary">
-                  {canRate || currentUserScore != null ? selectedScore : '—'}
+                  {displayYourScore}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
@@ -261,7 +269,7 @@ export function SquadDetailRatingBar({
                 <span className="font-headline text-[18px] leading-none font-bold tabular-nums text-on-surface">
                   {ratingCount > 0 ? averageRating.toFixed(1) : '—'}
                   <span className="font-body ml-1 text-[11px] font-normal text-on-surface-variant">
-                    ({ratingCount} oy)
+                    / 10 · {ratingCount} oy
                   </span>
                 </span>
               </div>

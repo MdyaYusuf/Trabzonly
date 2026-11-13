@@ -12,8 +12,8 @@ type SquadDetailHeaderProps = {
 
 function RatingStars({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5" aria-label={`${rating.toFixed(1)} / 5`}>
-      {Array.from({ length: 5 }, (_, index) => {
+    <div className="flex items-center gap-px" aria-label={`${rating.toFixed(1)} / 10`}>
+      {Array.from({ length: 10 }, (_, index) => {
         const starValue = index + 1
         const fill: 'full' | 'half' | 'empty' =
           rating >= starValue ? 'full' : rating >= starValue - 0.5 ? 'half' : 'empty'
@@ -22,8 +22,8 @@ function RatingStars({ rating }: { rating: number }) {
         return (
           <svg
             key={index}
-            width="20"
-            height="20"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             className="shrink-0"
             aria-hidden="true"
@@ -205,6 +205,7 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
                 {squad.rating.toFixed(1)}
               </span>
               <div className="flex flex-col">
+                <span className="font-kicker text-kicker text-on-surface-variant">/ 10</span>
                 <RatingStars rating={squad.rating} />
                 <span className="font-body mt-1 text-body-sm text-on-surface-variant">
                   {squad.ratingCount.toLocaleString('tr-TR')} Taraftar Oyladı

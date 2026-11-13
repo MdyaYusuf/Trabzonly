@@ -104,7 +104,7 @@ export function SquadPitchPreview({ formationLabel, columns }: SquadPitchPreview
       </svg>
 
       <div className="relative z-10 flex items-center gap-2">
-        <span className="font-kicker bg-primary px-2 py-0.5 text-kicker font-bold tracking-wider text-on-primary uppercase">
+        <span className="font-label bg-secondary-container/90 px-2 py-0.5 text-[10px] font-bold text-on-secondary-container uppercase">
           {formationLabel}
         </span>
       </div>

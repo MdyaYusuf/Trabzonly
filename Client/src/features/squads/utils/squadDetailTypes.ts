@@ -59,16 +59,26 @@ export type SquadDetailViewModel = {
   authorNoteCredit: string
 }
 
-export const ratingScores = ['1.0', '2.0', '3.0', '3.5', '4.0', '4.5', '5.0'] as const
+export const ratingScores = [
+  '1.0',
+  '1.5',
+  '2.0',
+  '2.5',
+  '3.0',
+  '3.5',
+  '4.0',
+  '4.5',
+  '5.0',
+  '5.5',
+  '6.0',
+  '6.5',
+  '7.0',
+  '7.5',
+  '8.0',
+  '8.5',
+  '9.0',
+  '9.5',
+  '10.0',
+] as const
 
 export type RatingScore = (typeof ratingScores)[number]
-
-export const ratingFeedbackMap: Record<RatingScore, string> = {
-  '1.0': 'Zayıf Taktik (Geliştirilmeli)',
-  '2.0': 'Eksik Dizilim (Savunma Zafiyeti Var)',
-  '3.0': 'Orta Seviye Plan',
-  '3.5': 'İyi Kurgulanmış Kadro',
-  '4.0': 'Çok Başarılı Taktik',
-  '4.5': 'Harika Taktik!',
-  '5.0': 'Kusursuz Karadeniz Fırtınası!',
-}

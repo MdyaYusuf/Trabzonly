@@ -11,8 +11,8 @@ type SquadGalleryCardProps = {
 
 function RatingStars({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5" aria-label={`${rating.toFixed(1)} / 5`}>
-      {Array.from({ length: 5 }, (_, index) => {
+    <div className="flex items-center gap-px" aria-label={`${rating.toFixed(1)} / 10`}>
+      {Array.from({ length: 10 }, (_, index) => {
         const starValue = index + 1
         const fill: 'full' | 'half' | 'empty' =
           rating >= starValue ? 'full' : rating >= starValue - 0.5 ? 'half' : 'empty'
@@ -21,8 +21,8 @@ function RatingStars({ rating }: { rating: number }) {
         return (
           <svg
             key={index}
-            width="16"
-            height="16"
+            width="12"
+            height="12"
             viewBox="0 0 24 24"
             className="shrink-0"
             aria-hidden="true"
@@ -102,7 +102,7 @@ export function SquadGalleryCard({ squad, listMode = false }: SquadGalleryCardPr
                 {squad.rating.toFixed(1)}
               </span>
               <span className="font-body text-body-sm text-on-surface-variant">
-                ({squad.ratingCount} oy)
+                / 10 · {squad.ratingCount} oy
               </span>
             </div>
 

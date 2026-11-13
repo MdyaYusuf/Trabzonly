@@ -100,7 +100,7 @@ export function SquadsGalleryHero() {
                   <span className="font-body mt-1 text-body-sm text-on-surface-variant">
                     {topSquadRating == null
                       ? 'Puanlı kadro bekleniyor'
-                      : `${topSquadRating.toFixed(1)} / 5.0 ortalama`}
+                      : `${topSquadRating.toFixed(1)} / 10.0 ortalama`}
                   </span>
                 </Link>
               ) : (
