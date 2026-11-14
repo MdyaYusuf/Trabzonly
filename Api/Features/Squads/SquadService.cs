@@ -208,6 +208,43 @@ public class SquadService(
     };
   }
 
+  public async Task<ReturnModel<MySquadStatsDto>> GetMyStatsAsync(
+    Guid currentUserId,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<Squad> mySquads = _squadRepository.Query(enableTracking: false)
+      .Where(squad => squad.UserId == currentUserId);
+
+    int totalSquads = await mySquads.CountAsync(cancellationToken);
+    int totalViewCount = totalSquads == 0
+      ? 0
+      : await mySquads.SumAsync(squad => squad.ViewCount, cancellationToken);
+
+    decimal averageRating = 0m;
+
+    if (totalSquads > 0)
+    {
+      bool hasRatedSquad = await mySquads.AnyAsync(
+        squad => squad.RatingCount > 0,
+        cancellationToken);
+
+      if (hasRatedSquad)
+      {
+        averageRating = await mySquads
+          .Where(squad => squad.RatingCount > 0)
+          .AverageAsync(squad => squad.AverageRating, cancellationToken);
+      }
+    }
+
+    return new ReturnModel<MySquadStatsDto>()
+    {
+      Success = true,
+      Message = "Kullanıcı kadro istatistikleri başarılı bir şekilde getirildi.",
+      Data = new MySquadStatsDto(totalSquads, totalViewCount, averageRating),
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<CreatedSquadResponseDto>> AddAsync(
     CreateSquadRequest request,
     Guid currentUserId,

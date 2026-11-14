@@ -9,6 +9,7 @@ import type {
   RateSquadRequest,
   SquadRatingResponseDto,
   SquadListQuery,
+  MySquadStatsDto,
 } from './squadTypes'
 
 const API_URL = '/squads'
@@ -61,6 +62,26 @@ const getByUserId = async (userId: string): Promise<ApiResponse<SquadPreviewDto[
   return await apiClient<SquadPreviewDto[]>(`${API_URL}/user/${userId}`)
 }
 
+const getMine = async (
+  query: SquadListQuery,
+): Promise<ApiResponse<PagedResponse<SquadPreviewDto>>> => {
+  const queryParams = new URLSearchParams({
+    pageNumber: query.pageNumber.toString(),
+    pageSize: query.pageSize.toString(),
+    sort: query.sort ?? 'newest',
+  })
+
+  if (query.search && query.search.trim().length > 0) {
+    queryParams.append('search', query.search.trim())
+  }
+
+  return await apiClient<PagedResponse<SquadPreviewDto>>(`${API_URL}/me?${queryParams}`)
+}
+
+const getMyStats = async (): Promise<ApiResponse<MySquadStatsDto>> => {
+  return await apiClient<MySquadStatsDto>(`${API_URL}/me/stats`)
+}
+
 const add = async (request: CreateSquadRequest): Promise<ApiResponse<CreatedSquadResponseDto>> => {
   return await apiClient<CreatedSquadResponseDto>(API_URL, {
     method: 'POST',
@@ -97,6 +118,8 @@ const squadService = {
   getRecent,
   getTopRated,
   getByUserId,
+  getMine,
+  getMyStats,
   add,
   update,
   remove,

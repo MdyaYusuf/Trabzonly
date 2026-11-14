@@ -113,3 +113,9 @@ export type SquadListQuery = {
   sort?: SquadListSort
   search?: string
 }
+
+export interface MySquadStatsDto {
+  totalSquads: number
+  totalViewCount: number
+  averageRating: number
+}

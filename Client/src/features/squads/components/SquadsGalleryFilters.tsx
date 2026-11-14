@@ -4,6 +4,7 @@ import type { GallerySortTab } from '../utils/squadsGalleryTypes'
 type SquadsGalleryFiltersProps = {
   sortTab: GallerySortTab
   search: string
+  searchPlaceholder?: string
   onSortTabChange: (tab: GallerySortTab) => void
   onSearchChange: (value: string) => void
 }
@@ -14,6 +15,7 @@ const controlClass =
 export function SquadsGalleryFilters({
   sortTab,
   search,
+  searchPlaceholder = 'Kadro veya yazar ara…',
   onSortTabChange,
   onSearchChange,
 }: SquadsGalleryFiltersProps) {
@@ -55,7 +57,7 @@ export function SquadsGalleryFilters({
           </span>
           <input
             className={`${controlClass} w-full pr-space-md pl-10 normal-case tracking-normal`}
-            placeholder="Kadro veya yazar ara…"
+            placeholder={searchPlaceholder}
             type="search"
             value={search}
             onChange={(event) => {

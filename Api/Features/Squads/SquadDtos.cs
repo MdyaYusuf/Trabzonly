@@ -106,3 +106,8 @@ public sealed record UpdateSquadRequest(
   List<SquadSlotRequest> Slots);
 
 public sealed record RateSquadRequest(decimal Score);
+
+public sealed record MySquadStatsDto(
+  int TotalSquads,
+  int TotalViewCount,
+  decimal AverageRating);

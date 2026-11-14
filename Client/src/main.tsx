@@ -135,10 +135,6 @@ const router = createBrowserRouter([
             element: <SquadDetailPage />,
           },
           {
-            path: 'kadrolarim',
-            element: <MySquadsPage />,
-          },
-          {
             path: 'quizler',
             element: <QuizListPage />,
           },
@@ -159,7 +155,15 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          // Authenticated member routes
+          {
+            element: <PublicLayout />,
+            children: [
+              {
+                path: 'kadrolarim',
+                element: <MySquadsPage />,
+              },
+            ],
+          },
         ],
       },
       {

@@ -45,6 +45,10 @@ public interface ISquadService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<MySquadStatsDto>> GetMyStatsAsync(
+    Guid currentUserId,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CreatedSquadResponseDto>> AddAsync(
     CreateSquadRequest request,
     Guid currentUserId,

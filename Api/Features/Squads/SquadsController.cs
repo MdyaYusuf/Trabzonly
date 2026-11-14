@@ -97,6 +97,64 @@ public class SquadsController(ISquadService _squadService) : CustomBaseControlle
     return CreateActionResult(result);
   }
 
+  [Authorize]
+  [HttpGet("me/stats")]
+  public async Task<IActionResult> GetMyStats(CancellationToken cancellationToken = default)
+  {
+    var result = await _squadService.GetMyStatsAsync(
+      currentUserId: GetUserId(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [Authorize]
+  [HttpGet("me")]
+  public async Task<IActionResult> GetMine(
+    [FromQuery] PaginationRequest pagination,
+    [FromQuery] string? search = null,
+    [FromQuery] string sort = "newest",
+    CancellationToken cancellationToken = default)
+  {
+    Guid currentUserId = GetUserId();
+
+    string? searchTerm = string.IsNullOrWhiteSpace(search)
+      ? null
+      : search.Trim().ToLowerInvariant();
+
+    Expression<Func<Squad, bool>> filter = searchTerm == null
+      ? squad => squad.UserId == currentUserId
+      : squad =>
+        squad.UserId == currentUserId &&
+        squad.Title.ToLower().Contains(searchTerm);
+
+    Func<IQueryable<Squad>, IOrderedQueryable<Squad>> orderBy;
+
+    if (string.Equals(sort, "topRated", StringComparison.OrdinalIgnoreCase))
+    {
+      orderBy = query => query
+        .OrderByDescending(squad => squad.AverageRating)
+        .ThenByDescending(squad => squad.RatingCount)
+        .ThenByDescending(squad => squad.CreatedDate)
+        .ThenByDescending(squad => squad.Id);
+    }
+    else
+    {
+      orderBy = query => query
+        .OrderByDescending(squad => squad.CreatedDate)
+        .ThenByDescending(squad => squad.Id);
+    }
+
+    var result = await _squadService.GetAllAsync(
+      filter: filter,
+      orderBy: orderBy,
+      pageNumber: pagination.PageNumber,
+      pageSize: pagination.PageSize,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpGet("{id:guid}")]
   public async Task<IActionResult> GetById(
     Guid id,
