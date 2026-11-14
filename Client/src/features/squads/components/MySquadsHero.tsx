@@ -49,11 +49,11 @@ export function MySquadsHero() {
               </span>
             </div>
             <h1 className="font-display text-headline-lg leading-[1.05] font-extrabold tracking-tight text-primary uppercase lg:text-display-xl">
-              BENİM KADROLARIM
+              KADROLARIM
             </h1>
             <p className="font-body mt-space-sm max-w-2xl text-body-md text-on-surface-variant">
-              Oluşturduğunuz taktik dizilişler, topluluk puanlamaları ve maç stratejileri. Bordo-Mavi
-              fırtınayı saha içine yansıtın, taraftarın takdirine sunun.
+              Oluşturduğunuz taktik dizilişler ve maç stratejileri. Bordo-Mavi fırtınayı saha içine
+              yansıtın, taraftarın takdirine sunun.
             </p>
           </div>
 
@@ -61,13 +61,19 @@ export function MySquadsHero() {
             <div className="grid grid-cols-3 gap-space-sm">
               <div className="flex h-36 flex-col justify-center bg-surface-container-low px-space-sm py-space-md sm:px-space-md">
                 <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
+                  Toplam Kadro
+                </span>
+                <span className="font-stat mt-1.5 text-headline-sm font-extrabold text-primary sm:text-headline-md">
+                  {stats == null ? '—' : stats.totalSquads.toLocaleString('tr-TR')}
+                </span>
+              </div>
+
+              <div className="flex h-36 flex-col justify-center bg-surface-container-low px-space-sm py-space-md sm:px-space-md">
+                <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
                   Toplam Görüntülenme
                 </span>
                 <span className="font-stat mt-1.5 text-headline-sm font-extrabold text-primary sm:text-headline-md">
                   {stats == null ? '—' : stats.totalViewCount.toLocaleString('tr-TR')}
-                </span>
-                <span className="font-body mt-1 text-body-sm text-on-surface-variant">
-                  Kadrolarınız
                 </span>
               </div>
 
@@ -82,18 +88,6 @@ export function MySquadsHero() {
                 </span>
                 <span className="font-body mt-1 text-body-sm text-on-surface-variant">
                   / 10.0 ortalama
-                </span>
-              </div>
-
-              <div className="flex h-36 flex-col justify-center bg-surface-container-low px-space-sm py-space-md sm:px-space-md">
-                <span className="font-kicker text-kicker font-bold tracking-wide text-on-surface-variant uppercase">
-                  Toplam Kadro
-                </span>
-                <span className="font-stat mt-1.5 text-headline-sm font-extrabold text-primary sm:text-headline-md">
-                  {stats == null ? '—' : stats.totalSquads.toLocaleString('tr-TR')}
-                </span>
-                <span className="font-body mt-1 text-body-sm text-on-surface-variant">
-                  Dizilişleriniz
                 </span>
               </div>
             </div>

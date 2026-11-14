@@ -2,6 +2,7 @@ type SquadBuilderSidebarActionsProps = {
   canPublish: boolean
   isPublishing: boolean
   onClear: () => void
+  onCancel: () => void
   onPublish: () => void
 }
 
@@ -9,6 +10,7 @@ export function SquadBuilderSidebarActions({
   canPublish,
   isPublishing,
   onClear,
+  onCancel,
   onPublish,
 }: SquadBuilderSidebarActionsProps) {
   return (
@@ -20,6 +22,14 @@ export function SquadBuilderSidebarActions({
       >
         <span className="material-symbols-outlined text-[18px]">ink_eraser</span>
         Temizle
+      </button>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="font-label flex cursor-pointer items-center gap-1 px-space-md py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase transition-colors hover:text-primary"
+      >
+        <span className="material-symbols-outlined text-[18px]">close</span>
+        İptal
       </button>
       <button
         type="button"

@@ -12,6 +12,7 @@ type SquadBuilderToolbarProps = {
   onTitleChange: (value: string) => void
   onFormationChange: (id: BuilderFormationId) => void
   onClear: () => void
+  onCancel: () => void
   onPublish: () => void
 }
 
@@ -23,13 +24,18 @@ export function SquadBuilderToolbar({
   onTitleChange,
   onFormationChange,
   onClear,
+  onCancel,
   onPublish,
 }: SquadBuilderToolbarProps) {
   return (
     <section className="w-full bg-surface py-space-md">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-md px-4 sm:px-6 lg:px-12">
         <div className="flex flex-wrap items-center gap-space-md">
-          <PageBackButton to="/kadrolar" label="Kadrolar listesine dön" />
+          <PageBackButton
+            to="/kadrolar"
+            label="Geri dön"
+            preferHistory
+          />
           <nav
             aria-label="Breadcrumb"
             className="font-label flex flex-wrap items-center gap-space-xs text-label-md text-on-surface-variant"
@@ -61,6 +67,14 @@ export function SquadBuilderToolbar({
             >
               <span className="material-symbols-outlined text-[18px]">ink_eraser</span>
               Temizle
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="font-label flex cursor-pointer items-center gap-1 px-space-md py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase transition-colors hover:text-primary"
+            >
+              <span className="material-symbols-outlined text-[18px]">close</span>
+              İptal
             </button>
             <button
               type="button"

@@ -447,6 +447,18 @@ export function SquadBuilderPage() {
     setRoleAssignments(keptRoles)
   }
 
+  function handleCancel() {
+    const historyIndex =
+      typeof window.history.state?.idx === 'number' ? window.history.state.idx : 0
+
+    if (historyIndex > 0) {
+      navigate(-1)
+      return
+    }
+
+    navigate('/kadrolar')
+  }
+
   function handleClear() {
     setStarterAssignments({})
     setRoleAssignments({})
@@ -784,6 +796,7 @@ export function SquadBuilderPage() {
         onTitleChange={setTitle}
         onFormationChange={handleFormationChange}
         onClear={handleClear}
+        onCancel={handleCancel}
         onPublish={() => {
           void handlePublish()
         }}
@@ -886,6 +899,7 @@ export function SquadBuilderPage() {
                 canPublish={canPublish}
                 isPublishing={isPublishing}
                 onClear={handleClear}
+                onCancel={handleCancel}
                 onPublish={() => {
                   void handlePublish()
                 }}
