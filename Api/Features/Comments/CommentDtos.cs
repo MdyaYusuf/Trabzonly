@@ -40,3 +40,12 @@ public sealed record CreateCommentRequest(
 public sealed record UpdateCommentRequest(
   Guid Id,
   string Content);
+
+public sealed record CommentRecentQueryRequest(
+  int Count = 10,
+  Guid? PostId = null,
+  int? PlayerId = null,
+  Guid? SquadId = null,
+  string? Sort = null,
+  DateTime? LastDate = null,
+  Guid? LastId = null);

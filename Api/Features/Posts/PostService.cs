@@ -126,6 +126,23 @@ public class PostService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<PostResponseDto>>> GetListAsync(
+    PostListQueryRequest query,
+    Guid? currentUserId = null,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
+
+    return await GetAllAsync(
+      filter: BuildListFilter(query),
+      orderBy: BuildListOrderBy(query.Sort),
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      currentUserId: currentUserId,
+      cancellationToken: cancellationToken);
+  }
+
   public async Task<ReturnModel<PostResponseDto>> GetAsync(
     Expression<Func<Post, bool>> predicate,
     Func<IQueryable<Post>, IQueryable<Post>>? include = null,
@@ -812,5 +829,47 @@ public class PostService(
         })
         .ToList()
     });
+  }
+
+  private static Expression<Func<Post, bool>> BuildListFilter(PostListQueryRequest query)
+  {
+    int? categoryId = query.CategoryId;
+    Guid? userId = query.UserId;
+    string? searchTerm = string.IsNullOrWhiteSpace(query.Search)
+      ? null
+      : query.Search.Trim().ToLowerInvariant();
+
+    return post =>
+      post.IsActive &&
+      (!categoryId.HasValue || post.CategoryId == categoryId.Value) &&
+      (!userId.HasValue || post.UserId == userId.Value) &&
+      (searchTerm == null ||
+       post.Title.ToLower().Contains(searchTerm) ||
+       post.User.Username.ToLower().Contains(searchTerm) ||
+       (post.Description != null && post.Description.ToLower().Contains(searchTerm)));
+  }
+
+  private static Func<IQueryable<Post>, IOrderedQueryable<Post>> BuildListOrderBy(
+    string? sort)
+  {
+    if (string.Equals(sort, "popular", StringComparison.OrdinalIgnoreCase))
+    {
+      return query => query
+        .OrderByDescending(post => post.LikeCount)
+        .ThenByDescending(post => post.CreatedDate)
+        .ThenByDescending(post => post.Id);
+    }
+
+    if (string.Equals(sort, "discussed", StringComparison.OrdinalIgnoreCase))
+    {
+      return query => query
+        .OrderByDescending(post => post.CommentCount)
+        .ThenByDescending(post => post.CreatedDate)
+        .ThenByDescending(post => post.Id);
+    }
+
+    return query => query
+      .OrderByDescending(post => post.CreatedDate)
+      .ThenByDescending(post => post.Id);
   }
 }

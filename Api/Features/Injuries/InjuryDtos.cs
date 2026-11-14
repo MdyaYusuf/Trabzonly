@@ -37,6 +37,11 @@ public sealed record UpdateInjuryRequest(
   int PlayerId,
   int? SeasonId);
 
+public sealed record InjuryListQueryRequest(
+  int? PlayerId = null,
+  int PageNumber = 1,
+  int PageSize = 10);
+
 public sealed record InjuryAdminListQueryRequest(
   string? Search = null,
   int? SeasonId = null,

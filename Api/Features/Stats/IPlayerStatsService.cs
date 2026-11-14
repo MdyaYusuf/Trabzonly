@@ -19,6 +19,10 @@ public interface IPlayerStatsService
     PlayerStatsAdminListQueryRequest query,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<PlayerStatsResponseDto>>> GetByPlayerAsync(
+    int playerId,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<PlayerStatsResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,

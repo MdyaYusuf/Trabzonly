@@ -111,3 +111,9 @@ public sealed record MySquadStatsDto(
   int TotalSquads,
   int TotalViewCount,
   decimal AverageRating);
+
+public sealed record SquadListQueryRequest(
+  string? Search = null,
+  string? Sort = null,
+  int PageNumber = 1,
+  int PageSize = 6);

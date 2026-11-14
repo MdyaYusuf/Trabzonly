@@ -16,6 +16,11 @@ public interface IPostService
     Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<PostResponseDto>>> GetListAsync(
+    PostListQueryRequest query,
+    Guid? currentUserId = null,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<PostResponseDto>> GetAsync(
     Expression<Func<Post, bool>> predicate,
     Func<IQueryable<Post>, IQueryable<Post>>? include = null,

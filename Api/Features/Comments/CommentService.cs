@@ -57,6 +57,24 @@ public class CommentService(
     };
   }
 
+  public Task<ReturnModel<CursorPagedResponse<CommentResponseDto>>> GetRecentCommentsAsync(
+    CommentRecentQueryRequest query,
+    Guid? currentUserId = null,
+    CancellationToken cancellationToken = default)
+  {
+    int count = query.Count < 1 ? 10 : Math.Min(query.Count, 50);
+
+    return GetRecentCommentsAsync(
+      count: count,
+      filter: BuildRecentFilter(query),
+      lastDateCursor: query.LastDate,
+      lastIdCursor: query.LastId,
+      include: BuildRecentInclude(query),
+      orderBy: BuildRecentOrderBy(query.Sort),
+      currentUserId: currentUserId,
+      cancellationToken: cancellationToken);
+  }
+
   public async Task<ReturnModel<CursorPagedResponse<CommentResponseDto>>> GetRecentCommentsAsync(
     int count,
     Expression<Func<Comment, bool>>? filter = null,
@@ -445,5 +463,57 @@ public class CommentService(
 
     squad.CommentCount = Math.Max(0, squad.CommentCount + delta);
     _squadRepository.Update(squad);
+  }
+
+  private static Expression<Func<Comment, bool>>? BuildRecentFilter(
+    CommentRecentQueryRequest query)
+  {
+    if (query.PostId.HasValue)
+    {
+      Guid resolvedPostId = query.PostId.Value;
+      return c => c.PostId == resolvedPostId && c.ParentCommentId == null;
+    }
+
+    if (query.PlayerId.HasValue)
+    {
+      int resolvedPlayerId = query.PlayerId.Value;
+      return c => c.PlayerId == resolvedPlayerId && c.ParentCommentId == null;
+    }
+
+    if (query.SquadId.HasValue)
+    {
+      Guid resolvedSquadId = query.SquadId.Value;
+      return c => c.SquadId == resolvedSquadId && c.ParentCommentId == null;
+    }
+
+    return null;
+  }
+
+  private static Func<IQueryable<Comment>, IQueryable<Comment>>? BuildRecentInclude(
+    CommentRecentQueryRequest query)
+  {
+    if (!query.PostId.HasValue && !query.PlayerId.HasValue && !query.SquadId.HasValue)
+    {
+      return null;
+    }
+
+    return q => q
+      .Include(c => c.User)
+      .Include(c => c.Replies)
+      .ThenInclude(r => r.User);
+  }
+
+  private static Func<IQueryable<Comment>, IOrderedQueryable<Comment>>? BuildRecentOrderBy(
+    string? sort)
+  {
+    if (!string.Equals(sort, "liked", StringComparison.OrdinalIgnoreCase))
+    {
+      return null;
+    }
+
+    return query => query
+      .OrderByDescending(c => c.LikeCount)
+      .ThenByDescending(c => c.CreatedDate)
+      .ThenByDescending(c => c.Id);
   }
 }

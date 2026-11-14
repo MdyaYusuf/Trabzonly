@@ -64,6 +64,22 @@ public class PlayerStatsService(
       cancellationToken: cancellationToken);
   }
 
+  public async Task<ReturnModel<PagedResponse<PlayerStatsResponseDto>>> GetByPlayerAsync(
+    int playerId,
+    CancellationToken cancellationToken = default)
+  {
+    int resolvedPlayerId = playerId;
+
+    return await GetAllAsync(
+      filter: stats => stats.PlayerId == resolvedPlayerId,
+      orderBy: query => query
+        .OrderByDescending(stats => stats.Season!.StartDate)
+        .ThenByDescending(stats => stats.Id),
+      pageNumber: 1,
+      pageSize: 50,
+      cancellationToken: cancellationToken);
+  }
+
   public async Task<ReturnModel<PlayerStatsResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<PlayerStats>, IQueryable<PlayerStats>>? include = null,

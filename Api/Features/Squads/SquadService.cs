@@ -69,6 +69,22 @@ public class SquadService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<SquadPreviewDto>>> GetListAsync(
+    SquadListQueryRequest query,
+    Guid? ownerUserId = null,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 6 : Math.Min(query.PageSize, 50);
+
+    return await GetAllAsync(
+      filter: BuildListFilter(query, ownerUserId),
+      orderBy: BuildListOrderBy(query.Sort),
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+  }
+
   public async Task<ReturnModel<SquadResponseDto>> GetByIdAsync(
     Guid id,
     Guid? currentUserId = null,
@@ -462,5 +478,54 @@ public class SquadService(
       : Math.Round(scores.Average(), 2);
 
     _squadRepository.Update(squad);
+  }
+
+  private static Expression<Func<Squad, bool>>? BuildListFilter(
+    SquadListQueryRequest query,
+    Guid? ownerUserId)
+  {
+    string? searchTerm = string.IsNullOrWhiteSpace(query.Search)
+      ? null
+      : query.Search.Trim().ToLowerInvariant();
+
+    if (ownerUserId.HasValue)
+    {
+      Guid resolvedOwnerUserId = ownerUserId.Value;
+
+      if (searchTerm == null)
+      {
+        return squad => squad.UserId == resolvedOwnerUserId;
+      }
+
+      return squad =>
+        squad.UserId == resolvedOwnerUserId &&
+        squad.Title.ToLower().Contains(searchTerm);
+    }
+
+    if (searchTerm == null)
+    {
+      return null;
+    }
+
+    return squad =>
+      squad.Title.ToLower().Contains(searchTerm) ||
+      squad.User.Username.ToLower().Contains(searchTerm);
+  }
+
+  private static Func<IQueryable<Squad>, IOrderedQueryable<Squad>> BuildListOrderBy(
+    string? sort)
+  {
+    if (string.Equals(sort, "topRated", StringComparison.OrdinalIgnoreCase))
+    {
+      return query => query
+        .OrderByDescending(squad => squad.AverageRating)
+        .ThenByDescending(squad => squad.RatingCount)
+        .ThenByDescending(squad => squad.CreatedDate)
+        .ThenByDescending(squad => squad.Id);
+    }
+
+    return query => query
+      .OrderByDescending(squad => squad.CreatedDate)
+      .ThenByDescending(squad => squad.Id);
   }
 }

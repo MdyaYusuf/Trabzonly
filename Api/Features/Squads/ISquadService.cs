@@ -15,6 +15,11 @@ public interface ISquadService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<PagedResponse<SquadPreviewDto>>> GetListAsync(
+    SquadListQueryRequest query,
+    Guid? ownerUserId = null,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<SquadResponseDto>> GetByIdAsync(
     Guid id,
     Guid? currentUserId = null,

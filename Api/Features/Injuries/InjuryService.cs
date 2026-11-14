@@ -46,6 +46,20 @@ public class InjuryService(
     };
   }
 
+  public async Task<ReturnModel<PagedResponse<InjuryResponseDto>>> GetListAsync(
+    InjuryListQueryRequest query,
+    CancellationToken cancellationToken = default)
+  {
+    int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
+    int pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 50);
+
+    return await GetAllAsync(
+      filter: BuildListFilter(query),
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      cancellationToken: cancellationToken);
+  }
+
   public async Task<ReturnModel<PagedResponse<InjuryResponseDto>>> GetAdminListAsync(
     InjuryAdminListQueryRequest query,
     CancellationToken cancellationToken = default)
@@ -189,6 +203,18 @@ public class InjuryService(
       .Include(i => i.Player)
         .ThenInclude(p => p.Position)
       .Include(i => i.Season);
+  }
+
+  private static Expression<Func<Injury, bool>>? BuildListFilter(
+    InjuryListQueryRequest query)
+  {
+    if (!query.PlayerId.HasValue)
+    {
+      return null;
+    }
+
+    int resolvedPlayerId = query.PlayerId.Value;
+    return injury => injury.PlayerId == resolvedPlayerId;
   }
 
   private static Expression<Func<Injury, bool>> BuildAdminListFilter(

@@ -107,3 +107,11 @@ public sealed record PostPlatformStatsDto(
   int TotalComments,
   int TotalLikes,
   int TotalDislikes);
+
+public sealed record PostListQueryRequest(
+  int? CategoryId = null,
+  Guid? UserId = null,
+  string? Search = null,
+  string? Sort = null,
+  int PageNumber = 1,
+  int PageSize = 10);

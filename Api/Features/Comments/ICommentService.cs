@@ -28,6 +28,11 @@ public interface ICommentService
     Guid? currentUserId = null,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<CursorPagedResponse<CommentResponseDto>>> GetRecentCommentsAsync(
+    CommentRecentQueryRequest query,
+    Guid? currentUserId = null,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CommentResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
