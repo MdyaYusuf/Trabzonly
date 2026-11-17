@@ -75,14 +75,18 @@ export function SquadsGallerySidebar() {
 
       setIsLoadingMySquads(true)
 
-      const result = await squadService.getByUserId(currentUserId)
+      const result = await squadService.getByUserId(currentUserId, {
+        pageNumber: 1,
+        pageSize: 1,
+        sort: 'newest',
+      })
 
       if (cancelled) {
         return
       }
 
       if (result.success && result.data) {
-        setMySquads(result.data)
+        setMySquads(result.data.items)
       } else {
         setMySquads([])
       }

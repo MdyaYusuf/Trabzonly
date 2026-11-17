@@ -58,8 +58,23 @@ const getTopRated = async (count: number): Promise<ApiResponse<SquadPreviewDto[]
   return await apiClient<SquadPreviewDto[]>(`${API_URL}/top-rated/${count}`)
 }
 
-const getByUserId = async (userId: string): Promise<ApiResponse<SquadPreviewDto[]>> => {
-  return await apiClient<SquadPreviewDto[]>(`${API_URL}/user/${userId}`)
+const getByUserId = async (
+  userId: string,
+  query: SquadListQuery,
+): Promise<ApiResponse<PagedResponse<SquadPreviewDto>>> => {
+  const queryParams = new URLSearchParams({
+    pageNumber: query.pageNumber.toString(),
+    pageSize: query.pageSize.toString(),
+    sort: query.sort ?? 'newest',
+  })
+
+  if (query.search && query.search.trim().length > 0) {
+    queryParams.append('search', query.search.trim())
+  }
+
+  return await apiClient<PagedResponse<SquadPreviewDto>>(
+    `${API_URL}/user/${userId}?${queryParams}`,
+  )
 }
 
 const getMine = async (

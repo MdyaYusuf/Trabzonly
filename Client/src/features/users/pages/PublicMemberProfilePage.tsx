@@ -19,8 +19,8 @@ function buildTabs(profile: PublicUserProfileDto): PublicMemberTab[] {
     },
     {
       id: 'squads',
-      label: 'Kadrolar & Taktikler',
-      icon: 'sports',
+      label: 'Kadrolar',
+      icon: 'person_play',
       count: profile.squadCount,
     },
   ]

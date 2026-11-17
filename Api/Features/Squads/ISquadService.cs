@@ -43,11 +43,9 @@ public interface ISquadService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<List<SquadPreviewDto>>> GetByUserIdAsync(
+  Task<ReturnModel<PagedResponse<SquadPreviewDto>>> GetByUserIdAsync(
     Guid userId,
-    Func<IQueryable<Squad>, IQueryable<Squad>>? include = null,
-    bool enableTracking = false,
-    bool withDeleted = false,
+    SquadListQueryRequest query,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<MySquadStatsDto>> GetMyStatsAsync(

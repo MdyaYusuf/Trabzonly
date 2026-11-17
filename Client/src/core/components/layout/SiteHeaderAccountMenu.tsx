@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authService } from '@/features/auth/authService'
 import { useAppSelector } from '@/core/store/hooks'
+import { publicProfilePath } from '@/features/users/components/UserProfileLink'
 
 type SiteHeaderAccountMenuProps = {
   onNavigate?: () => void
@@ -117,6 +118,21 @@ export function SiteHeaderAccountMenu({ onNavigate }: SiteHeaderAccountMenuProps
             </Link>
           ) : null}
 
+          {username ? (
+            <Link
+              role="menuitem"
+              to={publicProfilePath(username)}
+              className="font-label flex cursor-pointer items-center gap-space-sm px-space-md py-space-sm text-label-md text-on-surface uppercase transition-colors hover:bg-surface-container"
+              onClick={() => {
+                setIsOpen(false)
+                onNavigate?.()
+              }}
+            >
+              <span className="material-symbols-outlined text-[18px] text-primary">person</span>
+              Profilim
+            </Link>
+          ) : null}
+
           <Link
             role="menuitem"
             to="/profil"
@@ -127,7 +143,7 @@ export function SiteHeaderAccountMenu({ onNavigate }: SiteHeaderAccountMenuProps
             }}
           >
             <span className="material-symbols-outlined text-[18px] text-primary">settings</span>
-            Profil Ayarları
+            Hesap Ayarları
           </Link>
 
           <button

@@ -51,10 +51,12 @@ public class SquadsController(ISquadService _squadService) : CustomBaseControlle
   [HttpGet("user/{userId:guid}")]
   public async Task<IActionResult> GetByUserId(
     Guid userId,
+    [FromQuery] SquadListQueryRequest query,
     CancellationToken cancellationToken)
   {
     var result = await _squadService.GetByUserIdAsync(
       userId: userId,
+      query: query,
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

@@ -198,28 +198,21 @@ public class SquadService(
     };
   }
 
-  public async Task<ReturnModel<List<SquadPreviewDto>>> GetByUserIdAsync(
+  public async Task<ReturnModel<PagedResponse<SquadPreviewDto>>> GetByUserIdAsync(
     Guid userId,
-    Func<IQueryable<Squad>, IQueryable<Squad>>? include = null,
-    bool enableTracking = false,
-    bool withDeleted = false,
+    SquadListQueryRequest query,
     CancellationToken cancellationToken = default)
   {
-    List<Squad> squads = await _squadRepository.GetAllAsync(
-      filter: s => s.UserId == userId,
-      include: include ?? DefaultPreviewInclude,
-      orderBy: query => query.OrderByDescending(s => s.CreatedDate),
-      enableTracking,
-      withDeleted,
-      cancellationToken);
+    ReturnModel<PagedResponse<SquadPreviewDto>> result = await GetListAsync(
+      query: query,
+      ownerUserId: userId,
+      cancellationToken: cancellationToken);
 
-    List<SquadPreviewDto> response = _mapper.EntityToPreviewDtoList(squads);
-
-    return new ReturnModel<List<SquadPreviewDto>>()
+    return new ReturnModel<PagedResponse<SquadPreviewDto>>()
     {
       Success = true,
       Message = "Kullanıcının kadroları başarılı bir şekilde getirildi.",
-      Data = response,
+      Data = result.Data,
       StatusCode = 200
     };
   }
