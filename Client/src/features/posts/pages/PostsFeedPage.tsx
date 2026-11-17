@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useAppSelector } from '@/core/store/hooks'
 import { authService } from '@/features/auth/authService'
 import categoryService from '../../categories/categoryService'
@@ -8,11 +8,36 @@ import { PostsFeedBreadcrumb } from '../components/PostsFeedBreadcrumb'
 import { PostsFeedCta } from '../components/PostsFeedCta'
 import { PostsFeedFilters } from '../components/PostsFeedFilters'
 import { PostsFeedHero } from '../components/PostsFeedHero'
-import { PostsFeedPagination } from '../components/PostsFeedPagination'
+import { PostsFeedLoadMore } from '../components/PostsFeedLoadMore'
 import { PostsFeedSidebar } from '../components/PostsFeedSidebar'
 import postService from '../postService'
 import { mapPostToFeedCard } from '../utils/mapPostToFeedCard'
-import { PAGE_SIZE, type FeedPostCard, type FeedSortOption } from '../utils/postsFeedTypes'
+import {
+  FEED_PAGE_SIZE,
+  MAX_FEED_POSTS,
+  type FeedPostCard,
+  type FeedSortOption,
+} from '../utils/postsFeedTypes'
+
+/** ~3 feed cards visible (cards with featured comments run tall); scroll stays inside the panel. */
+const FEED_SCROLL_PANEL_CLASS =
+  'h-[min(110vh,88rem)] overflow-y-auto overscroll-contain px-space-md py-space-sm sm:px-space-lg [scrollbar-width:thin] [scrollbar-color:rgba(31,27,23,0.16)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-on-surface/12 hover:[&::-webkit-scrollbar-thumb]:bg-on-surface/22'
+
+function measureRemovedFeedHeight(scrollRoot: HTMLElement, removedIds: string[]) {
+  let height = 0
+
+  for (const id of removedIds) {
+    const node = scrollRoot.querySelector<HTMLElement>(
+      `[data-feed-post-id="${CSS.escape(id)}"]`,
+    )
+
+    if (node) {
+      height += node.offsetHeight
+    }
+  }
+
+  return height
+}
 
 export function PostsFeedPage() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
@@ -23,10 +48,25 @@ export function PostsFeedPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [sort, setSort] = useState<FeedSortOption>('newest')
   const [page, setPage] = useState(1)
+  const [reloadToken, setReloadToken] = useState(0)
   const [posts, setPosts] = useState<FeedPostCard[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasTrimmedWindow, setHasTrimmedWindow] = useState(false)
+  const [feedScrollEl, setFeedScrollEl] = useState<HTMLDivElement | null>(null)
+  const feedScrollElRef = useRef<HTMLDivElement | null>(null)
+  const postsRef = useRef<FeedPostCard[]>([])
+  const scrollAdjustRef = useRef(0)
+
+  useEffect(() => {
+    feedScrollElRef.current = feedScrollEl
+  }, [feedScrollEl])
+
+  useEffect(() => {
+    postsRef.current = posts
+  }, [posts])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -62,9 +102,14 @@ export function PostsFeedPage() {
 
   useEffect(() => {
     let cancelled = false
+    const isFirstPage = page === 1
 
     async function loadPosts() {
-      setIsLoading(true)
+      if (isFirstPage) {
+        setIsLoading(true)
+      } else {
+        setIsLoadingMore(true)
+      }
 
       await authService.ensureViewerSession()
 
@@ -74,7 +119,7 @@ export function PostsFeedPage() {
 
       const result = await postService.getAll({
         pageNumber: page,
-        pageSize: PAGE_SIZE,
+        pageSize: FEED_PAGE_SIZE,
         categoryId: categoryId === 'all' ? undefined : categoryId,
         search: debouncedSearch,
         sort,
@@ -85,16 +130,47 @@ export function PostsFeedPage() {
       }
 
       if (result.success && result.data) {
-        setPosts(result.data.items.map(mapPostToFeedCard))
+        const mapped = result.data.items.map(mapPostToFeedCard)
+        const nextTotalPages = Math.max(1, Math.ceil(result.data.totalCount / FEED_PAGE_SIZE))
+
         setTotalCount(result.data.totalCount)
-        setTotalPages(Math.max(1, Math.ceil(result.data.totalCount / PAGE_SIZE)))
-      } else {
+        setTotalPages(nextTotalPages)
+
+        if (isFirstPage) {
+          scrollAdjustRef.current = 0
+          setHasTrimmedWindow(false)
+          setPosts(mapped)
+        } else {
+          const current = postsRef.current
+          const seen = new Set(current.map((post) => post.id))
+          const appended = mapped.filter((post) => !seen.has(post.id))
+          const merged = [...current, ...appended]
+
+          if (merged.length <= MAX_FEED_POSTS) {
+            scrollAdjustRef.current = 0
+            setPosts(merged)
+          } else {
+            const removeCount = merged.length - MAX_FEED_POSTS
+            const removedIds = merged.slice(0, removeCount).map((post) => post.id)
+            const scrollRoot = feedScrollElRef.current
+
+            scrollAdjustRef.current = scrollRoot
+              ? measureRemovedFeedHeight(scrollRoot, removedIds)
+              : 0
+            setHasTrimmedWindow(true)
+            setPosts(merged.slice(-MAX_FEED_POSTS))
+          }
+        }
+      } else if (isFirstPage) {
+        scrollAdjustRef.current = 0
+        setHasTrimmedWindow(false)
         setPosts([])
         setTotalCount(0)
         setTotalPages(1)
       }
 
       setIsLoading(false)
+      setIsLoadingMore(false)
     }
 
     void loadPosts()
@@ -102,13 +178,43 @@ export function PostsFeedPage() {
     return () => {
       cancelled = true
     }
-  }, [categoryId, debouncedSearch, sort, page, isAuthenticated, userId])
+  }, [categoryId, debouncedSearch, sort, page, reloadToken, isAuthenticated, userId])
 
-  const rangeStart = totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
-  const rangeEnd = Math.min(page * PAGE_SIZE, totalCount)
+  useLayoutEffect(() => {
+    const el = feedScrollEl
+    const delta = scrollAdjustRef.current
+
+    if (!el || delta <= 0) {
+      return
+    }
+
+    el.scrollTop = Math.max(0, el.scrollTop - delta)
+    scrollAdjustRef.current = 0
+  }, [posts, feedScrollEl])
+
+  const hasMore = page < totalPages
+
+  function scrollFeedToTop() {
+    feedScrollEl?.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   function resetToFirstPage() {
+    scrollFeedToTop()
     setPage(1)
+  }
+
+  function handleRefresh() {
+    scrollFeedToTop()
+    setPage(1)
+    setReloadToken((token) => token + 1)
+  }
+
+  function handleLoadMore() {
+    if (isLoading || isLoadingMore || !hasMore) {
+      return
+    }
+
+    setPage((current) => current + 1)
   }
 
   return (
@@ -139,31 +245,51 @@ export function PostsFeedPage() {
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
             <div className="flex flex-col gap-space-md lg:col-span-8">
-              <div className="flex flex-col bg-background px-space-md py-space-sm shadow-[0_4px_24px_rgba(31,27,23,0.06)] sm:px-space-lg">
-                {isLoading ? (
-                  <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-                    Gönderiler yükleniyor...
-                  </p>
-                ) : posts.length === 0 ? (
-                  <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-                    Bu filtrelere uygun gönderi bulunamadı.
-                  </p>
-                ) : (
-                  posts.map((post) => <PostCard key={post.id} post={post} />)
-                )}
+              <div className="flex items-center justify-end px-space-xs">
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  disabled={isLoading}
+                  className="font-label inline-flex cursor-pointer items-center gap-1 text-label-md tracking-wider text-on-surface-variant uppercase transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                  title="Akışı yenile"
+                >
+                  <span className="material-symbols-outlined text-[18px]">refresh</span>
+                  Yenile
+                </button>
               </div>
 
-              <PostsFeedPagination
-                filteredCount={totalCount}
-                rangeStart={rangeStart}
-                rangeEnd={rangeEnd}
-                totalPages={totalPages}
-                currentPage={page}
-                onPageChange={(nextPage) => {
-                  setPage(nextPage)
-                  window.scrollTo({ top: 0, behavior: 'smooth' })
-                }}
-              />
+              <div className="flex flex-col bg-background shadow-[0_4px_24px_rgba(31,27,23,0.06)]">
+                <div ref={setFeedScrollEl} className={FEED_SCROLL_PANEL_CLASS}>
+                  {isLoading ? (
+                    <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                      Gönderiler yükleniyor...
+                    </p>
+                  ) : posts.length === 0 ? (
+                    <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
+                      Bu filtrelere uygun gönderi bulunamadı.
+                    </p>
+                  ) : (
+                    <>
+                      {hasTrimmedWindow ? (
+                        <p className="font-body border-b border-outline-variant/15 py-space-sm text-center text-body-sm text-on-surface-variant/70">
+                          Eski gönderiler temizlendi — başa dönmek için Yenile.
+                        </p>
+                      ) : null}
+                      {posts.map((post) => (
+                        <div key={post.id} data-feed-post-id={post.id}>
+                          <PostCard post={post} />
+                        </div>
+                      ))}
+                      <PostsFeedLoadMore
+                        hasMore={hasMore}
+                        isLoadingMore={isLoadingMore}
+                        onLoadMore={handleLoadMore}
+                        scrollRoot={feedScrollEl}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
 
             <PostsFeedSidebar />

@@ -53,7 +53,14 @@ export type FeedPostCard = {
   currentReaction?: PostReactionType | null
 }
 
+/** Classic pagination (e.g. public profile posts). */
 export const PAGE_SIZE = 5
+
+/** Infinite-scroll feed chunk size (`PostsFeedPage` only). */
+export const FEED_PAGE_SIZE = 6
+
+/** Sliding window cap for accumulated feed cards in memory. */
+export const MAX_FEED_POSTS = 24
 
 export const sortOptions: { value: FeedSortOption; label: string }[] = [
   { value: 'newest', label: 'En Yeniler' },

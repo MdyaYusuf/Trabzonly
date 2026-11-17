@@ -51,7 +51,7 @@ export function TakeQuizQuestionPanel({
         className="pointer-events-none absolute inset-x-0 top-0 h-2.5 bg-surface-container-high"
       >
         <div
-          className={`h-full transition-[width] duration-1000 ease-linear ${
+          className={`h-full transition-[width] duration-150 ease-linear ${
             timerUrgent ? 'bg-error' : 'bg-secondary'
           }`}
           style={{ width: `${timerPercent}%` }}
