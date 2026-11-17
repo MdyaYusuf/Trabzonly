@@ -64,12 +64,6 @@ export function PostDetailArticle({ post, textScale }: PostDetailArticleProps) {
 
   return (
     <div className="flex flex-col gap-space-lg">
-      {post.imageUrl ? (
-        <div className="overflow-hidden bg-surface-container">
-          <img src={post.imageUrl} alt="" className="h-auto max-h-[28rem] w-full object-cover" />
-        </div>
-      ) : null}
-
       <div
         className="font-body whitespace-pre-wrap bg-on-surface/[0.03] px-space-md py-space-md text-body-lg leading-relaxed text-text-dark sm:px-space-lg sm:py-space-lg"
         style={{ fontSize: `${textScale}rem` }}

@@ -29,7 +29,6 @@ export interface PostResponseDto {
   title: string;
   description?: string;
   content: string;
-  imageUrl?: string;
   isActive: boolean;
   likeCount: number;
   dislikeCount: number;
@@ -50,14 +49,12 @@ export interface PostResponseDto {
 export interface CreatedPostResponseDto {
   id: string;
   title: string;
-  imageUrl?: string;
 }
 
 export interface PostPreviewDto {
   id: string;
   title: string;
   description?: string;
-  imageUrl?: string;
   authorUsername: string;
   categoryName: string;
   createdDate: string;
@@ -84,7 +81,6 @@ export interface CreatePostRequest {
   description?: string;
   content: string;
   categoryId: number;
-  imageFile?: File | null;
   poll?: CreatePostPollRequest | null;
 }
 
@@ -94,7 +90,6 @@ export interface UpdatePostRequest {
   description?: string;
   content: string;
   categoryId: number;
-  imageFile?: File | null;
   isActive: boolean;
   poll?: CreatePostPollRequest | null;
   deactivatePoll?: boolean;

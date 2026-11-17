@@ -19,7 +19,6 @@ public class Post : Entity<Guid>
   public required string Title { get; set; }
   public string? Description { get; set; }
   public required string Content { get; set; }
-  public string? ImageUrl { get; set; }
   public bool IsActive { get; set; } = true;
   public int LikeCount { get; set; } = 0;
   public int DislikeCount { get; set; } = 0;

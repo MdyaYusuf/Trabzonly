@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Api.Core.Exceptions;
-using Api.Core.Helpers;
 using Api.Core.Repositories;
 using Api.Core.Responses;
 using Api.Features.Polls;
@@ -58,7 +57,6 @@ public class PostService(
         Title = p.Title,
         Description = p.Description,
         Content = p.Content,
-        ImageUrl = p.ImageUrl,
         IsActive = p.IsActive,
         LikeCount = p.LikeCount,
         DislikeCount = p.DislikeCount,
@@ -164,7 +162,6 @@ public class PostService(
         Title = p.Title,
         Description = p.Description,
         Content = p.Content,
-        ImageUrl = p.ImageUrl,
         IsActive = p.IsActive,
         LikeCount = p.LikeCount,
         DislikeCount = p.DislikeCount,
@@ -257,7 +254,6 @@ public class PostService(
         Title = p.Title,
         Description = p.Description,
         Content = p.Content,
-        ImageUrl = p.ImageUrl,
         IsActive = p.IsActive,
         LikeCount = p.LikeCount,
         DislikeCount = p.DislikeCount,
@@ -352,7 +348,6 @@ public class PostService(
         Title = p.Title,
         Description = p.Description,
         Content = p.Content,
-        ImageUrl = p.ImageUrl,
         IsActive = p.IsActive,
         LikeCount = p.LikeCount,
         DislikeCount = p.DislikeCount,
@@ -427,7 +422,6 @@ public class PostService(
         Id = p.Id,
         Title = p.Title,
         Description = p.Description,
-        ImageUrl = p.ImageUrl,
         AuthorUsername = p.User.Username,
         CategoryName = p.Category.Name,
         CreatedDate = p.CreatedDate,
@@ -509,7 +503,6 @@ public class PostService(
         Title = p.Title,
         Description = p.Description,
         Content = p.Content,
-        ImageUrl = p.ImageUrl,
         IsActive = p.IsActive,
         LikeCount = p.LikeCount,
         DislikeCount = p.DislikeCount,
@@ -598,15 +591,6 @@ public class PostService(
     Post post = _mapper.CreateToEntity(request);
     post.UserId = currentUserId;
 
-    if (request.ImageFile != null)
-    {
-      post.ImageUrl = await FileHelper.SaveImageToDisk(
-        request.ImageFile,
-        "posts",
-        request.Title,
-        cancellationToken);
-    }
-
     if (request.Poll != null)
     {
       AttachPollToPost(post, request.Poll);
@@ -649,13 +633,6 @@ public class PostService(
 
     _businessRules.UserMustBeOwnerOrAdmin(post.UserId, currentUserId, userRole);
 
-    post.ImageUrl = await FileHelper.ReplaceImageOnDisk(
-      request.ImageFile,
-      post.ImageUrl,
-      "posts",
-      request.Title,
-      cancellationToken);
-
     _mapper.UpdateEntityFromRequest(request, post);
 
     if (request.DeactivatePoll)
@@ -690,8 +667,6 @@ public class PostService(
     Post post = await _businessRules.GetPostIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
     _businessRules.UserMustBeOwnerOrAdmin(post.UserId, currentUserId, userRole);
-
-    FileHelper.DeleteImageFromDisk(post.ImageUrl);
 
     _postRepository.Delete(post);
     await _unitOfWork.SaveChangesAsync(cancellationToken);

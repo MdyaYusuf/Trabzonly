@@ -46,7 +46,6 @@ export type FeedPostCard = {
   likeCount: number
   dislikeCount: number
   commentCount: number
-  imageUrl?: string
   poll?: FeedPostPoll | null
   topComment?: FeedPostTopComment | null
   authorUserId: string

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { editorGuidelines, featureTips } from '../utils/postEditorCopy'
+import { editorGuidelines } from '../utils/postEditorCopy'
 
 type PostEditorSidebarProps = {
   mode: 'create' | 'edit'
@@ -167,28 +167,6 @@ export function PostEditorSidebar({
               <span className="font-body text-body-sm text-on-surface">
                 <strong>{item.title}:</strong> {item.body}
               </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-space-md bg-surface-container p-space-lg">
-        <div className="flex items-center gap-space-xs">
-          <span className="material-symbols-outlined text-lg text-secondary">tips_and_updates</span>
-          <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
-            Manşete Çıkma İpuçları
-          </span>
-        </div>
-        <div className="flex flex-col gap-space-sm">
-          {featureTips.map((tip, index) => (
-            <div
-              key={tip}
-              className="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm"
-            >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-on-secondary">
-                {index + 1}
-              </span>
-              <p className="font-body text-body-sm text-on-surface">{tip}</p>
             </div>
           ))}
         </div>

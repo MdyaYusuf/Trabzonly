@@ -178,16 +178,6 @@ export function PostCard({ post }: PostCardProps) {
             {post.excerpt}
           </p>
 
-          {post.imageUrl ? (
-            <div className="mt-space-md overflow-hidden border border-outline-variant/25">
-              <img
-                src={post.imageUrl}
-                alt=""
-                className="max-h-72 w-full object-cover transition-transform duration-300 group-hover:scale-[1.01]"
-              />
-            </div>
-          ) : null}
-
           {post.topComment ? (
             <div className="mt-space-md border-l-[3px] border-secondary bg-surface-container/55 px-space-sm py-space-sm">
               <div className="mb-1 flex flex-wrap items-center justify-between gap-space-xs">

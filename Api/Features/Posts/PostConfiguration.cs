@@ -34,9 +34,6 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
     builder.Property(b => b.Content)
       .IsRequired();
 
-    builder.Property(b => b.ImageUrl)
-      .HasMaxLength(500);
-
     builder.Property(b => b.LikeCount)
       .HasDefaultValue(0)
       .IsRequired();

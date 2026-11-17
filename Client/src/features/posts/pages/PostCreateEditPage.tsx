@@ -24,9 +24,6 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
   const [categoryId, setCategoryId] = useState<number | ''>('')
   const [summary, setSummary] = useState('')
   const [body, setBody] = useState('')
-  const [coverFile, setCoverFile] = useState<File | null>(null)
-  const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null)
-  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
   const [pollQuestion, setPollQuestion] = useState('')
   const [pollOptions, setPollOptions] = useState(['', ''])
   const [hasExistingPoll, setHasExistingPoll] = useState(false)
@@ -91,8 +88,6 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
       setCategoryId(post.categoryId)
       setSummary(post.description ?? '')
       setBody(post.content)
-      setExistingImageUrl(post.imageUrl ?? null)
-      setCoverPreviewUrl(post.imageUrl ?? null)
       setIsActive(post.isActive)
       setHasExistingPoll(Boolean(post.poll))
       setExistingPollQuestion(post.poll?.question ?? null)
@@ -109,39 +104,6 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
       cancelled = true
     }
   }, [mode, postId])
-
-  useEffect(() => {
-    return () => {
-      if (coverPreviewUrl && coverPreviewUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(coverPreviewUrl)
-      }
-    }
-  }, [coverPreviewUrl])
-
-  function handleCoverFileChange(file: File | null) {
-    if (coverPreviewUrl && coverPreviewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(coverPreviewUrl)
-    }
-
-    setCoverFile(file)
-
-    if (file) {
-      setCoverPreviewUrl(URL.createObjectURL(file))
-      return
-    }
-
-    setCoverPreviewUrl(existingImageUrl)
-  }
-
-  function handleRemoveCover() {
-    if (coverPreviewUrl && coverPreviewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(coverPreviewUrl)
-    }
-
-    setCoverFile(null)
-    setCoverPreviewUrl(null)
-    setExistingImageUrl(null)
-  }
 
   async function handlePublish() {
     const trimmedTitle = title.trim()
@@ -181,7 +143,6 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
           description: summary.trim() || undefined,
           content: trimmedBody,
           categoryId,
-          imageFile: coverFile,
           isActive,
           poll: pollPayload,
           deactivatePoll: hasExistingPoll && deactivatePoll ? true : undefined,
@@ -200,7 +161,6 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
         description: summary.trim() || undefined,
         content: trimmedBody,
         categoryId,
-        imageFile: coverFile,
         poll: pollPayload,
       })
 
@@ -258,12 +218,8 @@ export function PostCreateEditPage({ mode: modeProp }: PostCreateEditPageProps) 
               <PostEditorForm
                 summary={summary}
                 body={body}
-                coverPreviewUrl={coverPreviewUrl}
-                coverFileName={coverFile?.name ?? null}
                 onSummaryChange={setSummary}
                 onBodyChange={setBody}
-                onCoverFileChange={handleCoverFileChange}
-                onRemoveCover={handleRemoveCover}
               />
             </div>
 

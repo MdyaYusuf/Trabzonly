@@ -103,7 +103,6 @@ export function mapPostToFeedCard(post: PostResponseDto): FeedPostCard {
     likeCount: post.likeCount,
     dislikeCount: post.dislikeCount,
     commentCount: post.commentCount,
-    imageUrl: post.imageUrl,
     poll: post.poll ? mapPollSummary(post.poll) : null,
     topComment: post.topComment
       ? {

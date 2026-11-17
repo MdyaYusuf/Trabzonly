@@ -15,9 +15,3 @@ export const editorGuidelines = [
     icon: 'sports',
   },
 ]
-
-export const featureTips = [
-  'Göz alıcı ve yüksek çözünürlüklü bir kapak görseli ekleyin.',
-  'İsteğe bağlı anket ekleyerek tribünü tartışmaya davet edin.',
-  'En az 200 kelimelik doyurucu ve akıcı bir Karadeniz futbolu yazısı kurgulayın.',
-]
