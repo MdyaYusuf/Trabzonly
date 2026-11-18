@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '@/features/auth/authService'
+import { ProfileContactAdminForm } from '../components/ProfileContactAdminForm'
 import { ProfileEditForm } from '../components/ProfileEditForm'
 import { ProfilePasswordForm } from '../components/ProfilePasswordForm'
 import { ProfileSettingsBreadcrumb } from '../components/ProfileSettingsBreadcrumb'
@@ -50,11 +51,18 @@ export function ProfileSettingsPage() {
               showToast('Profil bilgileriniz başarıyla güncellendi.')
             }}
           />
-          <ProfilePasswordForm
-            onUpdated={() => {
-              showToast('Şifreniz başarıyla güncellendi.')
-            }}
-          />
+          <div className="flex flex-col gap-gutter">
+            <ProfilePasswordForm
+              onUpdated={() => {
+                showToast('Şifreniz başarıyla güncellendi.')
+              }}
+            />
+            <ProfileContactAdminForm
+              onSent={() => {
+                showToast('Mesajınız yöneticilere iletildi.')
+              }}
+            />
+          </div>
         </div>
       </div>
     </main>

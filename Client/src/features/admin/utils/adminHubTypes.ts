@@ -14,6 +14,8 @@ export type AdminModuleCard = {
   categoryLabel: string
   icon: string
   to: string
+  /** Visual unread hint only — no counts. */
+  hasUnreadHint?: boolean
 }
 
 export type AdminHubProfile = {

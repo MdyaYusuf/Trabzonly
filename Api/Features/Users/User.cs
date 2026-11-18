@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Api.Core.Entities;
 using Api.Features.Comments;
+using Api.Features.ContactMessages;
 using Api.Features.Roles;
 using Api.Features.Quizzes;
 using Api.Features.Posts;
@@ -46,4 +47,5 @@ public class User : Entity<Guid>
   public virtual ICollection<PlayerRating> PlayerRatings { get; set; } = new List<PlayerRating>();
   public virtual ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();
   public virtual ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
+  public virtual ICollection<ContactMessage> ContactMessages { get; set; } = new List<ContactMessage>();
 }

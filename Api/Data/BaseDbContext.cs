@@ -16,6 +16,7 @@ using Api.Features.Squads;
 using Api.Features.Metrics;
 using Api.Features.Polls;
 using Api.Features.MatchWeek;
+using Api.Features.ContactMessages;
 
 namespace Api.Data;
 
@@ -59,6 +60,7 @@ public class BaseDbContext : DbContext
   public DbSet<MatchWeek> MatchWeeks { get; set; }
   public DbSet<MatchWeekSlot> MatchWeekSlots { get; set; }
   public DbSet<MatchWeekPlayerRating> MatchWeekPlayerRatings { get; set; }
+  public DbSet<ContactMessage> ContactMessages { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

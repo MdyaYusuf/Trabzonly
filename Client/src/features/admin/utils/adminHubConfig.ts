@@ -26,12 +26,18 @@ export const adminShellProfile: AdminShellProfile = {
     { id: 'categories', label: 'Kategoriler', to: '/yonetim/kategoriler', icon: 'category' },
     { id: 'polls', label: 'Anketler', to: '/yonetim/anketler', icon: 'ballot' },
     { id: 'quizzes', label: 'Quizler', to: '/yonetim/quizler', icon: 'quiz' },
-    { id: 'members', label: 'Üyeler', to: '/yonetim/uyeler', icon: 'people' },
     {
       id: 'roles',
       label: 'Roller',
       to: '/yonetim/roller',
       icon: 'admin_panel_settings',
+    },
+    { id: 'members', label: 'Üyeler', to: '/yonetim/uyeler', icon: 'people' },
+    {
+      id: 'contact-messages',
+      label: 'Mesajlar',
+      to: '/yonetim/mesajlar',
+      icon: 'mail',
     },
   ],
 }
@@ -128,6 +134,14 @@ export const adminHubProfile: AdminHubProfile = {
       to: '/yonetim/quizler',
     },
     {
+      id: 'roles',
+      title: 'Roller',
+      description: 'Yetki şablonlarını, moderatör ve yazar erişim matrislerini yönet.',
+      categoryLabel: 'Erişim & Güvenlik',
+      icon: 'admin_panel_settings',
+      to: '/yonetim/roller',
+    },
+    {
       id: 'members',
       title: 'Üyeler',
       description:
@@ -137,12 +151,13 @@ export const adminHubProfile: AdminHubProfile = {
       to: '/yonetim/uyeler',
     },
     {
-      id: 'roles',
-      title: 'Roller',
-      description: 'Yetki şablonlarını, moderatör ve yazar erişim matrislerini yönet.',
-      categoryLabel: 'Erişim & Güvenlik',
-      icon: 'admin_panel_settings',
-      to: '/yonetim/roller',
+      id: 'contact-messages',
+      title: 'Mesajlar',
+      description:
+        'Üyelerin sorun ve öneri mesajlarını okuyun. Okundu işaretleyin veya silin.',
+      categoryLabel: 'Topluluk',
+      icon: 'mail',
+      to: '/yonetim/mesajlar',
     },
   ],
 }

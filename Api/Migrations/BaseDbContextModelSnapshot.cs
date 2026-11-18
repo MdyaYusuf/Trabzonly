@@ -153,6 +153,52 @@ namespace Trabzonly.Api.Migrations
                     b.ToTable("CommentReactions", (string)null);
                 });
 
+            modelBuilder.Entity("Api.Features.ContactMessages.ContactMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsResolved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsRead", "CreatedDate");
+
+                    b.HasIndex("IsResolved", "CreatedDate");
+
+                    b.HasIndex("UserId", "CreatedDate");
+
+                    b.ToTable("ContactMessages", (string)null);
+                });
+
             modelBuilder.Entity("Api.Features.Injuries.Injury", b =>
                 {
                     b.Property<int>("Id")
@@ -1625,6 +1671,17 @@ namespace Trabzonly.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Api.Features.ContactMessages.ContactMessage", b =>
+                {
+                    b.HasOne("Api.Features.Users.User", "User")
+                        .WithMany("ContactMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Api.Features.Injuries.Injury", b =>
                 {
                     b.HasOne("Api.Features.Players.Player", "Player")
@@ -2177,6 +2234,8 @@ namespace Trabzonly.Api.Migrations
             modelBuilder.Entity("Api.Features.Users.User", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("ContactMessages");
 
                     b.Navigation("Followers");
 

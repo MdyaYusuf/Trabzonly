@@ -26,6 +26,7 @@ import { AdminQuizCreatePage } from '@/features/admin/pages/AdminQuizCreatePage'
 import { AdminQuizEditPage } from '@/features/admin/pages/AdminQuizEditPage'
 import { AdminMemberListPage } from '@/features/admin/pages/AdminMemberListPage'
 import { AdminMemberDetailPage } from '@/features/admin/pages/AdminMemberDetailPage'
+import { AdminContactMessageListPage } from '@/features/admin/pages/AdminContactMessageListPage'
 import { AdminRoleListPage } from '@/features/admin/pages/AdminRoleListPage'
 import { AdminRoleCreateEditPage } from '@/features/admin/pages/AdminRoleCreateEditPage'
 import { AdminPollListPage } from '@/features/admin/pages/AdminPollListPage'
@@ -284,6 +285,10 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/uyeler/:memberId',
             element: <AdminMemberDetailPage />,
+          },
+          {
+            path: 'yonetim/mesajlar',
+            element: <AdminContactMessageListPage />,
           },
           {
             path: 'yonetim/roller',

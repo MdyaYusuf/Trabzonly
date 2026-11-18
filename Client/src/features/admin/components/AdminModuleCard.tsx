@@ -9,8 +9,14 @@ export function AdminModuleCardView({ module }: AdminModuleCardProps) {
   return (
     <article className="flex h-full flex-col border border-outline-variant/40 bg-surface-container-lowest p-space-md shadow-sm transition-all duration-200 hover:-translate-y-1 hover:scale-[1.035] hover:shadow-lg">
       <div className="flex items-center gap-space-sm">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary">
+        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary">
           <span className="material-symbols-outlined text-[22px]">{module.icon}</span>
+          {module.hasUnreadHint ? (
+            <span
+              className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface-container-lowest"
+              aria-label="Okunmamış mesaj var"
+            />
+          ) : null}
         </div>
         <h3 className="font-headline text-headline-md font-bold text-secondary">{module.title}</h3>
       </div>
