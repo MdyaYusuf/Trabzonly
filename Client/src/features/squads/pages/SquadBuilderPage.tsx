@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAppSelector } from '@/core/store/hooks'
 import playerService from '@/features/players/playerService'
 import positionService from '@/features/positions/positionService'
@@ -687,27 +688,55 @@ export function SquadBuilderPage() {
     showToast('Tüm slotlar dolu. Önce bir pozisyonu boşaltın.')
   }
 
-  const canPublish =
-    stats.starterFilled === 11 &&
-    stats.benchFilled === 10 &&
-    starterSlotsHaveRoles &&
-    Boolean(captainPlayerId) &&
-    Boolean(cornerTakerPlayerId) &&
-    Boolean(freeKickTakerPlayerId) &&
-    title.trim().length > 0 &&
-    notes.length <= NOTES_MAX_LENGTH &&
-    starterPlayerIds.has(captainPlayerId) &&
-    starterPlayerIds.has(cornerTakerPlayerId) &&
-    starterPlayerIds.has(freeKickTakerPlayerId)
+  function getPublishBlockReason(): string | null {
+    if (!isAuthenticated) {
+      return 'Yayınlamak için giriş yapmalısınız.'
+    }
+
+    if (title.trim().length === 0) {
+      return 'Kadro başlığı girmelisiniz.'
+    }
+
+    if (notes.length > NOTES_MAX_LENGTH) {
+      return `Notlar en fazla ${NOTES_MAX_LENGTH} karakter olabilir.`
+    }
+
+    if (stats.starterFilled < 11) {
+      return 'İlk 11 eksik. Tüm başlangıç oyuncularını seçmelisiniz.'
+    }
+
+    if (stats.benchFilled < 10) {
+      return 'Yedek kulübesi eksik. Tüm yedek oyuncuları seçmelisiniz.'
+    }
+
+    if (!starterSlotsHaveRoles) {
+      return 'Her başlangıç oyuncusu için bir rol seçmelisiniz.'
+    }
+
+    if (!captainPlayerId || !starterPlayerIds.has(captainPlayerId)) {
+      return 'İlk 11 içinden bir kaptan seçmelisiniz.'
+    }
+
+    if (!cornerTakerPlayerId || !starterPlayerIds.has(cornerTakerPlayerId)) {
+      return 'İlk 11 içinden bir korner kullanan seçmelisiniz.'
+    }
+
+    if (!freeKickTakerPlayerId || !starterPlayerIds.has(freeKickTakerPlayerId)) {
+      return 'İlk 11 içinden bir serbest vuruş kullanan seçmelisiniz.'
+    }
+
+    return null
+  }
 
   async function handlePublish() {
-    if (!canPublish || isPublishing) {
+    if (isPublishing) {
       return
     }
 
-    if (!isAuthenticated) {
-      showToast('Yayınlamak için giriş yapmalısınız.')
-      navigate('/login')
+    const blockReason = getPublishBlockReason()
+
+    if (blockReason) {
+      toast.warning(blockReason)
       return
     }
 
@@ -742,36 +771,38 @@ export function SquadBuilderPage() {
 
     setIsPublishing(true)
 
-    if (isEditMode && editSquadId) {
-      const updateRequest: UpdateSquadRequest = {
-        ...baseRequest,
-        id: editSquadId,
-      }
-      const result = await squadService.update(updateRequest)
+    try {
+      if (isEditMode && editSquadId) {
+        const updateRequest: UpdateSquadRequest = {
+          ...baseRequest,
+          id: editSquadId,
+        }
+        const result = await squadService.update(updateRequest)
 
-      setIsPublishing(false)
+        if (!result.success) {
+          showToast(result.message || 'Kadro güncellenemedi.')
+          return
+        }
 
-      if (!result.success) {
-        showToast(result.message || 'Kadro güncellenemedi.')
+        setPublishedSquadId(editSquadId)
+        setModalOpen(true)
         return
       }
 
-      setPublishedSquadId(editSquadId)
+      const result = await squadService.add(baseRequest)
+
+      if (!result.success || !result.data) {
+        showToast(result.message || 'Kadro yayınlanamadı.')
+        return
+      }
+
+      setPublishedSquadId(result.data.id)
       setModalOpen(true)
-      return
+    } catch {
+      // apiClient already surfaces errors via toast
+    } finally {
+      setIsPublishing(false)
     }
-
-    const result = await squadService.add(baseRequest)
-
-    setIsPublishing(false)
-
-    if (!result.success || !result.data) {
-      showToast(result.message || 'Kadro yayınlanamadı.')
-      return
-    }
-
-    setPublishedSquadId(result.data.id)
-    setModalOpen(true)
   }
 
   if (isLoadingSquad) {
@@ -791,7 +822,6 @@ export function SquadBuilderPage() {
       <SquadBuilderToolbar
         title={title}
         formationId={formationId}
-        canPublish={canPublish}
         isPublishing={isPublishing}
         onTitleChange={setTitle}
         onFormationChange={handleFormationChange}
@@ -896,7 +926,6 @@ export function SquadBuilderPage() {
 
             <div className="mt-auto w-full pt-space-md">
               <SquadBuilderSidebarActions
-                canPublish={canPublish}
                 isPublishing={isPublishing}
                 onClear={handleClear}
                 onCancel={handleCancel}

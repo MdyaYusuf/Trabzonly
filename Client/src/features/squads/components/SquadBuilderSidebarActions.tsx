@@ -1,5 +1,4 @@
 type SquadBuilderSidebarActionsProps = {
-  canPublish: boolean
   isPublishing: boolean
   onClear: () => void
   onCancel: () => void
@@ -7,7 +6,6 @@ type SquadBuilderSidebarActionsProps = {
 }
 
 export function SquadBuilderSidebarActions({
-  canPublish,
   isPublishing,
   onClear,
   onCancel,
@@ -34,11 +32,11 @@ export function SquadBuilderSidebarActions({
       <button
         type="button"
         onClick={onPublish}
-        disabled={!canPublish || isPublishing}
+        disabled={isPublishing}
         className={
-          canPublish && !isPublishing
-            ? 'font-headline flex cursor-pointer items-center gap-2 bg-primary-container px-space-lg py-space-xs text-label-md tracking-wider text-on-primary uppercase shadow-sm transition-all hover:bg-primary'
-            : 'font-headline flex cursor-not-allowed items-center gap-2 bg-surface-container-highest px-space-lg py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase opacity-70'
+          isPublishing
+            ? 'font-headline flex cursor-not-allowed items-center gap-2 bg-surface-container-highest px-space-lg py-space-xs text-label-md tracking-wider text-on-surface-variant uppercase opacity-70'
+            : 'font-headline flex cursor-pointer items-center gap-2 bg-primary-container px-space-lg py-space-xs text-label-md tracking-wider text-on-primary uppercase shadow-sm transition-all hover:bg-primary'
         }
       >
         <span className="material-symbols-outlined text-[18px] text-secondary-container">

@@ -11,9 +11,12 @@ export function SquadBuilderNotes({ notes, onNotesChange }: SquadBuilderNotesPro
   return (
     <div className="flex w-full flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-space-sm">
-        <span className="font-headline flex items-center gap-2 text-[16px] font-bold text-primary uppercase">
+        <span className="font-headline flex flex-wrap items-center gap-2 text-[16px] font-bold text-primary uppercase">
           <span className="material-symbols-outlined text-secondary">stylus_note</span>
           Yazarın Taktik Notu
+          <span className="font-kicker text-kicker font-bold tracking-wider text-on-surface-variant normal-case">
+            (İsteğe bağlı)
+          </span>
         </span>
         <span
           className={

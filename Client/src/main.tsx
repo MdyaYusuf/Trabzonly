@@ -127,10 +127,6 @@ const router = createBrowserRouter([
             element: <SquadBuilderPage />,
           },
           {
-            path: 'kadrolar/:squadId/duzenle',
-            element: <SquadBuilderPage />,
-          },
-          {
             path: 'kadrolar/:squadId',
             element: <SquadDetailPage />,
           },
@@ -161,6 +157,10 @@ const router = createBrowserRouter([
               {
                 path: 'kadrolarim',
                 element: <MySquadsPage />,
+              },
+              {
+                path: 'kadrolar/:squadId/duzenle',
+                element: <SquadBuilderPage />,
               },
             ],
           },

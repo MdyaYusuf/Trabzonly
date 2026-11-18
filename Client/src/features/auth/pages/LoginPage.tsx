@@ -1,18 +1,42 @@
-import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { AuthCard, AuthPageShell } from '@/features/auth/components/AuthPageShell'
 import { authService } from '@/features/auth/authService'
 import { setCredentials } from '@/features/auth/authSlice'
 import { useAppDispatch } from '@/core/store/hooks'
 
+type LoginLocationState = {
+  from?: string
+  notice?: string
+}
+
+function resolvePostLoginPath(from: string | undefined): string {
+  if (!from || !from.startsWith('/') || from.startsWith('//')) {
+    return '/'
+  }
+
+  return from
+}
+
 export function LoginPage() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
+  const locationState = (location.state as LoginLocationState | null) ?? null
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!locationState?.notice) {
+      return
+    }
+
+    toast.info(locationState.notice)
+  }, [locationState?.notice])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -30,7 +54,7 @@ export function LoginPage() {
       if (response.success && response.data) {
         dispatch(setCredentials(response.data))
         setStatusMessage('Doğrulama başarılı. Yönlendiriliyorsunuz!')
-        navigate('/')
+        navigate(resolvePostLoginPath(locationState?.from))
         return
       }
 
@@ -135,6 +159,7 @@ export function LoginPage() {
               Hesabın yok mu?{' '}
               <Link
                 to="/register"
+                state={locationState}
                 className="ml-1 font-headline text-body-md font-bold text-primary underline decoration-secondary decoration-2 underline-offset-4 transition-colors hover:text-secondary"
               >
                 Hemen Kayıt Ol

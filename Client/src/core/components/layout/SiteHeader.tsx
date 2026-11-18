@@ -1,4 +1,4 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { BrandLogo } from '@/core/components/BrandLogo'
 import { SiteHeaderAccountMenu } from '@/core/components/layout/SiteHeaderAccountMenu'
@@ -11,6 +11,12 @@ const navItems = [
   { to: '/mac-haftasi', label: 'Maç Haftası' },
   { to: '/quizler', label: 'Quizler' },
 ] as const
+
+const loginButtonClass =
+  'font-label inline-flex h-10 items-center border border-secondary-container/45 bg-on-primary/5 px-5 text-label-md tracking-wider text-on-primary uppercase transition-all hover:border-secondary-container hover:bg-secondary-container/20'
+
+const registerButtonClass =
+  'font-label inline-flex h-10 items-center gap-1.5 bg-gradient-to-r from-[#7a1235] via-primary-container to-secondary px-5 text-label-md font-bold tracking-wider text-on-primary uppercase shadow-[0_4px_14px_rgba(18,100,142,0.35)] transition-all hover:brightness-110 hover:shadow-[0_6px_18px_rgba(18,100,142,0.45)]'
 
 function ActiveNavUnderline({ className }: { className?: string }) {
   return (
@@ -28,12 +34,23 @@ function ActiveNavUnderline({ className }: { className?: string }) {
 
 export function SiteHeader() {
   const { isAuthenticated } = useAppSelector((state) => state.auth)
+  const { pathname } = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const isHome = pathname === '/'
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 w-full bg-primary/95 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-12">
-        <Link to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+    <header
+      className={[
+        'fixed top-0 right-0 left-0 z-50 w-full bg-gradient-to-r from-[#0d4a6e] via-primary to-[#0d4a6e]',
+        isHome ? 'shadow-[0_16px_40px_-12px_rgba(13,74,110,0.55)]' : '',
+      ].join(' ')}
+    >
+      <div className="mx-auto grid h-16 w-full max-w-[1520px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-10 px-6 sm:h-20 sm:gap-14 sm:px-10 lg:gap-16 lg:px-14 xl:px-16">
+        <Link
+          to="/"
+          className="flex shrink-0 items-center gap-3"
+          onClick={() => setMobileOpen(false)}
+        >
           <BrandLogo size={36} className="sm:h-10 sm:w-10" />
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1">
@@ -48,14 +65,14 @@ export function SiteHeader() {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-2 lg:flex">
+        <nav className="hidden min-w-0 items-center justify-center gap-1 lg:flex xl:gap-2">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 [
-                  'px-4 py-1 font-label text-label-md uppercase transition-colors',
+                  'px-3 py-1 font-label text-label-md uppercase transition-colors xl:px-3.5',
                   isActive
                     ? 'font-bold text-on-primary'
                     : 'text-on-primary/80 hover:text-on-primary',
@@ -74,28 +91,25 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden shrink-0 items-center gap-3 lg:flex">
           {isAuthenticated ? (
             <SiteHeaderAccountMenu />
           ) : (
             <>
-              <Link
-                to="/login"
-                className="bg-secondary-container px-4 py-1 font-label text-label-md tracking-wider text-on-secondary-container uppercase transition-all hover:bg-surface-container-lowest hover:text-on-surface"
-              >
+              <Link to="/login" className={loginButtonClass}>
                 Giriş Yap
               </Link>
-              <Link
-                to="/register"
-                className="bg-primary-container px-4 py-1 font-label text-label-md tracking-wider text-on-primary uppercase transition-all hover:bg-primary"
-              >
+              <Link to="/register" className={registerButtonClass}>
                 Topluluğa Katıl
+                <span className="material-symbols-outlined text-[16px] leading-none">
+                  arrow_forward
+                </span>
               </Link>
             </>
           )}
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center justify-end gap-2 lg:hidden">
           {isAuthenticated ? (
             <SiteHeaderAccountMenu
               onNavigate={() => {
@@ -118,7 +132,7 @@ export function SiteHeader() {
       </div>
 
       {mobileOpen ? (
-        <div className="border-t border-white/10 bg-primary px-4 py-4 lg:hidden">
+        <div className="border-t border-white/10 bg-primary/90 px-6 py-4 backdrop-blur-sm sm:px-10 lg:hidden">
           <nav className="flex flex-col gap-1">
             {navItems.map((item) => (
               <NavLink
@@ -144,20 +158,23 @@ export function SiteHeader() {
             ))}
           </nav>
           {!isAuthenticated ? (
-            <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
+            <div className="mt-4 flex flex-col gap-2.5 border-t border-white/10 pt-4">
               <Link
                 to="/login"
                 onClick={() => setMobileOpen(false)}
-                className="bg-secondary-container px-4 py-3 text-center font-label text-label-md tracking-wider text-on-secondary-container uppercase"
+                className={`${loginButtonClass} w-full justify-center`}
               >
                 Giriş Yap
               </Link>
               <Link
                 to="/register"
                 onClick={() => setMobileOpen(false)}
-                className="bg-primary-container px-4 py-3 text-center font-label text-label-md tracking-wider text-on-primary uppercase"
+                className={`${registerButtonClass} w-full justify-center`}
               >
                 Topluluğa Katıl
+                <span className="material-symbols-outlined text-[16px] leading-none">
+                  arrow_forward
+                </span>
               </Link>
             </div>
           ) : null}

@@ -64,10 +64,10 @@ function homePitchLineStyles(line: HomePitchLine): {
 } {
   if (line === 'gk') {
     return {
-      ring: 'bg-tertiary ring-tertiary-fixed',
-      fill: 'bg-gradient-to-br from-amber-400 to-amber-200',
-      label: 'text-on-tertiary-fixed',
-      badge: 'bg-tertiary-container text-on-tertiary-container',
+      ring: 'bg-surface-container-lowest ring-white/60',
+      fill: 'bg-surface-container-lowest',
+      label: 'text-primary',
+      badge: 'bg-primary text-on-primary',
     }
   }
 
@@ -90,9 +90,9 @@ function homePitchLineStyles(line: HomePitchLine): {
   }
 
   return {
-    ring: 'bg-surface-container-lowest ring-white/60',
-    fill: 'bg-surface-container-lowest',
-    label: 'text-primary',
+    ring: 'ring-secondary-container/70',
+    fill: 'bg-gradient-to-br from-primary via-primary-container to-secondary',
+    label: 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]',
     badge: 'bg-primary text-on-primary',
   }
 }
@@ -188,8 +188,12 @@ export function HomePage() {
             role="img"
             aria-label="Papara Park stadyum atmosferi"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1A040B] via-[#1A040B]/60 to-[#1A040B]/85" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1A040B] via-[#1A040B]/55 to-[#1A040B]/45" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#1A040B_80%)]" />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-24 bg-gradient-to-r from-[#0d4a6e] via-primary to-[#0d4a6e] [mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)] sm:h-28"
+          />
 
           <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-col items-center px-4 text-center sm:px-6 lg:px-12">
             <div className="mb-space-sm flex items-center justify-center p-space-lg">
