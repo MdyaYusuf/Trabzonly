@@ -52,6 +52,7 @@ export type SquadDetailViewModel = {
   pitchPlayers: SquadPitchPlayer[]
   benchPlayers: SquadBenchPlayer[]
   instructions: SquadInstructionRow[]
+  hasLegendInSquad: boolean
   avgAge: string
   avgAgeCaption: string
   totalValue: string

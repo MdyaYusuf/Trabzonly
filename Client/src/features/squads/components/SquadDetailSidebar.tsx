@@ -118,34 +118,42 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
           <span className="material-symbols-outlined text-[20px]">monitoring</span>
           Kadro İstatistik Özeti
         </h2>
-        <div className="grid grid-cols-2 gap-space-sm">
-          <div className="flex flex-col bg-surface-container-low p-space-sm">
-            <span className="font-kicker flex items-center gap-1 text-kicker text-on-surface-variant uppercase">
-              <span className="material-symbols-outlined text-[14px] text-secondary">
-                calendar_month
+        {squad.hasLegendInSquad ? (
+          <p className="font-body text-body-sm text-on-surface-variant">
+            Efsane oyuncular kadroda olduğu için yaş ve piyasa değeri özeti gizlendi.
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 gap-space-sm">
+            <div className="flex flex-col bg-surface-container-low p-space-sm">
+              <span className="font-kicker flex items-center gap-1 text-kicker text-on-surface-variant uppercase">
+                <span className="material-symbols-outlined text-[14px] text-secondary">
+                  calendar_month
+                </span>
+                Ortalama Yaş
               </span>
-              Ortalama Yaş
-            </span>
-            <span className="font-stat text-[32px] leading-tight font-extrabold text-primary">
-              {squad.avgAge}
-            </span>
-            <span className="font-body text-xs text-on-surface-variant">{squad.avgAgeCaption}</span>
-          </div>
-          <div className="flex flex-col bg-surface-container-low p-space-sm">
-            <span className="font-kicker flex items-center gap-1 text-kicker text-on-surface-variant uppercase">
-              <span className="material-symbols-outlined text-[14px] text-tertiary-container">
-                payments
+              <span className="font-stat text-[32px] leading-tight font-extrabold text-primary">
+                {squad.avgAge}
               </span>
-              Toplam Değer
-            </span>
-            <span className="font-stat text-[32px] leading-tight font-extrabold text-secondary">
-              {squad.totalValue}
-            </span>
-            <span className="font-body text-xs text-on-surface-variant">
-              {squad.totalValueCaption}
-            </span>
+              <span className="font-body text-xs text-on-surface-variant">
+                {squad.avgAgeCaption}
+              </span>
+            </div>
+            <div className="flex flex-col bg-surface-container-low p-space-sm">
+              <span className="font-kicker flex items-center gap-1 text-kicker text-on-surface-variant uppercase">
+                <span className="material-symbols-outlined text-[14px] text-tertiary-container">
+                  payments
+                </span>
+                Toplam Değer
+              </span>
+              <span className="font-stat text-[32px] leading-tight font-extrabold text-secondary">
+                {squad.totalValue}
+              </span>
+              <span className="font-body text-xs text-on-surface-variant">
+                {squad.totalValueCaption}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {squad.notes.trim() ? (

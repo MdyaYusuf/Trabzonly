@@ -1,3 +1,4 @@
+import { PlayerCategory } from '@/features/players/playerTypes'
 import type { SquadResponseDto, SquadSlotResponseDto } from '../squadTypes'
 import { getFormationConfig } from './squadBuilderConfig'
 import type { BuilderFormationId } from './squadBuilderTypes'
@@ -184,6 +185,9 @@ function mapBenchPlayers(slots: SquadSlotResponseDto[]): SquadBenchPlayer[] {
 export function mapSquadToDetailView(squad: SquadResponseDto): SquadDetailViewModel {
   const slots = squad.slots ?? []
   const starters = slots.filter((slot) => !isBenchSlot(slot.slotKey))
+  const hasLegendInSquad = slots.some(
+    (slot) => slot.category === PlayerCategory.Legend,
+  )
 
   const avgAge =
     starters.length === 0
@@ -236,6 +240,7 @@ export function mapSquadToDetailView(squad: SquadResponseDto): SquadDetailViewMo
         value: `${findPlayerName(slots, squad.cornerTakerPlayerId)}|${findPlayerName(slots, squad.freeKickTakerPlayerId)}`,
       },
     ],
+    hasLegendInSquad,
     avgAge: avgAge > 0 ? avgAge.toFixed(1) : '—',
     avgAgeCaption: 'İlk 11 ortalaması',
     totalValue: formatMarketValue(totalValue),

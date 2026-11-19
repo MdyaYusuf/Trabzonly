@@ -1,3 +1,5 @@
+import type { PlayerCategory } from '@/features/players/playerTypes'
+
 // Responses
 export interface SquadSlotResponseDto {
   id: string
@@ -10,6 +12,7 @@ export interface SquadSlotResponseDto {
   playerShirtNumber?: number | null
   age: number
   marketValue?: number | null
+  category: PlayerCategory
   positionRoleId?: number | null
   positionRoleName?: string | null
   positionRoleDescription?: string | null

@@ -1,3 +1,5 @@
+using Api.Features.Players;
+
 namespace Api.Features.Squads;
 
 // Responses
@@ -12,6 +14,7 @@ public sealed record SquadSlotResponseDto(
   int? PlayerShirtNumber,
   int Age,
   decimal? MarketValue,
+  PlayerCategory Category,
   int? PositionRoleId = null,
   string? PositionRoleName = null,
   string? PositionRoleDescription = null);
