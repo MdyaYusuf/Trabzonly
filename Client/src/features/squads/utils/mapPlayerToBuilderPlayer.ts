@@ -3,6 +3,7 @@ import {
   PlayerCategory,
   type PlayerResponseDto,
 } from '@/features/players/playerTypes'
+import type { SquadSlotResponseDto } from '../squadTypes'
 import type {
   BuilderPlayer,
   BuilderPlayerBadge,
@@ -58,6 +59,32 @@ function posGroupFromZone(zone: PositionZone): Exclude<BuilderPosGroup, 'ALL'> {
   return 'MF'
 }
 
+function posGroupFromAbbreviation(
+  abbreviation: string,
+): Exclude<BuilderPosGroup, 'ALL'> {
+  const key = abbreviation.trim().toUpperCase()
+
+  if (key === 'GK') {
+    return 'GK'
+  }
+
+  if (
+    key === 'CB' ||
+    key === 'LB' ||
+    key === 'RB' ||
+    key === 'LWB' ||
+    key === 'RWB'
+  ) {
+    return 'DF'
+  }
+
+  if (key === 'LW' || key === 'RW' || key === 'ST') {
+    return 'FW'
+  }
+
+  return 'MF'
+}
+
 function badgeForCategory(category: PlayerCategory): BuilderPlayerBadge | undefined {
   if (category === PlayerCategory.Legend) {
     return { label: 'EFSANE', tone: 'bordo' }
@@ -88,4 +115,51 @@ export function mapPlayerToBuilderPlayer(player: PlayerResponseDto): BuilderPlay
     category: player.category,
     badge: badgeForCategory(player.category),
   }
+}
+
+export function mapSquadSlotToBuilderPlayer(slot: SquadSlotResponseDto): BuilderPlayer {
+  const marketValueM =
+    slot.marketValue != null ? Math.round((slot.marketValue / 1_000_000) * 10) / 10 : 0
+
+  return {
+    id: String(slot.playerId),
+    name: slot.playerName,
+    shortName: shortNameFromFull(slot.playerName),
+    number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
+    posGroup: posGroupFromAbbreviation(slot.positionAbbreviation),
+    roleHint: slot.positionAbbreviation,
+    age: slot.age,
+    marketValueM,
+    avatarGradient: GRADIENTS[slot.playerId % GRADIENTS.length],
+    initials: initialsFromName(slot.playerName),
+    category: slot.category,
+    badge: badgeForCategory(slot.category),
+  }
+}
+
+export function mergeBuilderPlayers(
+  existing: BuilderPlayer[],
+  incoming: BuilderPlayer[],
+): BuilderPlayer[] {
+  if (incoming.length === 0) {
+    return existing
+  }
+
+  const byId = new Map(existing.map((player) => [player.id, player]))
+  let changed = false
+
+  for (const player of incoming) {
+    if (byId.has(player.id)) {
+      continue
+    }
+
+    byId.set(player.id, player)
+    changed = true
+  }
+
+  if (!changed) {
+    return existing
+  }
+
+  return Array.from(byId.values())
 }

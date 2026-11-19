@@ -61,7 +61,7 @@ public class PlayerService(
     CancellationToken cancellationToken = default)
   {
     int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
-    int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 50);
+    int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 200);
     int? statsSeasonId = await ResolveStatsSeasonIdAsync(query.Category, cancellationToken);
 
     return await GetAllAsync(
@@ -78,7 +78,7 @@ public class PlayerService(
     CancellationToken cancellationToken = default)
   {
     int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
-    int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 50);
+    int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 200);
     int? statsSeasonId = await ResolveStatsSeasonIdAsync(query.Category, cancellationToken);
 
     return await GetAllAsync(

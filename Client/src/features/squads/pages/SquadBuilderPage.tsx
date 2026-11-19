@@ -23,7 +23,11 @@ import type {
   UpdateSquadRequest,
 } from '../squadTypes'
 import { getCatalogAbbreviationForSlot } from '../utils/getCatalogAbbreviationForSlot'
-import { mapPlayerToBuilderPlayer } from '../utils/mapPlayerToBuilderPlayer'
+import {
+  mapPlayerToBuilderPlayer,
+  mapSquadSlotToBuilderPlayer,
+  mergeBuilderPlayers,
+} from '../utils/mapPlayerToBuilderPlayer'
 import {
   BENCH_SLOT_IDS,
   NOTES_MAX_LENGTH,
@@ -327,7 +331,7 @@ export function SquadBuilderPage() {
 
       const poolQuery = {
         pageNumber: 1,
-        pageSize: 50,
+        pageSize: 200,
         sort: 'number-asc' as const,
       }
 
@@ -369,7 +373,7 @@ export function SquadBuilderPage() {
         nextPlayers.push(...transferResult.data.items.map(mapPlayerToBuilderPlayer))
       }
 
-      setPlayers(nextPlayers)
+      setPlayers((prev) => mergeBuilderPlayers(nextPlayers, prev))
 
       if (positionsResult.success && positionsResult.data) {
         const nextRoles = new Map<string, PositionRoleResponseDto[]>()
@@ -439,6 +443,8 @@ export function SquadBuilderPage() {
         return
       }
 
+      const slotPlayers = (result.data.slots ?? []).map(mapSquadSlotToBuilderPlayer)
+      setPlayers((prev) => mergeBuilderPlayers(prev, slotPlayers))
       applySquadToBuilder(result.data)
       setIsLoadingSquad(false)
     }

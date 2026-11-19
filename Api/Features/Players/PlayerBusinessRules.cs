@@ -71,7 +71,7 @@ public class PlayerBusinessRules(IPlayerRepository _playerRepository)
 
     if (exists)
     {
-      throw new BusinessException("Bu forma numarası aktif kadroda başka bir oyuncu tarafından kullanılıyor.");
+      throw new BusinessException("Bu forma numarası mevcut kadroda başka bir oyuncu tarafından kullanılıyor.");
     }
   }
 
@@ -94,7 +94,7 @@ public class PlayerBusinessRules(IPlayerRepository _playerRepository)
 
     if (exists)
     {
-      throw new BusinessException("Bu forma numarası aktif kadroda başka bir oyuncu tarafından kullanılıyor.");
+      throw new BusinessException("Bu forma numarası mevcut kadroda başka bir oyuncu tarafından kullanılıyor.");
     }
   }
 

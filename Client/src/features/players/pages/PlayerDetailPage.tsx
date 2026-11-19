@@ -139,7 +139,9 @@ export function PlayerDetailPage() {
         <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
           <div className="flex flex-col gap-space-xl lg:col-span-8">
             <PlayerSeasonStatsSection player={player} />
-            <PlayerInjurySection playerId={player.id} />
+            {player.category === PlayerCategory.Legend ? null : (
+              <PlayerInjurySection playerId={player.id} />
+            )}
             <PlayerCommentsSection playerId={player.id} playerName={player.name} />
           </div>
 

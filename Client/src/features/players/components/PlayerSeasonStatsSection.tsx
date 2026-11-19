@@ -56,7 +56,9 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
 
       {!stats ? (
         <p className="font-body text-body-md text-on-surface-variant">
-          Bu sezon için henüz istatistik kaydı yok.
+          {isLegend
+            ? 'Bu efsane için henüz kariyer istatistik kaydı yok.'
+            : 'Bu sezon için henüz istatistik kaydı yok.'}
         </p>
       ) : (
         <>
