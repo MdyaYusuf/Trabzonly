@@ -4,6 +4,7 @@ import playerService from '@/features/players/playerService'
 import pollService from '@/features/polls/pollService'
 import { AdminPollDeactivateModal } from '../components/AdminPollDeactivateModal'
 import { AdminPollFormFields } from '../components/AdminPollFormFields'
+import { formatAdminPlayerOptionLabel } from '../utils/formatAdminPlayerOptionLabel'
 import {
   createEmptyAdminPollFormDraft,
   mapDraftToCreateRequest,
@@ -51,7 +52,7 @@ export function AdminPollCreateEditPage({ mode: modeProp }: AdminPollCreateEditP
         setPlayers(
           playersResult.data.items.map((player) => ({
             id: player.id,
-            name: player.name,
+            name: formatAdminPlayerOptionLabel(player),
           })),
         )
       } else {

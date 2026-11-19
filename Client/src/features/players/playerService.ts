@@ -83,7 +83,9 @@ const getAllForAdmin = async (
     queryParams.set('positionGroup', query.positionGroup)
   }
 
-  queryParams.set('category', String(query.category ?? PlayerCategory.Current))
+  if (query.category !== undefined) {
+    queryParams.set('category', String(query.category))
+  }
 
   if (query.isActive !== undefined) {
     queryParams.set('isActive', String(query.isActive))

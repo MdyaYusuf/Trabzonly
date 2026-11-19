@@ -46,7 +46,10 @@ function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
   return [
     { label: 'Maç', value: String(stats?.appearances ?? 0) },
     { label: 'Gol', value: String(stats?.goals ?? 0) },
-    { label: 'Asist', value: String(stats?.assists ?? 0) },
+    {
+      label: 'Asist',
+      value: stats?.assists != null ? String(stats.assists) : '—',
+    },
   ]
 }
 

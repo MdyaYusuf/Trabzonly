@@ -29,7 +29,7 @@ export type PlayerCardData = {
   commentCount: number
   description?: string | null
   goals?: number
-  assists?: number
+  assists?: number | null
   category: PlayerCategory
 }
 

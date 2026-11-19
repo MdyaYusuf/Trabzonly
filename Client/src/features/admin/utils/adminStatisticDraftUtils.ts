@@ -65,7 +65,7 @@ export function createEmptyAdminStatisticFormDraft(): AdminStatisticFormDraft {
     team: 'Trabzonspor',
     matches: '0',
     goals: '0',
-    assists: '0',
+    assists: '',
     yellowCards: '',
     redCards: '',
     cleanSheets: '',
@@ -89,7 +89,7 @@ export function mapPlayerStatsResponseToListRow(
     team: item.team,
     matches: item.appearances,
     goals: item.goals,
-    assists: item.assists,
+    assists: item.assists ?? null,
     yellowCards: item.yellowCards ?? null,
     redCards: item.redCards ?? null,
     cleanSheets: item.cleanSheets ?? null,
@@ -108,7 +108,7 @@ export function mapPlayerStatsResponseToFormDraft(
     team: item.team,
     matches: String(item.appearances),
     goals: String(item.goals),
-    assists: String(item.assists),
+    assists: item.assists != null ? String(item.assists) : '',
     yellowCards: item.yellowCards != null ? String(item.yellowCards) : '',
     redCards: item.redCards != null ? String(item.redCards) : '',
     cleanSheets: item.cleanSheets != null ? String(item.cleanSheets) : '',
@@ -133,7 +133,6 @@ export function validateAdminStatisticDraft(draft: AdminStatisticFormDraft): str
   const requiredFields: Array<[string, string]> = [
     [draft.matches, 'Maç sayısı'],
     [draft.goals, 'Gol'],
-    [draft.assists, 'Asist'],
   ]
 
   for (const [value, label] of requiredFields) {
@@ -145,6 +144,7 @@ export function validateAdminStatisticDraft(draft: AdminStatisticFormDraft): str
   }
 
   const optionalFields: Array<[string, string]> = [
+    [draft.assists, 'Asist'],
     [draft.yellowCards, 'Sarı kart'],
     [draft.redCards, 'Kırmızı kart'],
     [draft.cleanSheets, 'Gol yenmeyen maç'],
@@ -177,7 +177,7 @@ export function mapDraftToCreateRequest(draft: AdminStatisticFormDraft): CreateP
     team: draft.team.trim(),
     appearances: Number(draft.matches),
     goals: Number(draft.goals),
-    assists: Number(draft.assists),
+    assists: resolveOptionalInt(draft.assists),
     yellowCards: resolveOptionalInt(draft.yellowCards),
     redCards: resolveOptionalInt(draft.redCards),
     cleanSheets: resolveOptionalInt(draft.cleanSheets),

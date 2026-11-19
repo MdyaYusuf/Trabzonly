@@ -79,7 +79,7 @@ export function AdminStatisticTable({
                 </td>
                 <td className="px-space-sm py-space-sm">
                   <span className="font-label bg-secondary-container px-space-sm py-0.5 text-label-md font-bold text-on-secondary-container tabular-nums">
-                    {row.assists}
+                    {row.assists != null ? row.assists : '—'}
                   </span>
                 </td>
                 <td className="px-space-sm py-space-sm">

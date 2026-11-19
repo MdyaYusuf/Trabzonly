@@ -35,7 +35,8 @@ function formatRivalLine(peer: PlayerResponseDto, group: PositionGroup): string 
       : '— Gol Yenmeyen'
   }
 
-  return `${stats?.goals ?? 0} Gol • ${stats?.assists ?? 0} Asist`
+  const assists = stats?.assists != null ? String(stats.assists) : '—'
+  return `${stats?.goals ?? 0} Gol • ${assists} Asist`
 }
 
 function rivalScore(peer: PlayerResponseDto, group: PositionGroup): number {

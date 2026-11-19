@@ -62,14 +62,15 @@ public class PlayerStatsBusinessRules(IPlayerStatsRepository _playerStatsReposit
   public void PlayerStatsMustBeLogicallyValid(
     int appearances,
     int goals,
-    int assists,
+    int? assists,
     int? cleanSheets,
     int? redCards)
   {
+    int resolvedAssists = assists ?? 0;
     int resolvedCleanSheets = cleanSheets ?? 0;
     int resolvedRedCards = redCards ?? 0;
 
-    if (appearances == 0 && (goals > 0 || assists > 0 || resolvedCleanSheets > 0 || resolvedRedCards > 0))
+    if (appearances == 0 && (goals > 0 || resolvedAssists > 0 || resolvedCleanSheets > 0 || resolvedRedCards > 0))
     {
       throw new BusinessException("Hiç maça çıkmamış bir oyuncunun gol, asist veya kart gibi istatistikleri olamaz.");
     }

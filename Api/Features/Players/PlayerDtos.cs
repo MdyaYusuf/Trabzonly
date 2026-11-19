@@ -7,7 +7,7 @@ namespace Api.Features.Players;
 public sealed record PlayerSeasonStatsDto(
   int Appearances,
   int Goals,
-  int Assists,
+  int? Assists,
   int? CleanSheets,
   int? YellowCards,
   int? RedCards,
@@ -125,7 +125,7 @@ public sealed record PlayerListQueryRequest(
 public sealed record PlayerAdminListQueryRequest(
   string? Search = null,
   string? PositionGroup = null,
-  PlayerCategory Category = PlayerCategory.Current,
+  PlayerCategory? Category = null,
   bool? IsActive = null,
   string? Sort = null,
   int PageNumber = 1,

@@ -7,6 +7,7 @@ import { AdminStatisticListFilters } from '../components/AdminStatisticListFilte
 import { AdminStatisticListHeader } from '../components/AdminStatisticListHeader'
 import { AdminStatisticPagination } from '../components/AdminStatisticPagination'
 import { AdminStatisticTable } from '../components/AdminStatisticTable'
+import { formatAdminPlayerOptionLabel } from '../utils/formatAdminPlayerOptionLabel'
 import { mapPlayerStatsResponseToListRow } from '../utils/adminStatisticDraftUtils'
 import type {
   AdminStatisticListRow,
@@ -68,7 +69,7 @@ export function AdminStatisticListPage() {
     async function loadLookups() {
       const [seasonsResult, playersResult] = await Promise.all([
         seasonService.getAll({ pageNumber: 1, pageSize: 100 }),
-        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 100 }),
+        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 200, sort: 'number-asc' }),
       ])
 
       if (cancelled) {
@@ -90,10 +91,7 @@ export function AdminStatisticListPage() {
         setPlayers(
           playersResult.data.items.map((player) => ({
             id: player.id,
-            label:
-              player.shirtNumber != null
-                ? `${player.name} (#${player.shirtNumber})`
-                : player.name,
+            label: formatAdminPlayerOptionLabel(player),
           })),
         )
       } else {

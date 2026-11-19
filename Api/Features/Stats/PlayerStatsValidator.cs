@@ -17,7 +17,9 @@ public class CreatePlayerStatsRequestValidator : AbstractValidator<CreatePlayerS
       .GreaterThanOrEqualTo(0).WithMessage("Gol sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.Assists)
-      .GreaterThanOrEqualTo(0).WithMessage("Asist sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.Assists.HasValue)
+      .WithMessage("Asist sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.YellowCards)
       .GreaterThanOrEqualTo(0)
@@ -65,7 +67,9 @@ public class UpdatePlayerStatsRequestValidator : AbstractValidator<UpdatePlayerS
       .GreaterThanOrEqualTo(0).WithMessage("Gol sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.Assists)
-      .GreaterThanOrEqualTo(0).WithMessage("Asist sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.Assists.HasValue)
+      .WithMessage("Asist sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.YellowCards)
       .GreaterThanOrEqualTo(0)

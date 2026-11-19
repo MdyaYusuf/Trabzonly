@@ -27,6 +27,9 @@ public class PlayerStatsConfiguration : IEntityTypeConfiguration<PlayerStats>
       .HasMaxLength(100)
       .IsRequired();
 
+    builder.Property(s => s.Assists)
+      .IsRequired(false);
+
     builder.Property(s => s.YellowCards)
       .IsRequired(false);
 

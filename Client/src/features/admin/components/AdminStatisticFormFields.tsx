@@ -183,7 +183,10 @@ export function AdminStatisticFormFields({
             />
           </div>
           <div>
-            <FieldLabel htmlFor="assists">Asist</FieldLabel>
+            <FieldLabel htmlFor="assists">
+              Asist{' '}
+              <span className="text-[0.85em] text-error/70">(Boş bırakılabilir.)</span>
+            </FieldLabel>
             <input
               id="assists"
               type="number"
@@ -196,7 +199,10 @@ export function AdminStatisticFormFields({
             />
           </div>
           <div>
-            <FieldLabel htmlFor="yellow">Sarı Kart</FieldLabel>
+            <FieldLabel htmlFor="yellow">
+              Sarı Kart{' '}
+              <span className="text-[0.85em] text-error/70">(Boş bırakılabilir.)</span>
+            </FieldLabel>
             <input
               id="yellow"
               type="number"
@@ -209,7 +215,10 @@ export function AdminStatisticFormFields({
             />
           </div>
           <div>
-            <FieldLabel htmlFor="red">Kırmızı Kart</FieldLabel>
+            <FieldLabel htmlFor="red">
+              Kırmızı Kart{' '}
+              <span className="text-[0.85em] text-error/70">(Boş bırakılabilir.)</span>
+            </FieldLabel>
             <input
               id="red"
               type="number"
@@ -228,7 +237,10 @@ export function AdminStatisticFormFields({
         <SectionHeading section="Bölüm 04" title="Savunma Metrikleri" />
         <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
           <div>
-            <FieldLabel htmlFor="cleanSheets">Gol Yenmeyen Maç</FieldLabel>
+            <FieldLabel htmlFor="cleanSheets">
+              Gol Yenmeyen Maç{' '}
+              <span className="text-[0.85em] text-error/70">(Boş bırakılabilir.)</span>
+            </FieldLabel>
             <input
               id="cleanSheets"
               type="number"
@@ -241,7 +253,10 @@ export function AdminStatisticFormFields({
             />
           </div>
           <div>
-            <FieldLabel htmlFor="conceded">Yenilen Gol</FieldLabel>
+            <FieldLabel htmlFor="conceded">
+              Yenilen Gol{' '}
+              <span className="text-[0.85em] text-error/70">(Boş bırakılabilir.)</span>
+            </FieldLabel>
             <input
               id="conceded"
               type="number"

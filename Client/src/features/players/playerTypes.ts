@@ -12,7 +12,7 @@ export type PlayerCategory = (typeof PlayerCategory)[keyof typeof PlayerCategory
 export interface PlayerSeasonStatsDto {
   appearances: number
   goals: number
-  assists: number
+  assists?: number | null
   cleanSheets?: number | null
   yellowCards?: number | null
   redCards?: number | null
@@ -106,7 +106,7 @@ export interface PlayerAdminListQuery {
   pageSize?: number
   search?: string
   positionGroup?: PlayerPositionGroup
-  /** Defaults to Current when omitted by the client service */
+  /** Omit to include every category in admin lookups */
   category?: PlayerCategory
   /** undefined = all, true = active, false = inactive */
   isActive?: boolean

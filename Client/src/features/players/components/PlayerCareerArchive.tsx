@@ -22,7 +22,8 @@ function formatCareerRecord(stats: PlayerStatsResponseDto, group: PositionGroup)
     return `${cleanSheets} Gol Yenmeyen / ${stats.goals} Gol / ${stats.appearances} Maç`
   }
 
-  return `${stats.goals} Gol / ${stats.assists} Asist / ${stats.appearances} Maç`
+  const assists = stats.assists != null ? String(stats.assists) : '—'
+  return `${stats.goals} Gol / ${assists} Asist / ${stats.appearances} Maç`
 }
 
 export function PlayerCareerArchive({

@@ -7,6 +7,7 @@ import { AdminInjuryListFilters } from '../components/AdminInjuryListFilters'
 import { AdminInjuryListHeader } from '../components/AdminInjuryListHeader'
 import { AdminInjuryPagination } from '../components/AdminInjuryPagination'
 import { AdminInjuryTable } from '../components/AdminInjuryTable'
+import { formatAdminPlayerOptionLabel } from '../utils/formatAdminPlayerOptionLabel'
 import { mapInjuryResponseToListRow } from '../utils/adminInjuryDraftUtils'
 import type {
   AdminInjuryListRow,
@@ -52,7 +53,7 @@ export function AdminInjuryListPage() {
     async function loadLookups() {
       const [seasonsResult, playersResult] = await Promise.all([
         seasonService.getAll({ pageNumber: 1, pageSize: 100 }),
-        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 100 }),
+        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 200, sort: 'number-asc' }),
       ])
 
       if (cancelled) {
@@ -74,10 +75,7 @@ export function AdminInjuryListPage() {
         setPlayers(
           playersResult.data.items.map((player) => ({
             id: player.id,
-            label:
-              player.shirtNumber != null
-                ? `${player.name} (#${player.shirtNumber})`
-                : player.name,
+            label: formatAdminPlayerOptionLabel(player),
           })),
         )
       } else {

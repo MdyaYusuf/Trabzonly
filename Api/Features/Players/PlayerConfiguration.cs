@@ -45,7 +45,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
       .IsRequired();
 
     builder.Property(p => p.Description)
-      .HasMaxLength(2000)
+      .HasMaxLength(400)
       .IsRequired(false);
 
     builder.Property(p => p.MarketValue)

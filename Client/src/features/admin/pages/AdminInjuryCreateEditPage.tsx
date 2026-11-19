@@ -5,6 +5,7 @@ import playerService from '@/features/players/playerService'
 import seasonService from '@/features/seasons/seasonService'
 import { AdminInjuryDeleteModal } from '../components/AdminInjuryDeleteModal'
 import { AdminInjuryFormFields } from '../components/AdminInjuryFormFields'
+import { formatAdminPlayerOptionLabel } from '../utils/formatAdminPlayerOptionLabel'
 import {
   createEmptyAdminInjuryFormDraft,
   mapDraftToCreateRequest,
@@ -42,7 +43,7 @@ export function AdminInjuryCreateEditPage({ mode: modeProp }: AdminInjuryCreateE
     async function loadLookups() {
       const [seasonsResult, playersResult] = await Promise.all([
         seasonService.getAll({ pageNumber: 1, pageSize: 100 }),
-        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 100 }),
+        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 200, sort: 'number-asc' }),
       ])
 
       if (cancelled) {
@@ -63,10 +64,7 @@ export function AdminInjuryCreateEditPage({ mode: modeProp }: AdminInjuryCreateE
       if (playersResult.success && playersResult.data) {
         const playerItems = playersResult.data.items.map((player) => ({
           id: player.id,
-          label:
-            player.shirtNumber != null
-              ? `${player.name} (#${player.shirtNumber})`
-              : player.name,
+          label: formatAdminPlayerOptionLabel(player),
         }))
         setPlayers(playerItems)
 

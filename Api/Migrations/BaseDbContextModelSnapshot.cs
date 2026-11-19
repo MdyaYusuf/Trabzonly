@@ -607,8 +607,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
 
                     b.Property<int?>("Height")
                         .HasColumnType("int");
@@ -1458,7 +1458,7 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Appearances")
                         .HasColumnType("int");
 
-                    b.Property<int>("Assists")
+                    b.Property<int?>("Assists")
                         .HasColumnType("int");
 
                     b.Property<int?>("CleanSheets")

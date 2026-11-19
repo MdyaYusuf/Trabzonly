@@ -19,7 +19,7 @@ export type AdminStatisticListRow = {
   team: string
   matches: number
   goals: number
-  assists: number
+  assists: number | null
   yellowCards: number | null
   redCards: number | null
   cleanSheets: number | null

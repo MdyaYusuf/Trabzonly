@@ -4,7 +4,7 @@ export interface PlayerStatsResponseDto {
   team: string
   appearances: number
   goals: number
-  assists: number
+  assists?: number | null
   yellowCards?: number | null
   redCards?: number | null
   cleanSheets?: number | null
@@ -49,7 +49,7 @@ export interface CreatePlayerStatsRequest {
   team: string
   appearances: number
   goals: number
-  assists: number
+  assists?: number | null
   yellowCards?: number | null
   redCards?: number | null
   cleanSheets?: number | null
@@ -63,7 +63,7 @@ export interface UpdatePlayerStatsRequest {
   team: string
   appearances: number
   goals: number
-  assists: number
+  assists?: number | null
   yellowCards?: number | null
   redCards?: number | null
   cleanSheets?: number | null

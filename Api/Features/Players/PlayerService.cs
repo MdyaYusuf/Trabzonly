@@ -485,7 +485,7 @@ public class PlayerService(
   }
 
   private async Task<int?> ResolveStatsSeasonIdAsync(
-    PlayerCategory category,
+    PlayerCategory? category,
     CancellationToken cancellationToken)
   {
     if (category == PlayerCategory.Legend)
@@ -537,11 +537,11 @@ public class PlayerService(
     string? search = query.Search?.Trim();
     PositionZone? zone = PlayerPositionGroups.GetZone(query.PositionGroup);
     bool? isActive = query.IsActive;
-    PlayerCategory category = query.Category;
+    PlayerCategory? category = query.Category;
 
     return player =>
       (!isActive.HasValue || player.IsActive == isActive.Value) &&
-      player.Category == category &&
+      (!category.HasValue || player.Category == category.Value) &&
       (string.IsNullOrEmpty(search) ||
         player.Name.Contains(search) ||
         (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&

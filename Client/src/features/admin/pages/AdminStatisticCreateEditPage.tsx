@@ -5,6 +5,7 @@ import seasonService from '@/features/seasons/seasonService'
 import playerStatsService from '@/features/stats/playerStatsService'
 import { AdminStatisticDeleteModal } from '../components/AdminStatisticDeleteModal'
 import { AdminStatisticFormFields } from '../components/AdminStatisticFormFields'
+import { formatAdminPlayerOptionLabel } from '../utils/formatAdminPlayerOptionLabel'
 import {
   createEmptyAdminStatisticFormDraft,
   mapDraftToCreateRequest,
@@ -44,7 +45,7 @@ export function AdminStatisticCreateEditPage({
     async function loadLookups() {
       const [seasonsResult, playersResult] = await Promise.all([
         seasonService.getAll({ pageNumber: 1, pageSize: 100 }),
-        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 100 }),
+        playerService.getAllForAdmin({ pageNumber: 1, pageSize: 200, sort: 'number-asc' }),
       ])
 
       if (cancelled) {
@@ -77,10 +78,7 @@ export function AdminStatisticCreateEditPage({
       if (playersResult.success && playersResult.data) {
         const playerItems = playersResult.data.items.map((player) => ({
           id: player.id,
-          label:
-            player.shirtNumber != null
-              ? `${player.name} (#${player.shirtNumber})`
-              : player.name,
+          label: formatAdminPlayerOptionLabel(player),
         }))
         setPlayers(playerItems)
 

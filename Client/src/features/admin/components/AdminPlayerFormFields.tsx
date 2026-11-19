@@ -368,7 +368,7 @@ export function AdminPlayerFormFields({
         <textarea
           id="description"
           rows={6}
-          maxLength={2000}
+          maxLength={400}
           className={`${inputClass} resize-y`}
           value={draft.description}
           onChange={(event) => {
@@ -376,7 +376,7 @@ export function AdminPlayerFormFields({
           }}
         />
         <p className="font-label mt-space-xs text-right text-label-md text-on-surface-variant">
-          {profileLength} / 2000 karakter
+          {profileLength} / 400 karakter
         </p>
       </section>
 

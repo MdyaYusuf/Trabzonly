@@ -68,12 +68,12 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
   const sectionTitle = isLegend ? 'KARİYER İSTATİSTİKLERİ' : 'SEZON İSTATİSTİKLERİ'
   const appearances = stats?.appearances ?? 0
   const goals = stats?.goals ?? 0
-  const assists = stats?.assists ?? 0
+  const assists = stats?.assists
   const cleanSheets = stats?.cleanSheets
   const yellowCards = stats?.yellowCards
   const redCards = stats?.redCards
   const goalsConceded = stats?.goalsConceded
-  const contribution = goals + assists
+  const contribution = goals + (assists ?? 0)
   const isGk = group === 'gk'
   const isDef = group === 'def'
 
@@ -135,7 +135,10 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
               value={yellowCards != null ? String(yellowCards) : '—'}
             />
           ) : (
-            <StatBox label="Asist" value={String(assists)} />
+            <StatBox
+              label="Asist"
+              value={assists != null ? String(assists) : '—'}
+            />
           )}
 
           {isGk ? null : isDef ? (
@@ -147,7 +150,9 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
             <StatBox
               label="Skor Katkısı"
               value={String(contribution)}
-              hint={`${goals}G + ${assists}A`}
+              hint={
+                assists != null ? `${goals}G + ${assists}A` : `${goals}G`
+              }
             />
           )}
         </div>
