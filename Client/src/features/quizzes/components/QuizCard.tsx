@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { useAppSelector } from '@/core/store/hooks'
 import type { QuizListItemDto } from '../quizTypes'
 import { resolveQuizCategoryImageUrl } from '../utils/quizCategoryImage'
 import { formatQuizScore } from '../utils/quizFormat'
@@ -9,6 +11,7 @@ type QuizCardProps = {
 }
 
 export function QuizCard({ quiz }: QuizCardProps) {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const detailPath = `/quizler/${quiz.id}`
   const description = quiz.description?.trim() || 'Bu test için açıklama eklenmemiş.'
   const imageUrl = resolveQuizCategoryImageUrl(quiz.categoryImageUrl, quiz.categoryName)
@@ -22,6 +25,14 @@ export function QuizCard({ quiz }: QuizCardProps) {
   return (
     <Link
       to={detailPath}
+      onClick={(event) => {
+        if (isAuthenticated) {
+          return
+        }
+
+        event.preventDefault()
+        toast.info('Quiz çözmek için giriş yapmalısınız.')
+      }}
       className="group relative flex h-full cursor-pointer flex-col overflow-hidden bg-surface-container-lowest shadow-sm transition-all duration-200 hover:-translate-y-1 hover:scale-[1.035] hover:shadow-lg"
     >
       <div

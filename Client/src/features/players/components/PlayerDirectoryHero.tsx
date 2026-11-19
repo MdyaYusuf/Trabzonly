@@ -4,7 +4,6 @@ import playerService from '../playerService'
 import { formatMarketValue } from '../utils/formatMarketValue'
 
 export function PlayerDirectoryHero() {
-  const [seasonLabel, setSeasonLabel] = useState<string | null>(null)
   const [totalSquadValue, setTotalSquadValue] = useState<number | null>(null)
   const [topPlayerId, setTopPlayerId] = useState<number | null>(null)
   const [topPlayerName, setTopPlayerName] = useState<string | null>(null)
@@ -25,7 +24,6 @@ export function PlayerDirectoryHero() {
 
       if (overviewResult.success && overviewResult.data) {
         setTotalSquadValue(overviewResult.data.totalMarketValue)
-        setSeasonLabel(overviewResult.data.currentSeasonName ?? null)
       }
 
       if (
@@ -65,19 +63,15 @@ export function PlayerDirectoryHero() {
             <div className="mb-space-xs flex flex-wrap items-center gap-space-xs">
               <span className="inline-block h-2.5 w-2.5 bg-primary-container" />
               <span className="font-kicker text-kicker font-bold tracking-widest text-primary-container uppercase">
-                {seasonLabel?.trim() || 'GÜNCEL SEZON'}
-              </span>
-              <span className="text-label-md text-outline-variant">•</span>
-              <span className="font-kicker text-kicker text-on-surface-variant uppercase">
-                A TAKIM RAPORU
+                GÜNCEL KADRO &amp; EFSANELER &amp; TRANSFER HEDEFLERİ
               </span>
             </div>
             <h1 className="font-display text-headline-lg leading-[1.05] font-extrabold tracking-tight text-primary uppercase lg:text-display-xl">
-              TRABZONSPOR KADROSU
+              OYUNCULAR
             </h1>
             <p className="font-body mt-space-sm max-w-2xl text-body-md text-on-surface-variant">
-              Bordo-Mavi fırtınanın güncel kadrosu, taraftar reytingleri, piyasa değerleri ve detaylı
-              istatistik analizleri. Bağımsız tribün gözüyle oyuncu değerlendirme merkezi.
+              Bordo-Mavi’nin bugünü, efsaneleri ve transfer gündemi. Reytingler, piyasa değerleri ve
+              istatistikler.
             </p>
           </div>
 

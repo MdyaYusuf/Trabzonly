@@ -56,6 +56,18 @@ export function TakeQuizPage() {
   selectedAnswersRef.current = selectedAnswers
   feedbackByQuestionRef.current = feedbackByQuestion
 
+  const authNoticeShownRef = useRef(false)
+
+  useEffect(() => {
+    if (isAuthenticated || authNoticeShownRef.current) {
+      return
+    }
+
+    authNoticeShownRef.current = true
+    toast.info('Quiz çözmek için giriş yapmalısınız.')
+    navigate('/quizler', { replace: true })
+  }, [isAuthenticated, navigate])
+
   useEffect(() => {
     if (!isAuthenticated || !quizId) {
       return
@@ -240,7 +252,7 @@ export function TakeQuizPage() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
+    return null
   }
 
   if (!quizId) {

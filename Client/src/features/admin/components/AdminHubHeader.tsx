@@ -11,7 +11,7 @@ export function AdminHubHeader({ profile }: AdminHubHeaderProps) {
         {profile.title}
         <span className="h-2.5 w-2.5 rounded-full bg-tertiary-fixed-dim" aria-hidden />
       </h1>
-      <p className="font-body text-body-md text-on-surface-variant lg:text-body-lg">
+      <p className="font-body text-body-md text-on-surface-variant">
         {profile.description}
       </p>
     </header>

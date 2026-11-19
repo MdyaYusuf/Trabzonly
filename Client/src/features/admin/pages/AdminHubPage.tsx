@@ -43,7 +43,7 @@ export function AdminHubPage() {
   })
 
   return (
-    <main className="mx-auto flex w-full max-w-[1520px] flex-col gap-space-lg px-4 pt-14 pb-space-lg sm:px-6 sm:pt-16 lg:px-10">
+    <main className="mx-auto flex w-full max-w-[1520px] flex-col gap-space-md px-4 pt-14 pb-space-lg sm:px-6 sm:pt-16 lg:px-10">
       <AdminHubHeader profile={adminHubProfile} />
       <AdminModuleGrid modules={modules} />
     </main>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { scrollListToTop } from '@/core/utils/scrollListToTop'
 import { SquadGalleryCard } from '../components/SquadGalleryCard'
 import { SquadsGalleryBreadcrumb } from '../components/SquadsGalleryBreadcrumb'
 import { SquadsGalleryCta } from '../components/SquadsGalleryCta'
@@ -75,6 +76,15 @@ export function SquadsGalleryPage() {
     setPage(1)
   }
 
+  function handlePageChange(nextPage: number) {
+    if (nextPage === page) {
+      return
+    }
+
+    setPage(nextPage)
+    scrollListToTop('kadrolar-listesi', 'kadrolar-filters')
+  }
+
   const currentPage = Math.min(page, totalPages)
 
   return (
@@ -95,7 +105,7 @@ export function SquadsGalleryPage() {
         }}
       />
 
-      <div className="w-full bg-background py-space-xl">
+      <div id="kadrolar-listesi" className="w-full bg-background py-space-xl">
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
             <div className="flex flex-col gap-space-lg lg:col-span-8">
@@ -119,7 +129,7 @@ export function SquadsGalleryPage() {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 totalCount={totalCount}
-                onPageChange={setPage}
+                onPageChange={handlePageChange}
               />
             </div>
 

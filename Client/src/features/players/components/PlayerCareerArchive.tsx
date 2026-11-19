@@ -14,16 +14,16 @@ function formatCareerRecord(stats: PlayerStatsResponseDto, group: PositionGroup)
   if (group === 'gk') {
     const cleanSheets = stats.cleanSheets != null ? String(stats.cleanSheets) : '—'
     const conceded = stats.goalsConceded != null ? String(stats.goalsConceded) : '—'
-    return `${cleanSheets} Gol Yenmeyen / ${conceded} Yenilen / ${stats.appearances} Maç`
+    return `${stats.appearances} Maç / ${cleanSheets} Gol Yenilmeyen / ${conceded} Yenilen`
   }
 
   if (group === 'def') {
     const cleanSheets = stats.cleanSheets != null ? String(stats.cleanSheets) : '—'
-    return `${cleanSheets} Gol Yenmeyen / ${stats.goals} Gol / ${stats.appearances} Maç`
+    return `${stats.appearances} Maç / ${cleanSheets} Gol Yenilmeyen / ${stats.goals} Gol`
   }
 
   const assists = stats.assists != null ? String(stats.assists) : '—'
-  return `${stats.goals} Gol / ${assists} Asist / ${stats.appearances} Maç`
+  return `${stats.appearances} Maç / ${stats.goals} Gol / ${assists} Asist`
 }
 
 export function PlayerCareerArchive({

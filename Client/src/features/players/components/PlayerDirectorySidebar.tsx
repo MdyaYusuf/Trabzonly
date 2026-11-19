@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { SquadCreateIcon } from '@/features/squads/components/SquadCreateIcon'
+import { forumPrinciples } from '@/features/posts/utils/postsFeedTypes'
 import playerService from '../playerService'
 import type { PlayerResponseDto } from '../playerTypes'
 import { PlayerDirectoryPollCard } from './PlayerDirectoryPollCard'
@@ -11,21 +11,6 @@ const AVATAR_TONES = [
   'bg-primary-container text-on-primary',
   'bg-secondary text-on-secondary',
   'bg-primary text-on-primary',
-] as const
-
-const ratingTips = [
-  {
-    title: 'Formu Oku',
-    body: 'Son maçlar, sakatlık durumu ve rolünü değerlendirerek puan ver.',
-  },
-  {
-    title: 'Dürüst Ol',
-    body: 'Skordan bağımsız, saha içi performansa göre taraftar notunu bırak.',
-  },
-  {
-    title: "11'ini Kur",
-    body: "Beğendiğin isimlerle kendi dizilişini oluşturup tribüne sun.",
-  },
 ] as const
 
 function initialsFromName(name: string): string {
@@ -151,35 +136,35 @@ export function PlayerDirectorySidebar() {
 
       <div className="flex flex-col gap-space-md bg-surface-container p-space-lg">
         <div className="flex items-center gap-space-xs">
-          <span className="material-symbols-outlined text-lg text-secondary">menu_book</span>
+          <span className="material-symbols-outlined text-lg text-secondary">shield</span>
           <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
-            Taraftar Rehberi
+            Tribün ve Forum İlkeleri
           </span>
         </div>
         <p className="font-body text-body-sm text-on-surface-variant">
-          Oyuncu kartlarından detaya gir, taraftar puanı ver ve favori 11&apos;ini kur.
+          Trabzonly, seviyeli futbol tartışmalarının ve Karadeniz spor ahlakının dijital kalesidir.
         </p>
         <div className="flex flex-col gap-space-sm">
-          {ratingTips.map((tip, index) => (
+          {forumPrinciples.map((principle, index) => (
             <div
-              key={tip.title}
+              key={principle.title}
               className="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm"
             >
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold text-on-secondary">
                 {index + 1}
               </span>
               <p className="font-body text-body-sm text-on-surface">
-                <strong>{tip.title}:</strong> {tip.body}
+                <strong>{principle.title}:</strong> {principle.body}
               </p>
             </div>
           ))}
         </div>
         <Link
-          to="/kadrolar/olustur"
+          to="/topluluk-kurallari"
           className="font-label group ml-auto inline-flex items-center gap-1 text-label-md font-bold text-secondary uppercase transition-colors hover:text-primary"
         >
-          <SquadCreateIcon size={16} />
-          <span>Kadro oluştur</span>
+          <span className="material-symbols-outlined text-base">menu_book</span>
+          <span>Tüm topluluk kuralları</span>
           <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-0.5">
             arrow_forward
           </span>

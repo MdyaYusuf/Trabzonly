@@ -165,7 +165,10 @@ export function MatchWeekPlayerRateControl({
     function handleHostClick(event: MouseEvent) {
       const target = event.target as HTMLElement | null
 
-      if (target?.closest('[data-mw-rate-chip="true"]')) {
+      if (
+        target?.closest('[data-mw-rate-chip="true"]') ||
+        target?.closest('[data-mw-rate-hint="true"]')
+      ) {
         return
       }
 
@@ -351,9 +354,10 @@ export function MatchWeekPlayerRateControl({
           ? createPortal(chipButton, cornerHost)
           : null
         : chipButton}
-      {!hasUserVote ? (
+      {isAuthenticated && !hasUserVote ? (
         <button
           type="button"
+          data-mw-rate-hint="true"
           disabled={isSaving}
           onClick={(event) => {
             event.stopPropagation()

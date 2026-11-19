@@ -40,7 +40,10 @@ export function PlayerDirectoryFilters({
   const showMarketSort = category !== PlayerCategory.Legend
 
   return (
-    <section className="sticky top-16 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur-sm sm:top-20">
+    <section
+      id="oyuncular-filters"
+      className="sticky top-16 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur-sm sm:top-20"
+    >
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-sm px-4 py-space-sm sm:px-6 lg:px-12">
         <div
           className="flex flex-wrap gap-1 bg-surface-container p-1"

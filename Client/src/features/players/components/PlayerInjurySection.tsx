@@ -46,7 +46,7 @@ export function PlayerInjurySection({ playerId }: PlayerInjurySectionProps) {
       <div className="flex flex-wrap items-center justify-between gap-space-sm pb-space-xs">
         <div>
           <span className="font-kicker mb-1 block text-kicker font-bold tracking-widest text-secondary uppercase">
-            KULÜP DOKTORU RAPORU
+            SAĞLIK RAPORU
           </span>
           <h2 className="font-headline text-headline-md font-bold tracking-tight text-primary">
             SAKATLIK GEÇMİŞİ

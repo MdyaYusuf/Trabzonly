@@ -7,8 +7,11 @@ import {
   type PlayerPositionGroup,
 } from '../playerTypes'
 import { formatMarketValue } from '../utils/formatMarketValue'
-import { LEGEND_TEAM_LABEL, positionGroupFromZone } from '../utils/mapPlayerToCardData'
-import type { PositionGroup } from '../utils/playerDirectoryTypes'
+import { positionGroupFromZone } from '../utils/mapPlayerToCardData'
+import {
+  directoryCategoryPath,
+  type PositionGroup,
+} from '../utils/playerDirectoryTypes'
 import { PlayerCareerArchive } from './PlayerCareerArchive'
 import { PlayerPollCard } from './PlayerPollCard'
 
@@ -31,8 +34,8 @@ function formatRivalLine(peer: PlayerResponseDto, group: PositionGroup): string 
 
   if (group === 'gk' || group === 'def') {
     return stats?.cleanSheets != null
-      ? `${stats.cleanSheets} Gol Yenmeyen`
-      : '— Gol Yenmeyen'
+      ? `${stats.cleanSheets} Gol Yenilmeyen Maç`
+      : '— Gol Yenilmeyen Maç'
   }
 
   const assists = stats?.assists != null ? String(stats.assists) : '—'
@@ -97,6 +100,7 @@ function positionGroupLabel(group: PositionGroup): string {
 
 export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
   const group = positionGroupFromZone(player.positionZone)
+  const isCurrent = player.category === PlayerCategory.Current
   const isLegend = player.category === PlayerCategory.Legend
   const [peers, setPeers] = useState<PlayerResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -155,28 +159,21 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
     <aside className="flex flex-col gap-space-lg lg:col-span-4">
       <PlayerPollCard playerId={player.id} />
 
-      <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-        <div className="flex items-center gap-space-xs">
-          <span className="material-symbols-outlined text-lg text-secondary">compare_arrows</span>
-          <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
-            {isLegend ? `Efsane Kıyası · ${groupLabel}` : `Pozisyon Kıyası · ${groupLabel}`}
-          </span>
-        </div>
+      {isCurrent ? (
+        <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
+          <div className="flex items-center gap-space-xs">
+            <span className="material-symbols-outlined text-lg text-secondary">compare_arrows</span>
+            <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
+              {`Pozisyon Kıyası · ${groupLabel}`}
+            </span>
+          </div>
 
-        {isLoading ? (
-          <p className="font-body text-body-sm text-on-surface-variant">Kadro verisi yükleniyor...</p>
-        ) : (
-          <div className="grid grid-cols-2 gap-space-sm">
-            {isLegend ? (
-              <div className="bg-surface-container-low p-space-sm">
-                <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
-                  Kulüp
-                </span>
-                <span className="font-headline block text-headline-sm font-bold text-primary">
-                  {LEGEND_TEAM_LABEL}
-                </span>
-              </div>
-            ) : (
+          {isLoading ? (
+            <p className="font-body text-body-sm text-on-surface-variant">
+              Kadro verisi yükleniyor...
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-space-sm">
               <div className="bg-surface-container-low p-space-sm">
                 <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
                   Piyasa Değeri
@@ -191,21 +188,21 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
                   {marketAvg != null ? formatMarketValue(Math.round(marketAvg)) : '—'}
                 </span>
               </div>
-            )}
-            <div className="bg-surface-container-low p-space-sm">
-              <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
-                Ortalama Puan
-              </span>
-              <span className="font-headline block text-headline-sm font-bold text-primary">
-                {player.ratingCount > 0 ? formatRating(player.averageRating) : '—'}
-              </span>
-              <span className="font-body mt-1 block text-[12px] text-on-surface-variant">
-                Grup ort. {ratingAvg != null ? formatRating(ratingAvg) : '—'}
-              </span>
+              <div className="bg-surface-container-low p-space-sm">
+                <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
+                  Ortalama Puan
+                </span>
+                <span className="font-headline block text-headline-sm font-bold text-primary">
+                  {player.ratingCount > 0 ? formatRating(player.averageRating) : '—'}
+                </span>
+                <span className="font-body mt-1 block text-[12px] text-on-surface-variant">
+                  Grup ort. {ratingAvg != null ? formatRating(ratingAvg) : '—'}
+                </span>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
         <div className="flex items-center gap-space-xs">
@@ -249,13 +246,15 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
         )}
       </div>
 
-      <PlayerCareerArchive
-        playerId={player.id}
-        positionZone={player.positionZone}
-      />
+      {!isLegend ? (
+        <PlayerCareerArchive
+          playerId={player.id}
+          positionZone={player.positionZone}
+        />
+      ) : null}
 
       <Link
-        to="/oyuncular"
+        to={directoryCategoryPath(player.category)}
         className="font-label group flex w-full cursor-pointer items-center justify-start gap-space-xs bg-surface-container-lowest px-space-md py-space-sm text-label-md font-bold tracking-wider text-primary uppercase shadow-sm transition-all hover:text-secondary"
       >
         <span className="material-symbols-outlined text-[18px]">groups</span>

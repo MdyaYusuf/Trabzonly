@@ -37,7 +37,7 @@ function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
     return [
       { label: 'Maç', value: String(stats?.appearances ?? 0) },
       {
-        label: 'Gol Yenmeyen Maç',
+        label: 'Gol Yenilmeyen Maç',
         value: stats?.cleanSheets != null ? String(stats.cleanSheets) : '—',
       },
     ]

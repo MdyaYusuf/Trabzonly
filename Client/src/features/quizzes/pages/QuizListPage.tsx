@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
+import { scrollListToTop } from '@/core/utils/scrollListToTop'
 import { QuizCard } from '../components/QuizCard'
 import {
   QuizListFilters,
@@ -109,6 +110,15 @@ export function QuizListPage() {
   const pageStart = (currentPage - 1) * PAGE_SIZE
   const pageQuizzes = filteredQuizzes.slice(pageStart, pageStart + PAGE_SIZE)
 
+  function handlePageChange(nextPage: number) {
+    if (nextPage === page) {
+      return
+    }
+
+    setPage(nextPage)
+    scrollListToTop('quizler-listesi', 'quizler-filters')
+  }
+
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
       <div className="mx-auto w-full max-w-[1360px] px-4 py-space-md sm:px-6 lg:px-12">
@@ -135,7 +145,7 @@ export function QuizListPage() {
         onSearchChange={setSearch}
       />
 
-      <div className="w-full bg-background py-space-xl">
+      <div id="quizler-listesi" className="w-full bg-background py-space-xl">
         <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
           <div className="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
             <section className="flex flex-col gap-space-md lg:col-span-8">
@@ -177,7 +187,7 @@ export function QuizListPage() {
                 <QuizListPagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  onPageChange={setPage}
+                  onPageChange={handlePageChange}
                 />
               ) : null}
             </section>

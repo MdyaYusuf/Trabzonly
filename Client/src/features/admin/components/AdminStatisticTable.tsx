@@ -35,7 +35,7 @@ export function AdminStatisticTable({
             <th className="px-space-sm py-space-sm">Asist</th>
             <th className="px-space-sm py-space-sm">Sarı</th>
             <th className="px-space-sm py-space-sm">Kırmızı</th>
-            <th className="px-space-sm py-space-sm">Gol Yenmeyen</th>
+            <th className="px-space-sm py-space-sm">Gol Yenilmeyen</th>
             <th className="px-space-sm py-space-sm">Yenilen Gol</th>
             <th className="px-space-sm py-space-sm">İşlemler</th>
           </tr>

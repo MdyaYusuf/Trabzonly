@@ -5,18 +5,20 @@ type PlayerSeasonStatsSectionProps = {
   player: PlayerResponseDto
 }
 
+type StatBoxTone = 'default' | 'emphasize' | 'yellow' | 'red'
+
 function StatBox({
   label,
   value,
   hint,
-  emphasize = false,
+  tone = 'default',
 }: {
   label: string
   value: string
   hint?: string
-  emphasize?: boolean
+  tone?: StatBoxTone
 }) {
-  if (emphasize) {
+  if (tone === 'emphasize') {
     return (
       <div className="flex flex-col justify-between bg-primary-container p-space-md text-on-primary">
         <span className="font-kicker text-kicker font-bold text-secondary-fixed-dim uppercase">
@@ -31,6 +33,46 @@ function StatBox({
           <span className="font-body text-[12px] font-semibold text-tertiary-fixed-dim">
             {hint}
           </span>
+        ) : (
+          <span className="font-body text-[12px] text-transparent">—</span>
+        )}
+      </div>
+    )
+  }
+
+  if (tone === 'yellow') {
+    return (
+      <div className="flex flex-col justify-between bg-tertiary-fixed p-space-md">
+        <span className="font-kicker text-kicker font-bold text-on-tertiary-fixed-variant uppercase">
+          {label}
+        </span>
+        <div className="my-space-xs">
+          <span className="font-stat text-stat-counter font-extrabold text-on-tertiary-fixed">
+            {value}
+          </span>
+        </div>
+        {hint ? (
+          <span className="font-body text-[12px] text-on-tertiary-fixed-variant">{hint}</span>
+        ) : (
+          <span className="font-body text-[12px] text-transparent">—</span>
+        )}
+      </div>
+    )
+  }
+
+  if (tone === 'red') {
+    return (
+      <div className="flex flex-col justify-between bg-error-container p-space-md">
+        <span className="font-kicker text-kicker font-bold text-on-error-container/80 uppercase">
+          {label}
+        </span>
+        <div className="my-space-xs">
+          <span className="font-stat text-stat-counter font-extrabold text-on-error-container">
+            {value}
+          </span>
+        </div>
+        {hint ? (
+          <span className="font-body text-[12px] text-on-error-container/80">{hint}</span>
         ) : (
           <span className="font-body text-[12px] text-transparent">—</span>
         )}
@@ -65,7 +107,9 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
   const teamLabel = isLegend
     ? stats?.team?.trim() || LEGEND_TEAM_LABEL
     : stats?.team?.trim() || player.currentTeam?.trim() || '—'
-  const sectionTitle = isLegend ? 'KARİYER İSTATİSTİKLERİ' : 'SEZON İSTATİSTİKLERİ'
+  const sectionTitle = isLegend
+    ? 'TRABZONSPOR KARİYERİ İSTATİSTİKLERİ'
+    : 'SEZON İSTATİSTİKLERİ'
   const appearances = stats?.appearances ?? 0
   const goals = stats?.goals ?? 0
   const assists = stats?.assists
@@ -116,12 +160,12 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
 
           {isGk || isDef ? (
             <StatBox
-              label="Gol Yenmeyen Maç"
+              label="Gol Yenilmeyen Maç"
               value={cleanSheets != null ? String(cleanSheets) : '—'}
-              emphasize
+              tone="emphasize"
             />
           ) : (
-            <StatBox label="Atılan Gol" value={String(goals)} emphasize />
+            <StatBox label="Atılan Gol" value={String(goals)} tone="red" />
           )}
 
           {isGk ? (
@@ -133,11 +177,13 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
             <StatBox
               label="Sarı Kart"
               value={yellowCards != null ? String(yellowCards) : '—'}
+              tone="yellow"
             />
           ) : (
             <StatBox
               label="Asist"
               value={assists != null ? String(assists) : '—'}
+              tone="yellow"
             />
           )}
 
@@ -145,15 +191,10 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
             <StatBox
               label="Kırmızı Kart"
               value={redCards != null ? String(redCards) : '—'}
+              tone="red"
             />
           ) : (
-            <StatBox
-              label="Skor Katkısı"
-              value={String(contribution)}
-              hint={
-                assists != null ? `${goals}G + ${assists}A` : `${goals}G`
-              }
-            />
+            <StatBox label="Skor Katkısı" value={String(contribution)} tone="emphasize" />
           )}
         </div>
       )}

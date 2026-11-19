@@ -78,15 +78,7 @@ function resolveRosterBadge(player: PlayerResponseDto): { label: string; active:
 }
 
 function resolveBandLabel(player: PlayerResponseDto): string {
-  if (player.category === PlayerCategory.Legend) {
-    return player.positionName.toUpperCase()
-  }
-
-  if (player.category === PlayerCategory.TransferTarget) {
-    return `HEDEF ${player.positionName.toUpperCase()}`
-  }
-
-  return `A TAKIM ${player.positionName.toUpperCase()}`
+  return player.positionName.toUpperCase()
 }
 
 function resolveSeasonLabel(player: PlayerResponseDto): string {

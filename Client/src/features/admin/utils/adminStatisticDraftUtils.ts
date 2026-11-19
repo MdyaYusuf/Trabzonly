@@ -147,7 +147,7 @@ export function validateAdminStatisticDraft(draft: AdminStatisticFormDraft): str
     [draft.assists, 'Asist'],
     [draft.yellowCards, 'Sarı kart'],
     [draft.redCards, 'Kırmızı kart'],
-    [draft.cleanSheets, 'Gol yenmeyen maç'],
+    [draft.cleanSheets, 'Gol yenilmeyen maç'],
     [draft.goalsConceded, 'Yenilen gol'],
   ]
 

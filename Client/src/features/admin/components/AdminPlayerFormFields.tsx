@@ -197,7 +197,7 @@ export function AdminPlayerFormFields({
                     </span>
                   </div>
                   <p className="font-body mt-1 text-body-sm text-on-surface-variant">
-                    Aktif oyuncular kamu kadro listesinde görünür.
+                    Sadece aktif oyuncular kadro listelerinde görünür.
                   </p>
                 </div>
                 <button

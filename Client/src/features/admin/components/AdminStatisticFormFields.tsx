@@ -238,7 +238,7 @@ export function AdminStatisticFormFields({
         <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
           <div>
             <FieldLabel htmlFor="cleanSheets">
-              Gol Yenmeyen Maç{' '}
+              Gol Yenilmeyen Maç{' '}
               <span className="text-[0.85em] text-error/70">(Boş bırakılabilir.)</span>
             </FieldLabel>
             <input

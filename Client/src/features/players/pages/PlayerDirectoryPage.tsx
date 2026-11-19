@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { scrollListToTop } from '@/core/utils/scrollListToTop'
 import { PlayerCard } from '../components/PlayerCard'
 import { PlayerDirectoryBreadcrumb } from '../components/PlayerDirectoryBreadcrumb'
 import { PlayerDirectoryCta } from '../components/PlayerDirectoryCta'
@@ -13,8 +15,11 @@ import {
   mapPlayerToCardData,
 } from '../utils/mapPlayerToCardData'
 import {
+  DIRECTORY_CATEGORY_QUERY_KEY,
   DIRECTORY_CATEGORY_TABS,
   PAGE_SIZE,
+  directoryCategorySlug,
+  parseDirectoryCategory,
   type PlayerCardData,
   type PositionGroup,
   type SortOption,
@@ -29,11 +34,12 @@ function defaultSortForCategory(category: PlayerCategory): SortOption {
 }
 
 export function PlayerDirectoryPage() {
-  const [category, setCategory] = useState<PlayerCategory>(PlayerCategory.Current)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const category = parseDirectoryCategory(searchParams.get(DIRECTORY_CATEGORY_QUERY_KEY))
   const [positionFilter, setPositionFilter] = useState<PositionGroup>('all')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [sort, setSort] = useState<SortOption>('value-desc')
+  const [sort, setSort] = useState<SortOption>(() => defaultSortForCategory(category))
   const [page, setPage] = useState(1)
   const [players, setPlayers] = useState<PlayerCardData[]>([])
   const [totalCount, setTotalCount] = useState(0)
@@ -44,6 +50,11 @@ export function PlayerDirectoryPage() {
     const tab = DIRECTORY_CATEGORY_TABS.find((item) => item.category === category)
 
     return tab?.listTitle ?? 'GÜNCEL KADRO'
+  }, [category])
+
+  useEffect(() => {
+    setPage(1)
+    setSort(defaultSortForCategory(category))
   }, [category])
 
   useEffect(() => {
@@ -127,6 +138,15 @@ export function PlayerDirectoryPage() {
   const rangeStart = totalCount === 0 ? 0 : pageStart + 1
   const rangeEnd = Math.min(pageStart + PAGE_SIZE, totalCount)
 
+  function handlePageChange(nextPage: number) {
+    if (nextPage === page) {
+      return
+    }
+
+    setPage(nextPage)
+    scrollListToTop('kadro-listesi', 'oyuncular-filters')
+  }
+
   function setFilter(next: PositionGroup) {
     setPositionFilter(next)
     setPage(1)
@@ -137,9 +157,15 @@ export function PlayerDirectoryPage() {
       return
     }
 
-    setCategory(next)
-    setPage(1)
-    setSort(defaultSortForCategory(next))
+    const nextParams = new URLSearchParams(searchParams)
+
+    if (next === PlayerCategory.Current) {
+      nextParams.delete(DIRECTORY_CATEGORY_QUERY_KEY)
+    } else {
+      nextParams.set(DIRECTORY_CATEGORY_QUERY_KEY, directoryCategorySlug(next))
+    }
+
+    setSearchParams(nextParams, { replace: true })
   }
 
   return (
@@ -211,7 +237,7 @@ export function PlayerDirectoryPage() {
                 rangeEnd={rangeEnd}
                 totalPages={totalPages}
                 currentPage={currentPage}
-                onPageChange={setPage}
+                onPageChange={handlePageChange}
               />
             </div>
 

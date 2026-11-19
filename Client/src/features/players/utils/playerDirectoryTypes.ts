@@ -56,3 +56,35 @@ export const DIRECTORY_CATEGORY_TABS: {
     listTitle: 'TRANSFER HEDEFLERİ',
   },
 ]
+
+export const DIRECTORY_CATEGORY_QUERY_KEY = 'kategori'
+
+const DIRECTORY_CATEGORY_SLUGS: Record<PlayerCategory, string> = {
+  [PlayerCategory.Current]: 'guncel',
+  [PlayerCategory.Legend]: 'efsaneler',
+  [PlayerCategory.TransferTarget]: 'transfer',
+}
+
+export function parseDirectoryCategory(slug: string | null | undefined): PlayerCategory {
+  if (slug === DIRECTORY_CATEGORY_SLUGS[PlayerCategory.Legend]) {
+    return PlayerCategory.Legend
+  }
+
+  if (slug === DIRECTORY_CATEGORY_SLUGS[PlayerCategory.TransferTarget]) {
+    return PlayerCategory.TransferTarget
+  }
+
+  return PlayerCategory.Current
+}
+
+export function directoryCategorySlug(category: PlayerCategory): string {
+  return DIRECTORY_CATEGORY_SLUGS[category]
+}
+
+export function directoryCategoryPath(category: PlayerCategory): string {
+  if (category === PlayerCategory.Current) {
+    return '/oyuncular'
+  }
+
+  return `/oyuncular?${DIRECTORY_CATEGORY_QUERY_KEY}=${directoryCategorySlug(category)}`
+}

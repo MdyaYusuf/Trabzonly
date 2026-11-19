@@ -11,6 +11,7 @@ import { PlayerInjurySection } from '../components/PlayerInjurySection'
 import { PlayerSeasonStatsSection } from '../components/PlayerSeasonStatsSection'
 import playerService from '../playerService'
 import { PlayerCategory, type PlayerResponseDto } from '../playerTypes'
+import { directoryCategoryPath } from '../utils/playerDirectoryTypes'
 
 function categoryBreadcrumbLabel(category: PlayerCategory): string {
   if (category === PlayerCategory.Legend) {
@@ -112,6 +113,7 @@ export function PlayerDetailPage() {
       <PlayerDetailBreadcrumb
         playerName={player.name}
         categoryLabel={categoryBreadcrumbLabel(player.category)}
+        categoryPath={directoryCategoryPath(player.category)}
       />
       <PlayerDetailHero player={player} />
       <PlayerDetailRatingBar

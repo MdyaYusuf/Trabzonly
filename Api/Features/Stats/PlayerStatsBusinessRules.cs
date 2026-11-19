@@ -77,7 +77,7 @@ public class PlayerStatsBusinessRules(IPlayerStatsRepository _playerStatsReposit
 
     if (cleanSheets.HasValue && cleanSheets.Value > appearances)
     {
-      throw new BusinessException("Gol yenmeyen maç sayısı, toplam maça çıkma sayısından büyük olamaz.");
+      throw new BusinessException("Gol yenilmeyen maç sayısı, toplam maça çıkma sayısından büyük olamaz.");
     }
 
     if (resolvedRedCards > appearances)
