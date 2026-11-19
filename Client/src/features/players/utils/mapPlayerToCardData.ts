@@ -48,7 +48,7 @@ function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
 
 export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): PlayerCardData {
   const positionGroup = positionGroupFromZone(player.positionZone)
-  const note = player.description?.trim() || player.currentTeam
+  const note = player.description?.trim() || player.currentTeam?.trim() || ''
   const height =
     player.height != null ? `${(player.height / 100).toFixed(2).replace('.', ',')} m` : '—'
 

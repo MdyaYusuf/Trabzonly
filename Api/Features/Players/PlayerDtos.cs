@@ -26,7 +26,7 @@ public sealed record PlayerResponseDto(
   string PreferredFoot,
   decimal? MarketValue,
   decimal? Wage,
-  string CurrentTeam,
+  string? CurrentTeam,
   string? Description,
   string? ImageUrl,
   int? ShirtNumber,
@@ -34,6 +34,7 @@ public sealed record PlayerResponseDto(
   int RatingCount,
   bool IsActive,
   bool IsCaptain,
+  PlayerCategory Category,
   int PositionId,
   string PositionName,
   string PositionAbbreviation = "",
@@ -55,11 +56,12 @@ public sealed record PlayerPreviewDto(
   string Nationality,
   int Age,
   decimal? MarketValue,
-  string CurrentTeam,
+  string? CurrentTeam,
   string? ImageUrl,
   int? ShirtNumber,
   decimal AverageRating,
   int RatingCount,
+  PlayerCategory Category,
   string PositionName,
   string PositionAbbreviation = "",
   PositionZone PositionZone = PositionZone.Midfield);
@@ -85,11 +87,12 @@ public sealed record CreatePlayerRequest(
   string PreferredFoot,
   decimal? MarketValue,
   decimal? Wage,
-  string CurrentTeam,
+  string? CurrentTeam,
   string? Description,
   int? ShirtNumber,
   int PositionId,
   bool IsCaptain,
+  PlayerCategory Category,
   IFormFile? ImageFile);
 
 public sealed record UpdatePlayerRequest(
@@ -101,11 +104,12 @@ public sealed record UpdatePlayerRequest(
   string PreferredFoot,
   decimal? MarketValue,
   decimal? Wage,
-  string CurrentTeam,
+  string? CurrentTeam,
   string? Description,
   int? ShirtNumber,
   int PositionId,
   bool IsCaptain,
+  PlayerCategory Category,
   IFormFile? ImageFile,
   bool IsActive);
 

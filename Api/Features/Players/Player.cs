@@ -17,7 +17,6 @@ public class Player : Entity<int>
     Name = default!;
     Nationality = default!;
     PreferredFoot = default!;
-    CurrentTeam = default!;
   }
 
   public required string Name { get; set; }
@@ -27,7 +26,7 @@ public class Player : Entity<int>
   public required string PreferredFoot { get; set; }
   public decimal? MarketValue { get; set; }
   public decimal? Wage { get; set; }
-  public required string CurrentTeam { get; set; }
+  public string? CurrentTeam { get; set; }
   public string? Description { get; set; }
   public string? ImageUrl { get; set; }
   public int? ShirtNumber { get; set; }
@@ -35,6 +34,7 @@ public class Player : Entity<int>
   public int RatingCount { get; set; }
   public bool IsActive { get; set; } = true;
   public bool IsCaptain { get; set; }
+  public PlayerCategory Category { get; set; } = PlayerCategory.Current;
 
   [NotMapped]
   public int Age => DateOfBirth != default ? (DateTime.Today.Year - DateOfBirth.Year - (DateTime.Today.DayOfYear < DateOfBirth.DayOfYear ? 1 : 0)) : 0;

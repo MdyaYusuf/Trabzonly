@@ -151,7 +151,7 @@ export function PlayerDirectorySidebar() {
 
       <div className="flex flex-col gap-space-md bg-surface-container p-space-lg">
         <div className="flex items-center gap-space-xs">
-          <span className="material-symbols-outlined text-lg text-secondary">sports_soccer</span>
+          <span className="material-symbols-outlined text-lg text-secondary">menu_book</span>
           <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
             Taraftar Rehberi
           </span>

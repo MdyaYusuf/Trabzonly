@@ -1,7 +1,8 @@
-import type {
-  CreatePlayerRequest,
-  PlayerResponseDto,
-  UpdatePlayerRequest,
+import {
+  PlayerCategory,
+  type CreatePlayerRequest,
+  type PlayerResponseDto,
+  type UpdatePlayerRequest,
 } from '@/features/players/playerTypes'
 import { formatMarketValue } from '@/features/players/utils/formatMarketValue'
 import type {
@@ -94,6 +95,7 @@ export function createEmptyAdminPlayerFormDraft(
     wage: '',
     description: '',
     isCaptain: false,
+    category: PlayerCategory.Current,
     createdDate: null,
     updatedDate: null,
   }
@@ -109,7 +111,7 @@ export function mapPlayerResponseToListRow(player: PlayerResponseDto): AdminPlay
     positionLabel: player.positionAbbreviation
       ? `${player.positionName} (${player.positionAbbreviation})`
       : player.positionName,
-    currentTeam: player.currentTeam,
+    currentTeam: player.currentTeam?.trim() || '—',
     nationality: player.nationality,
     age: player.age,
     marketValueLabel:
@@ -133,11 +135,12 @@ export function mapPlayerResponseToFormDraft(player: PlayerResponseDto): AdminPl
     isActive: player.isActive,
     heightCm: player.height != null ? String(player.height) : '',
     positionId: player.positionId,
-    currentTeam: player.currentTeam,
+    currentTeam: player.currentTeam ?? '',
     marketValue: player.marketValue != null ? String(player.marketValue) : '',
     wage: player.wage != null ? String(player.wage) : '',
     description: player.description ?? '',
     isCaptain: player.isCaptain,
+    category: player.category ?? PlayerCategory.Current,
     createdDate: player.createdDate,
     updatedDate: player.updatedDate,
   }
@@ -202,11 +205,12 @@ function buildBaseRequest(draft: AdminPlayerFormDraft) {
     preferredFoot: draft.preferredFoot,
     marketValue: parseOptionalNumber(draft.marketValue),
     wage: parseOptionalNumber(draft.wage),
-    currentTeam: draft.currentTeam.trim(),
+    currentTeam: draft.currentTeam.trim() || null,
     description: draft.description.trim() || undefined,
     shirtNumber: shirtNumber != null ? Math.trunc(shirtNumber) : null,
     positionId: draft.positionId,
     isCaptain: draft.isCaptain,
+    category: draft.category,
   }
 }
 

@@ -131,7 +131,8 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
                     {player.currentSeasonStats?.seasonName?.trim() || '—'}
                   </span>
                   <span>
-                    <span className="text-tertiary-fixed-dim">TAKIM:</span> {player.currentTeam}
+                    <span className="text-tertiary-fixed-dim">TAKIM:</span>{' '}
+                    {player.currentTeam?.trim() || '—'}
                   </span>
                 </div>
 

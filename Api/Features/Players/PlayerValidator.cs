@@ -22,8 +22,12 @@ public class CreatePlayerRequestValidator : AbstractValidator<CreatePlayerReques
       .MaximumLength(20);
 
     RuleFor(p => p.CurrentTeam)
-      .NotEmpty().WithMessage("Mevcut takım boş olamaz.")
-      .MaximumLength(100);
+      .MaximumLength(100)
+      .When(p => !string.IsNullOrWhiteSpace(p.CurrentTeam));
+
+    RuleFor(p => p.Category)
+      .IsInEnum()
+      .WithMessage("Geçersiz oyuncu kategorisi.");
 
     RuleFor(p => p.PositionId)
       .GreaterThan(0).WithMessage("Pozisyon ID boş olamaz.");
@@ -73,8 +77,12 @@ public class UpdatePlayerRequestValidator : AbstractValidator<UpdatePlayerReques
       .MaximumLength(20);
 
     RuleFor(p => p.CurrentTeam)
-      .NotEmpty().WithMessage("Mevcut takım boş olamaz.")
-      .MaximumLength(100);
+      .MaximumLength(100)
+      .When(p => !string.IsNullOrWhiteSpace(p.CurrentTeam));
+
+    RuleFor(p => p.Category)
+      .IsInEnum()
+      .WithMessage("Geçersiz oyuncu kategorisi.");
 
     RuleFor(p => p.PositionId)
       .GreaterThan(0).WithMessage("Pozisyon ID boş olamaz.");

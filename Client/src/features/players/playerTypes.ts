@@ -1,5 +1,13 @@
 import type { PositionZone } from '@/features/positions/positionTypes'
 
+export const PlayerCategory = {
+  Current: 0,
+  Legend: 1,
+  TransferTarget: 2,
+} as const
+
+export type PlayerCategory = (typeof PlayerCategory)[keyof typeof PlayerCategory]
+
 // Responses
 export interface PlayerSeasonStatsDto {
   appearances: number
@@ -24,7 +32,7 @@ export interface PlayerResponseDto {
   preferredFoot: string
   marketValue?: number
   wage?: number
-  currentTeam: string
+  currentTeam?: string | null
   description?: string
   imageUrl?: string
   shirtNumber?: number | null
@@ -32,6 +40,7 @@ export interface PlayerResponseDto {
   ratingCount: number
   isActive: boolean
   isCaptain: boolean
+  category: PlayerCategory
   positionId: number
   positionName: string
   positionAbbreviation: string
@@ -62,11 +71,12 @@ export interface PlayerPreviewDto {
   nationality: string
   age: number
   marketValue?: number
-  currentTeam: string
+  currentTeam?: string | null
   imageUrl?: string
   shirtNumber?: number | null
   averageRating: number
   ratingCount: number
+  category: PlayerCategory
   positionName: string
   positionAbbreviation: string
   positionZone: PositionZone
@@ -109,11 +119,12 @@ export interface CreatePlayerRequest {
   preferredFoot: string
   marketValue?: number
   wage?: number
-  currentTeam: string
+  currentTeam?: string | null
   description?: string
   shirtNumber?: number | null
   positionId: number
   isCaptain: boolean
+  category: PlayerCategory
   imageFile?: File | null
 }
 

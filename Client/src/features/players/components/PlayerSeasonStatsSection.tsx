@@ -9,7 +9,7 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
   const stats = player.currentSeasonStats
   const group = positionGroupFromZone(player.positionZone)
   const seasonLabel = stats?.seasonName?.trim() || 'Güncel Sezon'
-  const teamLabel = stats?.team?.trim() || player.currentTeam
+  const teamLabel = stats?.team?.trim() || player.currentTeam?.trim() || '—'
   const appearances = stats?.appearances ?? 0
   const minutes = stats?.minutesPlayed ?? 0
   const goals = stats?.goals ?? 0

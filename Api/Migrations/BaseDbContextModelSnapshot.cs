@@ -590,12 +590,16 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("decimal(4,2)")
                         .HasDefaultValue(0m);
 
+                    b.Property<int>("Category")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("CurrentTeam")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -659,6 +663,8 @@ namespace Trabzonly.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PositionId");
+
+                    b.HasIndex("Category", "IsActive");
 
                     b.ToTable("Players", (string)null);
                 });

@@ -79,7 +79,7 @@ export function AdminPlayerTable({
                     {player.positionLabel}
                   </td>
                   <td className="font-body px-space-sm py-space-sm text-body-sm text-on-surface-variant">
-                    {player.currentTeam}
+                    {player.currentTeam || '—'}
                   </td>
                   <td className="font-body px-space-sm py-space-sm text-body-sm text-on-surface">
                     {player.nationality}

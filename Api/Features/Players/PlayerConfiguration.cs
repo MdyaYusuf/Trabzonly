@@ -37,6 +37,11 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
 
     builder.Property(p => p.CurrentTeam)
       .HasMaxLength(100)
+      .IsRequired(false);
+
+    builder.Property(p => p.Category)
+      .HasConversion<int>()
+      .HasDefaultValue(PlayerCategory.Current)
       .IsRequired();
 
     builder.Property(p => p.Description)
@@ -71,5 +76,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
       .WithMany(pos => pos.Players)
       .HasForeignKey(p => p.PositionId)
       .OnDelete(DeleteBehavior.Restrict);
+
+    builder.HasIndex(p => new { p.Category, p.IsActive });
   }
 }

@@ -39,6 +39,7 @@ export type AdminPlayerFormDraft = {
   wage: string
   description: string
   isCaptain: boolean
+  category: number
   createdDate?: string | null
   updatedDate?: string | null
 }
