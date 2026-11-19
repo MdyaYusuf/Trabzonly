@@ -42,8 +42,8 @@ export const DIRECTORY_CATEGORY_TABS: {
 }[] = [
   {
     category: PlayerCategory.Current,
-    label: 'Kadro',
-    listTitle: 'KADRO LİSTESİ',
+    label: 'Güncel Kadro',
+    listTitle: 'GÜNCEL KADRO',
   },
   {
     category: PlayerCategory.Legend,

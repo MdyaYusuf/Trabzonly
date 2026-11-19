@@ -5,13 +5,12 @@ public sealed record PlayerStatsResponseDto(
   int Id,
   string Team,
   int Appearances,
-  int? MinutesPlayed,
   int Goals,
   int Assists,
   int? YellowCards,
   int? RedCards,
-  int CleanSheets,
-  int GoalsConceded,
+  int? CleanSheets,
+  int? GoalsConceded,
   int PlayerId,
   string PlayerName,
   int? ShirtNumber,
@@ -32,13 +31,12 @@ public sealed record CreatedPlayerStatsResponseDto(
 public sealed record CreatePlayerStatsRequest(
   string Team,
   int Appearances,
-  int? MinutesPlayed,
   int Goals,
   int Assists,
   int? YellowCards,
   int? RedCards,
-  int CleanSheets,
-  int GoalsConceded,
+  int? CleanSheets,
+  int? GoalsConceded,
   int PlayerId,
   int SeasonId);
 
@@ -46,13 +44,12 @@ public sealed record UpdatePlayerStatsRequest(
   int Id,
   string Team,
   int Appearances,
-  int? MinutesPlayed,
   int Goals,
   int Assists,
   int? YellowCards,
   int? RedCards,
-  int CleanSheets,
-  int GoalsConceded,
+  int? CleanSheets,
+  int? GoalsConceded,
   int PlayerId,
   int SeasonId);
 
@@ -71,5 +68,4 @@ public static class PlayerStatsSortOptions
   public const string GoalsDesc = "goals-desc";
   public const string AssistsDesc = "assists-desc";
   public const string MatchesDesc = "matches-desc";
-  public const string MinutesDesc = "minutes-desc";
 }

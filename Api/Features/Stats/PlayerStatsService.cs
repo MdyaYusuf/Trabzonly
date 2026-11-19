@@ -199,7 +199,6 @@ public class PlayerStatsService(
 
     _businessRules.PlayerStatsMustBeLogicallyValid(
       request.Appearances,
-      request.MinutesPlayed,
       request.Goals,
       request.Assists,
       request.CleanSheets,
@@ -238,7 +237,6 @@ public class PlayerStatsService(
 
     _businessRules.PlayerStatsMustBeLogicallyValid(
       request.Appearances,
-      request.MinutesPlayed,
       request.Goals,
       request.Assists,
       request.CleanSheets,
@@ -320,9 +318,6 @@ public class PlayerStatsService(
         .ThenBy(s => s.Player.Name),
       PlayerStatsSortOptions.MatchesDesc => query => query
         .OrderByDescending(s => s.Appearances)
-        .ThenBy(s => s.Player.Name),
-      PlayerStatsSortOptions.MinutesDesc => query => query
-        .OrderByDescending(s => s.MinutesPlayed)
         .ThenBy(s => s.Player.Name),
       _ => query => query
         .OrderByDescending(s => s.Goals)

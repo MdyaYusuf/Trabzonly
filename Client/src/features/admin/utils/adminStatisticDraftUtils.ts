@@ -22,14 +22,6 @@ function initialsFromName(name: string): string {
   return `${parts[0]!.charAt(0)}${parts[parts.length - 1]!.charAt(0)}`.toUpperCase()
 }
 
-function formatMinutesLabel(minutes: number | null | undefined): string {
-  if (minutes == null) {
-    return '—'
-  }
-
-  return `${minutes.toLocaleString('tr-TR')}′`
-}
-
 function parseNonNegativeInt(value: string, fieldLabel: string): number | string {
   const trimmed = value.trim()
 
@@ -72,13 +64,12 @@ export function createEmptyAdminStatisticFormDraft(): AdminStatisticFormDraft {
     seasonId: 0,
     team: 'Trabzonspor',
     matches: '0',
-    minutes: '',
     goals: '0',
     assists: '0',
     yellowCards: '',
     redCards: '',
-    cleanSheets: '0',
-    goalsConceded: '0',
+    cleanSheets: '',
+    goalsConceded: '',
     createdDate: null,
   }
 }
@@ -97,14 +88,12 @@ export function mapPlayerStatsResponseToListRow(
     season: item.seasonName,
     team: item.team,
     matches: item.appearances,
-    minutesLabel: formatMinutesLabel(item.minutesPlayed),
-    minutes: item.minutesPlayed ?? null,
     goals: item.goals,
     assists: item.assists,
     yellowCards: item.yellowCards ?? null,
     redCards: item.redCards ?? null,
-    cleanSheets: item.cleanSheets,
-    goalsConceded: item.goalsConceded,
+    cleanSheets: item.cleanSheets ?? null,
+    goalsConceded: item.goalsConceded ?? null,
     initials: initialsFromName(item.playerName),
   }
 }
@@ -118,13 +107,12 @@ export function mapPlayerStatsResponseToFormDraft(
     seasonId: item.seasonId,
     team: item.team,
     matches: String(item.appearances),
-    minutes: item.minutesPlayed != null ? String(item.minutesPlayed) : '',
     goals: String(item.goals),
     assists: String(item.assists),
     yellowCards: item.yellowCards != null ? String(item.yellowCards) : '',
     redCards: item.redCards != null ? String(item.redCards) : '',
-    cleanSheets: String(item.cleanSheets),
-    goalsConceded: String(item.goalsConceded),
+    cleanSheets: item.cleanSheets != null ? String(item.cleanSheets) : '',
+    goalsConceded: item.goalsConceded != null ? String(item.goalsConceded) : '',
     createdDate: item.createdDate,
   }
 }
@@ -146,8 +134,6 @@ export function validateAdminStatisticDraft(draft: AdminStatisticFormDraft): str
     [draft.matches, 'Maç sayısı'],
     [draft.goals, 'Gol'],
     [draft.assists, 'Asist'],
-    [draft.cleanSheets, 'Golsüz maç'],
-    [draft.goalsConceded, 'Yenilen gol'],
   ]
 
   for (const [value, label] of requiredFields) {
@@ -159,9 +145,10 @@ export function validateAdminStatisticDraft(draft: AdminStatisticFormDraft): str
   }
 
   const optionalFields: Array<[string, string]> = [
-    [draft.minutes, 'Oynanan dakika'],
     [draft.yellowCards, 'Sarı kart'],
     [draft.redCards, 'Kırmızı kart'],
+    [draft.cleanSheets, 'Gol yenmeyen maç'],
+    [draft.goalsConceded, 'Yenilen gol'],
   ]
 
   for (const [value, label] of optionalFields) {
@@ -189,13 +176,12 @@ export function mapDraftToCreateRequest(draft: AdminStatisticFormDraft): CreateP
   return {
     team: draft.team.trim(),
     appearances: Number(draft.matches),
-    minutesPlayed: resolveOptionalInt(draft.minutes),
     goals: Number(draft.goals),
     assists: Number(draft.assists),
     yellowCards: resolveOptionalInt(draft.yellowCards),
     redCards: resolveOptionalInt(draft.redCards),
-    cleanSheets: Number(draft.cleanSheets),
-    goalsConceded: Number(draft.goalsConceded),
+    cleanSheets: resolveOptionalInt(draft.cleanSheets),
+    goalsConceded: resolveOptionalInt(draft.goalsConceded),
     playerId: draft.playerId,
     seasonId: draft.seasonId,
   }

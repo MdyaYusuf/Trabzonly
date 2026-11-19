@@ -12,11 +12,14 @@ type PlayerCareerArchiveProps = {
 
 function formatCareerRecord(stats: PlayerStatsResponseDto, group: PositionGroup): string {
   if (group === 'gk') {
-    return `${stats.cleanSheets} Golsüz / ${stats.goalsConceded} Yenilen / ${stats.appearances} Maç`
+    const cleanSheets = stats.cleanSheets != null ? String(stats.cleanSheets) : '—'
+    const conceded = stats.goalsConceded != null ? String(stats.goalsConceded) : '—'
+    return `${cleanSheets} Gol Yenmeyen / ${conceded} Yenilen / ${stats.appearances} Maç`
   }
 
   if (group === 'def') {
-    return `${stats.cleanSheets} Golsüz / ${stats.goals} Gol / ${stats.appearances} Maç`
+    const cleanSheets = stats.cleanSheets != null ? String(stats.cleanSheets) : '—'
+    return `${cleanSheets} Gol Yenmeyen / ${stats.goals} Gol / ${stats.appearances} Maç`
   }
 
   return `${stats.goals} Gol / ${stats.assists} Asist / ${stats.appearances} Maç`

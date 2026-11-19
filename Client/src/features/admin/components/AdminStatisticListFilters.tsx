@@ -144,7 +144,6 @@ export function AdminStatisticListFilters({
               <option value="goals-desc">Sırala: Gol</option>
               <option value="assists-desc">Sırala: Asist</option>
               <option value="matches-desc">Sırala: Maç</option>
-              <option value="minutes-desc">Sırala: Dakika</option>
             </select>
 
             <button

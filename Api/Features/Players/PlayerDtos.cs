@@ -6,13 +6,12 @@ namespace Api.Features.Players;
 // Responses
 public sealed record PlayerSeasonStatsDto(
   int Appearances,
-  int? MinutesPlayed,
   int Goals,
   int Assists,
-  int CleanSheets,
+  int? CleanSheets,
   int? YellowCards,
   int? RedCards,
-  int GoalsConceded,
+  int? GoalsConceded,
   string Team,
   string SeasonName);
 

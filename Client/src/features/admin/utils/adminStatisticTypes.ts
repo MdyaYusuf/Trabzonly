@@ -18,14 +18,12 @@ export type AdminStatisticListRow = {
   season: string
   team: string
   matches: number
-  minutesLabel: string
-  minutes: number | null
   goals: number
   assists: number
   yellowCards: number | null
   redCards: number | null
-  cleanSheets: number
-  goalsConceded: number
+  cleanSheets: number | null
+  goalsConceded: number | null
   initials: string
 }
 
@@ -35,7 +33,6 @@ export type AdminStatisticFormDraft = {
   seasonId: number
   team: string
   matches: string
-  minutes: string
   goals: string
   assists: string
   yellowCards: string

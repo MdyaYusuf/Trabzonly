@@ -31,12 +31,11 @@ export function AdminStatisticTable({
             <th className="px-space-sm py-space-sm">Sezon</th>
             <th className="px-space-sm py-space-sm">Takım</th>
             <th className="px-space-sm py-space-sm">Maç</th>
-            <th className="px-space-sm py-space-sm">Dakika</th>
             <th className="px-space-sm py-space-sm">Gol</th>
             <th className="px-space-sm py-space-sm">Asist</th>
             <th className="px-space-sm py-space-sm">Sarı</th>
             <th className="px-space-sm py-space-sm">Kırmızı</th>
-            <th className="px-space-sm py-space-sm">Golsüz Maç</th>
+            <th className="px-space-sm py-space-sm">Gol Yenmeyen</th>
             <th className="px-space-sm py-space-sm">Yenilen Gol</th>
             <th className="px-space-sm py-space-sm">İşlemler</th>
           </tr>
@@ -73,9 +72,6 @@ export function AdminStatisticTable({
                 <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
                   {row.matches}
                 </td>
-                <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
-                  {row.minutesLabel}
-                </td>
                 <td className="px-space-sm py-space-sm">
                   <span className="font-label bg-primary-container px-space-sm py-0.5 text-label-md font-bold text-on-primary tabular-nums">
                     {row.goals}
@@ -97,10 +93,10 @@ export function AdminStatisticTable({
                   </span>
                 </td>
                 <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
-                  {row.cleanSheets}
+                  {row.cleanSheets != null ? row.cleanSheets : '—'}
                 </td>
                 <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
-                  {row.goalsConceded}
+                  {row.goalsConceded != null ? row.goalsConceded : '—'}
                 </td>
                 <td className="px-space-sm py-space-sm">
                   <div className="flex items-center gap-1">

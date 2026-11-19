@@ -3,13 +3,12 @@ export interface PlayerStatsResponseDto {
   id: number
   team: string
   appearances: number
-  minutesPlayed?: number | null
   goals: number
   assists: number
   yellowCards?: number | null
   redCards?: number | null
-  cleanSheets: number
-  goalsConceded: number
+  cleanSheets?: number | null
+  goalsConceded?: number | null
   playerId: number
   playerName: string
   shirtNumber?: number | null
@@ -33,7 +32,6 @@ export type PlayerStatsSortOption =
   | 'goals-desc'
   | 'assists-desc'
   | 'matches-desc'
-  | 'minutes-desc'
 
 export interface PlayerStatsAdminListQuery {
   pageNumber?: number
@@ -50,13 +48,12 @@ export interface PlayerStatsAdminListQuery {
 export interface CreatePlayerStatsRequest {
   team: string
   appearances: number
-  minutesPlayed?: number | null
   goals: number
   assists: number
   yellowCards?: number | null
   redCards?: number | null
-  cleanSheets: number
-  goalsConceded: number
+  cleanSheets?: number | null
+  goalsConceded?: number | null
   playerId: number
   seasonId: number
 }
@@ -65,13 +62,12 @@ export interface UpdatePlayerStatsRequest {
   id: number
   team: string
   appearances: number
-  minutesPlayed?: number | null
   goals: number
   assists: number
   yellowCards?: number | null
   redCards?: number | null
-  cleanSheets: number
-  goalsConceded: number
+  cleanSheets?: number | null
+  goalsConceded?: number | null
   playerId: number
   seasonId: number
 }

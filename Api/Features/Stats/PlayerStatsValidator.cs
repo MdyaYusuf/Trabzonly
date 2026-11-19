@@ -13,11 +13,6 @@ public class CreatePlayerStatsRequestValidator : AbstractValidator<CreatePlayerS
     RuleFor(s => s.Appearances)
       .GreaterThanOrEqualTo(0).WithMessage("Maça çıkma sayısı 0'dan küçük olamaz.");
 
-    RuleFor(s => s.MinutesPlayed)
-      .GreaterThanOrEqualTo(0)
-      .When(s => s.MinutesPlayed.HasValue)
-      .WithMessage("Oynanan dakika 0'dan küçük olamaz.");
-
     RuleFor(s => s.Goals)
       .GreaterThanOrEqualTo(0).WithMessage("Gol sayısı 0'dan küçük olamaz.");
 
@@ -35,10 +30,14 @@ public class CreatePlayerStatsRequestValidator : AbstractValidator<CreatePlayerS
       .WithMessage("Kırmızı kart sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.CleanSheets)
-      .GreaterThanOrEqualTo(0).WithMessage("Gol yemeden bitirilen maç sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.CleanSheets.HasValue)
+      .WithMessage("Gol yenmeyen maç sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.GoalsConceded)
-      .GreaterThanOrEqualTo(0).WithMessage("Yenilen gol sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.GoalsConceded.HasValue)
+      .WithMessage("Yenilen gol sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.PlayerId)
       .NotEmpty().WithMessage("Oyuncu ID boş olamaz.");
@@ -62,11 +61,6 @@ public class UpdatePlayerStatsRequestValidator : AbstractValidator<UpdatePlayerS
     RuleFor(s => s.Appearances)
       .GreaterThanOrEqualTo(0).WithMessage("Maça çıkma sayısı 0'dan küçük olamaz.");
 
-    RuleFor(s => s.MinutesPlayed)
-      .GreaterThanOrEqualTo(0)
-      .When(s => s.MinutesPlayed.HasValue)
-      .WithMessage("Oynanan dakika 0'dan küçük olamaz.");
-
     RuleFor(s => s.Goals)
       .GreaterThanOrEqualTo(0).WithMessage("Gol sayısı 0'dan küçük olamaz.");
 
@@ -84,10 +78,14 @@ public class UpdatePlayerStatsRequestValidator : AbstractValidator<UpdatePlayerS
       .WithMessage("Kırmızı kart sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.CleanSheets)
-      .GreaterThanOrEqualTo(0).WithMessage("Gol yemeden bitirilen maç sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.CleanSheets.HasValue)
+      .WithMessage("Gol yenmeyen maç sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.GoalsConceded)
-      .GreaterThanOrEqualTo(0).WithMessage("Yenilen gol sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.GoalsConceded.HasValue)
+      .WithMessage("Yenilen gol sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.PlayerId)
       .NotEmpty().WithMessage("Oyuncu ID boş olamaz.");

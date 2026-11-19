@@ -1461,7 +1461,7 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Assists")
                         .HasColumnType("int");
 
-                    b.Property<int>("CleanSheets")
+                    b.Property<int?>("CleanSheets")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
@@ -1471,10 +1471,7 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Goals")
                         .HasColumnType("int");
 
-                    b.Property<int>("GoalsConceded")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MinutesPlayed")
+                    b.Property<int?>("GoalsConceded")
                         .HasColumnType("int");
 
                     b.Property<int>("PlayerId")

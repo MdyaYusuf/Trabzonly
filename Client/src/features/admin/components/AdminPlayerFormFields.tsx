@@ -75,7 +75,7 @@ const inputClass =
 const FOOT_OPTIONS: Array<{ id: AdminPlayerPreferredFoot; label: string }> = [
   { id: 'Right', label: 'Sağ' },
   { id: 'Left', label: 'Sol' },
-  { id: 'Both', label: 'Her İkisi' },
+  { id: 'Both', label: 'Çift Ayak' },
 ]
 
 export function AdminPlayerFormFields({

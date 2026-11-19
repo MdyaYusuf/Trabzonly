@@ -11,13 +11,12 @@ export type PlayerCategory = (typeof PlayerCategory)[keyof typeof PlayerCategory
 // Responses
 export interface PlayerSeasonStatsDto {
   appearances: number
-  minutesPlayed?: number | null
   goals: number
   assists: number
-  cleanSheets: number
+  cleanSheets?: number | null
   yellowCards?: number | null
   redCards?: number | null
-  goalsConceded: number
+  goalsConceded?: number | null
   team: string
   seasonName: string
 }

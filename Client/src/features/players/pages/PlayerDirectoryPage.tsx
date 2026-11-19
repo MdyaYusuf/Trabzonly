@@ -43,7 +43,7 @@ export function PlayerDirectoryPage() {
   const listTitle = useMemo(() => {
     const tab = DIRECTORY_CATEGORY_TABS.find((item) => item.category === category)
 
-    return tab?.listTitle ?? 'KADRO LİSTESİ'
+    return tab?.listTitle ?? 'GÜNCEL KADRO'
   }, [category])
 
   useEffect(() => {

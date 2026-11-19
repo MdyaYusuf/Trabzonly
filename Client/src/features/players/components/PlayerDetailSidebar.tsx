@@ -30,7 +30,9 @@ function formatRivalLine(peer: PlayerResponseDto, group: PositionGroup): string 
   const stats = peer.currentSeasonStats
 
   if (group === 'gk' || group === 'def') {
-    return `${stats?.cleanSheets ?? 0} Golsüz`
+    return stats?.cleanSheets != null
+      ? `${stats.cleanSheets} Gol Yenmeyen`
+      : '— Gol Yenmeyen'
   }
 
   return `${stats?.goals ?? 0} Gol • ${stats?.assists ?? 0} Asist`
@@ -89,7 +91,7 @@ function positionGroupLabel(group: PositionGroup): string {
     return 'Forvet'
   }
 
-  return 'Kadro'
+  return 'Güncel Kadro'
 }
 
 export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {

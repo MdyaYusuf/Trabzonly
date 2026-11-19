@@ -27,13 +27,16 @@ public class PlayerStatsConfiguration : IEntityTypeConfiguration<PlayerStats>
       .HasMaxLength(100)
       .IsRequired();
 
-    builder.Property(s => s.MinutesPlayed)
-      .IsRequired(false);
-
     builder.Property(s => s.YellowCards)
       .IsRequired(false);
 
     builder.Property(s => s.RedCards)
+      .IsRequired(false);
+
+    builder.Property(s => s.CleanSheets)
+      .IsRequired(false);
+
+    builder.Property(s => s.GoalsConceded)
       .IsRequired(false);
 
     builder.HasIndex(s => new { s.PlayerId, s.SeasonId, s.Team })

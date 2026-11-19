@@ -15,13 +15,12 @@ public class PlayerStats : Entity<int>
 
   public required string Team { get; set; }
   public int Appearances { get; set; }
-  public int? MinutesPlayed { get; set; }
   public int Goals { get; set; }
   public int Assists { get; set; }
   public int? YellowCards { get; set; }
   public int? RedCards { get; set; }
-  public int CleanSheets { get; set; }
-  public int GoalsConceded { get; set; }
+  public int? CleanSheets { get; set; }
+  public int? GoalsConceded { get; set; }
 
   // Navigation properties
   public int PlayerId { get; set; }

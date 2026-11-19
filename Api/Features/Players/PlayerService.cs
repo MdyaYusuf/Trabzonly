@@ -605,7 +605,6 @@ public class PlayerService(
       {
         seasonStats = new PlayerSeasonStatsDto(
           stats.Appearances,
-          stats.MinutesPlayed,
           stats.Goals,
           stats.Assists,
           stats.CleanSheets,

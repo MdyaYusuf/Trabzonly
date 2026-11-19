@@ -5,6 +5,56 @@ type PlayerSeasonStatsSectionProps = {
   player: PlayerResponseDto
 }
 
+function StatBox({
+  label,
+  value,
+  hint,
+  emphasize = false,
+}: {
+  label: string
+  value: string
+  hint?: string
+  emphasize?: boolean
+}) {
+  if (emphasize) {
+    return (
+      <div className="flex flex-col justify-between bg-primary-container p-space-md text-on-primary">
+        <span className="font-kicker text-kicker font-bold text-secondary-fixed-dim uppercase">
+          {label}
+        </span>
+        <div className="my-space-xs">
+          <span className="font-stat text-stat-counter font-extrabold text-on-primary">
+            {value}
+          </span>
+        </div>
+        {hint ? (
+          <span className="font-body text-[12px] font-semibold text-tertiary-fixed-dim">
+            {hint}
+          </span>
+        ) : (
+          <span className="font-body text-[12px] text-transparent">—</span>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col justify-between bg-surface-container p-space-md">
+      <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
+        {label}
+      </span>
+      <div className="my-space-xs">
+        <span className="font-stat text-stat-counter font-extrabold text-primary">{value}</span>
+      </div>
+      {hint ? (
+        <span className="font-body text-[12px] text-on-surface-variant">{hint}</span>
+      ) : (
+        <span className="font-body text-[12px] text-transparent">—</span>
+      )}
+    </div>
+  )
+}
+
 export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionProps) {
   const stats = player.currentSeasonStats
   const group = positionGroupFromZone(player.positionZone)
@@ -17,21 +67,15 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
     : stats?.team?.trim() || player.currentTeam?.trim() || '—'
   const sectionTitle = isLegend ? 'KARİYER İSTATİSTİKLERİ' : 'SEZON İSTATİSTİKLERİ'
   const appearances = stats?.appearances ?? 0
-  const minutes = stats?.minutesPlayed
   const goals = stats?.goals ?? 0
   const assists = stats?.assists ?? 0
-  const cleanSheets = stats?.cleanSheets ?? 0
+  const cleanSheets = stats?.cleanSheets
   const yellowCards = stats?.yellowCards
   const redCards = stats?.redCards
-  const goalsConceded = stats?.goalsConceded ?? 0
+  const goalsConceded = stats?.goalsConceded
   const contribution = goals + assists
-  const minutesPerGoal =
-    goals > 0 && minutes != null ? Math.round(minutes / goals) : null
-  const minutesLabel = minutes != null ? String(minutes) : '—'
-  const yellowLabel = yellowCards != null ? String(yellowCards) : '—'
-  const redLabel = redCards != null ? String(redCards) : '—'
-  const minutesPerAppearance =
-    appearances > 0 && minutes != null ? Math.round(minutes / appearances) : null
+  const isGk = group === 'gk'
+  const isDef = group === 'def'
 
   return (
     <section className="flex flex-col gap-space-lg bg-surface-container-lowest p-space-lg shadow-sm">
@@ -61,169 +105,52 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
             : 'Bu sezon için henüz istatistik kaydı yok.'}
         </p>
       ) : (
-        <>
-          <div className="grid grid-cols-2 gap-space-sm sm:grid-cols-4">
-            <div className="flex flex-col justify-between bg-surface-container p-space-md">
-              <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-                Maç
-              </span>
-              <div className="my-space-xs">
-                <span className="font-stat text-stat-counter font-extrabold text-primary">
-                  {appearances}
-                </span>
-              </div>
-              <span className="font-body text-[12px] text-on-surface-variant">
-                {minutes != null ? `${minutes.toLocaleString('tr-TR')} Dakika` : '—'}
-              </span>
-            </div>
+        <div
+          className={
+            isGk
+              ? 'grid grid-cols-1 gap-space-sm sm:grid-cols-3'
+              : 'grid grid-cols-2 gap-space-sm sm:grid-cols-4'
+          }
+        >
+          <StatBox label="Maç" value={String(appearances)} />
 
-            {group === 'gk' || group === 'def' ? (
-              <div className="flex flex-col justify-between bg-primary-container p-space-md text-on-primary">
-                <span className="font-kicker text-kicker font-bold text-secondary-fixed-dim uppercase">
-                  Golsüz Maç
-                </span>
-                <div className="my-space-xs">
-                  <span className="font-stat text-stat-counter font-extrabold text-on-primary">
-                    {cleanSheets}
-                  </span>
-                </div>
-                <span className="font-body text-[12px] font-semibold text-tertiary-fixed-dim">
-                  {group === 'gk'
-                    ? `${goalsConceded} Gol Yedi`
-                    : `${appearances > 0 ? Math.round((cleanSheets / appearances) * 100) : 0}% Oran`}
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col justify-between bg-primary-container p-space-md text-on-primary">
-                <span className="font-kicker text-kicker font-bold text-secondary-fixed-dim uppercase">
-                  Atılan Gol
-                </span>
-                <div className="my-space-xs">
-                  <span className="font-stat text-stat-counter font-extrabold text-on-primary">
-                    {goals}
-                  </span>
-                </div>
-                <span className="font-body text-[12px] font-semibold text-tertiary-fixed-dim">
-                  {minutesPerGoal != null ? `${minutesPerGoal} dk / gol` : 'Gol yok'}
-                </span>
-              </div>
-            )}
+          {isGk || isDef ? (
+            <StatBox
+              label="Gol Yenmeyen Maç"
+              value={cleanSheets != null ? String(cleanSheets) : '—'}
+              emphasize
+            />
+          ) : (
+            <StatBox label="Atılan Gol" value={String(goals)} emphasize />
+          )}
 
-            {group === 'gk' ? (
-              <div className="flex flex-col justify-between bg-surface-container p-space-md">
-                <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-                  Yenilen Gol
-                </span>
-                <div className="my-space-xs">
-                  <span className="font-stat text-stat-counter font-extrabold text-secondary">
-                    {goalsConceded}
-                  </span>
-                </div>
-                <span className="font-body text-[12px] text-on-surface-variant">
-                  {appearances > 0
-                    ? `Maç başı ${(goalsConceded / appearances).toFixed(2)}`
-                    : '—'}
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col justify-between bg-surface-container p-space-md">
-                <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-                  Asist
-                </span>
-                <div className="my-space-xs">
-                  <span className="font-stat text-stat-counter font-extrabold text-secondary">
-                    {assists}
-                  </span>
-                </div>
-                <span className="font-body text-[12px] text-on-surface-variant">
-                  Doğrudan {contribution} skor katkısı
-                </span>
-              </div>
-            )}
+          {isGk ? (
+            <StatBox
+              label="Yenilen Gol"
+              value={goalsConceded != null ? String(goalsConceded) : '—'}
+            />
+          ) : isDef ? (
+            <StatBox
+              label="Sarı Kart"
+              value={yellowCards != null ? String(yellowCards) : '—'}
+            />
+          ) : (
+            <StatBox label="Asist" value={String(assists)} />
+          )}
 
-            <div className="flex flex-col justify-between bg-surface-container p-space-md">
-              <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
-                Dakika
-              </span>
-              <div className="my-space-xs">
-                <span className="font-stat text-stat-counter font-extrabold text-primary">
-                  {minutesLabel}
-                </span>
-              </div>
-              <span className="font-body text-[12px] text-on-surface-variant">
-                {minutesPerAppearance != null
-                  ? `Maç başı ${minutesPerAppearance} dk`
-                  : '—'}
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-space-sm bg-surface-container-low p-space-md md:grid-cols-3">
-            <div>
-              <span className="font-kicker mb-1 block text-kicker font-bold text-on-surface-variant uppercase">
-                Kart Durumu
-              </span>
-              <div className="flex items-center gap-space-xs">
-                <span className="bg-tertiary-fixed px-2 py-0.5 text-[12px] font-bold text-tertiary">
-                  {yellowLabel} Sarı
-                </span>
-                <span className="bg-error-container px-2 py-0.5 text-[12px] font-bold text-on-error-container">
-                  {redLabel} Kırmızı
-                </span>
-              </div>
-            </div>
-            {group === 'gk' || group === 'def' ? (
-              <div>
-                <span className="font-kicker mb-1 block text-kicker font-bold text-on-surface-variant uppercase">
-                  Golsüz Maç
-                </span>
-                <span className="font-headline text-headline-sm font-bold text-primary">
-                  {cleanSheets}
-                </span>
-              </div>
-            ) : (
-              <div>
-                <span className="font-kicker mb-1 block text-kicker font-bold text-on-surface-variant uppercase">
-                  Skor Katkısı
-                </span>
-                <span className="font-headline text-headline-sm font-bold text-primary">
-                  {contribution}{' '}
-                  <span className="font-body text-body-sm font-normal text-on-surface-variant">
-                    ({goals}G + {assists}A)
-                  </span>
-                </span>
-              </div>
-            )}
-            {group !== 'gk' && group !== 'def' && minutesPerGoal != null ? (
-              <div>
-                <span className="font-kicker mb-1 block text-kicker font-bold text-on-surface-variant uppercase">
-                  Dakika / Gol
-                </span>
-                <span className="font-headline text-headline-sm font-bold text-primary">
-                  {minutesPerGoal} dk
-                </span>
-              </div>
-            ) : group === 'gk' ? (
-              <div>
-                <span className="font-kicker mb-1 block text-kicker font-bold text-on-surface-variant uppercase">
-                  Yenilen Gol
-                </span>
-                <span className="font-headline text-headline-sm font-bold text-primary">
-                  {goalsConceded}
-                </span>
-              </div>
-            ) : (
-              <div>
-                <span className="font-kicker mb-1 block text-kicker font-bold text-on-surface-variant uppercase">
-                  Gol / Asist
-                </span>
-                <span className="font-headline text-headline-sm font-bold text-primary">
-                  {goals} / {assists}
-                </span>
-              </div>
-            )}
-          </div>
-        </>
+          {isGk ? null : isDef ? (
+            <StatBox
+              label="Kırmızı Kart"
+              value={redCards != null ? String(redCards) : '—'}
+            />
+          ) : (
+            <StatBox
+              label="Skor Katkısı"
+              value={String(contribution)}
+              hint={`${goals}G + ${assists}A`}
+            />
+          )}
+        </div>
       )}
     </section>
   )

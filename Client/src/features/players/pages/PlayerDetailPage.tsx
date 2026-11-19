@@ -21,7 +21,7 @@ function categoryBreadcrumbLabel(category: PlayerCategory): string {
     return 'Transfer Hedefleri'
   }
 
-  return 'Kadro'
+  return 'Güncel Kadro'
 }
 
 export function PlayerDetailPage() {

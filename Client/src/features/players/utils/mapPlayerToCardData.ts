@@ -32,17 +32,19 @@ export function positionGroupFromZone(zone: PositionZone): PositionGroup {
 function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
   const stats = player.currentSeasonStats
   const group = positionGroupFromZone(player.positionZone)
-  const minutes = stats?.minutesPlayed != null ? String(stats.minutesPlayed) : '—'
 
   if (group === 'gk' || group === 'def') {
     return [
-      { label: 'Dakika', value: minutes },
-      { label: 'Golsüz Maç', value: String(stats?.cleanSheets ?? 0) },
+      { label: 'Maç', value: String(stats?.appearances ?? 0) },
+      {
+        label: 'Gol Yenmeyen Maç',
+        value: stats?.cleanSheets != null ? String(stats.cleanSheets) : '—',
+      },
     ]
   }
 
   return [
-    { label: 'Dakika', value: minutes },
+    { label: 'Maç', value: String(stats?.appearances ?? 0) },
     { label: 'Gol', value: String(stats?.goals ?? 0) },
     { label: 'Asist', value: String(stats?.assists ?? 0) },
   ]
@@ -96,8 +98,6 @@ export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): Playe
   const positionGroup = positionGroupFromZone(player.positionZone)
   const height =
     player.height != null ? `${(player.height / 100).toFixed(2).replace('.', ',')} m` : '—'
-  const showMarketValue = player.category !== PlayerCategory.Legend
-
   return {
     id: player.id,
     number: player.shirtNumber ?? 0,
@@ -110,8 +110,8 @@ export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): Playe
     height,
     subtitle: resolveSubtitle(player, height),
     note: resolveTeamNote(player),
-    marketValue: showMarketValue ? (player.marketValue ?? null) : null,
-    showMarketValue,
+    marketValue: player.marketValue ?? null,
+    showMarketValue: true,
     badge: resolveBadge(player),
     stats: buildCardStats(player),
     tone: CARD_TONES[index % CARD_TONES.length],

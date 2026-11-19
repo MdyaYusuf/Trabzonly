@@ -148,36 +148,21 @@ export function AdminStatisticFormFields({
       </section>
 
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <SectionHeading section="Bölüm 02" title="Müsabaka ve Süre" />
-        <div className="grid grid-cols-1 gap-space-md md:grid-cols-2">
-          <div>
-            <FieldLabel htmlFor="matches" required>
-              Maç Sayısı
-            </FieldLabel>
-            <input
-              id="matches"
-              type="number"
-              min={0}
-              className={inputClass}
-              value={draft.matches}
-              onChange={(event) => {
-                onChange('matches', event.target.value)
-              }}
-            />
-          </div>
-          <div>
-            <FieldLabel htmlFor="minutes">Oynanan Dakika</FieldLabel>
-            <input
-              id="minutes"
-              type="number"
-              min={0}
-              className={inputClass}
-              value={draft.minutes}
-              onChange={(event) => {
-                onChange('minutes', event.target.value)
-              }}
-            />
-          </div>
+        <SectionHeading section="Bölüm 02" title="Müsabaka" />
+        <div>
+          <FieldLabel htmlFor="matches" required>
+            Maç Sayısı
+          </FieldLabel>
+          <input
+            id="matches"
+            type="number"
+            min={0}
+            className={inputClass}
+            value={draft.matches}
+            onChange={(event) => {
+              onChange('matches', event.target.value)
+            }}
+          />
         </div>
       </section>
 
@@ -243,7 +228,7 @@ export function AdminStatisticFormFields({
         <SectionHeading section="Bölüm 04" title="Savunma Metrikleri" />
         <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2">
           <div>
-            <FieldLabel htmlFor="cleanSheets">Golsüz Maç</FieldLabel>
+            <FieldLabel htmlFor="cleanSheets">Gol Yenmeyen Maç</FieldLabel>
             <input
               id="cleanSheets"
               type="number"
