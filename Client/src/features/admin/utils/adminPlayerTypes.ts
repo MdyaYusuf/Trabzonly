@@ -1,4 +1,7 @@
-import type { PlayerPositionGroup } from '@/features/players/playerTypes'
+import type {
+  PlayerCategory,
+  PlayerPositionGroup,
+} from '@/features/players/playerTypes'
 
 export type AdminPlayerStatus = 'active' | 'inactive'
 
@@ -39,7 +42,7 @@ export type AdminPlayerFormDraft = {
   wage: string
   description: string
   isCaptain: boolean
-  category: number
+  category: PlayerCategory
   createdDate?: string | null
   updatedDate?: string | null
 }

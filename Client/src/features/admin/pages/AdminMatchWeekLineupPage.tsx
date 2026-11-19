@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import matchWeekService from '@/features/matchWeek/matchWeekService'
 import type { MatchWeekResponseDto } from '@/features/matchWeek/matchWeekTypes'
 import playerService from '@/features/players/playerService'
+import { PlayerCategory } from '@/features/players/playerTypes'
 import { mapPlayerToBuilderPlayer } from '@/features/squads/utils/mapPlayerToBuilderPlayer'
 import {
   formationConfigs,
@@ -102,6 +103,7 @@ export function AdminMatchWeekLineupPage() {
         playerService.getAllForAdmin({
           pageNumber: 1,
           pageSize: 200,
+          category: PlayerCategory.Current,
           isActive: true,
           sort: 'number-asc',
         }),

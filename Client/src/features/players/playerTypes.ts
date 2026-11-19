@@ -97,6 +97,8 @@ export interface PlayerListQuery {
   pageSize?: number
   search?: string
   positionGroup?: PlayerPositionGroup
+  /** Defaults to Current when omitted by the client service */
+  category?: PlayerCategory
   sort?: PlayerSortOption
 }
 
@@ -105,6 +107,8 @@ export interface PlayerAdminListQuery {
   pageSize?: number
   search?: string
   positionGroup?: PlayerPositionGroup
+  /** Defaults to Current when omitted by the client service */
+  category?: PlayerCategory
   /** undefined = all, true = active, false = inactive */
   isActive?: boolean
   sort?: PlayerSortOption

@@ -54,6 +54,50 @@ public class PlayerBusinessRules(IPlayerRepository _playerRepository)
     }
   }
 
+  public async Task ShirtNumberMustBeUniqueAmongCurrentAsync(
+    int? shirtNumber,
+    PlayerCategory category,
+    CancellationToken cancellationToken = default)
+  {
+    if (!shirtNumber.HasValue || category != PlayerCategory.Current)
+    {
+      return;
+    }
+
+    bool exists = await _playerRepository.AnyAsync(
+      p => p.Category == PlayerCategory.Current &&
+           p.ShirtNumber == shirtNumber.Value,
+      cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu forma numarası aktif kadroda başka bir oyuncu tarafından kullanılıyor.");
+    }
+  }
+
+  public async Task ShirtNumberMustBeUniqueAmongCurrentWhenUpdatedAsync(
+    int id,
+    int? shirtNumber,
+    PlayerCategory category,
+    CancellationToken cancellationToken = default)
+  {
+    if (!shirtNumber.HasValue || category != PlayerCategory.Current)
+    {
+      return;
+    }
+
+    bool exists = await _playerRepository.AnyAsync(
+      p => p.Id != id &&
+           p.Category == PlayerCategory.Current &&
+           p.ShirtNumber == shirtNumber.Value,
+      cancellationToken);
+
+    if (exists)
+    {
+      throw new BusinessException("Bu forma numarası aktif kadroda başka bir oyuncu tarafından kullanılıyor.");
+    }
+  }
+
   public void ScoreMustBeValid(decimal score)
   {
     if (score < 1m || score > 10m)

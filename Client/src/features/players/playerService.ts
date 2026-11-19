@@ -16,6 +16,7 @@ import type {
   PlayerListQuery,
   PlayerAdminListQuery,
 } from './playerTypes'
+import { PlayerCategory } from './playerTypes'
 
 const API_URL = '/players'
 
@@ -53,6 +54,8 @@ const getAll = async (
     queryParams.set('positionGroup', query.positionGroup)
   }
 
+  queryParams.set('category', String(query.category ?? PlayerCategory.Current))
+
   if (query.sort) {
     queryParams.set('sort', query.sort)
   }
@@ -79,6 +82,8 @@ const getAllForAdmin = async (
   if (query.positionGroup && query.positionGroup !== 'all') {
     queryParams.set('positionGroup', query.positionGroup)
   }
+
+  queryParams.set('category', String(query.category ?? PlayerCategory.Current))
 
   if (query.isActive !== undefined) {
     queryParams.set('isActive', String(query.isActive))

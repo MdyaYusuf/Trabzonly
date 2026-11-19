@@ -281,6 +281,10 @@ public class PlayerService(
     }
 
     await _businessRules.PlayerCannotBeDuplicatedAsync(request.Name, request.DateOfBirth, cancellationToken);
+    await _businessRules.ShirtNumberMustBeUniqueAmongCurrentAsync(
+      request.ShirtNumber,
+      request.Category,
+      cancellationToken);
 
     Player player = _mapper.CreateToEntity(request);
 
@@ -318,6 +322,11 @@ public class PlayerService(
     }
 
     await _businessRules.PlayerCannotBeDuplicatedWhenUpdatedAsync(request.Id, request.Name, request.DateOfBirth, cancellationToken);
+    await _businessRules.ShirtNumberMustBeUniqueAmongCurrentWhenUpdatedAsync(
+      request.Id,
+      request.ShirtNumber,
+      request.Category,
+      cancellationToken);
 
     Player player = await _businessRules.GetPlayerIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
@@ -487,9 +496,11 @@ public class PlayerService(
   {
     string? search = query.Search?.Trim();
     PositionZone? zone = PlayerPositionGroups.GetZone(query.PositionGroup);
+    PlayerCategory category = query.Category;
 
     return player =>
       player.IsActive &&
+      player.Category == category &&
       (string.IsNullOrEmpty(search) ||
         player.Name.Contains(search) ||
         (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&
@@ -502,9 +513,11 @@ public class PlayerService(
     string? search = query.Search?.Trim();
     PositionZone? zone = PlayerPositionGroups.GetZone(query.PositionGroup);
     bool? isActive = query.IsActive;
+    PlayerCategory category = query.Category;
 
     return player =>
       (!isActive.HasValue || player.IsActive == isActive.Value) &&
+      player.Category == category &&
       (string.IsNullOrEmpty(search) ||
         player.Name.Contains(search) ||
         (player.ShirtNumber.HasValue && player.ShirtNumber.Value.ToString().Contains(search))) &&

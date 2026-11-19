@@ -1,3 +1,5 @@
+import { PlayerCategory } from '../playerTypes'
+
 export type PositionGroup = 'all' | 'gk' | 'def' | 'mid' | 'fwd'
 export type SortOption = 'value-desc' | 'rating-desc' | 'number-asc' | 'apps-desc'
 
@@ -15,10 +17,11 @@ export type PlayerCardData = {
   positionCode: string
   positionLabel: string
   rating: number
-  age: number
   height: string
+  subtitle: string
   note: string
-  marketValue: number
+  marketValue: number | null
+  showMarketValue: boolean
   badge?: { label: string; tone: 'bordo' | 'mavi' | 'neutral' }
   stats: PlayerCardStat[]
   tone: string
@@ -27,6 +30,29 @@ export type PlayerCardData = {
   description?: string | null
   goals?: number
   assists?: number
+  category: PlayerCategory
 }
 
 export const PAGE_SIZE = 6
+
+export const DIRECTORY_CATEGORY_TABS: {
+  category: PlayerCategory
+  label: string
+  listTitle: string
+}[] = [
+  {
+    category: PlayerCategory.Current,
+    label: 'Kadro',
+    listTitle: 'KADRO LİSTESİ',
+  },
+  {
+    category: PlayerCategory.Legend,
+    label: 'Efsaneler',
+    listTitle: 'EFSANELER',
+  },
+  {
+    category: PlayerCategory.TransferTarget,
+    label: 'Transfer Hedefleri',
+    listTitle: 'TRANSFER HEDEFLERİ',
+  },
+]

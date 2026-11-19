@@ -140,7 +140,7 @@ export function mapPlayerResponseToFormDraft(player: PlayerResponseDto): AdminPl
     wage: player.wage != null ? String(player.wage) : '',
     description: player.description ?? '',
     isCaptain: player.isCaptain,
-    category: player.category ?? PlayerCategory.Current,
+    category: player.category,
     createdDate: player.createdDate,
     updatedDate: player.updatedDate,
   }

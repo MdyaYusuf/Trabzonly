@@ -34,7 +34,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
     }
 
     return await query
-      .Where(p => p.IsActive && p.MarketValue.HasValue)
+      .Where(p => p.IsActive && p.Category == PlayerCategory.Current && p.MarketValue.HasValue)
       .OrderByDescending(p => p.MarketValue).ThenByDescending(p => p.Id)
       .Take(count)
       .ToListAsync(cancellationToken);
@@ -55,7 +55,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
     }
 
     return await query
-      .Where(p => p.IsActive)
+      .Where(p => p.IsActive && p.Category == PlayerCategory.Current)
       .OrderByDescending(p => p.Comments.Count)
       .Take(count)
       .ToListAsync(cancellationToken);
@@ -78,7 +78,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
     int take = count < 1 ? 1 : count;
 
     return await query
-      .Where(p => p.IsActive)
+      .Where(p => p.IsActive && p.Category == PlayerCategory.Current)
       .OrderByDescending(p => p.RatingCount + p.Comments.Count)
       .ThenByDescending(p => p.RatingCount)
       .ThenByDescending(p => p.Id)
@@ -101,7 +101,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
     }
 
     return await query
-      .Where(p => p.IsActive && p.RatingCount > 0)
+      .Where(p => p.IsActive && p.Category == PlayerCategory.Current && p.RatingCount > 0)
       .OrderByDescending(p => p.AverageRating)
       .ThenByDescending(p => p.RatingCount)
       .ThenByDescending(p => p.Id)
@@ -114,7 +114,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
     CancellationToken cancellationToken = default)
   {
     IQueryable<Player> query = Query(enableTracking: false)
-      .Where(p => p.IsActive);
+      .Where(p => p.IsActive && p.Category == PlayerCategory.Current);
 
     bool hasPlayers = await query.AnyAsync(cancellationToken);
 

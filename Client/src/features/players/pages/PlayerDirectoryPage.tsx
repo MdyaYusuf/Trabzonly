@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PlayerCard } from '../components/PlayerCard'
 import { PlayerDirectoryBreadcrumb } from '../components/PlayerDirectoryBreadcrumb'
 import { PlayerDirectoryCta } from '../components/PlayerDirectoryCta'
@@ -7,18 +7,29 @@ import { PlayerDirectoryHero } from '../components/PlayerDirectoryHero'
 import { PlayerDirectoryPagination } from '../components/PlayerDirectoryPagination'
 import { PlayerDirectorySidebar } from '../components/PlayerDirectorySidebar'
 import playerService from '../playerService'
+import { PlayerCategory } from '../playerTypes'
 import {
   formatLastUpdated,
   mapPlayerToCardData,
 } from '../utils/mapPlayerToCardData'
 import {
+  DIRECTORY_CATEGORY_TABS,
   PAGE_SIZE,
   type PlayerCardData,
   type PositionGroup,
   type SortOption,
 } from '../utils/playerDirectoryTypes'
 
+function defaultSortForCategory(category: PlayerCategory): SortOption {
+  if (category === PlayerCategory.Legend) {
+    return 'rating-desc'
+  }
+
+  return 'value-desc'
+}
+
 export function PlayerDirectoryPage() {
+  const [category, setCategory] = useState<PlayerCategory>(PlayerCategory.Current)
   const [positionFilter, setPositionFilter] = useState<PositionGroup>('all')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -28,6 +39,12 @@ export function PlayerDirectoryPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [lastUpdatedLabel, setLastUpdatedLabel] = useState('—')
   const [isLoading, setIsLoading] = useState(true)
+
+  const listTitle = useMemo(() => {
+    const tab = DIRECTORY_CATEGORY_TABS.find((item) => item.category === category)
+
+    return tab?.listTitle ?? 'KADRO LİSTESİ'
+  }, [category])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -72,6 +89,7 @@ export function PlayerDirectoryPage() {
         pageSize: PAGE_SIZE,
         search: debouncedSearch || undefined,
         positionGroup: positionFilter,
+        category,
         sort,
       })
 
@@ -101,7 +119,7 @@ export function PlayerDirectoryPage() {
     return () => {
       cancelled = true
     }
-  }, [debouncedSearch, page, positionFilter, sort])
+  }, [category, debouncedSearch, page, positionFilter, sort])
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
@@ -114,15 +132,27 @@ export function PlayerDirectoryPage() {
     setPage(1)
   }
 
+  function handleCategoryChange(next: PlayerCategory) {
+    if (next === category) {
+      return
+    }
+
+    setCategory(next)
+    setPage(1)
+    setSort(defaultSortForCategory(next))
+  }
+
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
       <PlayerDirectoryBreadcrumb />
       <PlayerDirectoryHero />
 
       <PlayerDirectoryFilters
+        category={category}
         positionFilter={positionFilter}
         search={search}
         sort={sort}
+        onCategoryChange={handleCategoryChange}
         onPositionFilterChange={setFilter}
         onSearchChange={(value) => {
           setSearch(value)
@@ -142,7 +172,7 @@ export function PlayerDirectoryPage() {
                 <div className="flex flex-wrap items-center gap-space-sm">
                   <span className="inline-block h-3 w-3 bg-primary" />
                   <h2 className="font-headline text-headline-md font-bold tracking-tight text-primary uppercase">
-                    KADRO LİSTESİ
+                    {listTitle}
                   </h2>
                   <div className="flex items-center gap-space-sm bg-surface-container-highest px-space-sm py-0.5">
                     <span className="material-symbols-outlined text-[18px] text-secondary">

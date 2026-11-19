@@ -197,9 +197,10 @@ public class MatchWeekBusinessRules(
         throw new NotFoundException($"{slot.PlayerId} numaralı oyuncu bulunamadı.");
       }
 
-      if (!player.IsActive)
+      if (!player.IsActive || player.Category != PlayerCategory.Current)
       {
-        throw new BusinessException($"{player.Name} aktif olmadığı için kadroya eklenemez.");
+        throw new BusinessException(
+          $"{player.Name} maç haftası kadrosuna yalnızca aktif kadro oyuncuları eklenebilir.");
       }
     }
   }

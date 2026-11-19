@@ -1,12 +1,16 @@
+import { PlayerCategory } from '../playerTypes'
 import {
+  DIRECTORY_CATEGORY_TABS,
   type PositionGroup,
   type SortOption,
 } from '../utils/playerDirectoryTypes'
 
 type PlayerDirectoryFiltersProps = {
+  category: PlayerCategory
   positionFilter: PositionGroup
   search: string
   sort: SortOption
+  onCategoryChange: (next: PlayerCategory) => void
   onPositionFilterChange: (next: PositionGroup) => void
   onSearchChange: (value: string) => void
   onSortChange: (value: SortOption) => void
@@ -24,16 +28,49 @@ const controlClass =
   'h-10 border border-outline-variant/40 bg-surface-container-low font-label text-label-md font-semibold tracking-wider text-on-surface uppercase transition-colors focus:border-primary focus:bg-surface-container-lowest focus:outline-none'
 
 export function PlayerDirectoryFilters({
+  category,
   positionFilter,
   search,
   sort,
+  onCategoryChange,
   onPositionFilterChange,
   onSearchChange,
   onSortChange,
 }: PlayerDirectoryFiltersProps) {
+  const showMarketSort = category !== PlayerCategory.Legend
+
   return (
     <section className="sticky top-16 z-40 w-full border-b border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur-sm sm:top-20">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-sm px-4 py-space-sm sm:px-6 lg:px-12">
+        <div
+          className="flex flex-wrap gap-1 bg-surface-container p-1"
+          role="tablist"
+          aria-label="Oyuncu kategorisi"
+        >
+          {DIRECTORY_CATEGORY_TABS.map((tab) => {
+            const isActive = category === tab.category
+
+            return (
+              <button
+                key={tab.category}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => {
+                  onCategoryChange(tab.category)
+                }}
+                className={
+                  isActive
+                    ? 'min-w-[30%] flex-1 cursor-pointer bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
+                    : 'min-w-[30%] flex-1 cursor-pointer px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
+                }
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
+
         <div
           className="flex flex-wrap gap-1 bg-surface-container p-1"
           role="tablist"
@@ -53,7 +90,7 @@ export function PlayerDirectoryFilters({
                 }}
                 className={
                   isActive
-                    ? 'min-w-[30%] flex-1 cursor-pointer bg-primary-container px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
+                    ? 'min-w-[30%] flex-1 cursor-pointer bg-primary px-space-sm py-2 font-label text-label-md font-bold tracking-wider text-on-primary uppercase shadow-sm transition-colors sm:min-w-0'
                     : 'min-w-[30%] flex-1 cursor-pointer px-space-sm py-2 font-label text-label-md font-semibold tracking-wider text-on-surface-variant uppercase transition-colors hover:bg-surface-container-high hover:text-primary sm:min-w-0'
                 }
               >
@@ -88,7 +125,9 @@ export function PlayerDirectoryFilters({
                 onSortChange(event.target.value as SortOption)
               }}
             >
-              <option value="value-desc">Piyasa: Azalan</option>
+              {showMarketSort ? (
+                <option value="value-desc">Piyasa: Azalan</option>
+              ) : null}
               <option value="rating-desc">Reyting: Yüksek</option>
               <option value="number-asc">Forma Numarası</option>
               <option value="apps-desc">En Çok Maç</option>

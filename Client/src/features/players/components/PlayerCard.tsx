@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatMarketValue } from '../utils/formatMarketValue'
+import { LEGEND_TEAM_LABEL } from '../utils/mapPlayerToCardData'
 import { type PlayerCardData } from '../utils/playerDirectoryTypes'
 
 function badgeClass(tone: 'bordo' | 'mavi' | 'neutral') {
@@ -92,7 +93,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
             {player.name}
           </h3>
           <p className="font-body mt-0.5 truncate text-body-sm text-on-surface-variant">
-            {player.nationality} · {player.age} yaş · {player.height}
+            {player.subtitle}
           </p>
         </div>
 
@@ -112,14 +113,25 @@ export function PlayerCard({ player }: PlayerCardProps) {
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-space-sm pt-space-xs">
-          <div className="min-w-0">
-            <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
-              Piyasa Değeri
-            </span>
-            <span className="font-headline text-headline-sm font-bold text-primary">
-              {formatMarketValue(player.marketValue)}
-            </span>
-          </div>
+          {player.showMarketValue ? (
+            <div className="min-w-0">
+              <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
+                Piyasa Değeri
+              </span>
+              <span className="font-headline text-headline-sm font-bold text-primary">
+                {player.marketValue != null ? formatMarketValue(player.marketValue) : '—'}
+              </span>
+            </div>
+          ) : (
+            <div className="min-w-0">
+              <span className="font-kicker block text-kicker text-on-surface-variant uppercase">
+                Kulüp
+              </span>
+              <span className="font-headline text-label-md font-bold text-primary">
+                {LEGEND_TEAM_LABEL}
+              </span>
+            </div>
+          )}
           <span
             aria-hidden="true"
             className="flex h-10 w-10 shrink-0 items-center justify-center border border-primary/35 text-primary transition-all duration-200 group-hover:border-secondary group-hover:bg-secondary group-hover:text-on-secondary"

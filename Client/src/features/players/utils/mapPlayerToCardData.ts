@@ -1,5 +1,5 @@
 import { PositionZone } from '@/features/positions/positionTypes'
-import type { PlayerResponseDto } from '../playerTypes'
+import { PlayerCategory, type PlayerResponseDto } from '../playerTypes'
 import { getNationalityFlagUrl } from './nationalityFlag'
 import type { PlayerCardData, PlayerCardStat, PositionGroup } from './playerDirectoryTypes'
 
@@ -10,6 +10,8 @@ const CARD_TONES = [
   'from-[#1A3A2A] to-[#1A040B]',
   'from-[#4A1A4A] to-[#1A040B]',
 ] as const
+
+export const LEGEND_TEAM_LABEL = 'Trabzonspor Efsanesi'
 
 export function positionGroupFromZone(zone: PositionZone): PositionGroup {
   if (zone === PositionZone.Goalkeeper) {
@@ -46,11 +48,55 @@ function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
   ]
 }
 
+function resolveTeamNote(player: PlayerResponseDto): string {
+  if (player.category === PlayerCategory.Legend) {
+    return LEGEND_TEAM_LABEL
+  }
+
+  return player.currentTeam?.trim() || player.description?.trim() || ''
+}
+
+function resolveSubtitle(player: PlayerResponseDto, height: string): string {
+  const nationality = player.nationality.toUpperCase()
+
+  if (player.category === PlayerCategory.Legend) {
+    return `${nationality} · ${height}`
+  }
+
+  if (player.category === PlayerCategory.TransferTarget) {
+    const team = player.currentTeam?.trim()
+
+    if (team) {
+      return `${nationality} · ${player.age} yaş · ${team}`
+    }
+  }
+
+  return `${nationality} · ${player.age} yaş · ${height}`
+}
+
+function resolveBadge(
+  player: PlayerResponseDto,
+): PlayerCardData['badge'] {
+  if (player.category === PlayerCategory.Legend) {
+    return { label: 'EFSANE', tone: 'bordo' }
+  }
+
+  if (player.category === PlayerCategory.TransferTarget) {
+    return { label: 'HEDEF', tone: 'mavi' }
+  }
+
+  if (player.isCaptain) {
+    return { label: 'KAPTAN', tone: 'bordo' }
+  }
+
+  return undefined
+}
+
 export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): PlayerCardData {
   const positionGroup = positionGroupFromZone(player.positionZone)
-  const note = player.description?.trim() || player.currentTeam?.trim() || ''
   const height =
     player.height != null ? `${(player.height / 100).toFixed(2).replace('.', ',')} m` : '—'
+  const showMarketValue = player.category !== PlayerCategory.Legend
 
   return {
     id: player.id,
@@ -61,11 +107,12 @@ export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): Playe
     positionCode: player.positionAbbreviation || '—',
     positionLabel: player.positionName.toUpperCase(),
     rating: player.averageRating,
-    age: player.age,
     height,
-    note,
-    marketValue: player.marketValue ?? 0,
-    badge: player.isCaptain ? { label: 'KAPTAN', tone: 'bordo' } : undefined,
+    subtitle: resolveSubtitle(player, height),
+    note: resolveTeamNote(player),
+    marketValue: showMarketValue ? (player.marketValue ?? null) : null,
+    showMarketValue,
+    badge: resolveBadge(player),
     stats: buildCardStats(player),
     tone: CARD_TONES[index % CARD_TONES.length],
     flagUrl: getNationalityFlagUrl(player.nationality),
@@ -73,6 +120,7 @@ export function mapPlayerToCardData(player: PlayerResponseDto, index = 0): Playe
     description: player.description,
     goals: player.currentSeasonStats?.goals,
     assists: player.currentSeasonStats?.assists,
+    category: player.category,
   }
 }
 

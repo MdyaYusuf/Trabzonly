@@ -118,6 +118,7 @@ public sealed record RatePlayerRequest(decimal Score);
 public sealed record PlayerListQueryRequest(
   string? Search = null,
   string? PositionGroup = null,
+  PlayerCategory Category = PlayerCategory.Current,
   string? Sort = null,
   int PageNumber = 1,
   int PageSize = 12);
@@ -125,6 +126,7 @@ public sealed record PlayerListQueryRequest(
 public sealed record PlayerAdminListQueryRequest(
   string? Search = null,
   string? PositionGroup = null,
+  PlayerCategory Category = PlayerCategory.Current,
   bool? IsActive = null,
   string? Sort = null,
   int PageNumber = 1,
