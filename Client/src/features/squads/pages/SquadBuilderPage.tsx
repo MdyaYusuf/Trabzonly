@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '@/core/store/hooks'
 import playerService from '@/features/players/playerService'
+import { PlayerCategory } from '@/features/players/playerTypes'
 import positionService from '@/features/positions/positionService'
 import type { PositionRoleResponseDto } from '@/features/positions/positionTypes'
 import { SquadBuilderBench } from '../components/SquadBuilderBench'
@@ -45,6 +46,7 @@ import type {
   DefenseLineOption,
   TempoOption,
 } from '../utils/squadBuilderTypes'
+import { DEFAULT_ENABLED_POOL_CATEGORIES } from '../utils/squadPoolCategories'
 
 function isBuilderFormationId(value: string): value is BuilderFormationId {
   return getFormationConfig(value as BuilderFormationId).id === value
@@ -94,6 +96,9 @@ export function SquadBuilderPage() {
   )
   const [search, setSearch] = useState('')
   const [posFilter, setPosFilter] = useState<BuilderPosGroup>('ALL')
+  const [enabledCategories, setEnabledCategories] = useState<Set<PlayerCategory>>(
+    () => new Set(DEFAULT_ENABLED_POOL_CATEGORIES),
+  )
   const [attackStyle, setAttackStyle] = useState<AttackStyleOption>(attackStyleOptions[0])
   const [defenseLine, setDefenseLine] = useState<DefenseLineOption>(defenseLineOptions[0])
   const [tempo, setTempo] = useState<TempoOption>(tempoOptions[0])
@@ -143,12 +148,33 @@ export function SquadBuilderPage() {
     [starterAssignments, benchAssignments, playersById],
   )
 
+  const poolPlayers = useMemo(
+    () => players.filter((player) => enabledCategories.has(player.category)),
+    [players, enabledCategories],
+  )
+
   const allAssignments = useMemo(
     () => ({ ...starterAssignments, ...benchAssignments }) as Partial<
       Record<AssignmentSlotId, string>
     >,
     [starterAssignments, benchAssignments],
   )
+
+  const hasLegendInSquad = useMemo(() => {
+    for (const playerId of Object.values(allAssignments)) {
+      if (!playerId) {
+        continue
+      }
+
+      const player = playersById.get(playerId)
+
+      if (player?.category === PlayerCategory.Legend) {
+        return true
+      }
+    }
+
+    return false
+  }, [allAssignments, playersById])
 
   const starterPlayers = useMemo(() => {
     return slotIdsForFormation(formationId)
@@ -299,27 +325,51 @@ export function SquadBuilderPage() {
     async function loadCatalog() {
       setIsLoadingPlayers(true)
 
-      const [playersResult, positionsResult] = await Promise.all([
-        playerService.getAll({
-          pageNumber: 1,
-          pageSize: 100,
-          sort: 'number-asc',
-        }),
-        positionService.getAll({
-          pageNumber: 1,
-          pageSize: 100,
-        }),
-      ])
+      const poolQuery = {
+        pageNumber: 1,
+        pageSize: 50,
+        sort: 'number-asc' as const,
+      }
+
+      const [currentResult, legendResult, transferResult, positionsResult] =
+        await Promise.all([
+          playerService.getAll({
+            ...poolQuery,
+            category: PlayerCategory.Current,
+          }),
+          playerService.getAll({
+            ...poolQuery,
+            category: PlayerCategory.Legend,
+          }),
+          playerService.getAll({
+            ...poolQuery,
+            category: PlayerCategory.TransferTarget,
+          }),
+          positionService.getAll({
+            pageNumber: 1,
+            pageSize: 100,
+          }),
+        ])
 
       if (cancelled) {
         return
       }
 
-      if (playersResult.success && playersResult.data) {
-        setPlayers(playersResult.data.items.map(mapPlayerToBuilderPlayer))
-      } else {
-        setPlayers([])
+      const nextPlayers: BuilderPlayer[] = []
+
+      if (currentResult.success && currentResult.data) {
+        nextPlayers.push(...currentResult.data.items.map(mapPlayerToBuilderPlayer))
       }
+
+      if (legendResult.success && legendResult.data) {
+        nextPlayers.push(...legendResult.data.items.map(mapPlayerToBuilderPlayer))
+      }
+
+      if (transferResult.success && transferResult.data) {
+        nextPlayers.push(...transferResult.data.items.map(mapPlayerToBuilderPlayer))
+      }
+
+      setPlayers(nextPlayers)
 
       if (positionsResult.success && positionsResult.data) {
         const nextRoles = new Map<string, PositionRoleResponseDto[]>()
@@ -346,6 +396,24 @@ export function SquadBuilderPage() {
       cancelled = true
     }
   }, [])
+
+  function handleTogglePoolCategory(category: PlayerCategory) {
+    setEnabledCategories((prev) => {
+      const next = new Set(prev)
+
+      if (next.has(category)) {
+        if (next.size <= 1) {
+          return prev
+        }
+
+        next.delete(category)
+        return next
+      }
+
+      next.add(category)
+      return next
+    })
+  }
 
   useEffect(() => {
     if (!editSquadId) {
@@ -869,7 +937,7 @@ export function SquadBuilderPage() {
               assignments={starterAssignments}
               roleAssignments={roleAssignments}
               rolesBySlotId={rolesBySlotId}
-              players={players}
+              players={poolPlayers}
               playersById={playersById}
               assignedPlayerIds={assignedPlayerIds}
               captainPlayerId={captainPlayerId}
@@ -889,14 +957,16 @@ export function SquadBuilderPage() {
               </p>
             ) : (
               <SquadBuilderPlayerPool
-                players={players}
+                players={poolPlayers}
                 assignments={allAssignments}
                 search={search}
                 posFilter={posFilter}
+                enabledCategories={enabledCategories}
                 starterFilled={stats.starterFilled}
                 benchFilled={stats.benchFilled}
                 onSearchChange={setSearch}
                 onPosFilterChange={setPosFilter}
+                onToggleCategory={handleTogglePoolCategory}
                 onAssign={handleAssign}
               />
             )}
@@ -904,7 +974,9 @@ export function SquadBuilderPage() {
             <SquadBuilderBench
               assignments={benchAssignments}
               playersById={playersById}
-              availablePlayers={players.filter((player) => !assignedPlayerIds.has(player.id))}
+              availablePlayers={poolPlayers.filter(
+                (player) => !assignedPlayerIds.has(player.id),
+              )}
               onClearSlot={handleClearBenchSlot}
               onAssignToSlot={(slotId, playerId) => {
                 if (assignedPlayerIds.has(playerId)) {
@@ -922,6 +994,7 @@ export function SquadBuilderPage() {
             <SquadBuilderSidebarStats
               avgAge={stats.avgAge}
               totalValue={stats.totalValue}
+              hasLegendInSquad={hasLegendInSquad}
             />
 
             <div className="mt-auto w-full pt-space-md">

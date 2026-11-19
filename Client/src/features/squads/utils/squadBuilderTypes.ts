@@ -1,3 +1,5 @@
+import type { PlayerCategory } from '@/features/players/playerTypes'
+
 export type BuilderFormationId =
   | '4-2-3-1'
   | '4-3-3'
@@ -12,6 +14,11 @@ export type BuilderFormationId =
   | '5-3-2'
 
 export type BuilderPosGroup = 'ALL' | 'FW' | 'MF' | 'DF' | 'GK'
+
+export type BuilderPlayerBadge = {
+  label: string
+  tone: 'bordo' | 'mavi'
+}
 
 export type BuilderSlotId =
   | 'GK'
@@ -63,6 +70,8 @@ export type BuilderPlayer = {
   marketValueM: number
   avatarGradient: string
   initials: string
+  category: PlayerCategory
+  badge?: BuilderPlayerBadge
 }
 
 export type FormationSlot = {

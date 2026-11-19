@@ -16,6 +16,7 @@ import {
   pitchRowShiftClass,
   pitchSlotNudgeClass,
 } from '../utils/squadBuilderConfig'
+import { builderBadgeClass } from '../utils/squadPoolCategories'
 import { CaptainArmband } from './CaptainArmband'
 import { SquadPitchSlotCaption } from './SquadPitchSlotCaption'
 import { SquadPlayerPickerMenu } from './SquadPlayerPickerMenu'
@@ -163,6 +164,13 @@ function SlotCard({
           #{player.number}
         </span>
         {isCaptain ? <CaptainArmband side="right" className="group-hover:hidden" /> : null}
+        {player.badge ? (
+          <span
+            className={`font-kicker absolute -bottom-1 left-1/2 z-[1] -translate-x-1/2 px-1 py-px text-[8px] font-bold tracking-wide uppercase shadow ${builderBadgeClass(player.badge.tone)}`}
+          >
+            {player.badge.label}
+          </span>
+        ) : null}
         <button
           type="button"
           title="Pozisyonu Boşalt"

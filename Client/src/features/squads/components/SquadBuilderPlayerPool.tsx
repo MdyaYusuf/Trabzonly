@@ -1,3 +1,4 @@
+import { PlayerCategory } from '@/features/players/playerTypes'
 import type {
   AssignmentSlotId,
   BuilderPlayer,
@@ -5,16 +6,22 @@ import type {
 } from '../utils/squadBuilderTypes'
 import { isBenchSlotId } from '../utils/squadBuilderConfig'
 import { setSquadPlayerDragData } from '../utils/squadBuilderDnD'
+import {
+  SQUAD_POOL_CATEGORY_TOGGLES,
+  builderBadgeClass,
+} from '../utils/squadPoolCategories'
 
 type SquadBuilderPlayerPoolProps = {
   players: BuilderPlayer[]
   assignments: Partial<Record<AssignmentSlotId, string>>
   search: string
   posFilter: BuilderPosGroup
+  enabledCategories: Set<PlayerCategory>
   starterFilled: number
   benchFilled: number
   onSearchChange: (value: string) => void
   onPosFilterChange: (value: BuilderPosGroup) => void
+  onToggleCategory: (category: PlayerCategory) => void
   onAssign: (playerId: string) => void
 }
 
@@ -44,10 +51,12 @@ export function SquadBuilderPlayerPool({
   assignments,
   search,
   posFilter,
+  enabledCategories,
   starterFilled,
   benchFilled,
   onSearchChange,
   onPosFilterChange,
+  onToggleCategory,
   onAssign,
 }: SquadBuilderPlayerPoolProps) {
   const startersComplete = starterFilled >= 11
@@ -76,20 +85,39 @@ export function SquadBuilderPlayerPool({
     <div className="flex w-full flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
       <div className="flex flex-col gap-space-xs">
         <div className="flex items-center justify-between gap-space-sm">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-headline flex items-center gap-2 text-headline-sm font-bold text-primary uppercase">
-              <span className="material-symbols-outlined text-[20px] text-secondary">
-                diversity_3
-              </span>
-              Oyuncu Havuzu
+          <span className="font-headline flex items-center gap-2 text-headline-sm font-bold text-primary uppercase">
+            <span className="material-symbols-outlined text-[20px] text-secondary">
+              diversity_3
             </span>
-            <span className="font-kicker bg-secondary-container px-2 py-0.5 text-[10px] font-bold text-on-secondary-container">
-              TRABZONSPOR A TAKIMI
-            </span>
-          </div>
+            Oyuncu Havuzu
+          </span>
           <span className="font-label text-[12px] font-semibold text-on-surface-variant">
             {players.length} Futbolcu
           </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1 pt-1">
+          {SQUAD_POOL_CATEGORY_TOGGLES.map((toggle) => {
+            const isActive = enabledCategories.has(toggle.category)
+
+            return (
+              <button
+                key={toggle.category}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => {
+                  onToggleCategory(toggle.category)
+                }}
+                className={
+                  isActive
+                    ? 'font-kicker bg-primary px-3 py-1 text-kicker font-bold text-on-primary uppercase'
+                    : 'font-kicker bg-surface-container px-3 py-1 text-kicker font-bold text-on-surface uppercase transition-colors hover:bg-surface-container-high'
+                }
+              >
+                {toggle.label}
+              </button>
+            )
+          })}
         </div>
 
         <div className="relative mt-1 w-full">
@@ -132,8 +160,9 @@ export function SquadBuilderPlayerPool({
 
         <div className="mt-1 flex items-center gap-2 bg-secondary-fixed/50 px-space-sm py-space-xs">
           <span
-            className={`material-symbols-outlined text-[18px] ${isComplete ? 'text-[#2e7d32]' : 'text-secondary'
-              }`}
+            className={`material-symbols-outlined text-[18px] ${
+              isComplete ? 'text-[#2e7d32]' : 'text-secondary'
+            }`}
           >
             {isComplete ? 'check_circle' : 'info'}
           </span>
@@ -170,13 +199,20 @@ export function SquadBuilderPlayerPool({
                     {player.initials}
                   </div>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       <span className="font-headline text-[14px] font-bold text-on-surface-variant line-through">
                         {player.name}
                       </span>
                       <span className="font-kicker bg-surface-variant px-1.5 text-[10px] text-on-surface-variant">
                         #{player.number}
                       </span>
+                      {player.badge ? (
+                        <span
+                          className={`font-kicker px-1.5 text-[9px] font-bold uppercase ${builderBadgeClass(player.badge.tone)}`}
+                        >
+                          {player.badge.label}
+                        </span>
+                      ) : null}
                     </div>
                     <span className="font-body text-[12px] text-on-surface-variant">
                       {locationLabel}
@@ -220,6 +256,13 @@ export function SquadBuilderPlayerPool({
                     <span className="font-kicker bg-primary/10 px-1.5 text-[10px] font-bold text-primary">
                       #{player.number}
                     </span>
+                    {player.badge ? (
+                      <span
+                        className={`font-kicker px-1.5 text-[9px] font-bold uppercase ${builderBadgeClass(player.badge.tone)}`}
+                      >
+                        {player.badge.label}
+                      </span>
+                    ) : null}
                   </div>
                   <span className="font-body text-[12px] text-on-surface-variant">
                     {player.roleHint}

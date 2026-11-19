@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import type { BuilderPlayer } from '../utils/squadBuilderTypes'
+import { builderBadgeClass } from '../utils/squadPoolCategories'
 
 type SquadPlayerPickerMenuProps = {
   title: string
@@ -205,9 +206,18 @@ export function SquadPlayerPickerMenu({
                   {player.initials}
                 </div>
                 <div className="min-w-0 flex-1 overflow-hidden">
-                  <span className="font-headline block truncate text-[12px] font-bold leading-tight text-secondary-container">
-                    {player.name}
-                  </span>
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    <span className="font-headline truncate text-[12px] font-bold leading-tight text-secondary-container">
+                      {player.name}
+                    </span>
+                    {player.badge ? (
+                      <span
+                        className={`font-kicker shrink-0 px-1 py-px text-[8px] font-bold uppercase ${builderBadgeClass(player.badge.tone)}`}
+                      >
+                        {player.badge.label}
+                      </span>
+                    ) : null}
+                  </div>
                   <span
                     className="font-kicker block truncate text-[9px] text-white uppercase"
                     title={`#${player.number} · ${player.roleHint}`}

@@ -1,6 +1,13 @@
 import { PositionZone } from '@/features/positions/positionTypes'
-import type { PlayerResponseDto } from '@/features/players/playerTypes'
-import type { BuilderPlayer, BuilderPosGroup } from './squadBuilderTypes'
+import {
+  PlayerCategory,
+  type PlayerResponseDto,
+} from '@/features/players/playerTypes'
+import type {
+  BuilderPlayer,
+  BuilderPlayerBadge,
+  BuilderPosGroup,
+} from './squadBuilderTypes'
 
 const GRADIENTS = [
   'from-[#5a0e27] to-[#1A040B]',
@@ -51,6 +58,18 @@ function posGroupFromZone(zone: PositionZone): Exclude<BuilderPosGroup, 'ALL'> {
   return 'MF'
 }
 
+function badgeForCategory(category: PlayerCategory): BuilderPlayerBadge | undefined {
+  if (category === PlayerCategory.Legend) {
+    return { label: 'EFSANE', tone: 'bordo' }
+  }
+
+  if (category === PlayerCategory.TransferTarget) {
+    return { label: 'HEDEF', tone: 'mavi' }
+  }
+
+  return undefined
+}
+
 export function mapPlayerToBuilderPlayer(player: PlayerResponseDto): BuilderPlayer {
   const marketValueM =
     player.marketValue != null ? Math.round((player.marketValue / 1_000_000) * 10) / 10 : 0
@@ -66,5 +85,7 @@ export function mapPlayerToBuilderPlayer(player: PlayerResponseDto): BuilderPlay
     marketValueM,
     avatarGradient: GRADIENTS[player.id % GRADIENTS.length],
     initials: initialsFromName(player.name),
+    category: player.category,
+    badge: badgeForCategory(player.category),
   }
 }

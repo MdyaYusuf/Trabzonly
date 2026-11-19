@@ -5,6 +5,7 @@ import {
   readSquadPlayerDragData,
   setSquadPlayerDragData,
 } from '../utils/squadBuilderDnD'
+import { builderBadgeClass } from '../utils/squadPoolCategories'
 import { SquadPlayerPickerMenu } from './SquadPlayerPickerMenu'
 
 type SquadBuilderBenchProps = {
@@ -124,6 +125,13 @@ export function SquadBuilderBench({
                 <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
                   #{player.number} · {player.posGroup}
                 </span>
+                {player.badge ? (
+                  <span
+                    className={`font-kicker absolute bottom-0.5 left-0.5 px-1 py-px text-[8px] font-bold uppercase ${builderBadgeClass(player.badge.tone)}`}
+                  >
+                    {player.badge.label}
+                  </span>
+                ) : null}
                 <button
                   type="button"
                   title="Yedeği kaldır"
