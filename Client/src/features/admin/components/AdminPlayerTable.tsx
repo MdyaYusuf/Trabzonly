@@ -3,14 +3,20 @@ import type { AdminPlayerListRow } from '../utils/adminPlayerTypes'
 
 type AdminPlayerTableProps = {
   players: AdminPlayerListRow[]
+  editPathPrefix: string
   deletingId: number | null
   onDelete: (player: AdminPlayerListRow) => void
+  hideMarketColumn?: boolean
+  hideAgeColumn?: boolean
 }
 
 export function AdminPlayerTable({
   players,
+  editPathPrefix,
   deletingId,
   onDelete,
+  hideMarketColumn = false,
+  hideAgeColumn = false,
 }: AdminPlayerTableProps) {
   return (
     <section className="overflow-x-auto border border-outline-variant/40 bg-surface-container-lowest">
@@ -28,8 +34,12 @@ export function AdminPlayerTable({
               <th className="px-space-sm py-space-sm">Pozisyon</th>
               <th className="px-space-sm py-space-sm">Takım</th>
               <th className="px-space-sm py-space-sm">Uyruk</th>
-              <th className="px-space-sm py-space-sm">Yaş</th>
-              <th className="px-space-sm py-space-sm">Piyasa Değeri</th>
+              {hideAgeColumn ? null : (
+                <th className="px-space-sm py-space-sm">Yaş</th>
+              )}
+              {hideMarketColumn ? null : (
+                <th className="px-space-sm py-space-sm">Piyasa Değeri</th>
+              )}
               <th className="px-space-sm py-space-sm">Durum</th>
               <th className="px-space-sm py-space-sm">İşlemler</th>
             </tr>
@@ -84,12 +94,16 @@ export function AdminPlayerTable({
                   <td className="font-body px-space-sm py-space-sm text-body-sm text-on-surface">
                     {player.nationality}
                   </td>
-                  <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
-                    {player.age}
-                  </td>
-                  <td className="font-label px-space-sm py-space-sm text-label-md font-bold text-primary tabular-nums">
-                    {player.marketValueLabel}
-                  </td>
+                  {hideAgeColumn ? null : (
+                    <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">
+                      {player.age}
+                    </td>
+                  )}
+                  {hideMarketColumn ? null : (
+                    <td className="font-label px-space-sm py-space-sm text-label-md font-bold text-primary tabular-nums">
+                      {player.marketValueLabel}
+                    </td>
+                  )}
                   <td className="px-space-sm py-space-sm">
                     <span
                       className={`font-kicker px-space-sm py-0.5 text-kicker uppercase ${statusClass}`}
@@ -100,7 +114,7 @@ export function AdminPlayerTable({
                   <td className="px-space-sm py-space-sm">
                     <div className="flex items-center gap-1">
                       <Link
-                        to={`/yonetim/oyuncular/${player.id}/duzenle`}
+                        to={`${editPathPrefix}/${player.id}/duzenle`}
                         aria-label="Düzenle"
                         className="flex h-8 w-8 cursor-pointer items-center justify-center text-secondary transition-colors hover:bg-secondary-container/40"
                       >

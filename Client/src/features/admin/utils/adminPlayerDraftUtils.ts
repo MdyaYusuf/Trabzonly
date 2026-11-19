@@ -5,6 +5,8 @@ import {
   type UpdatePlayerRequest,
 } from '@/features/players/playerTypes'
 import { formatMarketValue } from '@/features/players/utils/formatMarketValue'
+import { LEGEND_TEAM_LABEL } from '@/features/players/utils/mapPlayerToCardData'
+import { getAdminPlayerModule } from './adminPlayerModuleConfig'
 import type {
   AdminPlayerFormDraft,
   AdminPlayerListRow,
@@ -78,8 +80,11 @@ function parseOptionalNumber(value: string): number | undefined {
 }
 
 export function createEmptyAdminPlayerFormDraft(
+  category: PlayerCategory = PlayerCategory.Current,
   defaultPositionId: number = 0,
 ): AdminPlayerFormDraft {
+  const module = getAdminPlayerModule(category)
+
   return {
     id: null,
     name: '',
@@ -90,12 +95,12 @@ export function createEmptyAdminPlayerFormDraft(
     isActive: true,
     heightCm: '',
     positionId: defaultPositionId,
-    currentTeam: 'Trabzonspor',
+    currentTeam: module.defaultCurrentTeam,
     marketValue: '',
     wage: '',
     description: '',
     isCaptain: false,
-    category: PlayerCategory.Current,
+    category,
     createdDate: null,
     updatedDate: null,
   }
@@ -111,11 +116,18 @@ export function mapPlayerResponseToListRow(player: PlayerResponseDto): AdminPlay
     positionLabel: player.positionAbbreviation
       ? `${player.positionName} (${player.positionAbbreviation})`
       : player.positionName,
-    currentTeam: player.currentTeam?.trim() || '—',
+    currentTeam:
+      player.category === PlayerCategory.Legend
+        ? LEGEND_TEAM_LABEL
+        : player.currentTeam?.trim() || '—',
     nationality: player.nationality,
     age: player.age,
     marketValueLabel:
-      player.marketValue != null ? formatMarketValue(player.marketValue) : '—',
+      player.category === PlayerCategory.Legend
+        ? '—'
+        : player.marketValue != null
+          ? formatMarketValue(player.marketValue)
+          : '—',
     status,
     statusLabel: player.isActive ? 'Aktif' : 'Pasif',
     isCaptain: player.isCaptain,
@@ -159,7 +171,9 @@ export function validateAdminPlayerDraft(draft: AdminPlayerFormDraft): string | 
     return 'Doğum tarihi zorunludur.'
   }
 
-  if (!draft.currentTeam.trim()) {
+  const module = getAdminPlayerModule(draft.category)
+
+  if (module.currentTeamRequired && !draft.currentTeam.trim()) {
     return 'Mevcut takım zorunludur.'
   }
 
@@ -196,6 +210,7 @@ export function validateAdminPlayerDraft(draft: AdminPlayerFormDraft): string | 
 
 function buildBaseRequest(draft: AdminPlayerFormDraft) {
   const shirtNumber = parseOptionalNumber(draft.shirtNumber)
+  const hideMarket = getAdminPlayerModule(draft.category).hideMarketFields
 
   return {
     name: draft.name.trim(),
@@ -203,8 +218,8 @@ function buildBaseRequest(draft: AdminPlayerFormDraft) {
     dateOfBirth: draft.dateOfBirth,
     height: parseOptionalNumber(draft.heightCm),
     preferredFoot: draft.preferredFoot,
-    marketValue: parseOptionalNumber(draft.marketValue),
-    wage: parseOptionalNumber(draft.wage),
+    marketValue: hideMarket ? undefined : parseOptionalNumber(draft.marketValue),
+    wage: hideMarket ? undefined : parseOptionalNumber(draft.wage),
     currentTeam: draft.currentTeam.trim() || null,
     description: draft.description.trim() || undefined,
     shirtNumber: shirtNumber != null ? Math.trunc(shirtNumber) : null,

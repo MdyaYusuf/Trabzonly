@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { PositionResponseDto } from '@/features/positions/positionTypes'
+import { getAdminPlayerModule } from '../utils/adminPlayerModuleConfig'
 import type { AdminPlayerFormDraft, AdminPlayerPreferredFoot } from '../utils/adminPlayerTypes'
 
 type AdminPlayerFormFieldsProps = {
@@ -83,8 +84,11 @@ export function AdminPlayerFormFields({
   mode,
   onChange,
 }: AdminPlayerFormFieldsProps) {
+  const module = getAdminPlayerModule(draft.category)
   const profileLength = draft.description.length
   const showActiveToggle = mode === 'edit'
+  const hideMarketFields = module.hideMarketFields
+  const currentTeamRequired = module.currentTeamRequired
   const statusClass = draft.isActive
     ? 'bg-secondary-container/50 text-on-secondary-container'
     : 'bg-error-container text-on-error-container'
@@ -292,55 +296,69 @@ export function AdminPlayerFormFields({
       </section>
 
       <section className="border border-outline-variant/40 bg-surface-container-lowest p-space-md">
-        <SectionHeading section="Bölüm 03" title="Kulüp & Finans" />
-        <div className="grid grid-cols-1 gap-space-md md:grid-cols-3">
+        <SectionHeading
+          section="Bölüm 03"
+          title={hideMarketFields ? 'Kulüp' : 'Kulüp & Finans'}
+        />
+        <div
+          className={`grid grid-cols-1 gap-space-md ${
+            hideMarketFields ? 'md:grid-cols-1' : 'md:grid-cols-3'
+          }`}
+        >
           <div>
-            <FieldLabel htmlFor="currentTeam" required>
+            <FieldLabel htmlFor="currentTeam" required={currentTeamRequired}>
               Mevcut Takım
             </FieldLabel>
             <input
               id="currentTeam"
               className={inputClass}
               value={draft.currentTeam}
+              placeholder={
+                hideMarketFields ? 'Boş bırakılabilir (Efsane etiketi kullanılır)' : undefined
+              }
               onChange={(event) => {
                 onChange('currentTeam', event.target.value)
               }}
             />
           </div>
-          <div>
-            <FieldLabel htmlFor="marketValue">Piyasa Değeri</FieldLabel>
-            <div className="relative">
-              <input
-                id="marketValue"
-                inputMode="decimal"
-                className={`${inputClass} pr-8`}
-                value={draft.marketValue}
-                onChange={(event) => {
-                  onChange('marketValue', event.target.value)
-                }}
-              />
-              <span className="font-label absolute top-1/2 right-3 -translate-y-1/2 text-label-md text-on-surface-variant">
-                €
-              </span>
-            </div>
-          </div>
-          <div>
-            <FieldLabel htmlFor="wage">Maaş</FieldLabel>
-            <div className="relative">
-              <input
-                id="wage"
-                inputMode="decimal"
-                className={`${inputClass} pr-8`}
-                value={draft.wage}
-                onChange={(event) => {
-                  onChange('wage', event.target.value)
-                }}
-              />
-              <span className="font-label absolute top-1/2 right-3 -translate-y-1/2 text-label-md text-on-surface-variant">
-                €
-              </span>
-            </div>
-          </div>
+          {hideMarketFields ? null : (
+            <>
+              <div>
+                <FieldLabel htmlFor="marketValue">Piyasa Değeri</FieldLabel>
+                <div className="relative">
+                  <input
+                    id="marketValue"
+                    inputMode="decimal"
+                    className={`${inputClass} pr-8`}
+                    value={draft.marketValue}
+                    onChange={(event) => {
+                      onChange('marketValue', event.target.value)
+                    }}
+                  />
+                  <span className="font-label absolute top-1/2 right-3 -translate-y-1/2 text-label-md text-on-surface-variant">
+                    €
+                  </span>
+                </div>
+              </div>
+              <div>
+                <FieldLabel htmlFor="wage">Maaş</FieldLabel>
+                <div className="relative">
+                  <input
+                    id="wage"
+                    inputMode="decimal"
+                    className={`${inputClass} pr-8`}
+                    value={draft.wage}
+                    onChange={(event) => {
+                      onChange('wage', event.target.value)
+                    }}
+                  />
+                  <span className="font-label absolute top-1/2 right-3 -translate-y-1/2 text-label-md text-on-surface-variant">
+                    €
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

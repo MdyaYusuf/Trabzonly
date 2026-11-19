@@ -7,6 +7,13 @@ export const adminShellProfile: AdminShellProfile = {
   navItems: [
     { id: 'overview', label: 'Genel Bakış', to: '/yonetim', icon: 'dashboard' },
     { id: 'players', label: 'Oyuncular', to: '/yonetim/oyuncular', icon: 'groups' },
+    { id: 'legends', label: 'Efsaneler', to: '/yonetim/efsaneler', icon: 'military_tech' },
+    {
+      id: 'transfer-targets',
+      label: 'Transfer Hedefleri',
+      to: '/yonetim/transfer-hedefleri',
+      icon: 'swap_horiz',
+    },
     {
       id: 'match-week',
       label: 'Maç Haftası',
@@ -50,10 +57,26 @@ export const adminHubProfile: AdminHubProfile = {
     {
       id: 'players',
       title: 'Oyuncular',
-      description: 'Oyuncu kayıtlarını ekle, profil kartlarını ve transfer durumlarını düzenle.',
+      description: 'Aktif kadro oyuncu kayıtlarını ekle, profil kartlarını ve durumlarını düzenle.',
       categoryLabel: 'Trabzonspor Kadrosu',
       icon: 'groups',
       to: '/yonetim/oyuncular',
+    },
+    {
+      id: 'legends',
+      title: 'Efsaneler',
+      description: 'Kulüp efsanelerini ekle. Kariyer profili ve forma numaralarını yönet.',
+      categoryLabel: 'Tarih & Miras',
+      icon: 'military_tech',
+      to: '/yonetim/efsaneler',
+    },
+    {
+      id: 'transfer-targets',
+      title: 'Transfer Hedefleri',
+      description: 'Transfer gündemindeki hedefleri kaydet. Kulüp ve piyasa bilgilerini güncelle.',
+      categoryLabel: 'Transfer Ofisi',
+      icon: 'swap_horiz',
+      to: '/yonetim/transfer-hedefleri',
     },
     {
       id: 'match-week',

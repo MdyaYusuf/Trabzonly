@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
 import playerService from '@/features/players/playerService'
+import { PlayerCategory } from '@/features/players/playerTypes'
 import { AdminPlayerDeleteModal } from '../components/AdminPlayerDeleteModal'
 import { AdminPlayerListFilters } from '../components/AdminPlayerListFilters'
 import { AdminPlayerListHeader } from '../components/AdminPlayerListHeader'
 import { AdminPlayerPagination } from '../components/AdminPlayerPagination'
 import { AdminPlayerTable } from '../components/AdminPlayerTable'
 import { mapPlayerResponseToListRow } from '../utils/adminPlayerDraftUtils'
+import {
+  getAdminPlayerCreatePath,
+  getAdminPlayerModule,
+} from '../utils/adminPlayerModuleConfig'
 import type {
   AdminPlayerListRow,
   AdminPlayerPositionFilter,
@@ -14,7 +19,14 @@ import type {
 
 const DEFAULT_PAGE_SIZE = 10
 
-export function AdminPlayerListPage() {
+type AdminPlayerListPageProps = {
+  category?: PlayerCategory
+}
+
+export function AdminPlayerListPage({
+  category = PlayerCategory.Current,
+}: AdminPlayerListPageProps) {
+  const module = getAdminPlayerModule(category)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<AdminPlayerStatusFilter>('all')
@@ -40,6 +52,14 @@ export function AdminPlayerListPage() {
 
   useEffect(() => {
     setPage(1)
+    setSearch('')
+    setDebouncedSearch('')
+    setStatusFilter('all')
+    setPositionFilter('all')
+  }, [category])
+
+  useEffect(() => {
+    setPage(1)
   }, [debouncedSearch, statusFilter, positionFilter, pageSize])
 
   useEffect(() => {
@@ -56,6 +76,7 @@ export function AdminPlayerListPage() {
         pageSize,
         search: debouncedSearch || undefined,
         positionGroup: positionFilter,
+        category,
         isActive,
       })
 
@@ -83,7 +104,7 @@ export function AdminPlayerListPage() {
     return () => {
       cancelled = true
     }
-  }, [page, pageSize, debouncedSearch, statusFilter, positionFilter, listVersion])
+  }, [category, page, pageSize, debouncedSearch, statusFilter, positionFilter, listVersion])
 
   function clearFilters() {
     setSearch('')
@@ -114,12 +135,17 @@ export function AdminPlayerListPage() {
   return (
     <div className="flex flex-col">
       <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-lg px-4 py-space-lg sm:px-6 lg:px-12">
-        <AdminPlayerListHeader />
+        <AdminPlayerListHeader
+          title={module.listLabel}
+          description={module.listDescription}
+        />
 
         <AdminPlayerListFilters
           search={search}
           statusFilter={statusFilter}
           positionFilter={positionFilter}
+          createPath={getAdminPlayerCreatePath(category)}
+          addButtonLabel={module.addButtonLabel}
           onSearchChange={setSearch}
           onStatusChange={setStatusFilter}
           onPositionChange={setPositionFilter}
@@ -128,13 +154,16 @@ export function AdminPlayerListPage() {
 
         {isLoading ? (
           <p className="font-body py-space-xl text-center text-body-md text-on-surface-variant">
-            Oyuncular yükleniyor...
+            {module.listLabel} yükleniyor...
           </p>
         ) : (
           <AdminPlayerTable
             players={rows}
+            editPathPrefix={module.listPath}
             deletingId={deletingId}
             onDelete={setDeleteTarget}
+            hideMarketColumn={module.hideMarketFields}
+            hideAgeColumn={category === PlayerCategory.Legend}
           />
         )}
 

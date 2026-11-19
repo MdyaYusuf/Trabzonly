@@ -11,6 +11,7 @@ import { PublicLayout } from './layouts/PublicLayout'
 import { AdminHubPage } from '@/features/admin/pages/AdminHubPage'
 import { AdminPlayerListPage } from '@/features/admin/pages/AdminPlayerListPage'
 import { AdminPlayerCreateEditPage } from '@/features/admin/pages/AdminPlayerCreateEditPage'
+import { PlayerCategory } from '@/features/players/playerTypes'
 import { AdminCategoryListPage } from '@/features/admin/pages/AdminCategoryListPage'
 import { AdminCategoryCreateEditPage } from '@/features/admin/pages/AdminCategoryCreateEditPage'
 import { AdminPositionListPage } from '@/features/admin/pages/AdminPositionListPage'
@@ -185,6 +186,44 @@ const router = createBrowserRouter([
           {
             path: 'yonetim/oyuncular/:playerId/duzenle',
             element: <AdminPlayerCreateEditPage mode="edit" />,
+          },
+          {
+            path: 'yonetim/efsaneler',
+            element: <AdminPlayerListPage category={PlayerCategory.Legend} />,
+          },
+          {
+            path: 'yonetim/efsaneler/yeni',
+            element: (
+              <AdminPlayerCreateEditPage mode="create" category={PlayerCategory.Legend} />
+            ),
+          },
+          {
+            path: 'yonetim/efsaneler/:playerId/duzenle',
+            element: (
+              <AdminPlayerCreateEditPage mode="edit" category={PlayerCategory.Legend} />
+            ),
+          },
+          {
+            path: 'yonetim/transfer-hedefleri',
+            element: <AdminPlayerListPage category={PlayerCategory.TransferTarget} />,
+          },
+          {
+            path: 'yonetim/transfer-hedefleri/yeni',
+            element: (
+              <AdminPlayerCreateEditPage
+                mode="create"
+                category={PlayerCategory.TransferTarget}
+              />
+            ),
+          },
+          {
+            path: 'yonetim/transfer-hedefleri/:playerId/duzenle',
+            element: (
+              <AdminPlayerCreateEditPage
+                mode="edit"
+                category={PlayerCategory.TransferTarget}
+              />
+            ),
           },
           {
             path: 'yonetim/kategoriler',

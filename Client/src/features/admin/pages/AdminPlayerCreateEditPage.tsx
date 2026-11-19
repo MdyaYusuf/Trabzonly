@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import playerService from '@/features/players/playerService'
+import { PlayerCategory } from '@/features/players/playerTypes'
 import positionService from '@/features/positions/positionService'
 import type { PositionResponseDto } from '@/features/positions/positionTypes'
 import { AdminPlayerDeleteModal } from '../components/AdminPlayerDeleteModal'
@@ -12,24 +13,41 @@ import {
   mapPlayerResponseToFormDraft,
   validateAdminPlayerDraft,
 } from '../utils/adminPlayerDraftUtils'
+import {
+  getAdminPlayerEditPath,
+  getAdminPlayerModule,
+} from '../utils/adminPlayerModuleConfig'
 import type { AdminPlayerFormDraft } from '../utils/adminPlayerTypes'
 
 type AdminPlayerCreateEditPageProps = {
   mode?: 'create' | 'edit'
+  category?: PlayerCategory
 }
 
-export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateEditPageProps) {
+export function AdminPlayerCreateEditPage({
+  mode: modeProp,
+  category = PlayerCategory.Current,
+}: AdminPlayerCreateEditPageProps) {
   const { playerId } = useParams<{ playerId: string }>()
   const navigate = useNavigate()
   const mode = modeProp ?? (playerId ? 'edit' : 'create')
+  const module = getAdminPlayerModule(category)
 
-  const [draft, setDraft] = useState<AdminPlayerFormDraft>(createEmptyAdminPlayerFormDraft)
+  const [draft, setDraft] = useState<AdminPlayerFormDraft>(() =>
+    createEmptyAdminPlayerFormDraft(category),
+  )
   const [positions, setPositions] = useState<PositionResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(mode === 'edit')
   const [isSaving, setIsSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    if (mode === 'create') {
+      setDraft(createEmptyAdminPlayerFormDraft(category))
+    }
+  }, [category, mode])
 
   useEffect(() => {
     let cancelled = false
@@ -70,7 +88,7 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
     return () => {
       cancelled = true
     }
-  }, [mode])
+  }, [mode, category])
 
   useEffect(() => {
     if (mode !== 'edit' || !playerId) {
@@ -98,7 +116,17 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
       }
 
       if (result.success && result.data) {
-        setDraft(mapPlayerResponseToFormDraft(result.data))
+        if (result.data.category !== category) {
+          navigate(getAdminPlayerEditPath(result.data.category, result.data.id), {
+            replace: true,
+          })
+          return
+        }
+
+        setDraft({
+          ...mapPlayerResponseToFormDraft(result.data),
+          category,
+        })
       } else {
         setFormError(result.message || 'Oyuncu yüklenemedi.')
       }
@@ -111,7 +139,7 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
     return () => {
       cancelled = true
     }
-  }, [mode, playerId])
+  }, [mode, playerId, category, navigate])
 
   function updateField<K extends keyof AdminPlayerFormDraft>(
     key: K,
@@ -124,7 +152,7 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
   }
 
   function handleCancel() {
-    navigate('/yonetim/oyuncular')
+    navigate(module.listPath)
   }
 
   async function handleSave() {
@@ -132,7 +160,12 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
       return
     }
 
-    const validationError = validateAdminPlayerDraft(draft)
+    const draftWithCategory: AdminPlayerFormDraft = {
+      ...draft,
+      category,
+    }
+
+    const validationError = validateAdminPlayerDraft(draftWithCategory)
 
     if (validationError) {
       setFormError(validationError)
@@ -143,18 +176,18 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
     setFormError(null)
 
     if (mode === 'create') {
-      const result = await playerService.add(mapDraftToCreateRequest(draft))
+      const result = await playerService.add(mapDraftToCreateRequest(draftWithCategory))
 
       if (result.success) {
-        navigate('/yonetim/oyuncular')
+        navigate(module.listPath)
       } else {
         setFormError(result.message || 'Oyuncu kaydedilemedi.')
       }
     } else {
-      const result = await playerService.update(mapDraftToUpdateRequest(draft))
+      const result = await playerService.update(mapDraftToUpdateRequest(draftWithCategory))
 
       if (result.success) {
-        navigate('/yonetim/oyuncular')
+        navigate(module.listPath)
       } else {
         setFormError(result.message || 'Oyuncu güncellenemedi.')
       }
@@ -173,7 +206,7 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
     const result = await playerService.remove(draft.id)
 
     if (result.success) {
-      navigate('/yonetim/oyuncular')
+      navigate(module.listPath)
       return
     }
 
@@ -182,11 +215,9 @@ export function AdminPlayerCreateEditPage({ mode: modeProp }: AdminPlayerCreateE
     setDeleteOpen(false)
   }
 
-  const title = mode === 'edit' ? 'Oyuncuyu Düzenle' : 'Yeni Oyuncu Ekle'
+  const title = mode === 'edit' ? module.editTitle : module.createTitle
   const description =
-    mode === 'edit'
-      ? 'Oyuncu kimlik, fizik ve kadro bilgilerini güncelleyin.'
-      : 'Yeni oyuncu kaydı oluşturun. Temel kimlik, pozisyon ve kulüp alanlarını doldurun.'
+    mode === 'edit' ? module.editDescription : module.createDescription
 
   const actionButtonClass =
     'font-label inline-flex h-10 w-[8.75rem] cursor-pointer items-center justify-center gap-1 border px-space-md text-label-md uppercase'

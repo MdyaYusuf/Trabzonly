@@ -26,6 +26,20 @@ const MODULES: ModuleCrumb[] = [
     editLabel: 'Oyuncuyu Düzenle',
   },
   {
+    listPath: '/yonetim/efsaneler',
+    listLabel: 'Efsaneler',
+    createSuffix: '/yeni',
+    createLabel: 'Yeni Efsane',
+    editLabel: 'Efsaneyi Düzenle',
+  },
+  {
+    listPath: '/yonetim/transfer-hedefleri',
+    listLabel: 'Transfer Hedefleri',
+    createSuffix: '/yeni',
+    createLabel: 'Yeni Transfer Hedefi',
+    editLabel: 'Transfer Hedefini Düzenle',
+  },
+  {
     listPath: '/yonetim/kategoriler',
     listLabel: 'Kategoriler',
     createSuffix: '/yeni',
