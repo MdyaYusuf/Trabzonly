@@ -61,13 +61,16 @@ public class PlayerStatsBusinessRules(IPlayerStatsRepository _playerStatsReposit
 
   public void PlayerStatsMustBeLogicallyValid(
     int appearances,
-    int minutesPlayed,
+    int? minutesPlayed,
     int goals,
     int assists,
     int cleanSheets,
-    int redCards)
+    int? redCards)
   {
-    if (appearances == 0 && (goals > 0 || assists > 0 || minutesPlayed > 0 || cleanSheets > 0 || redCards > 0))
+    int resolvedMinutes = minutesPlayed ?? 0;
+    int resolvedRedCards = redCards ?? 0;
+
+    if (appearances == 0 && (goals > 0 || assists > 0 || resolvedMinutes > 0 || cleanSheets > 0 || resolvedRedCards > 0))
     {
       throw new BusinessException("Hiç maça çıkmamış bir oyuncunun gol, asist veya dakika gibi istatistikleri olamaz.");
     }
@@ -77,13 +80,13 @@ public class PlayerStatsBusinessRules(IPlayerStatsRepository _playerStatsReposit
       throw new BusinessException("Gol yemeden bitirilen maç sayısı, toplam maça çıkma sayısından büyük olamaz.");
     }
 
-    if (redCards > appearances)
+    if (resolvedRedCards > appearances)
     {
       throw new BusinessException("Kırmızı kart sayısı, toplam maça çıkma sayısından büyük olamaz.");
     }
 
     // Assuming a max of ~130 minutes per game (90 mins + 30 extra time + 10 stoppage)
-    if (minutesPlayed > appearances * 130)
+    if (minutesPlayed.HasValue && minutesPlayed.Value > appearances * 130)
     {
       throw new BusinessException("Girilen oynanan dakika sayısı, çıkılan maç sayısına göre fiziksel olarak imkansız.");
     }

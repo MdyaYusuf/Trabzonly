@@ -3,11 +3,11 @@ export interface PlayerStatsResponseDto {
   id: number
   team: string
   appearances: number
-  minutesPlayed: number
+  minutesPlayed?: number | null
   goals: number
   assists: number
-  yellowCards: number
-  redCards: number
+  yellowCards?: number | null
+  redCards?: number | null
   cleanSheets: number
   goalsConceded: number
   playerId: number
@@ -50,11 +50,11 @@ export interface PlayerStatsAdminListQuery {
 export interface CreatePlayerStatsRequest {
   team: string
   appearances: number
-  minutesPlayed: number
+  minutesPlayed?: number | null
   goals: number
   assists: number
-  yellowCards: number
-  redCards: number
+  yellowCards?: number | null
+  redCards?: number | null
   cleanSheets: number
   goalsConceded: number
   playerId: number
@@ -65,11 +65,11 @@ export interface UpdatePlayerStatsRequest {
   id: number
   team: string
   appearances: number
-  minutesPlayed: number
+  minutesPlayed?: number | null
   goals: number
   assists: number
-  yellowCards: number
-  redCards: number
+  yellowCards?: number | null
+  redCards?: number | null
   cleanSheets: number
   goalsConceded: number
   playerId: number

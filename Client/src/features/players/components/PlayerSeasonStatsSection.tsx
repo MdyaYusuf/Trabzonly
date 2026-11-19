@@ -11,15 +11,21 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
   const seasonLabel = stats?.seasonName?.trim() || 'Güncel Sezon'
   const teamLabel = stats?.team?.trim() || player.currentTeam?.trim() || '—'
   const appearances = stats?.appearances ?? 0
-  const minutes = stats?.minutesPlayed ?? 0
+  const minutes = stats?.minutesPlayed
   const goals = stats?.goals ?? 0
   const assists = stats?.assists ?? 0
   const cleanSheets = stats?.cleanSheets ?? 0
-  const yellowCards = stats?.yellowCards ?? 0
-  const redCards = stats?.redCards ?? 0
+  const yellowCards = stats?.yellowCards
+  const redCards = stats?.redCards
   const goalsConceded = stats?.goalsConceded ?? 0
   const contribution = goals + assists
-  const minutesPerGoal = goals > 0 ? Math.round(minutes / goals) : null
+  const minutesPerGoal =
+    goals > 0 && minutes != null ? Math.round(minutes / goals) : null
+  const minutesLabel = minutes != null ? String(minutes) : '—'
+  const yellowLabel = yellowCards != null ? String(yellowCards) : '—'
+  const redLabel = redCards != null ? String(redCards) : '—'
+  const minutesPerAppearance =
+    appearances > 0 && minutes != null ? Math.round(minutes / appearances) : null
 
   return (
     <section className="flex flex-col gap-space-lg bg-surface-container-lowest p-space-lg shadow-sm">
@@ -59,7 +65,7 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
                 </span>
               </div>
               <span className="font-body text-[12px] text-on-surface-variant">
-                {minutes.toLocaleString('tr-TR')} Dakika
+                {minutes != null ? `${minutes.toLocaleString('tr-TR')} Dakika` : '—'}
               </span>
             </div>
 
@@ -133,11 +139,13 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
               </span>
               <div className="my-space-xs">
                 <span className="font-stat text-stat-counter font-extrabold text-primary">
-                  {minutes.toLocaleString('tr-TR')}
+                  {minutesLabel}
                 </span>
               </div>
               <span className="font-body text-[12px] text-on-surface-variant">
-                {appearances > 0 ? `Maç başı ${Math.round(minutes / appearances)} dk` : '—'}
+                {minutesPerAppearance != null
+                  ? `Maç başı ${minutesPerAppearance} dk`
+                  : '—'}
               </span>
             </div>
           </div>
@@ -149,10 +157,10 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
               </span>
               <div className="flex items-center gap-space-xs">
                 <span className="bg-tertiary-fixed px-2 py-0.5 text-[12px] font-bold text-tertiary">
-                  {yellowCards} Sarı
+                  {yellowLabel} Sarı
                 </span>
                 <span className="bg-error-container px-2 py-0.5 text-[12px] font-bold text-on-error-container">
-                  {redCards} Kırmızı
+                  {redLabel} Kırmızı
                 </span>
               </div>
             </div>

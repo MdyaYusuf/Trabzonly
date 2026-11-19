@@ -1474,13 +1474,13 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("GoalsConceded")
                         .HasColumnType("int");
 
-                    b.Property<int>("MinutesPlayed")
+                    b.Property<int?>("MinutesPlayed")
                         .HasColumnType("int");
 
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RedCards")
+                    b.Property<int?>("RedCards")
                         .HasColumnType("int");
 
                     b.Property<int>("SeasonId")
@@ -1495,7 +1495,7 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("UpdatedDate");
 
-                    b.Property<int>("YellowCards")
+                    b.Property<int?>("YellowCards")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

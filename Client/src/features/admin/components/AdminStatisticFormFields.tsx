@@ -166,9 +166,7 @@ export function AdminStatisticFormFields({
             />
           </div>
           <div>
-            <FieldLabel htmlFor="minutes" required>
-              Oynanan Dakika
-            </FieldLabel>
+            <FieldLabel htmlFor="minutes">Oynanan Dakika</FieldLabel>
             <input
               id="minutes"
               type="number"

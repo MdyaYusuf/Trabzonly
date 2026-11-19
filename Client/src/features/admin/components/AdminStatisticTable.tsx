@@ -88,12 +88,12 @@ export function AdminStatisticTable({
                 </td>
                 <td className="px-space-sm py-space-sm">
                   <span className="font-label bg-tertiary-fixed px-space-sm py-0.5 text-label-md text-on-tertiary-fixed-variant tabular-nums">
-                    {row.yellowCards}
+                    {row.yellowCards != null ? row.yellowCards : '—'}
                   </span>
                 </td>
                 <td className="px-space-sm py-space-sm">
                   <span className="font-label bg-error-container px-space-sm py-0.5 text-label-md text-on-error-container tabular-nums">
-                    {row.redCards}
+                    {row.redCards != null ? row.redCards : '—'}
                   </span>
                 </td>
                 <td className="font-label px-space-sm py-space-sm text-label-md tabular-nums">

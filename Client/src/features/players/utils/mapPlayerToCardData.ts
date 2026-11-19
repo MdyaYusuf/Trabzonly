@@ -30,7 +30,7 @@ export function positionGroupFromZone(zone: PositionZone): PositionGroup {
 function buildCardStats(player: PlayerResponseDto): PlayerCardStat[] {
   const stats = player.currentSeasonStats
   const group = positionGroupFromZone(player.positionZone)
-  const minutes = String(stats?.minutesPlayed ?? 0)
+  const minutes = stats?.minutesPlayed != null ? String(stats.minutesPlayed) : '—'
 
   if (group === 'gk' || group === 'def') {
     return [

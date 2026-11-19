@@ -19,11 +19,11 @@ export type AdminStatisticListRow = {
   team: string
   matches: number
   minutesLabel: string
-  minutes: number
+  minutes: number | null
   goals: number
   assists: number
-  yellowCards: number
-  redCards: number
+  yellowCards: number | null
+  redCards: number | null
   cleanSheets: number
   goalsConceded: number
   initials: string

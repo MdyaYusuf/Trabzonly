@@ -14,7 +14,9 @@ public class CreatePlayerStatsRequestValidator : AbstractValidator<CreatePlayerS
       .GreaterThanOrEqualTo(0).WithMessage("Maça çıkma sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.MinutesPlayed)
-      .GreaterThanOrEqualTo(0).WithMessage("Oynanan dakika 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.MinutesPlayed.HasValue)
+      .WithMessage("Oynanan dakika 0'dan küçük olamaz.");
 
     RuleFor(s => s.Goals)
       .GreaterThanOrEqualTo(0).WithMessage("Gol sayısı 0'dan küçük olamaz.");
@@ -23,10 +25,14 @@ public class CreatePlayerStatsRequestValidator : AbstractValidator<CreatePlayerS
       .GreaterThanOrEqualTo(0).WithMessage("Asist sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.YellowCards)
-      .GreaterThanOrEqualTo(0).WithMessage("Sarı kart sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.YellowCards.HasValue)
+      .WithMessage("Sarı kart sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.RedCards)
-      .GreaterThanOrEqualTo(0).WithMessage("Kırmızı kart sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.RedCards.HasValue)
+      .WithMessage("Kırmızı kart sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.CleanSheets)
       .GreaterThanOrEqualTo(0).WithMessage("Gol yemeden bitirilen maç sayısı 0'dan küçük olamaz.");
@@ -57,7 +63,9 @@ public class UpdatePlayerStatsRequestValidator : AbstractValidator<UpdatePlayerS
       .GreaterThanOrEqualTo(0).WithMessage("Maça çıkma sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.MinutesPlayed)
-      .GreaterThanOrEqualTo(0).WithMessage("Oynanan dakika 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.MinutesPlayed.HasValue)
+      .WithMessage("Oynanan dakika 0'dan küçük olamaz.");
 
     RuleFor(s => s.Goals)
       .GreaterThanOrEqualTo(0).WithMessage("Gol sayısı 0'dan küçük olamaz.");
@@ -66,10 +74,14 @@ public class UpdatePlayerStatsRequestValidator : AbstractValidator<UpdatePlayerS
       .GreaterThanOrEqualTo(0).WithMessage("Asist sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.YellowCards)
-      .GreaterThanOrEqualTo(0).WithMessage("Sarı kart sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.YellowCards.HasValue)
+      .WithMessage("Sarı kart sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.RedCards)
-      .GreaterThanOrEqualTo(0).WithMessage("Kırmızı kart sayısı 0'dan küçük olamaz.");
+      .GreaterThanOrEqualTo(0)
+      .When(s => s.RedCards.HasValue)
+      .WithMessage("Kırmızı kart sayısı 0'dan küçük olamaz.");
 
     RuleFor(s => s.CleanSheets)
       .GreaterThanOrEqualTo(0).WithMessage("Gol yemeden bitirilen maç sayısı 0'dan küçük olamaz.");
