@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import playerService from '../playerService'
-import type { PlayerResponseDto, PlayerPositionGroup } from '../playerTypes'
+import {
+  PlayerCategory,
+  type PlayerResponseDto,
+  type PlayerPositionGroup,
+} from '../playerTypes'
 import { formatMarketValue } from '../utils/formatMarketValue'
-import { positionGroupFromZone } from '../utils/mapPlayerToCardData'
+import { LEGEND_TEAM_LABEL, positionGroupFromZone } from '../utils/mapPlayerToCardData'
 import type { PositionGroup } from '../utils/playerDirectoryTypes'
 import { PlayerCareerArchive } from './PlayerCareerArchive'
 import { PlayerPollCard } from './PlayerPollCard'
@@ -90,6 +94,7 @@ function positionGroupLabel(group: PositionGroup): string {
 
 export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
   const group = positionGroupFromZone(player.positionZone)
+  const isLegend = player.category === PlayerCategory.Legend
   const [peers, setPeers] = useState<PlayerResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -103,6 +108,7 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
         pageNumber: 1,
         pageSize: 50,
         positionGroup: toListPositionGroup(group),
+        category: player.category,
         sort: 'rating-desc',
       })
 
@@ -124,7 +130,7 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
     return () => {
       cancelled = true
     }
-  }, [group])
+  }, [group, player.category])
 
   const groupPeers = peers.filter((peer) => peer.id !== player.id)
   const rivals = [...groupPeers]
@@ -135,6 +141,12 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
   const marketAvg = averageMarketValue(groupForAverages)
   const ratingAvg = averageRating(groupForAverages)
   const groupLabel = positionGroupLabel(group)
+  const peersHeading =
+    player.category === PlayerCategory.Legend
+      ? 'Diğer Efsaneler'
+      : player.category === PlayerCategory.TransferTarget
+        ? 'Diğer Transfer Hedefleri'
+        : 'Pozisyonundaki Diğer Oyuncular'
 
   return (
     <aside className="flex flex-col gap-space-lg lg:col-span-4">
@@ -144,7 +156,7 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
         <div className="flex items-center gap-space-xs">
           <span className="material-symbols-outlined text-lg text-secondary">compare_arrows</span>
           <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
-            Pozisyon Kıyası · {groupLabel}
+            {isLegend ? `Efsane Kıyası · ${groupLabel}` : `Pozisyon Kıyası · ${groupLabel}`}
           </span>
         </div>
 
@@ -152,20 +164,31 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
           <p className="font-body text-body-sm text-on-surface-variant">Kadro verisi yükleniyor...</p>
         ) : (
           <div className="grid grid-cols-2 gap-space-sm">
-            <div className="bg-surface-container-low p-space-sm">
-              <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
-                Piyasa Değeri
-              </span>
-              <span className="font-headline block text-headline-sm font-bold text-primary">
-                {player.marketValue != null
-                  ? formatMarketValue(player.marketValue)
-                  : '—'}
-              </span>
-              <span className="font-body mt-1 block text-[12px] text-on-surface-variant">
-                Grup ort.{' '}
-                {marketAvg != null ? formatMarketValue(Math.round(marketAvg)) : '—'}
-              </span>
-            </div>
+            {isLegend ? (
+              <div className="bg-surface-container-low p-space-sm">
+                <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
+                  Kulüp
+                </span>
+                <span className="font-headline block text-headline-sm font-bold text-primary">
+                  {LEGEND_TEAM_LABEL}
+                </span>
+              </div>
+            ) : (
+              <div className="bg-surface-container-low p-space-sm">
+                <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
+                  Piyasa Değeri
+                </span>
+                <span className="font-headline block text-headline-sm font-bold text-primary">
+                  {player.marketValue != null
+                    ? formatMarketValue(player.marketValue)
+                    : '—'}
+                </span>
+                <span className="font-body mt-1 block text-[12px] text-on-surface-variant">
+                  Grup ort.{' '}
+                  {marketAvg != null ? formatMarketValue(Math.round(marketAvg)) : '—'}
+                </span>
+              </div>
+            )}
             <div className="bg-surface-container-low p-space-sm">
               <span className="font-kicker mb-1 block text-kicker text-on-surface-variant uppercase">
                 Ortalama Puan
@@ -185,7 +208,7 @@ export function PlayerDetailSidebar({ player }: PlayerDetailSidebarProps) {
         <div className="flex items-center gap-space-xs">
           <span className="material-symbols-outlined text-lg text-secondary">groups</span>
           <span className="font-headline text-label-md font-bold tracking-wider text-primary uppercase">
-            Pozisyonundaki Diğer Oyuncular
+            {peersHeading}
           </span>
         </div>
 

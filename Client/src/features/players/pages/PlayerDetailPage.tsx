@@ -10,7 +10,19 @@ import { PlayerDetailSidebar } from '../components/PlayerDetailSidebar'
 import { PlayerInjurySection } from '../components/PlayerInjurySection'
 import { PlayerSeasonStatsSection } from '../components/PlayerSeasonStatsSection'
 import playerService from '../playerService'
-import type { PlayerResponseDto } from '../playerTypes'
+import { PlayerCategory, type PlayerResponseDto } from '../playerTypes'
+
+function categoryBreadcrumbLabel(category: PlayerCategory): string {
+  if (category === PlayerCategory.Legend) {
+    return 'Efsaneler'
+  }
+
+  if (category === PlayerCategory.TransferTarget) {
+    return 'Transfer Hedefleri'
+  }
+
+  return 'Kadro'
+}
 
 export function PlayerDetailPage() {
   const { playerId } = useParams<{ playerId: string }>()
@@ -97,7 +109,10 @@ export function PlayerDetailPage() {
 
   return (
     <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-      <PlayerDetailBreadcrumb playerName={player.name} />
+      <PlayerDetailBreadcrumb
+        playerName={player.name}
+        categoryLabel={categoryBreadcrumbLabel(player.category)}
+      />
       <PlayerDetailHero player={player} />
       <PlayerDetailRatingBar
         playerId={player.id}

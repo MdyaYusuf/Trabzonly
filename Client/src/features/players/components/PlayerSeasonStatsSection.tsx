@@ -1,5 +1,5 @@
-import type { PlayerResponseDto } from '../playerTypes'
-import { positionGroupFromZone } from '../utils/mapPlayerToCardData'
+import { PlayerCategory, type PlayerResponseDto } from '../playerTypes'
+import { LEGEND_TEAM_LABEL, positionGroupFromZone } from '../utils/mapPlayerToCardData'
 
 type PlayerSeasonStatsSectionProps = {
   player: PlayerResponseDto
@@ -8,8 +8,14 @@ type PlayerSeasonStatsSectionProps = {
 export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionProps) {
   const stats = player.currentSeasonStats
   const group = positionGroupFromZone(player.positionZone)
-  const seasonLabel = stats?.seasonName?.trim() || 'Güncel Sezon'
-  const teamLabel = stats?.team?.trim() || player.currentTeam?.trim() || '—'
+  const isLegend = player.category === PlayerCategory.Legend
+  const seasonLabel =
+    stats?.seasonName?.trim() ||
+    (isLegend ? 'Kariyer' : 'Güncel Sezon')
+  const teamLabel = isLegend
+    ? stats?.team?.trim() || LEGEND_TEAM_LABEL
+    : stats?.team?.trim() || player.currentTeam?.trim() || '—'
+  const sectionTitle = isLegend ? 'KARİYER İSTATİSTİKLERİ' : 'SEZON İSTATİSTİKLERİ'
   const appearances = stats?.appearances ?? 0
   const minutes = stats?.minutesPlayed
   const goals = stats?.goals ?? 0
@@ -35,7 +41,7 @@ export function PlayerSeasonStatsSection({ player }: PlayerSeasonStatsSectionPro
             DETAYLI ANALİZ &amp; PERFORMANS
           </span>
           <h2 className="font-headline text-headline-md font-bold tracking-tight text-primary">
-            SEZON İSTATİSTİKLERİ
+            {sectionTitle}
           </h2>
         </div>
         <div className="flex flex-wrap items-center gap-space-xs">

@@ -4,6 +4,7 @@ using Api.Core.Repositories;
 using Api.Core.Responses;
 using Api.Features.Positions;
 using Api.Features.Seasons;
+using Api.Features.Stats;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,12 +62,12 @@ public class PlayerService(
   {
     int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
     int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 50);
-    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? statsSeasonId = await ResolveStatsSeasonIdAsync(query.Category, cancellationToken);
 
     return await GetAllAsync(
       filter: BuildListFilter(query),
-      include: BuildDefaultInclude(currentSeasonId),
-      orderBy: BuildListOrderBy(query.Sort, currentSeasonId),
+      include: BuildDefaultInclude(statsSeasonId),
+      orderBy: BuildListOrderBy(query.Sort, statsSeasonId),
       pageNumber: pageNumber,
       pageSize: pageSize,
       cancellationToken: cancellationToken);
@@ -78,12 +79,12 @@ public class PlayerService(
   {
     int pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
     int pageSize = query.PageSize < 1 ? 12 : Math.Min(query.PageSize, 50);
-    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
+    int? statsSeasonId = await ResolveStatsSeasonIdAsync(query.Category, cancellationToken);
 
     return await GetAllAsync(
       filter: BuildAdminListFilter(query),
-      include: BuildDefaultInclude(currentSeasonId),
-      orderBy: BuildListOrderBy(query.Sort, currentSeasonId),
+      include: BuildDefaultInclude(statsSeasonId),
+      orderBy: BuildListOrderBy(query.Sort, statsSeasonId),
       pageNumber: pageNumber,
       pageSize: pageSize,
       cancellationToken: cancellationToken);
@@ -113,13 +114,16 @@ public class PlayerService(
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
-    int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
-
     Player player = await _businessRules.GetPlayerIfExistAsync(
       id,
-      include: include ?? BuildDefaultInclude(currentSeasonId),
+      include: include ?? (query => query
+        .Include(p => p.Position)
+        .Include(p => p.Stats)
+          .ThenInclude(s => s.Season)),
       enableTracking,
       cancellationToken);
+
+    int? preferredSeasonId = await ResolveStatsSeasonIdAsync(player.Category, cancellationToken);
 
     decimal? currentUserScore = null;
 
@@ -133,7 +137,10 @@ public class PlayerService(
       currentUserScore = rating?.Score;
     }
 
-    PlayerResponseDto response = (await MapPlayersAsync([player], cancellationToken))[0]
+    PlayerResponseDto response = (await MapPlayersAsync(
+      [player],
+      cancellationToken,
+      preferredSeasonId))[0]
       with
     { CurrentUserScore = currentUserScore };
 
@@ -477,6 +484,23 @@ public class PlayerService(
     return seasons.FirstOrDefault()?.Id;
   }
 
+  private async Task<int?> ResolveStatsSeasonIdAsync(
+    PlayerCategory category,
+    CancellationToken cancellationToken)
+  {
+    if (category == PlayerCategory.Legend)
+    {
+      Season? kariyer = await _seasonRepository.GetAsync(
+        predicate: s => s.Name == "Kariyer",
+        enableTracking: false,
+        cancellationToken: cancellationToken);
+
+      return kariyer?.Id;
+    }
+
+    return await ResolveCurrentSeasonIdAsync(cancellationToken);
+  }
+
   private static Func<IQueryable<Player>, IQueryable<Player>> BuildDefaultInclude(int? currentSeasonId)
   {
     if (currentSeasonId.HasValue)
@@ -555,7 +579,8 @@ public class PlayerService(
 
   private async Task<List<PlayerResponseDto>> MapPlayersAsync(
     List<Player> players,
-    CancellationToken cancellationToken)
+    CancellationToken cancellationToken,
+    int? preferredSeasonId = null)
   {
     if (players.Count == 0)
     {
@@ -574,7 +599,7 @@ public class PlayerService(
     {
       PlayerResponseDto mapped = _mapper.EntityToResponseDto(player);
       PlayerSeasonStatsDto? seasonStats = null;
-      var stats = player.Stats.FirstOrDefault();
+      PlayerStats? stats = PickSeasonStats(player, preferredSeasonId);
 
       if (stats != null)
       {
@@ -599,5 +624,31 @@ public class PlayerService(
         PositionZone = player.Position?.Zone ?? mapped.PositionZone
       };
     }).ToList();
+  }
+
+  private static PlayerStats? PickSeasonStats(Player player, int? preferredSeasonId)
+  {
+    if (preferredSeasonId.HasValue)
+    {
+      PlayerStats? preferred = player.Stats.FirstOrDefault(s => s.SeasonId == preferredSeasonId.Value);
+
+      if (preferred != null)
+      {
+        return preferred;
+      }
+    }
+
+    if (player.Category == PlayerCategory.Legend)
+    {
+      PlayerStats? kariyer = player.Stats.FirstOrDefault(
+        s => s.Season != null && s.Season.Name == "Kariyer");
+
+      if (kariyer != null)
+      {
+        return kariyer;
+      }
+    }
+
+    return player.Stats.FirstOrDefault();
   }
 }

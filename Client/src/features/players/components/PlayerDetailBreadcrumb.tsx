@@ -4,9 +4,13 @@ import { PageBreadcrumbHome } from '@/core/components/PageBreadcrumbHome'
 
 type PlayerDetailBreadcrumbProps = {
   playerName: string
+  categoryLabel?: string
 }
 
-export function PlayerDetailBreadcrumb({ playerName }: PlayerDetailBreadcrumbProps) {
+export function PlayerDetailBreadcrumb({
+  playerName,
+  categoryLabel = 'Oyuncular',
+}: PlayerDetailBreadcrumbProps) {
   return (
     <div className="w-full border-b border-border-subtle bg-surface-container-low">
       <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-space-md px-4 py-space-sm sm:px-6 lg:px-12">
@@ -18,7 +22,7 @@ export function PlayerDetailBreadcrumb({ playerName }: PlayerDetailBreadcrumbPro
           <PageBreadcrumbHome />
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <Link to="/oyuncular" className="transition-colors hover:text-primary">
-            Oyuncular
+            {categoryLabel}
           </Link>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="font-bold text-primary">{playerName}</span>

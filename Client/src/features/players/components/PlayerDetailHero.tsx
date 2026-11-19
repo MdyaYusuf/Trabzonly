@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { PlayerCategory, type PlayerResponseDto } from '../playerTypes'
 import { formatMarketValue } from '../utils/formatMarketValue'
+import { LEGEND_TEAM_LABEL } from '../utils/mapPlayerToCardData'
 import { getNationalityFlagUrl } from '../utils/nationalityFlag'
-import type { PlayerResponseDto } from '../playerTypes'
 
 const CARD_TONES = [
   'from-[#5A0E27] to-[#1A040B]',
@@ -51,19 +52,75 @@ function formatVoteCount(count: number) {
   return count.toLocaleString('tr-TR')
 }
 
+function resolveTeamLabel(player: PlayerResponseDto): string {
+  if (player.category === PlayerCategory.Legend) {
+    return LEGEND_TEAM_LABEL
+  }
+
+  return player.currentTeam?.trim() || '—'
+}
+
+function resolveRosterBadge(player: PlayerResponseDto): { label: string; active: boolean } {
+  if (player.category === PlayerCategory.Legend) {
+    return { label: 'Efsane', active: player.isActive }
+  }
+
+  if (player.category === PlayerCategory.TransferTarget) {
+    return { label: 'Transfer Hedefi', active: player.isActive }
+  }
+
+  return {
+    label: player.isActive ? 'Aktif Kadro' : 'Pasif',
+    active: player.isActive,
+  }
+}
+
+function resolveBandLabel(player: PlayerResponseDto): string {
+  if (player.category === PlayerCategory.Legend) {
+    return `EFSANE ${player.positionName.toUpperCase()}`
+  }
+
+  if (player.category === PlayerCategory.TransferTarget) {
+    return `HEDEF ${player.positionName.toUpperCase()}`
+  }
+
+  return `A TAKIM ${player.positionName.toUpperCase()}`
+}
+
+function resolveSeasonLabel(player: PlayerResponseDto): string {
+  const seasonName = player.currentSeasonStats?.seasonName?.trim()
+
+  if (seasonName) {
+    return seasonName
+  }
+
+  if (player.category === PlayerCategory.Legend) {
+    return 'Kariyer'
+  }
+
+  return '—'
+}
+
 type PlayerDetailHeroProps = {
   player: PlayerResponseDto
 }
 
 export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
   const [flagFailed, setFlagFailed] = useState(false)
+  const isLegend = player.category === PlayerCategory.Legend
   const tone = CARD_TONES[player.name.length % CARD_TONES.length]
   const shirtLabel =
     player.shirtNumber != null && player.shirtNumber > 0 ? `#${player.shirtNumber}` : '—'
-  const positionLabel = `${player.positionName.toUpperCase()} / NO: ${player.shirtNumber != null && player.shirtNumber > 0 ? player.shirtNumber : '—'
-    }`
+  const positionLabel = `${player.positionName.toUpperCase()} / NO: ${
+    player.shirtNumber != null && player.shirtNumber > 0 ? player.shirtNumber : '—'
+  }`
   const flagUrl = getNationalityFlagUrl(player.nationality)
   const showFlag = !player.imageUrl && Boolean(flagUrl) && !flagFailed
+  const teamLabel = resolveTeamLabel(player)
+  const rosterBadge = resolveRosterBadge(player)
+  const bandLabel = resolveBandLabel(player)
+  const seasonLabel = resolveSeasonLabel(player)
+  const description = player.description?.trim()
 
   return (
     <>
@@ -108,7 +165,7 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent" />
                 <div className="absolute right-space-md bottom-space-md left-space-md flex items-center justify-between bg-primary/90 px-space-sm py-space-xs backdrop-blur-md">
                   <span className="font-kicker text-kicker tracking-widest text-secondary-container uppercase">
-                    A TAKIM {player.positionName.toUpperCase()}
+                    {bandLabel}
                   </span>
                   <span className="font-label flex items-center gap-1 text-label-md font-bold text-tertiary-fixed-dim uppercase">
                     <span
@@ -117,7 +174,7 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
                     >
                       verified
                     </span>
-                    {player.isActive ? 'Aktif Kadro' : 'Pasif'}
+                    {rosterBadge.label}
                   </span>
                 </div>
               </div>
@@ -127,12 +184,13 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
               <div className="flex flex-col gap-space-sm">
                 <div className="font-label flex flex-wrap items-center gap-space-sm text-label-md font-semibold tracking-wider text-on-primary uppercase">
                   <span>
-                    <span className="text-tertiary-fixed-dim">SEZON:</span>{' '}
-                    {player.currentSeasonStats?.seasonName?.trim() || '—'}
+                    <span className="text-tertiary-fixed-dim">
+                      {isLegend ? 'DÖNEM:' : 'SEZON:'}
+                    </span>{' '}
+                    {seasonLabel}
                   </span>
                   <span>
-                    <span className="text-tertiary-fixed-dim">TAKIM:</span>{' '}
-                    {player.currentTeam?.trim() || '—'}
+                    <span className="text-tertiary-fixed-dim">TAKIM:</span> {teamLabel}
                   </span>
                 </div>
 
@@ -145,6 +203,16 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
                       <span className="flex items-center gap-1 bg-tertiary-container px-space-sm py-space-xs font-kicker text-kicker font-bold text-tertiary-fixed-dim uppercase">
                         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-tertiary-fixed-dim" />
                         KAPTAN
+                      </span>
+                    ) : null}
+                    {player.category === PlayerCategory.Legend ? (
+                      <span className="bg-primary-container px-space-sm py-space-xs font-kicker text-kicker font-bold tracking-wider text-on-primary uppercase">
+                        EFSANE
+                      </span>
+                    ) : null}
+                    {player.category === PlayerCategory.TransferTarget ? (
+                      <span className="bg-secondary-container px-space-sm py-space-xs font-kicker text-kicker font-bold tracking-wider text-on-secondary-container uppercase">
+                        HEDEF
                       </span>
                     ) : null}
                   </div>
@@ -178,29 +246,55 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
                   <h1 className="-ml-1 font-display text-display-xl-mobile leading-none font-black tracking-tight text-on-primary uppercase sm:text-display-xl">
                     {player.name}
                   </h1>
+                  {description ? (
+                    <p className="font-body mt-space-sm max-w-3xl text-body-md text-on-primary/85">
+                      {description}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
               <div className="flex flex-wrap items-stretch gap-space-sm bg-primary-container/80 p-space-sm sm:p-space-md">
                 <div className="grid min-w-0 flex-1 grid-cols-2 gap-space-sm sm:grid-cols-3">
+                  {!isLegend ? (
+                    <div>
+                      <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
+                        Piyasa Değeri
+                      </span>
+                      <span className="font-headline text-headline-md font-bold text-tertiary-fixed-dim">
+                        {player.marketValue != null
+                          ? formatMarketValue(player.marketValue)
+                          : '—'}
+                      </span>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
+                        Kulüp
+                      </span>
+                      <span className="font-headline text-headline-sm font-bold text-tertiary-fixed-dim">
+                        {LEGEND_TEAM_LABEL}
+                      </span>
+                    </div>
+                  )}
                   <div>
                     <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
-                      Piyasa Değeri
+                      {isLegend ? 'Doğum Tarihi' : 'Yaş / Doğum'}
                     </span>
-                    <span className="font-headline text-headline-md font-bold text-tertiary-fixed-dim">
-                      {player.marketValue != null ? formatMarketValue(player.marketValue) : '—'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
-                      Yaş / Doğum
-                    </span>
-                    <span className="font-headline text-headline-md font-bold text-on-primary">
-                      {player.age} Yaş
-                    </span>
-                    <span className="font-body block text-[11px] text-on-primary/60">
-                      {formatBirthDate(player.dateOfBirth)}
-                    </span>
+                    {isLegend ? (
+                      <span className="font-headline text-headline-md font-bold text-on-primary">
+                        {formatBirthDate(player.dateOfBirth)}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="font-headline text-headline-md font-bold text-on-primary">
+                          {player.age} Yaş
+                        </span>
+                        <span className="font-body block text-[11px] text-on-primary/60">
+                          {formatBirthDate(player.dateOfBirth)}
+                        </span>
+                      </>
+                    )}
                   </div>
                   <div>
                     <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
