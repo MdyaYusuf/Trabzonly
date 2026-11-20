@@ -1,4 +1,4 @@
-import { apiClient } from '../../core/api/apiClient'
+import { apiClient, apiClientResult } from '../../core/api/apiClient'
 import type { ApiResponse, NoData, PagedResponse, CursorPagedResponse } from '../../core/types/ApiResponse'
 import type {
   SquadResponseDto,
@@ -31,7 +31,9 @@ const getAll = async (
 }
 
 const getById = async (id: string): Promise<ApiResponse<SquadResponseDto>> => {
-  return await apiClient<SquadResponseDto>(`${API_URL}/${id}`)
+  return await apiClientResult<SquadResponseDto>(`${API_URL}/${id}`, {
+    silentNotFound: true,
+  })
 }
 
 const getRecent = async (

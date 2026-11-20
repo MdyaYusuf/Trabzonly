@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useAppSelector } from '@/core/store/hooks'
 import { authService } from '@/features/auth/authService'
+import { ContentNotFoundPage } from '@/features/status/pages/ContentNotFoundPage'
 import { PostCommentsSection } from '../components/PostCommentsSection'
 import { PostDetailArticle } from '../components/PostDetailArticle'
 import { PostDetailBreadcrumb } from '../components/PostDetailBreadcrumb'
@@ -33,27 +34,39 @@ export function PostDetailPage() {
       setIsLoading(true)
       setNotFound(false)
 
-      await authService.ensureViewerSession()
+      try {
+        await authService.ensureViewerSession()
 
-      if (cancelled) {
-        return
-      }
+        if (cancelled) {
+          return
+        }
 
-      const result = await postService.getById(detailPostId)
+        const result = await postService.getById(detailPostId)
 
-      if (cancelled) {
-        return
-      }
+        if (cancelled) {
+          return
+        }
 
-      if (!result.success || !result.data) {
+        if (!result.success || !result.data) {
+          setPost(null)
+          setNotFound(true)
+          return
+        }
+
+        setPost(result.data)
+        setNotFound(false)
+      } catch {
+        if (cancelled) {
+          return
+        }
+
         setPost(null)
         setNotFound(true)
-        setIsLoading(false)
-        return
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
-
-      setPost(result.data)
-      setIsLoading(false)
     }
 
     void loadPost()
@@ -75,16 +88,11 @@ export function PostDetailPage() {
 
   if (notFound || !post) {
     return (
-      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-        <div className="mx-auto max-w-[1360px] px-4 py-space-xl text-center sm:px-6 lg:px-12">
-          <p className="font-body mb-space-md text-body-md text-on-surface-variant">
-            Gönderi bulunamadı.
-          </p>
-          <Link to="/gonderiler" className="font-label font-bold text-primary uppercase">
-            Gönderilere dön
-          </Link>
-        </div>
-      </main>
+      <ContentNotFoundPage
+        secondaryTo="/gonderiler"
+        secondaryLabel="Gönderilere Göz At"
+        secondaryIcon="article"
+      />
     )
   }
 

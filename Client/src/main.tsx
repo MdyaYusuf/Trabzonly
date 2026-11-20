@@ -55,11 +55,17 @@ import { TakeQuizPage } from '@/features/quizzes/pages/TakeQuizPage'
 import { QuizResultPage } from '@/features/quizzes/pages/QuizResultPage'
 import { CommunityRulesPage } from '@/features/community/pages/CommunityRulesPage'
 import { MatchWeekPage } from '@/features/matchWeek/pages/MatchWeekPage'
+import { ForbiddenPage } from '@/features/status/pages/ForbiddenPage'
+import { NotFoundPage } from '@/features/status/pages/NotFoundPage'
+import { ContentNotFoundPage } from '@/features/status/pages/ContentNotFoundPage'
+import { ServerErrorPage } from '@/features/status/pages/ServerErrorPage'
+import { StatusErrorBoundary } from '@/features/status/pages/StatusErrorBoundary'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    errorElement: <StatusErrorBoundary />,
     children: [
       {
         element: <PublicLayout />,
@@ -87,6 +93,22 @@ const router = createBrowserRouter([
           {
             path: 'topluluk-kurallari',
             element: <CommunityRulesPage />,
+          },
+          {
+            path: 'erisim-yok',
+            element: <ForbiddenPage />,
+          },
+          {
+            path: 'sayfa-bulunamadi',
+            element: <NotFoundPage />,
+          },
+          {
+            path: 'icerik-bulunamadi',
+            element: <ContentNotFoundPage />,
+          },
+          {
+            path: 'sunucu-hatasi',
+            element: <ServerErrorPage />,
           },
           {
             path: 'oyuncular',
@@ -148,6 +170,10 @@ const router = createBrowserRouter([
             path: 'mac-haftasi',
             element: <MatchWeekPage />,
           },
+          {
+            path: '*',
+            element: <NotFoundPage />,
+          },
         ],
       },
       {
@@ -169,8 +195,11 @@ const router = createBrowserRouter([
         ],
       },
       {
-        element: <AdminLayout />,
+        element: <ProtectedRoute allowedRoles={['Admin']} />,
         children: [
+          {
+            element: <AdminLayout />,
+            children: [
           {
             path: 'yonetim',
             element: <AdminHubPage />,
@@ -341,12 +370,8 @@ const router = createBrowserRouter([
             path: 'yonetim/roller/:roleId/duzenle',
             element: <AdminRoleCreateEditPage mode="edit" />,
           },
-        ],
-      },
-      {
-        element: <ProtectedRoute allowedRoles={['Admin']} />,
-        children: [
-          // Admin-only routes (API-backed)
+            ],
+          },
         ],
       },
     ],

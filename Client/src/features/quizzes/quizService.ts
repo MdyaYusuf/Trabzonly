@@ -1,4 +1,4 @@
-import { apiClient } from '../../core/api/apiClient'
+import { apiClient, apiClientResult } from '../../core/api/apiClient'
 import type { ApiResponse, NoData, PagedResponse } from '../../core/types/ApiResponse'
 import type {
   QuizResponseDto,
@@ -43,7 +43,9 @@ const getActiveList = async (
 }
 
 const getTake = async (id: string): Promise<ApiResponse<QuizTakeDto>> => {
-  return await apiClient<QuizTakeDto>(`${API_URL}/${id}/take`)
+  return await apiClientResult<QuizTakeDto>(`${API_URL}/${id}/take`, {
+    silentNotFound: true,
+  })
 }
 
 const checkAnswer = async (

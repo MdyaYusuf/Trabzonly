@@ -20,13 +20,45 @@ function isPublicAuthPath(pathname: string = window.location.pathname): boolean 
 export type ApiClientOptions = RequestInit & {
   /** Skip success toast for mutating requests (errors still toast). */
   silentSuccess?: boolean;
+  /** Skip 404 warning toast when the caller shows its own not-found UI. */
+  silentNotFound?: boolean;
 };
+
+function isApiResponse<T>(error: unknown): error is ApiResponse<T> {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'success' in error &&
+    'statusCode' in error
+  )
+}
+
+/** Like apiClient, but returns failed ApiResponse instead of throwing. */
+export const apiClientResult = async <T>(
+  endpoint: string,
+  options: ApiClientOptions = {},
+): Promise<ApiResponse<T>> => {
+  try {
+    return await apiClient<T>(endpoint, options)
+  } catch (error: unknown) {
+    if (isApiResponse<T>(error)) {
+      return error
+    }
+
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'İstek başarısız.',
+      data: null,
+      statusCode: 0,
+    }
+  }
+}
 
 export const apiClient = async <T>(
   endpoint: string,
   options: ApiClientOptions = {}
 ): Promise<ApiResponse<T>> => {
-  const { silentSuccess = false, ...requestOptions } = options;
+  const { silentSuccess = false, silentNotFound = false, ...requestOptions } = options;
   const headers = new Headers(requestOptions.headers);
 
   if (!headers.has("Content-Type") && !(requestOptions.body instanceof FormData)) {
@@ -88,9 +120,13 @@ export const apiClient = async <T>(
     }
 
     if (!response.ok) {
-      handleApiError(result);
+      const skipToast = silentNotFound && response.status === 404
 
-      throw result;
+      if (!skipToast) {
+        handleApiError(result)
+      }
+
+      throw result
     }
 
     if (
@@ -104,18 +140,9 @@ export const apiClient = async <T>(
 
     return result;
   } catch (error: unknown) {
-    const isApiResponse = (err: unknown): err is ApiResponse<T> => {
-      return (
-        err !== null &&
-        typeof err === "object" &&
-        "success" in err &&
-        "statusCode" in err
-      );
-    };
-
-    if (isApiResponse(error)) {
+    if (isApiResponse<T>(error)) {
       if (!error.success) {
-        throw error;
+        throw error
       }
     }
 

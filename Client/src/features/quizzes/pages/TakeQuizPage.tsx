@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '@/core/store/hooks'
+import { ContentNotFoundPage } from '@/features/status/pages/ContentNotFoundPage'
 import { TakeQuizHeader } from '../components/TakeQuizHeader'
 import {
   TakeQuizProgress,
@@ -79,27 +80,38 @@ export function TakeQuizPage() {
       setIsLoading(true)
       setLoadError(false)
 
-      const result = await quizService.getTake(quizId!)
+      try {
+        const result = await quizService.getTake(quizId!)
 
-      if (cancelled) {
-        return
-      }
+        if (cancelled) {
+          return
+        }
 
-      if (result.success && result.data && result.data.questions.length > 0) {
-        const ordered = [...result.data.questions].sort((a, b) => a.sortOrder - b.sortOrder)
-        setQuiz({ ...result.data, questions: ordered })
-        startedAtRef.current = Date.now()
-        finishedRef.current = false
-        setCurrentIndex(0)
-        setFeedbackByQuestion({})
-        setSelectedAnswers({})
-        toast.info('Quiz başladı. Bol şans!')
-      } else {
+        if (result.success && result.data && result.data.questions.length > 0) {
+          const ordered = [...result.data.questions].sort((a, b) => a.sortOrder - b.sortOrder)
+          setQuiz({ ...result.data, questions: ordered })
+          startedAtRef.current = Date.now()
+          finishedRef.current = false
+          setCurrentIndex(0)
+          setFeedbackByQuestion({})
+          setSelectedAnswers({})
+          toast.info('Quiz başladı. Bol şans!')
+        } else {
+          setQuiz(null)
+          setLoadError(true)
+        }
+      } catch {
+        if (cancelled) {
+          return
+        }
+
         setQuiz(null)
         setLoadError(true)
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
-
-      setIsLoading(false)
     }
 
     void loadQuiz()
@@ -271,22 +283,11 @@ export function TakeQuizPage() {
 
   if (loadError || !quiz || !question) {
     return (
-      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-        <div className="mx-auto flex max-w-[1360px] flex-col gap-space-md px-4 py-space-xl sm:px-6 lg:px-12">
-          <p className="font-body text-body-md text-on-surface-variant">
-            Quiz yüklenemedi veya artık aktif değil.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              navigate('/quizler')
-            }}
-            className="font-label w-fit bg-primary-container px-space-md py-space-sm text-label-md font-bold text-on-primary uppercase"
-          >
-            Quiz listesine dön
-          </button>
-        </div>
-      </main>
+      <ContentNotFoundPage
+        secondaryTo="/quizler"
+        secondaryLabel="Quizlere Göz At"
+        secondaryIcon="quiz"
+      />
     )
   }
 

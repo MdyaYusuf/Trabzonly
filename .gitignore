@@ -472,6 +472,7 @@ trabzonly-quiz.json
 
 # Vite / frontend (merged from Client/.gitignore)
 **/dist-ssr/
+*.local
 *.ntvs*
 *.njsproj
 *.sw?
@@ -502,6 +503,3 @@ lerna-debug.log*
 
 # Cursor AI Indexing Exclusions
 .cursorignore
-
-# Stitch UI reference exports (local only — not used at build time)
-Client/design/

@@ -1,4 +1,4 @@
-import { apiClient } from '../../core/api/apiClient'
+import { apiClient, apiClientResult } from '../../core/api/apiClient'
 import type {
   ApiResponse,
   NoData,
@@ -113,8 +113,9 @@ const getMe = async (): Promise<ApiResponse<UserResponseDto>> => {
 const getByUsername = async (
   username: string,
 ): Promise<ApiResponse<PublicUserProfileDto>> => {
-  return await apiClient<PublicUserProfileDto>(
+  return await apiClientResult<PublicUserProfileDto>(
     `${API_URL}/by-username/${encodeURIComponent(username)}`,
+    { silentNotFound: true },
   )
 }
 

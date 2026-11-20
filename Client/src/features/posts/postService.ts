@@ -1,4 +1,4 @@
-import { apiClient } from '../../core/api/apiClient';
+import { apiClient, apiClientResult } from '../../core/api/apiClient';
 import type { ApiResponse, NoData, PagedResponse, CursorPagedResponse } from '../../core/types/ApiResponse';
 import type {
   PostResponseDto,
@@ -72,7 +72,9 @@ const getAll = async (
 };
 
 const getById = async (id: string): Promise<ApiResponse<PostResponseDto>> => {
-  return await apiClient<PostResponseDto>(`${API_URL}/${id}`);
+  return await apiClientResult<PostResponseDto>(`${API_URL}/${id}`, {
+    silentNotFound: true,
+  });
 };
 
 const getTopCommented = async (count: number): Promise<ApiResponse<PostResponseDto[]>> => {

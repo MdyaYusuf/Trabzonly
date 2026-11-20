@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useAppSelector } from '@/core/store/hooks'
 import { authService } from '@/features/auth/authService'
+import { ContentNotFoundPage } from '@/features/status/pages/ContentNotFoundPage'
 import { PlayerCommentsSection } from '../components/PlayerCommentsSection'
 import { PlayerDetailBreadcrumb } from '../components/PlayerDetailBreadcrumb'
 import { PlayerDetailHero } from '../components/PlayerDetailHero'
@@ -40,6 +41,7 @@ export function PlayerDetailPage() {
       const parsedId = Number(playerId)
 
       if (!playerId || Number.isNaN(parsedId)) {
+        setPlayer(null)
         setNotFound(true)
         setIsLoading(false)
         return
@@ -48,27 +50,39 @@ export function PlayerDetailPage() {
       setIsLoading(true)
       setNotFound(false)
 
-      await authService.ensureViewerSession()
+      try {
+        await authService.ensureViewerSession()
 
-      if (cancelled) {
-        return
+        if (cancelled) {
+          return
+        }
+
+        const result = await playerService.getById(parsedId)
+
+        if (cancelled) {
+          return
+        }
+
+        if (result.success && result.data) {
+          setPlayer(result.data)
+          setNotFound(false)
+          return
+        }
+
+        setPlayer(null)
+        setNotFound(true)
+      } catch {
+        if (cancelled) {
+          return
+        }
+
+        setPlayer(null)
+        setNotFound(true)
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
-
-      const result = await playerService.getById(parsedId)
-
-      if (cancelled) {
-        return
-      }
-
-      if (result.success && result.data) {
-        setPlayer(result.data)
-        setIsLoading(false)
-        return
-      }
-
-      setPlayer(null)
-      setNotFound(true)
-      setIsLoading(false)
     }
 
     void loadPlayer()
@@ -90,21 +104,11 @@ export function PlayerDetailPage() {
 
   if (notFound || !player) {
     return (
-      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-        <div className="mx-auto flex max-w-[1360px] flex-col items-start gap-space-md px-4 py-space-xl sm:px-6 lg:px-12">
-          <h1 className="font-headline text-headline-md font-bold text-primary">Oyuncu bulunamadı</h1>
-          <p className="font-body text-body-md text-on-surface-variant">
-            Bu oyuncu kaydı yok veya kaldırılmış olabilir.
-          </p>
-          <Link
-            to="/oyuncular"
-            className="font-label inline-flex items-center gap-1 bg-primary-container px-space-md py-space-sm text-label-md font-bold text-on-primary uppercase"
-          >
-            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-            Kadroya Dön
-          </Link>
-        </div>
-      </main>
+      <ContentNotFoundPage
+        secondaryTo="/oyuncular"
+        secondaryLabel="Oyunculara Göz At"
+        secondaryIcon="groups"
+      />
     )
   }
 

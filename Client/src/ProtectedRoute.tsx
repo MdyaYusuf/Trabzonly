@@ -23,7 +23,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.roleName)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/erisim-yok" replace />;
   }
 
   return <Outlet />;

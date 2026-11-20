@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useAppSelector } from '@/core/store/hooks'
 import { authService } from '@/features/auth/authService'
+import { ContentNotFoundPage } from '@/features/status/pages/ContentNotFoundPage'
 import { SquadCommentsSection } from '../components/SquadCommentsSection'
 import { SquadDetailBreadcrumb } from '../components/SquadDetailBreadcrumb'
 import { SquadDetailHeader } from '../components/SquadDetailHeader'
@@ -25,6 +26,7 @@ export function SquadDetailPage() {
 
     async function loadSquad() {
       if (!squadId) {
+        setSquad(null)
         setNotFound(true)
         setIsLoading(false)
         return
@@ -33,27 +35,39 @@ export function SquadDetailPage() {
       setIsLoading(true)
       setNotFound(false)
 
-      await authService.ensureViewerSession()
+      try {
+        await authService.ensureViewerSession()
 
-      if (cancelled) {
-        return
-      }
+        if (cancelled) {
+          return
+        }
 
-      const result = await squadService.getById(squadId)
+        const result = await squadService.getById(squadId)
 
-      if (cancelled) {
-        return
-      }
+        if (cancelled) {
+          return
+        }
 
-      if (!result.success || !result.data) {
+        if (!result.success || !result.data) {
+          setSquad(null)
+          setNotFound(true)
+          return
+        }
+
+        setSquad(mapSquadToDetailView(result.data))
+        setNotFound(false)
+      } catch {
+        if (cancelled) {
+          return
+        }
+
         setSquad(null)
         setNotFound(true)
-        setIsLoading(false)
-        return
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
-
-      setSquad(mapSquadToDetailView(result.data))
-      setIsLoading(false)
     }
 
     void loadSquad()
@@ -75,19 +89,11 @@ export function SquadDetailPage() {
 
   if (notFound || !squad) {
     return (
-      <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
-        <div className="mx-auto flex max-w-[1360px] flex-col items-center gap-space-md px-4 py-space-xl sm:px-6 lg:px-12">
-          <p className="font-body text-center text-body-md text-on-surface-variant">
-            Kadro bulunamadı.
-          </p>
-          <Link
-            to="/kadrolar"
-            className="font-label bg-primary-container px-space-lg py-space-xs text-label-md tracking-wider text-on-primary uppercase"
-          >
-            Galeriye Dön
-          </Link>
-        </div>
-      </main>
+      <ContentNotFoundPage
+        secondaryTo="/kadrolar"
+        secondaryLabel="Kadrolara Göz At"
+        secondaryIcon="person_play"
+      />
     )
   }
 

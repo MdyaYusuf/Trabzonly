@@ -1,4 +1,4 @@
-import { apiClient } from '../../core/api/apiClient'
+import { apiClient, apiClientResult } from '../../core/api/apiClient'
 import type {
   ApiResponse,
   NoData,
@@ -101,7 +101,9 @@ const getAllForAdmin = async (
 }
 
 const getById = async (id: number): Promise<ApiResponse<PlayerResponseDto>> => {
-  return await apiClient<PlayerResponseDto>(`${API_URL}/${id}`)
+  return await apiClientResult<PlayerResponseDto>(`${API_URL}/${id}`, {
+    silentNotFound: true,
+  })
 }
 
 const getTopValued = async (
