@@ -14,8 +14,7 @@ export function SiteFooter() {
             </div>
             <p className="max-w-md font-body text-body-md text-on-surface-variant">
               Karadeniz Fırtınası&apos;nın kalbi burada atıyor. Bordo-Mavi renklere gönül vermiş
-              bağımsız taraftar topluluğu için taktikler, tartışmalar, taraftar kadroları ve zengin
-              arşiv.
+              bağımsız taraftar topluluğu için gönderiler, kadrolar, quizler ve daha fazlası.
             </p>
             <div className="flex items-center gap-space-xs">
               <span className="inline-block h-3 w-3 rounded-full bg-secondary-container" />
@@ -31,40 +30,40 @@ export function SiteFooter() {
             </span>
             <div className="flex flex-col gap-space-xs">
               <Link
-                to="/topluluk-kurallari"
-                className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
-              >
-                Topluluk Kuralları
-              </Link>
-              <Link
                 to="/oyuncular"
                 className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
               >
-                Futbolcu Profilleri
+                Oyuncular
               </Link>
               <Link
                 to="/gonderiler"
                 className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
               >
-                Tribün Güncesi &amp; Yazılar
+                Taraftar Gönderileri
               </Link>
               <Link
                 to="/kadrolar"
                 className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
               >
-                Taktik Tahtası &amp; 11&apos;ler
+                Taraftar Kadroları
               </Link>
               <Link
                 to="/mac-haftasi"
                 className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
               >
-                Maç Haftası &amp; Puan Durumu
+                Haftanın Kadrosu &amp; Puan Durumu &amp; Fikstür
               </Link>
               <Link
                 to="/quizler"
                 className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
               >
-                Trabzonspor Tarih Quizleri
+                Trabzonspor Quizleri
+              </Link>
+              <Link
+                to="/topluluk-kurallari"
+                className="font-body text-body-sm text-on-surface-variant transition-colors hover:text-primary"
+              >
+                Topluluk Kuralları
               </Link>
             </div>
           </div>
@@ -74,22 +73,17 @@ export function SiteFooter() {
               Bağlantıda Kalın
             </span>
             <p className="font-body text-body-sm text-on-surface-variant">
-              Sosyal medyada ve dijital tribünde fırtınanın sesine ortak olun.
+              Aşağıdaki mail adresi aracılığıyla bizimle iletişime geçebilirsiniz.
             </p>
-            <div className="flex items-center gap-space-sm">
-              <span className="flex items-center justify-center bg-surface-container p-space-xs text-on-surface">
-                <span className="material-symbols-outlined">forum</span>
-              </span>
-              <span className="flex items-center justify-center bg-surface-container p-space-xs text-on-surface">
-                <span className="material-symbols-outlined">sports_soccer</span>
-              </span>
-              <span className="flex items-center justify-center bg-surface-container p-space-xs text-on-surface">
-                <span className="material-symbols-outlined">podcasts</span>
-              </span>
-              <span className="flex items-center justify-center bg-surface-container p-space-xs text-on-surface">
+            <a
+              href="mailto:trabzonly@gmail.com"
+              className="inline-flex items-center gap-space-sm text-on-surface transition-colors hover:text-primary"
+            >
+              <span className="flex items-center justify-center bg-surface-container p-space-xs">
                 <span className="material-symbols-outlined">mail</span>
               </span>
-            </div>
+              <span className="font-body text-body-sm">trabzonly@gmail.com</span>
+            </a>
           </div>
         </div>
 

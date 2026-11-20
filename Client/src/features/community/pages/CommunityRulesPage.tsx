@@ -71,7 +71,7 @@ export function CommunityRulesPage() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary via-primary-container/90 to-primary/80" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(117,183,229,0.18),transparent_65%)]" />
 
-        <div className="relative z-10 mx-auto flex min-h-[520px] max-w-[1240px] flex-col justify-end px-4 pt-20 pb-16 sm:px-6 md:min-h-[580px] md:pt-28 md:pb-24 lg:px-12">
+        <div className="relative z-10 mx-auto flex max-w-[1240px] flex-col justify-end px-4 pt-12 pb-10 sm:px-6 md:pt-16 md:pb-12 lg:px-12">
           <div className="mb-space-md flex items-center gap-space-sm">
             <BrandLogo size={28} />
             <span className="font-kicker text-kicker tracking-[0.22em] text-secondary-fixed-dim uppercase">
@@ -79,36 +79,20 @@ export function CommunityRulesPage() {
             </span>
           </div>
 
-          <h1 className="font-display mb-space-md max-w-4xl text-display-xl-mobile tracking-tighter text-on-primary uppercase sm:text-display-xl">
+          <h1 className="font-display mb-space-sm max-w-4xl text-display-xl-mobile tracking-tighter text-on-primary uppercase sm:text-display-xl">
             TOPLULUK KURALLARI
           </h1>
 
-          <p className="font-body mb-space-xl max-w-2xl text-body-md leading-relaxed text-surface-container-high sm:text-body-lg">
+          <p className="font-body max-w-2xl text-body-md leading-relaxed text-surface-container-high sm:text-body-lg">
             Bordo-mavi armanın onurunu, saygılı fikir teatisi ve bağımsız tribün kültürüyle geleceğe
             taşıyan ortak ilkelerimiz.
           </p>
 
-          <div className="flex flex-wrap items-center gap-space-md pt-space-xs">
-            <Link
-              to="/register"
-              className="inline-flex items-center justify-center bg-on-primary px-8 py-3.5 font-headline text-label-md tracking-wider text-primary-container uppercase shadow-md transition-all duration-200 hover:bg-secondary-fixed hover:text-on-secondary-fixed active:scale-95"
-            >
-              Topluluğa Katıl
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center bg-transparent px-8 py-3.5 font-headline text-label-md tracking-wider text-on-primary uppercase shadow-sm transition-all duration-200 hover:bg-on-primary/10 active:scale-95"
-            >
-              Giriş Yap
-            </Link>
-          </div>
-
-          <div className="mt-14 flex items-center justify-between pt-space-sm font-kicker text-kicker tracking-widest text-surface-variant/80 uppercase">
+          <div className="mt-space-lg flex items-center pt-space-sm font-kicker text-kicker tracking-widest text-surface-variant/80 uppercase">
             <span className="flex items-center gap-space-xs text-secondary-fixed-dim">
               <span className="h-2 w-2 animate-pulse rounded-full bg-secondary-fixed-dim" />
-              Resmi Olmayan Bağımsız Taraftar Platformu
+              7 Temel İlke
             </span>
-            <span className="hidden md:inline-block">7 Temel İlke • Yürürlük: 2025</span>
           </div>
         </div>
       </section>
@@ -143,24 +127,20 @@ export function CommunityRulesPage() {
             </nav>
           </div>
 
-          <div className="flex w-full flex-col justify-between gap-space-sm border-l-4 border-primary-container bg-surface-container p-space-md text-on-surface-variant shadow-sm md:flex-row md:items-center">
-            <div className="flex items-center gap-space-sm">
-              <span className="material-symbols-outlined shrink-0 text-[22px] text-primary">
-                info
-              </span>
-              <div>
-                <span className="font-headline block text-label-md font-bold text-primary">
-                  Önemli Hatırlatma
-                </span>
-                <p className="font-body text-body-sm leading-relaxed text-on-surface-variant">
-                  Platforma gönderi yazan ya da yorum yapan her bordo-mavili bu kuralları peşinen
-                  kabul etmiş sayılır.
-                </p>
-              </div>
-            </div>
-            <span className="hidden shrink-0 font-kicker text-kicker font-bold text-secondary uppercase md:inline-block">
-              Trabzonly Etik İlkeleri
+          <div className="flex w-full items-center gap-space-sm border-l-4 border-primary-container bg-surface-container p-space-md text-on-surface-variant shadow-sm">
+            <span className="material-symbols-outlined shrink-0 text-[22px] text-primary">
+              info
             </span>
+            <div>
+              <span className="font-headline mb-space-xs block text-label-md font-bold text-primary">
+                Önemli Hatırlatma
+              </span>
+              <p className="font-body text-body-sm leading-relaxed text-on-surface-variant">
+                Platformda hesap açan ya da gönderi, yorum, puanlama, anket, quiz, kadro paylaşımı
+                ve benzeri herhangi bir etkileşime katılan her bordo-mavili bu kuralları peşinen
+                kabul etmiş sayılır.
+              </p>
+            </div>
           </div>
 
           <div className="grid w-full grid-cols-1 gap-space-lg md:grid-cols-2">
@@ -218,12 +198,6 @@ export function CommunityRulesPage() {
                   Kabul Et ve Kayıt Ol
                 </span>
               )}
-              <Link
-                to="/login"
-                className="w-full px-6 py-4 text-center font-headline text-label-md tracking-wider text-secondary uppercase transition-colors hover:text-on-secondary-container sm:w-auto"
-              >
-                Zaten üye misin? Giriş Yap
-              </Link>
             </div>
           </div>
         </div>

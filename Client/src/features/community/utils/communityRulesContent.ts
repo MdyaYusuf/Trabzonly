@@ -35,11 +35,11 @@ export const communityRuleSections: CommunityRuleSection[] = [
       },
       {
         title: 'Bağımsız Duruş:',
-        body: 'Platform hiçbir siyasi, ticari ya da harici çıkar grubunun güdümünde değildir; topluluğun tek ortak paydası Karadeniz fırtınasıdır.',
+        body: 'Platform hiçbir siyasi, ticari ya da harici çıkar grubunun güdümünde değildir. Topluluğun tek ortak paydası Karadeniz fırtınasıdır.',
       },
       {
         title: 'Ortak Sağduyu:',
-        body: 'Her üye, yazdığı her cümlenin ve paylaştığı her analizin topluluğun editoryal saygınlığını yansıttığını kabul eder.',
+        body: 'Her üye, yazdığı her cümlenin ve paylaştığı her analizin bu topluluğun itibarını yansıttığını kabul eder.',
       },
     ],
   },
@@ -91,7 +91,7 @@ export const communityRuleSections: CommunityRuleSection[] = [
     items: [
       {
         title: 'Tek Kişi, Tek Hesap:',
-        body: 'Her taraftar platformda tek bir profille temsil edilir; sahte kimliklerle açılan (troll/bot) hesaplar tespit edildiğinde doğrudan kapatılır.',
+        body: 'Her taraftar platformda tek bir profille temsil edilir. Sahte kimliklerle açılan (troll/bot) hesaplar tespit edildiğinde doğrudan kapatılır.',
       },
       {
         title: 'Profil Bütünlüğü:',
@@ -110,16 +110,16 @@ export const communityRuleSections: CommunityRuleSection[] = [
     heading: 'Moderasyon',
     items: [
       {
-        title: 'Topluluk Denetimi:',
-        body: 'Moderatörler ve editörler kural ihlallerini tespit ettiğinde uyarı, gönderi gizleme veya süreli/süresiz erişim kısıtlama yetkisine sahiptir.',
+        title: 'İçerik Denetimi:',
+        body: 'Topluluk kurallarını ihlal eden gönderi ve yorumlar, önceden uyarı veya onay gerekmeksizin site adminleri tarafından kaldırılabilir. Ağır veya tekrarlayan ihlallerde üye hesabı pasife alınabilir ya da kapatılabilir.',
       },
       {
-        title: 'Şeffaf İşlem Geçmişi:',
-        body: 'Uygulanan yaptırımlar keyfi olmayıp, topluluk sicil protokolü çerçevesinde kayıt altına alınır.',
+        title: 'Kural Dayanaklı İşlem:',
+        body: 'İçerik kaldırma ve hesap işlemleri keyfi değildir. Her adım, bu sayfada belirtilen topluluk kurallarına dayandırılır.',
       },
       {
-        title: 'İtiraz Hakkı:',
-        body: "Kısıtlama uygulanan üyeler, 7 iş günü içerisinde Topluluk Yönetim Masası'na gerekçeli itirazda bulunabilir.",
+        title: 'Yönetime Ulaşma:',
+        body: 'Kaldırılan içerikler hakkında görüşmek isteyen üyeler, profil ayarlarındaki Admine Ulaş bölümünden site yönetimine yazabilir. Ağır ihlaller nedeniyle hesabı kapatılan üyelerle gerektiğinde kayıtlı e-posta adresi üzerinden iletişime geçilebilir.',
       },
     ],
   },
@@ -134,12 +134,12 @@ export const communityRuleSections: CommunityRuleSection[] = [
         body: 'Üyelerin e-posta adresleri ve kişisel erişim kayıtları KVKK standartlarında korunur, üçüncü taraflarla paylaşılmaz.',
       },
       {
-        title: 'Özel Mesajlaşma Güvenliği:',
-        body: 'Üyeler arasındaki doğrudan iletişim kanalları taciz veya ticari teklif amacıyla kullanılamaz.',
+        title: 'Kamuya Açık Etkileşim:',
+        body: 'Üyeler birbirine yalnızca gönderi ve yorumlar üzerinden ulaşabilir. Bu alanlar taciz, kişisel hedef alma veya ticari teklif amacıyla kullanılamaz.',
       },
       {
         title: 'Parola Standartları:',
-        body: 'Kullanıcı şifreleri tek yönlü güçlü kriptografik özetleme (hash) ile korunur; sistem yöneticileri dahi şifreleri göremez.',
+        body: 'Kullanıcı şifreleri düz metin olarak saklanmaz. Şifreler tek yönlü kriptografik özetleme ile korunur. Sistem yöneticileri dahi orijinal şifreyi göremez.',
       },
     ],
   },
@@ -155,12 +155,12 @@ export const communityRuleSections: CommunityRuleSection[] = [
         body: "Trabzonly, Trabzonspor Kulübü Derneği'nin veya iştiraklerinin resmi internet sitesi değildir.",
       },
       {
-        title: 'Fikirlerin Bağlayıcılığı:',
-        body: 'Platformda üyeler ve köşe yazarları tarafından ifade edilen görüşler tamamen yazarların şahsi görüşleridir.',
+        title: 'Logo ve Telif Hakları:',
+        body: 'Trabzonly kulübün resmi logolarını, tescilli armalarını, oyuncu fotoğraflarını veya benzeri telifli materyalleri bilerek kullanmaz. Telif hakkı ihlali olduğu düşünülen bir içerik bildirildiğinde, ilgili materyal incelenir ve gerektiğinde kaldırılır.',
       },
       {
-        title: 'Logo ve Telif Hakları:',
-        body: 'Trabzonspor markası ve tescilli armaları kulübün mülkiyetindedir; topluluk bağımsız taraftar kültürü çerçevesinde faaliyet gösterir.',
+        title: 'Fikirlerin Bağlayıcılığı:',
+        body: 'Platformda üyeler tarafından paylaşılan görüşler, analizler ve yorumlar tamamen ilgili kişilerin şahsi fikirleridir.',
       },
     ],
   },
