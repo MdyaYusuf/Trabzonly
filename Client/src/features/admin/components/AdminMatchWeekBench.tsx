@@ -5,6 +5,7 @@ import {
   setSquadPlayerDragData,
 } from '@/features/squads/utils/squadBuilderDnD'
 import type { BenchSlotId, BuilderPlayer } from '@/features/squads/utils/squadBuilderTypes'
+import { builderBadgeClass } from '@/features/squads/utils/squadPoolCategories'
 import {
   MATCH_WEEK_BENCH_SLOT_IDS,
   MATCH_WEEK_MAX_BENCH,
@@ -86,6 +87,8 @@ export function AdminMatchWeekBench({
           }
 
           if (player) {
+            const isGk = player.posGroup === 'GK'
+
             return (
               <div
                 key={slotId}
@@ -103,26 +106,49 @@ export function AdminMatchWeekBench({
                 {...dropHandlers}
                 className={
                   isDropTarget
-                    ? 'group relative z-10 flex h-[6.5rem] cursor-pointer flex-col items-center gap-1 overflow-hidden border border-primary bg-primary-container/20 p-2 shadow-sm ring-2 ring-primary active:cursor-grabbing'
-                    : 'group relative z-10 flex h-[6.5rem] cursor-pointer flex-col items-center gap-1 overflow-hidden border border-primary/40 bg-primary-container/10 p-2 shadow-sm active:cursor-grabbing'
+                    ? 'group relative z-10 flex h-[6.5rem] cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden border border-primary bg-primary-container/20 p-2 shadow-sm ring-2 ring-primary active:cursor-grabbing'
+                    : 'group relative z-10 flex h-[6.5rem] cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden border border-primary/40 bg-primary-container/10 p-2 shadow-sm active:cursor-grabbing'
                 }
               >
-                <span className="font-kicker text-[10px] font-bold text-primary uppercase">
-                  Y{index + 1}
-                </span>
-                <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${player.avatarGradient}`}
-                >
-                  {player.initials}
+                <div className="relative">
+                  <div
+                    className={`relative h-11 w-11 rounded-full p-0.5 shadow-lg ring-2 transition-[box-shadow] ${
+                      isGk
+                        ? 'bg-tertiary ring-tertiary-fixed group-hover:ring-white'
+                        : 'bg-primary-container ring-white/60 group-hover:ring-secondary-container'
+                    }`}
+                  >
+                    <div
+                      className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br text-[12px] font-bold text-white ${player.avatarGradient}`}
+                    >
+                      {player.initials}
+                    </div>
+                  </div>
+                  <span
+                    className={`font-kicker absolute -top-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold shadow ${
+                      isGk
+                        ? 'bg-tertiary-container text-on-tertiary-container'
+                        : 'bg-primary text-on-primary'
+                    }`}
+                  >
+                    #{player.number}
+                  </span>
+                  {player.badge ? (
+                    <span
+                      className={`font-kicker absolute -bottom-1 left-1/2 z-[1] -translate-x-1/2 px-1 py-px text-[8px] font-bold uppercase ${builderBadgeClass(player.badge.tone)}`}
+                    >
+                      {player.badge.label}
+                    </span>
+                  ) : null}
                 </div>
                 <span
-                  className="font-headline w-full truncate text-center text-xs font-bold text-primary"
+                  className="font-headline w-full truncate text-center text-[11px] font-bold text-primary"
                   title={player.shortName}
                 >
                   {player.shortName}
                 </span>
-                <span className="font-kicker text-[10px] font-bold text-on-surface-variant uppercase">
-                  #{player.number} · {player.posGroup}
+                <span className="font-body w-full truncate text-center text-[10px] text-on-surface-variant">
+                  {player.roleHint}
                 </span>
                 <button
                   type="button"
@@ -130,9 +156,11 @@ export function AdminMatchWeekBench({
                   onClick={() => {
                     onClearSlot(slotId)
                   }}
-                  className="absolute top-0.5 right-0.5 hidden h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
+                  className="absolute top-0.5 right-0.5 hidden h-4 w-4 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
                 >
-                  <span className="material-symbols-outlined text-[12px] leading-none">close</span>
+                  <span className="material-symbols-outlined origin-center scale-[0.65] text-[12px] leading-none">
+                    close
+                  </span>
                 </button>
               </div>
             )

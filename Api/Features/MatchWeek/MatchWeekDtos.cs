@@ -76,6 +76,7 @@ public sealed record MatchWeekSlotResponseDto(
   string? PlayerImageUrl,
   int? ShirtNumber,
   string? PositionAbbreviation,
+  string? PositionName,
   string SlotKey,
   bool IsStarter,
   int SortOrder,

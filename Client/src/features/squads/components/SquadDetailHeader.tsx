@@ -196,23 +196,25 @@ export function SquadDetailHeader({ squad, onFollowChange }: SquadDetailHeaderPr
             </div>
           </div>
 
-          <div className="flex w-full flex-col justify-between gap-space-md bg-surface-container-lowest p-space-md shadow-sm lg:w-80">
+          <div className="flex w-full flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm lg:w-80">
             <span className="font-kicker text-kicker font-bold tracking-widest text-on-surface-variant uppercase">
               TOPLULUK PUANI
             </span>
-            <div className="flex items-baseline gap-space-sm">
+            <div className="flex items-center gap-space-sm">
               <span className="font-stat text-stat-counter leading-none font-extrabold text-primary">
                 {squad.rating.toFixed(1)}
               </span>
-              <div className="flex flex-col">
-                <span className="font-kicker text-kicker text-on-surface-variant">/ 10</span>
+              <span className="font-kicker self-center text-[13px] font-bold tracking-wide text-on-surface-variant">
+                / 10
+              </span>
+              <div className="flex min-w-0 flex-col items-end gap-0.5">
                 <RatingStars rating={squad.rating} />
-                <span className="font-body mt-1 text-body-sm text-on-surface-variant">
+                <span className="font-body text-[11px] leading-tight text-on-surface-variant">
                   {squad.ratingCount.toLocaleString('tr-TR')} Taraftar Oyladı
                 </span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-space-xs pt-space-xs text-center">
+            <div className="grid grid-cols-2 gap-space-xs text-center">
               <div className="bg-surface-container-low p-2">
                 <span className="font-label block text-label-md font-bold text-primary">
                   {squad.commentCount.toLocaleString('tr-TR')}

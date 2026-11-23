@@ -26,7 +26,7 @@ export function SquadBuilderToolbar({
   onPublish,
 }: SquadBuilderToolbarProps) {
   return (
-    <section className="w-full bg-surface py-space-md">
+    <section className="w-full bg-surface pt-space-md pb-space-sm">
       <div className="mx-auto flex max-w-[1360px] flex-col gap-space-md px-4 sm:px-6 lg:px-12">
         <div className="flex flex-wrap items-center gap-space-md">
           <PageBackButton
@@ -106,8 +106,8 @@ export function SquadBuilderToolbar({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-kicker shrink-0 pr-2 text-kicker font-bold text-on-surface-variant uppercase">
-            DİZİLİŞ:
+          <span className="font-kicker shrink-0 pr-2 text-[12px] font-bold tracking-wider text-on-surface-variant uppercase">
+            DİZİLİŞİNİ SEÇ:
           </span>
           {formationConfigs.map((formation) => {
             const isActive = formation.id === formationId

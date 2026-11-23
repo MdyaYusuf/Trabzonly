@@ -8,6 +8,7 @@ import {
 } from '../utils/squadBuilderConfig'
 import type { BuilderFormationId, FormationSlot } from '../utils/squadBuilderTypes'
 import type { SquadBenchPlayer, SquadPitchPlayer } from '../utils/squadDetailTypes'
+import { builderBadgeClass } from '../utils/squadPoolCategories'
 
 type SquadDetailPitchProps = {
   formation: string
@@ -156,19 +157,51 @@ export function SquadDetailPitch({
             YEDEK KULÜBESİ ({benchPlayers.length} OYUNCU)
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-space-xs text-center sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-space-xs sm:grid-cols-5">
           {benchPlayers.map((player) => (
             <div
               key={`${player.playerId}-${player.name}`}
-              className="flex flex-col items-center gap-0.5 bg-surface-container-low p-2"
+              className="flex flex-col items-center gap-1 bg-surface-container-low px-1.5 pt-3 pb-1.5"
             >
-              <span className="font-kicker text-kicker text-on-surface-variant">
-                #{player.number}
-              </span>
-              <span className="font-headline text-xs font-bold text-on-surface">{player.name}</span>
-              <span className="font-kicker text-[10px] font-bold tracking-wider text-secondary uppercase">
-                {player.position}
-              </span>
+              <div className="relative">
+                <div
+                  className={`relative h-11 w-11 rounded-full p-0.5 shadow-lg ring-2 ${
+                    player.isGk
+                      ? 'bg-tertiary ring-tertiary-fixed'
+                      : 'bg-primary-container ring-white/60'
+                  }`}
+                >
+                  <div
+                    className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br text-[12px] font-bold text-white ${player.avatarGradient}`}
+                  >
+                    {player.avatarInitials}
+                  </div>
+                </div>
+                <span
+                  className={`font-kicker absolute -top-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold shadow ${
+                    player.isGk
+                      ? 'bg-tertiary-container text-on-tertiary-container'
+                      : 'bg-primary text-on-primary'
+                  }`}
+                >
+                  #{player.number}
+                </span>
+                {player.badge ? (
+                  <span
+                    className={`font-kicker absolute -bottom-1 left-1/2 z-[1] -translate-x-1/2 px-1 py-px text-[8px] font-bold uppercase shadow ${builderBadgeClass(player.badge.tone)}`}
+                  >
+                    {player.badge.label}
+                  </span>
+                ) : null}
+              </div>
+              <div className="w-full text-center">
+                <p className="font-headline truncate text-[11px] font-bold text-on-surface">
+                  {player.name}
+                </p>
+                <p className="font-body mt-0.5 truncate text-[10px] text-on-surface-variant">
+                  {player.position}
+                </p>
+              </div>
             </div>
           ))}
         </div>

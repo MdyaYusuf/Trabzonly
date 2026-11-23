@@ -45,7 +45,14 @@ export function SquadBuilderTactics({
 
   return (
     <div className="flex flex-col gap-space-md bg-surface-container-lowest p-space-md shadow-sm">
-      <div className="grid w-full grid-cols-1 gap-space-md sm:grid-cols-3">
+      <div className="flex items-center gap-2">
+        <span className="material-symbols-outlined text-[20px] text-secondary">sports</span>
+        <span className="font-headline text-headline-sm font-bold text-primary uppercase">
+          Taktik Ayarları
+        </span>
+      </div>
+
+      <div className="grid w-full grid-cols-1 gap-space-sm sm:grid-cols-2">
         <div className="flex flex-col gap-1">
           <label className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
             Hücum Anlayışı
@@ -100,9 +107,6 @@ export function SquadBuilderTactics({
             ))}
           </select>
         </div>
-      </div>
-
-      <div className="grid w-full grid-cols-1 gap-space-md sm:grid-cols-3">
         <div className="flex flex-col gap-1">
           <label className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
             Kaptan

@@ -1,5 +1,6 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import { ActiveNavUnderline } from '@/core/components/ActiveNavUnderline'
 import { BrandLogo } from '@/core/components/BrandLogo'
 import { SiteHeaderAccountMenu } from '@/core/components/layout/SiteHeaderAccountMenu'
 import { useAppSelector } from '@/core/store/hooks'
@@ -17,20 +18,6 @@ const loginButtonClass =
 
 const registerButtonClass =
   'font-label inline-flex h-10 items-center gap-1.5 bg-gradient-to-r from-[#7a1235] via-primary-container to-secondary px-5 text-label-md font-bold tracking-wider text-on-primary uppercase shadow-[0_4px_14px_rgba(18,100,142,0.35)] transition-all hover:brightness-110 hover:shadow-[0_6px_18px_rgba(18,100,142,0.45)]'
-
-function ActiveNavUnderline({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden viewBox="0 0 100 6" preserveAspectRatio="none" className={className}>
-      <path
-        d="M2 4.2 C 28 1.2, 72 1.2, 98 4.2"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
 
 export function SiteHeader() {
   const { isAuthenticated } = useAppSelector((state) => state.auth)

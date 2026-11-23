@@ -11,6 +11,7 @@ public sealed record SquadSlotResponseDto(
   string PlayerName,
   string? PlayerImageUrl,
   string PositionAbbreviation,
+  string PositionName,
   int? PlayerShirtNumber,
   int Age,
   decimal? MarketValue,

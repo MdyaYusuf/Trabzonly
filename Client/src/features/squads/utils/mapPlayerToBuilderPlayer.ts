@@ -91,7 +91,7 @@ function badgeForCategory(category: PlayerCategory): BuilderPlayerBadge | undefi
   }
 
   if (category === PlayerCategory.TransferTarget) {
-    return { label: 'HEDEF', tone: 'mavi' }
+    return { label: 'TRANSFER', tone: 'mavi' }
   }
 
   return undefined
@@ -107,7 +107,8 @@ export function mapPlayerToBuilderPlayer(player: PlayerResponseDto): BuilderPlay
     shortName: shortNameFromFull(player.name),
     number: player.shirtNumber != null ? String(player.shirtNumber) : '—',
     posGroup: posGroupFromZone(player.positionZone),
-    roleHint: `${player.positionName} • ${player.nationality}`,
+    roleHint: player.positionName,
+    nationality: player.nationality,
     age: player.age,
     marketValueM,
     avatarGradient: GRADIENTS[player.id % GRADIENTS.length],
@@ -127,7 +128,8 @@ export function mapSquadSlotToBuilderPlayer(slot: SquadSlotResponseDto): Builder
     shortName: shortNameFromFull(slot.playerName),
     number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
     posGroup: posGroupFromAbbreviation(slot.positionAbbreviation),
-    roleHint: slot.positionAbbreviation,
+    roleHint: slot.positionName?.trim() || slot.positionAbbreviation,
+    nationality: '',
     age: slot.age,
     marketValueM,
     avatarGradient: GRADIENTS[slot.playerId % GRADIENTS.length],

@@ -9,6 +9,7 @@ export interface SquadSlotResponseDto {
   playerName: string
   playerImageUrl?: string
   positionAbbreviation: string
+  positionName: string
   playerShirtNumber?: number | null
   age: number
   marketValue?: number | null

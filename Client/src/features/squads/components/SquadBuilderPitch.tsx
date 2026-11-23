@@ -178,9 +178,11 @@ function SlotCard({
             event.stopPropagation()
             onClear()
           }}
-          className="absolute -top-1 -right-1 hidden h-6 w-6 items-center justify-center rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
+          className="absolute -top-1 -right-1 hidden h-5 w-5 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-error text-on-error shadow group-hover:flex hover:opacity-90"
         >
-          <span className="material-symbols-outlined text-[14px]">close</span>
+          <span className="material-symbols-outlined origin-center scale-[0.7] text-[12px] leading-none">
+            close
+          </span>
         </button>
       </div>
       <SquadPitchSlotCaption

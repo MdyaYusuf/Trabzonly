@@ -196,7 +196,7 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
                     ) : null}
                     {player.category === PlayerCategory.TransferTarget ? (
                       <span className="bg-secondary-container px-space-sm py-space-xs font-kicker text-kicker font-bold tracking-wider text-on-secondary-container uppercase">
-                        HEDEF
+                        TRANSFER
                       </span>
                     ) : null}
                   </div>

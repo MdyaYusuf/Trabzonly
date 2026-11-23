@@ -81,6 +81,7 @@ export interface MatchWeekSlotResponseDto {
   playerImageUrl?: string | null
   shirtNumber?: number | null
   positionAbbreviation?: string | null
+  positionName?: string | null
   slotKey: string
   isStarter: boolean
   sortOrder: number

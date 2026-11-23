@@ -87,7 +87,7 @@ function resolveBadge(
   }
 
   if (player.category === PlayerCategory.TransferTarget) {
-    return { label: 'HEDEF', tone: 'mavi' }
+    return { label: 'TRANSFER', tone: 'mavi' }
   }
 
   if (player.isCaptain) {

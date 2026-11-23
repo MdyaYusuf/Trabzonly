@@ -10,6 +10,7 @@ import type { BuilderFormationId, FormationSlot } from '@/features/squads/utils/
 import type { MatchWeekSlotResponseDto } from '../matchWeekTypes'
 import {
   avatarGradientForPlayerId,
+  initialsFromName,
   shortNameFromFull,
   splitBoardSlots,
 } from '../utils/matchWeekPublicUtils'
@@ -101,6 +102,74 @@ function PitchSlotCard({
   )
 }
 
+function BenchPlayerCard({
+  player,
+  onPlayerRated,
+}: {
+  player: MatchWeekSlotResponseDto
+  onPlayerRated: MatchWeekPitchProps['onPlayerRated']
+}) {
+  const isGk = player.positionAbbreviation?.trim().toUpperCase() === 'GK'
+  const [avatarHost, setAvatarHost] = useState<HTMLDivElement | null>(null)
+  const [clickHost, setClickHost] = useState<HTMLDivElement | null>(null)
+  const positionLabel =
+    player.positionName?.trim() || player.positionAbbreviation?.trim() || '—'
+
+  return (
+    <div
+      ref={setClickHost}
+      className="flex flex-col items-center gap-1 bg-surface-container-low px-1.5 pt-3 pb-1.5"
+    >
+      <div className="relative">
+        <div
+          ref={setAvatarHost}
+          className={`relative h-12 w-12 rounded-full p-0.5 shadow-lg ring-2 ${
+            isGk
+              ? 'bg-tertiary ring-tertiary-fixed'
+              : 'bg-primary-container ring-white/60'
+          }`}
+        >
+          <div
+            className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br text-[12px] font-bold tracking-[0.08em] text-white uppercase ${avatarGradientForPlayerId(player.playerId)}`}
+          >
+            {initialsFromName(player.playerName)}
+          </div>
+          <span
+            className={`font-kicker pointer-events-none absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold shadow ${
+              isGk
+                ? 'bg-tertiary-container text-on-tertiary-container'
+                : 'bg-primary text-on-primary'
+            }`}
+          >
+            #{player.shirtNumber ?? '—'}
+          </span>
+        </div>
+        <MatchWeekPlayerRateControl
+          playerId={player.playerId}
+          averageRating={player.averageRating}
+          ratingCount={player.ratingCount}
+          currentUserScore={player.currentUserScore}
+          tone="onSurface"
+          placement="corner"
+          cornerHost={avatarHost}
+          clickHost={clickHost}
+          onRated={(averageRating, ratingCount, score) => {
+            onPlayerRated(player.playerId, averageRating, ratingCount, score)
+          }}
+        />
+      </div>
+      <div className="w-full text-center">
+        <p className="font-headline truncate text-[11px] font-bold text-on-surface">
+          {shortNameFromFull(player.playerName)}
+        </p>
+        <p className="font-body mt-0.5 truncate text-[10px] text-on-surface-variant">
+          {positionLabel}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function MatchWeekPitch({ formation, slots, onPlayerRated }: MatchWeekPitchProps) {
   const formationConfig = getFormationConfig(formation.trim() as BuilderFormationId)
   const { starters, bench } = splitBoardSlots(slots)
@@ -178,32 +247,13 @@ export function MatchWeekPitch({ formation, slots, onPlayerRated }: MatchWeekPit
               Oyuna Sonradan Girenler ({bench.length})
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-space-sm sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-space-xs sm:grid-cols-3 lg:grid-cols-6">
             {bench.map((player) => (
-              <div
+              <BenchPlayerCard
                 key={`${player.playerId}-${player.slotKey}`}
-                className="flex flex-col items-center gap-1 border border-outline-variant/30 bg-surface p-space-sm"
-              >
-                <span className="font-kicker text-[10px] text-on-surface-variant">
-                  #{player.shirtNumber ?? '—'}
-                </span>
-                <span className="font-headline text-center text-xs font-bold text-on-surface">
-                  {shortNameFromFull(player.playerName)}
-                </span>
-                <span className="font-kicker text-[10px] font-bold tracking-wider text-secondary uppercase">
-                  {player.positionAbbreviation?.trim() || '—'}
-                </span>
-                <MatchWeekPlayerRateControl
-                  playerId={player.playerId}
-                  averageRating={player.averageRating}
-                  ratingCount={player.ratingCount}
-                  currentUserScore={player.currentUserScore}
-                  tone="onSurface"
-                  onRated={(averageRating, ratingCount, score) => {
-                    onPlayerRated(player.playerId, averageRating, ratingCount, score)
-                  }}
-                />
-              </div>
+                player={player}
+                onPlayerRated={onPlayerRated}
+              />
             ))}
           </div>
         </div>

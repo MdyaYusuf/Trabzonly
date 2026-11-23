@@ -170,16 +170,36 @@ function mapStartersToPitchPlayers(
   return players
 }
 
+function badgeForCategory(category: PlayerCategory): SquadBenchPlayer['badge'] {
+  if (category === PlayerCategory.Legend) {
+    return { label: 'EFSANE', tone: 'bordo' }
+  }
+
+  if (category === PlayerCategory.TransferTarget) {
+    return { label: 'TRANSFER', tone: 'mavi' }
+  }
+
+  return undefined
+}
+
 function mapBenchPlayers(slots: SquadSlotResponseDto[]): SquadBenchPlayer[] {
   return slots
     .filter((slot) => isBenchSlot(slot.slotKey))
     .sort((a, b) => a.sortOrder - b.sortOrder || a.slotKey.localeCompare(b.slotKey))
-    .map((slot) => ({
-      playerId: slot.playerId,
-      number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
-      position: slot.positionAbbreviation,
-      name: shortPlayerName(slot.playerName),
-    }))
+    .map((slot) => {
+      const abbreviation = slot.positionAbbreviation.trim().toUpperCase()
+
+      return {
+        playerId: slot.playerId,
+        number: slot.playerShirtNumber != null ? String(slot.playerShirtNumber) : '—',
+        position: slot.positionName?.trim() || slot.positionAbbreviation,
+        name: shortPlayerName(slot.playerName),
+        isGk: abbreviation === 'GK',
+        avatarInitials: initialsFromPlayerName(slot.playerName),
+        avatarGradient: GRADIENTS[slot.playerId % GRADIENTS.length],
+        badge: badgeForCategory(slot.category),
+      }
+    })
 }
 
 export function mapSquadToDetailView(squad: SquadResponseDto): SquadDetailViewModel {

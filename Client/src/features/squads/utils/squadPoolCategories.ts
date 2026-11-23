@@ -6,9 +6,9 @@ export type SquadPoolCategoryToggle = {
 }
 
 export const SQUAD_POOL_CATEGORY_TOGGLES: SquadPoolCategoryToggle[] = [
-  { category: PlayerCategory.Current, label: 'Kadro' },
+  { category: PlayerCategory.Current, label: 'Güncel Kadro' },
   { category: PlayerCategory.Legend, label: 'Efsaneler' },
-  { category: PlayerCategory.TransferTarget, label: 'Hedefler' },
+  { category: PlayerCategory.TransferTarget, label: 'Transfer Hedefleri' },
 ]
 
 export const DEFAULT_ENABLED_POOL_CATEGORIES: PlayerCategory[] = [

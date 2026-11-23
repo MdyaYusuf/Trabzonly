@@ -27,6 +27,7 @@ public partial class SquadMapper
   [MapProperty("Player.Name", "PlayerName")]
   [MapProperty("Player.ImageUrl", "PlayerImageUrl")]
   [MapProperty("Player.Position.Abbreviation", "PositionAbbreviation")]
+  [MapProperty("Player.Position.Name", "PositionName")]
   [MapProperty("Player.ShirtNumber", "PlayerShirtNumber")]
   [MapProperty("Player.Age", "Age")]
   [MapProperty("Player.MarketValue", "MarketValue")]

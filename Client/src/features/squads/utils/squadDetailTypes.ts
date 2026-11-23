@@ -19,6 +19,13 @@ export type SquadBenchPlayer = {
   number: string
   position: string
   name: string
+  isGk: boolean
+  avatarInitials: string
+  avatarGradient: string
+  badge?: {
+    label: string
+    tone: 'bordo' | 'mavi'
+  }
 }
 
 export type SquadInstructionRow = {

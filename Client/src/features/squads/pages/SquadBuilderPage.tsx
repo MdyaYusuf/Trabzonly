@@ -914,27 +914,29 @@ export function SquadBuilderPage() {
         </div>
       ) : null}
 
-      <section className="mx-auto w-full max-w-[1360px] px-4 py-space-xl sm:px-6 lg:px-12">
-        <div className="flex flex-col gap-gutter lg:flex-row lg:items-start">
-          <div className="flex min-w-0 flex-col gap-space-md lg:w-7/12 lg:shrink-0">
-            <SquadBuilderTactics
-              attackStyle={attackStyle}
-              defenseLine={defenseLine}
-              tempo={tempo}
-              captainPlayerId={captainPlayerId}
-              cornerTakerPlayerId={cornerTakerPlayerId}
-              freeKickTakerPlayerId={freeKickTakerPlayerId}
-              starterPlayers={starterPlayers}
-              onAttackStyleChange={setAttackStyle}
-              onDefenseLineChange={setDefenseLine}
-              onTempoChange={setTempo}
-              onCaptainChange={setCaptainPlayerId}
-              onCornerTakerChange={setCornerTakerPlayerId}
-              onFreeKickTakerChange={setFreeKickTakerPlayerId}
-            />
+      <section className="mx-auto flex w-full max-w-[1360px] flex-col gap-gutter px-4 pt-space-sm pb-space-xl sm:px-6 lg:px-12">
+        {isLoadingPlayers ? (
+          <p className="font-body bg-surface-container-lowest p-space-md text-body-md text-on-surface-variant shadow-sm">
+            Oyuncu havuzu yükleniyor…
+          </p>
+        ) : (
+          <SquadBuilderPlayerPool
+            players={poolPlayers}
+            assignments={allAssignments}
+            search={search}
+            posFilter={posFilter}
+            enabledCategories={enabledCategories}
+            onSearchChange={setSearch}
+            onPosFilterChange={setPosFilter}
+            onToggleCategory={handleTogglePoolCategory}
+            onAssign={handleAssign}
+          />
+        )}
 
+        <div className="flex flex-col gap-gutter lg:flex-row lg:items-stretch">
+          <div className="flex min-w-0 flex-col gap-space-md lg:w-7/12 lg:shrink-0">
             <p className="font-body max-w-3xl text-[10px] leading-snug text-on-surface-variant/70">
-              Boş pozisyonlara tıklayarak mevkiye uygun oyuncu seçebilir veya havuzdan sürükleyip
+              * Boş pozisyonlara tıklayarak mevkiye uygun oyuncu seçebilir veya havuzdan sürükleyip
               bırakabilirsiniz. Yedek kulübenizi de doldurmayı unutmayınız.
             </p>
 
@@ -953,30 +955,14 @@ export function SquadBuilderPage() {
               onRoleChange={handleRoleChange}
             />
 
-            <SquadBuilderNotes notes={notes} onNotesChange={setNotes} />
+            <SquadBuilderSidebarStats
+              avgAge={stats.avgAge}
+              totalValue={stats.totalValue}
+              hasLegendInSquad={hasLegendInSquad}
+            />
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-space-lg">
-            {isLoadingPlayers ? (
-              <p className="font-body bg-surface-container-lowest p-space-md text-body-md text-on-surface-variant shadow-sm">
-                Oyuncu havuzu yükleniyor…
-              </p>
-            ) : (
-              <SquadBuilderPlayerPool
-                players={poolPlayers}
-                assignments={allAssignments}
-                search={search}
-                posFilter={posFilter}
-                enabledCategories={enabledCategories}
-                starterFilled={stats.starterFilled}
-                benchFilled={stats.benchFilled}
-                onSearchChange={setSearch}
-                onPosFilterChange={setPosFilter}
-                onToggleCategory={handleTogglePoolCategory}
-                onAssign={handleAssign}
-              />
-            )}
-
             <SquadBuilderBench
               assignments={benchAssignments}
               playersById={playersById}
@@ -997,13 +983,27 @@ export function SquadBuilderPage() {
               onDropPlayer={handleDropOnBenchSlot}
             />
 
-            <SquadBuilderSidebarStats
-              avgAge={stats.avgAge}
-              totalValue={stats.totalValue}
-              hasLegendInSquad={hasLegendInSquad}
+            <SquadBuilderTactics
+              attackStyle={attackStyle}
+              defenseLine={defenseLine}
+              tempo={tempo}
+              captainPlayerId={captainPlayerId}
+              cornerTakerPlayerId={cornerTakerPlayerId}
+              freeKickTakerPlayerId={freeKickTakerPlayerId}
+              starterPlayers={starterPlayers}
+              onAttackStyleChange={setAttackStyle}
+              onDefenseLineChange={setDefenseLine}
+              onTempoChange={setTempo}
+              onCaptainChange={setCaptainPlayerId}
+              onCornerTakerChange={setCornerTakerPlayerId}
+              onFreeKickTakerChange={setFreeKickTakerPlayerId}
             />
 
-            <div className="mt-auto w-full pt-space-md">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <SquadBuilderNotes notes={notes} onNotesChange={setNotes} />
+            </div>
+
+            <div className="mt-auto w-full">
               <SquadBuilderSidebarActions
                 isPublishing={isPublishing}
                 onClear={handleClear}

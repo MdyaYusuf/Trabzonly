@@ -9,15 +9,26 @@ export function SquadBuilderNotes({ notes, onNotesChange }: SquadBuilderNotesPro
   const remaining = NOTES_MAX_LENGTH - notes.length
 
   return (
-    <div className="flex w-full flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-space-sm">
-        <span className="font-headline flex flex-wrap items-center gap-2 text-[16px] font-bold text-primary uppercase">
-          <span className="material-symbols-outlined text-secondary">stylus_note</span>
-          Yazarın Taktik Notu
-          <span className="font-kicker text-kicker font-bold tracking-wider text-on-surface-variant normal-case">
-            (İsteğe bağlı)
-          </span>
+    <div className="flex h-full min-h-[14rem] w-full flex-col gap-space-sm bg-surface-container-lowest p-space-md shadow-sm">
+      <h2 className="font-headline flex flex-wrap items-center gap-1.5 text-headline-sm font-bold text-primary uppercase">
+        <span className="material-symbols-outlined text-[20px] text-secondary">stylus_note</span>
+        Taktik Notu
+        <span className="font-kicker text-kicker font-bold tracking-wider text-on-surface-variant normal-case">
+          (İsteğe bağlı)
         </span>
+      </h2>
+
+      <textarea
+        maxLength={NOTES_MAX_LENGTH}
+        value={notes}
+        onChange={(event) => {
+          onNotesChange(event.target.value.slice(0, NOTES_MAX_LENGTH))
+        }}
+        placeholder="Kadronuzun kısa ve net taktiksel fikri..."
+        className="font-body min-h-[8rem] w-full flex-1 resize-none bg-surface-container p-space-sm text-body-sm leading-relaxed text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
+      />
+
+      <div className="flex justify-end">
         <span
           className={
             remaining < 40
@@ -28,17 +39,6 @@ export function SquadBuilderNotes({ notes, onNotesChange }: SquadBuilderNotesPro
           {notes.length} / {NOTES_MAX_LENGTH} Karakter
         </span>
       </div>
-
-      <textarea
-        rows={5}
-        maxLength={NOTES_MAX_LENGTH}
-        value={notes}
-        onChange={(event) => {
-          onNotesChange(event.target.value.slice(0, NOTES_MAX_LENGTH))
-        }}
-        placeholder="Kadronuzun kısa ve net taktiksel fikri..."
-        className="font-body w-full bg-surface-container p-space-sm text-body-sm leading-relaxed text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"
-      />
     </div>
   )
 }

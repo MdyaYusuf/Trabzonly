@@ -131,7 +131,7 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
                 </span>
                 Ortalama Yaş
               </span>
-              <span className="font-stat text-[32px] leading-tight font-extrabold text-primary">
+              <span className="font-stat text-[26px] leading-tight font-extrabold text-primary">
                 {squad.avgAge}
               </span>
               <span className="font-body text-xs text-on-surface-variant">
@@ -145,7 +145,7 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
                 </span>
                 Toplam Değer
               </span>
-              <span className="font-stat text-[32px] leading-tight font-extrabold text-secondary">
+              <span className="font-stat text-[26px] leading-tight font-extrabold text-secondary">
                 {squad.totalValue}
               </span>
               <span className="font-body text-xs text-on-surface-variant">
@@ -173,7 +173,7 @@ export function SquadDetailSidebar({ squad }: SquadDetailSidebarProps) {
             &ldquo;{squad.notes.trim()}&rdquo;
           </p>
           <div className="z-10 border-t border-on-primary/10 pt-space-xs">
-            <span className="font-label text-label-md font-bold text-tertiary-fixed">
+            <span className="font-label text-label-md font-bold text-secondary-fixed-dim">
               {squad.authorNoteCredit}
             </span>
           </div>

@@ -66,6 +66,7 @@ export type BuilderPlayer = {
   number: string
   posGroup: Exclude<BuilderPosGroup, 'ALL'>
   roleHint: string
+  nationality: string
   age: number
   marketValueM: number
   avatarGradient: string
