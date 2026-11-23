@@ -71,7 +71,7 @@ export function PlayerDirectoryPage() {
     let cancelled = false
 
     async function loadOverview() {
-      const summaryResult = await playerService.getRosterOverview()
+      const summaryResult = await playerService.getRosterOverview(category)
 
       if (cancelled) {
         return
@@ -87,7 +87,7 @@ export function PlayerDirectoryPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [category])
 
   useEffect(() => {
     let cancelled = false

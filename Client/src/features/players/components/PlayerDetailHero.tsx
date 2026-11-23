@@ -239,7 +239,7 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
               </div>
 
               <div className="flex flex-wrap items-stretch gap-space-sm bg-primary-container/80 p-space-sm sm:p-space-md">
-                <div className="grid min-w-0 flex-1 grid-cols-2 gap-space-sm sm:grid-cols-3">
+                <div className="grid min-w-0 flex-1 grid-cols-2 gap-space-sm sm:grid-cols-4">
                   <div>
                     <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
                       Piyasa Değeri
@@ -248,6 +248,14 @@ export function PlayerDetailHero({ player }: PlayerDetailHeroProps) {
                       {player.marketValue != null
                         ? formatMarketValue(player.marketValue)
                         : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-kicker block text-kicker text-on-primary/70 uppercase">
+                      Maaş
+                    </span>
+                    <span className="font-headline text-headline-md font-bold text-tertiary-fixed-dim">
+                      {player.wage != null ? formatMarketValue(player.wage) : '—'}
                     </span>
                   </div>
                   <div>

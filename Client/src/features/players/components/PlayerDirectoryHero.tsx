@@ -78,14 +78,11 @@ export function PlayerDirectoryHero() {
           <div className="flex w-full shrink-0 flex-col gap-space-sm lg:w-[28rem]">
             <div className="grid grid-cols-2 items-stretch gap-space-sm">
               <div className="flex h-36 min-w-0 flex-col justify-center bg-surface-container-low px-space-md py-space-md">
-                <span className="font-kicker text-kicker font-bold whitespace-nowrap text-on-surface-variant uppercase">
-                  Kadro Değeri
+                <span className="font-kicker text-kicker font-bold text-on-surface-variant uppercase">
+                  Trabzonspor Güncel Kadro Değeri
                 </span>
                 <span className="font-stat mt-1.5 text-headline-sm font-extrabold whitespace-nowrap text-primary sm:text-headline-md">
                   {totalSquadValue == null ? '—' : formatMarketValue(totalSquadValue)}
-                </span>
-                <span className="font-body mt-1 text-body-sm text-on-surface-variant">
-                  Toplam Piyasa Değeri
                 </span>
               </div>
 

@@ -63,8 +63,15 @@ const getAll = async (
   return await apiClient<PagedResponse<PlayerResponseDto>>(`${API_URL}?${queryParams}`)
 }
 
-const getRosterOverview = async (): Promise<ApiResponse<PlayerRosterOverviewDto>> => {
-  return await apiClient<PlayerRosterOverviewDto>(`${API_URL}/roster-overview`)
+const getRosterOverview = async (
+  category: PlayerCategory = PlayerCategory.Current,
+): Promise<ApiResponse<PlayerRosterOverviewDto>> => {
+  const queryParams = new URLSearchParams()
+  queryParams.set('category', String(category))
+
+  return await apiClient<PlayerRosterOverviewDto>(
+    `${API_URL}/roster-overview?${queryParams}`,
+  )
 }
 
 const getAllForAdmin = async (

@@ -253,7 +253,7 @@ export function HomePage() {
               </div>
               <div className="font-kicker hidden items-center gap-space-md tracking-wider text-surface-variant uppercase md:flex">
                 <span>61. DAKİKA KÜLTÜRÜ</span>
-                <span className="text-tertiary-fixed-dim">★ 8 ŞAMPİYONLUK</span>
+                <span className="text-tertiary-fixed-dim">★ 33 KUPA</span>
                 <span>BİZE HER YER TRABZON</span>
               </div>
             </div>
@@ -687,8 +687,8 @@ export function HomePage() {
                           <span className="font-headline text-stat-counter font-black text-primary tabular-nums">
                             {editorialStats
                               ? formatStatCount(
-                                  editorialStats.totalLikes + editorialStats.totalDislikes,
-                                )
+                                editorialStats.totalLikes + editorialStats.totalDislikes,
+                              )
                               : '—'}
                           </span>
                           <span className="text-xs font-medium text-on-surface-variant">

@@ -35,6 +35,7 @@ public interface IPlayerRepository : IRepository<Player, int>
     CancellationToken cancellationToken = default);
 
   Task<PlayerRosterOverviewDto> GetRosterOverviewAsync(
+    PlayerCategory category = PlayerCategory.Current,
     int? currentSeasonId = null,
     CancellationToken cancellationToken = default);
 }

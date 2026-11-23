@@ -79,6 +79,65 @@ function parseOptionalNumber(value: string): number | undefined {
   return parsed
 }
 
+export function formatAdminMoneyInput(raw: string): string {
+  const withoutGrouping = raw.replace(/\./g, '')
+  const cleaned = withoutGrouping.replace(/[^\d,]/g, '')
+
+  if (!cleaned) {
+    return ''
+  }
+
+  const commaIndex = cleaned.indexOf(',')
+  let integerDigits =
+    commaIndex === -1 ? cleaned : cleaned.slice(0, commaIndex)
+  const fractionDigits =
+    commaIndex === -1
+      ? null
+      : cleaned.slice(commaIndex + 1).replace(/,/g, '').slice(0, 2)
+
+  integerDigits = integerDigits.replace(/^0+(?=\d)/, '')
+
+  if (!integerDigits) {
+    integerDigits = '0'
+  }
+
+  const grouped = integerDigits.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+
+  if (fractionDigits != null) {
+    return `${grouped},${fractionDigits}`
+  }
+
+  if (cleaned.endsWith(',')) {
+    return `${grouped},`
+  }
+
+  return grouped
+}
+
+export function formatAdminMoneyAmount(value: number): string {
+  return value.toLocaleString('tr-TR', {
+    maximumFractionDigits: 2,
+    useGrouping: true,
+  })
+}
+
+export function parseAdminMoneyInput(value: string): number | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return undefined
+  }
+
+  const normalized = trimmed.replace(/\./g, '').replace(',', '.')
+  const parsed = Number(normalized)
+
+  if (Number.isNaN(parsed)) {
+    return undefined
+  }
+
+  return parsed
+}
+
 export function createEmptyAdminPlayerFormDraft(
   category: PlayerCategory = PlayerCategory.Current,
   defaultPositionId: number = 0,
@@ -148,8 +207,9 @@ export function mapPlayerResponseToFormDraft(player: PlayerResponseDto): AdminPl
     heightCm: player.height != null ? String(player.height) : '',
     positionId: player.positionId,
     currentTeam: player.currentTeam ?? '',
-    marketValue: player.marketValue != null ? String(player.marketValue) : '',
-    wage: player.wage != null ? String(player.wage) : '',
+    marketValue:
+      player.marketValue != null ? formatAdminMoneyAmount(player.marketValue) : '',
+    wage: player.wage != null ? formatAdminMoneyAmount(player.wage) : '',
     description: player.description ?? '',
     isCaptain: player.isCaptain,
     category: player.category,
@@ -193,13 +253,13 @@ export function validateAdminPlayerDraft(draft: AdminPlayerFormDraft): string | 
     return 'Boy geçerli bir sayı olmalıdır.'
   }
 
-  const marketValue = parseOptionalNumber(draft.marketValue)
+  const marketValue = parseAdminMoneyInput(draft.marketValue)
 
   if (draft.marketValue.trim() && (marketValue == null || marketValue < 0)) {
     return 'Piyasa değeri geçerli bir sayı olmalıdır.'
   }
 
-  const wage = parseOptionalNumber(draft.wage)
+  const wage = parseAdminMoneyInput(draft.wage)
 
   if (draft.wage.trim() && (wage == null || wage < 0)) {
     return 'Maaş geçerli bir sayı olmalıdır.'
@@ -218,8 +278,8 @@ function buildBaseRequest(draft: AdminPlayerFormDraft) {
     dateOfBirth: draft.dateOfBirth,
     height: parseOptionalNumber(draft.heightCm),
     preferredFoot: draft.preferredFoot,
-    marketValue: hideMarket ? undefined : parseOptionalNumber(draft.marketValue),
-    wage: hideMarket ? undefined : parseOptionalNumber(draft.wage),
+    marketValue: hideMarket ? undefined : parseAdminMoneyInput(draft.marketValue),
+    wage: hideMarket ? undefined : parseAdminMoneyInput(draft.wage),
     currentTeam: draft.currentTeam.trim() || null,
     description: draft.description.trim() || undefined,
     shirtNumber: shirtNumber != null ? Math.trunc(shirtNumber) : null,

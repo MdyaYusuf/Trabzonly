@@ -91,10 +91,12 @@ public class PlayerService(
   }
 
   public async Task<ReturnModel<PlayerRosterOverviewDto>> GetRosterOverviewAsync(
+    PlayerCategory category = PlayerCategory.Current,
     CancellationToken cancellationToken = default)
   {
     int? currentSeasonId = await ResolveCurrentSeasonIdAsync(cancellationToken);
     PlayerRosterOverviewDto overview = await _playerRepository.GetRosterOverviewAsync(
+      category,
       currentSeasonId,
       cancellationToken);
 

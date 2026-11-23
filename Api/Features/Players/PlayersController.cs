@@ -22,9 +22,10 @@ public class PlayersController(IPlayerService _playerService) : CustomBaseContro
 
   [HttpGet("roster-overview")]
   public async Task<IActionResult> GetRosterOverview(
+    [FromQuery] PlayerCategory category = PlayerCategory.Current,
     CancellationToken cancellationToken = default)
   {
-    var result = await _playerService.GetRosterOverviewAsync(cancellationToken);
+    var result = await _playerService.GetRosterOverviewAsync(category, cancellationToken);
 
     return CreateActionResult(result);
   }

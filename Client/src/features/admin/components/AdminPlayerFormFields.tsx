@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { PositionResponseDto } from '@/features/positions/positionTypes'
+import { formatAdminMoneyInput } from '../utils/adminPlayerDraftUtils'
 import { getAdminPlayerModule } from '../utils/adminPlayerModuleConfig'
 import type { AdminPlayerFormDraft, AdminPlayerPreferredFoot } from '../utils/adminPlayerTypes'
 
@@ -332,7 +333,7 @@ export function AdminPlayerFormFields({
                     className={`${inputClass} pr-8`}
                     value={draft.marketValue}
                     onChange={(event) => {
-                      onChange('marketValue', event.target.value)
+                      onChange('marketValue', formatAdminMoneyInput(event.target.value))
                     }}
                   />
                   <span className="font-label absolute top-1/2 right-3 -translate-y-1/2 text-label-md text-on-surface-variant">
@@ -349,7 +350,7 @@ export function AdminPlayerFormFields({
                     className={`${inputClass} pr-8`}
                     value={draft.wage}
                     onChange={(event) => {
-                      onChange('wage', event.target.value)
+                      onChange('wage', formatAdminMoneyInput(event.target.value))
                     }}
                   />
                   <span className="font-label absolute top-1/2 right-3 -translate-y-1/2 text-label-md text-on-surface-variant">

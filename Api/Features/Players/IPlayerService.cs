@@ -24,6 +24,7 @@ public interface IPlayerService
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<PlayerRosterOverviewDto>> GetRosterOverviewAsync(
+    PlayerCategory category = PlayerCategory.Current,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<PlayerResponseDto>> GetByIdAsync(

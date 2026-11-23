@@ -110,11 +110,12 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
   }
 
   public async Task<PlayerRosterOverviewDto> GetRosterOverviewAsync(
+    PlayerCategory category = PlayerCategory.Current,
     int? currentSeasonId = null,
     CancellationToken cancellationToken = default)
   {
     IQueryable<Player> query = Query(enableTracking: false)
-      .Where(p => p.IsActive && p.Category == PlayerCategory.Current);
+      .Where(p => p.IsActive && p.Category == category);
 
     bool hasPlayers = await query.AnyAsync(cancellationToken);
 
