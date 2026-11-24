@@ -10,7 +10,7 @@ public class QuizBusinessRules(IQuizRepository _quizRepository)
   public const int DefaultLeaderboardTake = 10;
 
   public async Task<Quiz> GetQuizIfExistAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -43,7 +43,7 @@ public class QuizBusinessRules(IQuizRepository _quizRepository)
     }
   }
 
-  public async Task QuizTitleCannotBeDuplicatedWhenUpdatedAsync(Guid id, string title, CancellationToken cancellationToken = default)
+  public async Task QuizTitleCannotBeDuplicatedWhenUpdatedAsync(int id, string title, CancellationToken cancellationToken = default)
   {
     bool exists = await _quizRepository.AnyAsync(q => q.Id != id && q.Title == title, cancellationToken);
 
@@ -74,7 +74,7 @@ public class QuizBusinessRules(IQuizRepository _quizRepository)
     }
   }
 
-  public Question GetQuestionBelongingToQuizIfExist(Quiz quiz, Guid questionId)
+  public Question GetQuestionBelongingToQuizIfExist(Quiz quiz, int questionId)
   {
     Question? question = quiz.Questions.FirstOrDefault(q => q.Id == questionId);
 
@@ -123,8 +123,8 @@ public class QuizBusinessRules(IQuizRepository _quizRepository)
 
   public void SubmitAnswersMustBeValid(Quiz quiz, List<QuestionAnswerDto> answers)
   {
-    HashSet<Guid> quizQuestionIds = quiz.Questions.Select(q => q.Id).ToHashSet();
-    HashSet<Guid> seenQuestionIds = [];
+    HashSet<int> quizQuestionIds = quiz.Questions.Select(q => q.Id).ToHashSet();
+    HashSet<int> seenQuestionIds = [];
 
     foreach (QuestionAnswerDto answer in answers)
     {

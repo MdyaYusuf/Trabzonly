@@ -3,7 +3,7 @@ using Api.Core.Repositories;
 
 namespace Api.Features.Quizzes;
 
-public interface IQuizRepository : IRepository<Quiz, Guid>
+public interface IQuizRepository : IRepository<Quiz, int>
 {
   Task<(List<QuizAdminListItemDto> Items, int TotalCount)> GetAdminListAsync(
     Expression<Func<Quiz, bool>>? filter = null,
@@ -22,7 +22,7 @@ public interface IQuizRepository : IRepository<Quiz, Guid>
   Task<List<Quiz>> GetRecentQuizzesAsync(
     int count,
     DateTime? lastDateCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,

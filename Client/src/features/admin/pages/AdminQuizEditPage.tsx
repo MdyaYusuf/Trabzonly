@@ -38,8 +38,17 @@ export function AdminQuizEditPage() {
       setIsLoading(true)
       setLoadError(false)
 
+      const parsedId = Number(quizId)
+
+      if (!Number.isFinite(parsedId)) {
+        setDraft(null)
+        setLoadError(true)
+        setIsLoading(false)
+        return
+      }
+
       const [quizResult, categoryResult] = await Promise.all([
-        quizService.getById(quizId!),
+        quizService.getById(parsedId),
         quizCategoryService.getAllForAdmin(),
       ])
 
@@ -86,7 +95,7 @@ export function AdminQuizEditPage() {
     })
   }
 
-  function updateQuestion(questionId: string, patch: Partial<AdminQuizQuestion>) {
+  function updateQuestion(questionId: string | number, patch: Partial<AdminQuizQuestion>) {
     setDraft((prev) => {
       if (!prev) {
         return prev
@@ -101,7 +110,7 @@ export function AdminQuizEditPage() {
     })
   }
 
-  function setCorrectOption(questionId: string, optionId: string) {
+  function setCorrectOption(questionId: string | number, optionId: string | number) {
     setDraft((prev) => {
       if (!prev) {
         return prev
@@ -126,7 +135,7 @@ export function AdminQuizEditPage() {
     })
   }
 
-  function updateOptionText(questionId: string, optionId: string, text: string) {
+  function updateOptionText(questionId: string | number, optionId: string | number, text: string) {
     setDraft((prev) => {
       if (!prev) {
         return prev
@@ -168,7 +177,7 @@ export function AdminQuizEditPage() {
     })
   }
 
-  function removeQuestion(questionId: string) {
+  function removeQuestion(questionId: string | number) {
     setDraft((prev) => {
       if (!prev || prev.questions.length <= 10) {
         return prev
@@ -186,7 +195,7 @@ export function AdminQuizEditPage() {
     })
   }
 
-  function toggleExpand(questionId: string) {
+  function toggleExpand(questionId: string | number) {
     setDraft((prev) => {
       if (!prev) {
         return prev

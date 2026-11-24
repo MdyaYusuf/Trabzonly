@@ -1,14 +1,14 @@
 import { ADMIN_QUIZ_REQUIRED_QUESTION_COUNT } from '../utils/adminQuizDraftUtils'
-import type { AdminQuizQuestion } from '../utils/adminQuizTypes'
+import type { AdminQuizQuestion, DraftKey } from '../utils/adminQuizTypes'
 
 type AdminQuizQuestionEditorProps = {
   questions: AdminQuizQuestion[]
-  onUpdateQuestion: (questionId: string, patch: Partial<AdminQuizQuestion>) => void
-  onSetCorrectOption: (questionId: string, optionId: string) => void
-  onUpdateOptionText: (questionId: string, optionId: string, text: string) => void
+  onUpdateQuestion: (questionId: DraftKey, patch: Partial<AdminQuizQuestion>) => void
+  onSetCorrectOption: (questionId: DraftKey, optionId: DraftKey) => void
+  onUpdateOptionText: (questionId: DraftKey, optionId: DraftKey, text: string) => void
   onAddQuestion: () => void
-  onRemoveQuestion: (questionId: string) => void
-  onToggleExpand: (questionId: string) => void
+  onRemoveQuestion: (questionId: DraftKey) => void
+  onToggleExpand: (questionId: DraftKey) => void
 }
 
 const inputClass =

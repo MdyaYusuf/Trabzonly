@@ -1,5 +1,9 @@
 import type { QuizCategoryResponseDto } from '@/features/quizzes/quizTypes'
-import type { AdminQuizCreateDraft, AdminQuizQuestion } from '../utils/adminQuizTypes'
+import type {
+  AdminQuizCreateDraft,
+  AdminQuizQuestion,
+  DraftKey,
+} from '../utils/adminQuizTypes'
 import { AdminQuizQuestionEditor } from './AdminQuizQuestionEditor'
 
 type AdminQuizCreateFormFieldsProps = {
@@ -9,12 +13,12 @@ type AdminQuizCreateFormFieldsProps = {
     key: K,
     value: AdminQuizCreateDraft[K],
   ) => void
-  onUpdateQuestion: (questionId: string, patch: Partial<AdminQuizQuestion>) => void
-  onSetCorrectOption: (questionId: string, optionId: string) => void
-  onUpdateOptionText: (questionId: string, optionId: string, text: string) => void
+  onUpdateQuestion: (questionId: DraftKey, patch: Partial<AdminQuizQuestion>) => void
+  onSetCorrectOption: (questionId: DraftKey, optionId: DraftKey) => void
+  onUpdateOptionText: (questionId: DraftKey, optionId: DraftKey, text: string) => void
   onAddQuestion: () => void
-  onRemoveQuestion: (questionId: string) => void
-  onToggleExpand: (questionId: string) => void
+  onRemoveQuestion: (questionId: DraftKey) => void
+  onToggleExpand: (questionId: DraftKey) => void
 }
 
 const inputClass =

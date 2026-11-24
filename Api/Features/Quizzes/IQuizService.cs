@@ -11,7 +11,7 @@ public interface IQuizService
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<QuizTakeDto>> GetTakeAsync(
-    Guid id,
+    int id,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<QuizPlatformStatsDto>> GetPlatformStatsAsync(
@@ -38,7 +38,7 @@ public interface IQuizService
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<QuizResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
@@ -50,7 +50,7 @@ public interface IQuizService
   Task<ReturnModel<CursorPagedResponse<QuizListItemDto>>> GetRecentQuizzesAsync(
     int count,
     DateTime? lastDateCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<CreatedQuizResponseDto>> AddAsync(
@@ -64,7 +64,7 @@ public interface IQuizService
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default);
 

@@ -42,7 +42,7 @@ const getActiveList = async (
   return await apiClient<QuizListItemDto[]>(`${API_URL}${qs}`)
 }
 
-const getTake = async (id: string): Promise<ApiResponse<QuizTakeDto>> => {
+const getTake = async (id: number): Promise<ApiResponse<QuizTakeDto>> => {
   return await apiClientResult<QuizTakeDto>(`${API_URL}/${id}/take`, {
     silentNotFound: true,
   })
@@ -106,7 +106,7 @@ const getAllForAdmin = async (
 }
 
 /** Admin-only full quiz by id (includes IsCorrect). */
-const getById = async (id: string): Promise<ApiResponse<QuizResponseDto>> => {
+const getById = async (id: number): Promise<ApiResponse<QuizResponseDto>> => {
   return await apiClient<QuizResponseDto>(`${API_URL}/${id}`)
 }
 
@@ -124,7 +124,7 @@ const update = async (request: UpdateQuizRequest): Promise<ApiResponse<NoData>> 
   })
 }
 
-const remove = async (id: string): Promise<ApiResponse<NoData>> => {
+const remove = async (id: number): Promise<ApiResponse<NoData>> => {
   return await apiClient<NoData>(`${API_URL}/${id}`, {
     method: 'DELETE',
   })

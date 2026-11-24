@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 type QuizResultActionsProps = {
-  quizId: string
+  quizId: number
 }
 
 export function QuizResultActions({ quizId }: QuizResultActionsProps) {

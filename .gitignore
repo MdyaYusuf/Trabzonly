@@ -461,6 +461,7 @@ $RECYCLE.BIN/
 
 # Local DB seed / bootstrap SQL (run manually; do not push)
 sql-queries.sql
+quiz.sql
 
 # Quiz question bank with correct answers (seed locally / privately; do not push)
 trabzonly-quiz.json

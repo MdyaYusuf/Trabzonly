@@ -51,7 +51,7 @@ public class QuizService(
   }
 
   public async Task<ReturnModel<QuizTakeDto>> GetTakeAsync(
-    Guid id,
+    int id,
     CancellationToken cancellationToken = default)
   {
     Quiz quiz = await _businessRules.GetQuizIfExistAsync(
@@ -246,7 +246,7 @@ public class QuizService(
   }
 
   public async Task<ReturnModel<QuizResponseDto>> GetByIdAsync(
-    Guid id,
+    int id,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
@@ -298,7 +298,7 @@ public class QuizService(
   public async Task<ReturnModel<CursorPagedResponse<QuizListItemDto>>> GetRecentQuizzesAsync(
     int count,
     DateTime? lastDateCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     CancellationToken cancellationToken = default)
   {
     List<Quiz> quizzes = await _quizRepository.GetRecentQuizzesAsync(
@@ -442,7 +442,7 @@ public class QuizService(
   }
 
   public async Task<ReturnModel<NoData>> RemoveAsync(
-    Guid id,
+    int id,
     string userRole,
     CancellationToken cancellationToken = default)
   {
@@ -540,12 +540,12 @@ public class QuizService(
 
     int totalScore = 0;
 
-    Dictionary<Guid, Guid> userAnswersDict = request.Answers
+    Dictionary<int, int> userAnswersDict = request.Answers
       .ToDictionary(a => a.QuestionId, a => a.AnswerId);
 
     foreach (Question question in quiz.Questions)
     {
-      if (!userAnswersDict.TryGetValue(question.Id, out Guid submittedAnswerId))
+      if (!userAnswersDict.TryGetValue(question.Id, out int submittedAnswerId))
       {
         continue;
       }

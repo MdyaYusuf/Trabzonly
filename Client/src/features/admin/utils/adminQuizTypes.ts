@@ -7,7 +7,7 @@ export type AdminQuizStatus = 'active' | 'passive'
 export type AdminQuizSort = QuizAdminSortOption
 
 export type AdminQuizListRow = {
-  id: string
+  id: number
   title: string
   quizCategoryId: number
   categoryLabel: string
@@ -17,15 +17,18 @@ export type AdminQuizListRow = {
   statusLabel: string
 }
 
+/** Draft keys — API ids are numbers; new drafts use temp string keys. */
+export type DraftKey = string | number
+
 export type AdminQuizOption = {
-  id: string
+  id: DraftKey
   label: string
   text: string
   isCorrect: boolean
 }
 
 export type AdminQuizQuestion = {
-  id: string
+  id: DraftKey
   number: number
   text: string
   explanation: string
@@ -43,7 +46,7 @@ export type AdminQuizCreateDraft = {
 }
 
 export type AdminQuizEditDraft = {
-  id: string
+  id: number
   title: string
   description: string
   quizCategoryId: number

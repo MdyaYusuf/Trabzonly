@@ -32,7 +32,7 @@ export function AdminQuizListPage() {
   const [categories, setCategories] = useState<QuizCategoryResponseDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<AdminQuizListRow | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
   const [listVersion, setListVersion] = useState(0)
 
   useEffect(() => {

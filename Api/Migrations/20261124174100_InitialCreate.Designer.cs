@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Trabzonly.Api.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20261117161954_RemovePostImageUrl")]
-    partial class RemovePostImageUrl
+    [Migration("20261124174100_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -154,6 +154,52 @@ namespace Trabzonly.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("CommentReactions", (string)null);
+                });
+
+            modelBuilder.Entity("Api.Features.ContactMessages.ContactMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsResolved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedDate");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsRead", "CreatedDate");
+
+                    b.HasIndex("IsResolved", "CreatedDate");
+
+                    b.HasIndex("UserId", "CreatedDate");
+
+                    b.ToTable("ContactMessages", (string)null);
                 });
 
             modelBuilder.Entity("Api.Features.Injuries.Injury", b =>
@@ -547,12 +593,16 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("decimal(4,2)")
                         .HasDefaultValue(0m);
 
+                    b.Property<int>("Category")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("CurrentTeam")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -560,8 +610,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
 
                     b.Property<int?>("Height")
                         .HasColumnType("int");
@@ -616,6 +666,8 @@ namespace Trabzonly.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PositionId");
+
+                    b.HasIndex("Category", "IsActive");
 
                     b.ToTable("Players", (string)null);
                 });
@@ -957,10 +1009,12 @@ namespace Trabzonly.Api.Migrations
 
             modelBuilder.Entity("Api.Features.Quizzes.Answer", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("int")
                         .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
@@ -969,8 +1023,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("QuestionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -990,10 +1044,12 @@ namespace Trabzonly.Api.Migrations
 
             modelBuilder.Entity("Api.Features.Quizzes.Question", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("int")
                         .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
@@ -1006,8 +1062,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("QuizId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
@@ -1030,10 +1086,12 @@ namespace Trabzonly.Api.Migrations
 
             modelBuilder.Entity("Api.Features.Quizzes.Quiz", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("int")
                         .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
@@ -1107,10 +1165,12 @@ namespace Trabzonly.Api.Migrations
 
             modelBuilder.Entity("Api.Features.Quizzes.UserQuizResult", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("int")
                         .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CompletedAt")
                         .HasColumnType("datetime2");
@@ -1122,8 +1182,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
-                    b.Property<Guid>("QuizId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Score")
                         .HasColumnType("int");
@@ -1409,10 +1469,10 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Appearances")
                         .HasColumnType("int");
 
-                    b.Property<int>("Assists")
+                    b.Property<int?>("Assists")
                         .HasColumnType("int");
 
-                    b.Property<int>("CleanSheets")
+                    b.Property<int?>("CleanSheets")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
@@ -1422,16 +1482,13 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Goals")
                         .HasColumnType("int");
 
-                    b.Property<int>("GoalsConceded")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MinutesPlayed")
+                    b.Property<int?>("GoalsConceded")
                         .HasColumnType("int");
 
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RedCards")
+                    b.Property<int?>("RedCards")
                         .HasColumnType("int");
 
                     b.Property<int>("SeasonId")
@@ -1446,7 +1503,7 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("UpdatedDate");
 
-                    b.Property<int>("YellowCards")
+                    b.Property<int?>("YellowCards")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -1624,6 +1681,17 @@ namespace Trabzonly.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Api.Features.ContactMessages.ContactMessage", b =>
+                {
+                    b.HasOne("Api.Features.Users.User", "User")
+                        .WithMany("ContactMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -2180,6 +2248,8 @@ namespace Trabzonly.Api.Migrations
             modelBuilder.Entity("Api.Features.Users.User", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("ContactMessages");
 
                     b.Navigation("Followers");
 

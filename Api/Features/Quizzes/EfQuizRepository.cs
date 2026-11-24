@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Quizzes;
 
-public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, Guid>, IQuizRepository
+public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, int>, IQuizRepository
 {
   public EfQuizRepository(BaseDbContext context) : base(context)
   {
@@ -90,7 +90,7 @@ public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, Guid>, IQu
   public async Task<List<Quiz>> GetRecentQuizzesAsync(
     int count,
     DateTime? lastDateCursor = null,
-    Guid? lastIdCursor = null,
+    int? lastIdCursor = null,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,
     bool withDeleted = false,
@@ -106,7 +106,7 @@ public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, Guid>, IQu
     if (lastDateCursor.HasValue && lastIdCursor.HasValue)
     {
       query = query.Where(q => q.CreatedDate < lastDateCursor ||
-                              (q.CreatedDate == lastDateCursor && q.Id.CompareTo(lastIdCursor.Value) < 0));
+                              (q.CreatedDate == lastDateCursor && q.Id < lastIdCursor.Value));
     }
 
     return await query

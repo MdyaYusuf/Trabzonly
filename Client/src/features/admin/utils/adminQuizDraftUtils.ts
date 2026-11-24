@@ -99,7 +99,7 @@ export function mapQuizResponseToEditDraft(quiz: QuizResponseDto): AdminQuizEdit
       while (options.length < 4) {
         const label = OPTION_LABELS[options.length] ?? String(options.length + 1)
         options.push({
-          id: `pad-${question.id}-${label}`,
+          id: `pad-${String(question.id)}-${label}`,
           label,
           text: '',
           isCorrect: false,

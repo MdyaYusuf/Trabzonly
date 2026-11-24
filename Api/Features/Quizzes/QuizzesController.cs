@@ -84,7 +84,7 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   public async Task<IActionResult> GetRecentQuizzes(
     int count,
     [FromQuery] DateTime? lastDate = null,
-    [FromQuery] Guid? lastId = null,
+    [FromQuery] int? lastId = null,
     CancellationToken cancellationToken = default)
   {
     var result = await _quizService.GetRecentQuizzesAsync(
@@ -97,9 +97,9 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   }
 
   [Authorize]
-  [HttpGet("{id:guid}/take")]
+  [HttpGet("{id:int}/take")]
   public async Task<IActionResult> GetTake(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _quizService.GetTakeAsync(
@@ -110,9 +110,9 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   }
 
   [Authorize(Roles = "Admin")]
-  [HttpGet("{id:guid}")]
+  [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _quizService.GetByIdAsync(id: id, cancellationToken: cancellationToken);
@@ -149,9 +149,9 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   }
 
   [Authorize(Roles = "Admin")]
-  [HttpDelete("{id:guid}")]
+  [HttpDelete("{id:int}")]
   public async Task<IActionResult> Delete(
-    Guid id,
+    int id,
     CancellationToken cancellationToken)
   {
     var result = await _quizService.RemoveAsync(

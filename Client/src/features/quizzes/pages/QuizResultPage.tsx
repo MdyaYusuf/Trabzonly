@@ -7,7 +7,9 @@ import { QuizResultHero } from '../components/QuizResultHero'
 import type { QuizResultLocationState } from './TakeQuizPage'
 
 export function QuizResultPage() {
-  const { quizId } = useParams<{ quizId: string }>()
+  const { quizId: quizIdParam } = useParams<{ quizId: string }>()
+  const quizId = Number(quizIdParam)
+  const hasValidQuizId = Number.isFinite(quizId) && quizId > 0
   const location = useLocation()
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const state = location.state as QuizResultLocationState | null
@@ -16,7 +18,7 @@ export function QuizResultPage() {
     return <Navigate to="/login" replace />
   }
 
-  if (!quizId || !state?.result || state.result.quizId !== quizId) {
+  if (!hasValidQuizId || !state?.result || state.result.quizId !== quizId) {
     return (
       <main className="min-h-screen w-full bg-background pt-16 sm:pt-20">
         <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-space-md px-4 py-space-xl sm:px-6 lg:px-12">
@@ -30,7 +32,7 @@ export function QuizResultPage() {
             >
               Quiz listesi
             </Link>
-            {quizId ? (
+            {hasValidQuizId ? (
               <Link
                 to={`/quizler/${quizId}`}
                 className="font-label border border-outline-variant px-space-md py-space-sm text-label-md font-bold text-primary uppercase"

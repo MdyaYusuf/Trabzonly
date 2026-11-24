@@ -63,7 +63,7 @@ export function AdminQuizCreatePage() {
     }))
   }
 
-  function updateQuestion(questionId: string, patch: Partial<AdminQuizQuestion>) {
+  function updateQuestion(questionId: string | number, patch: Partial<AdminQuizQuestion>) {
     setDraft((prev) => ({
       ...prev,
       questions: prev.questions.map((question) =>
@@ -72,7 +72,7 @@ export function AdminQuizCreatePage() {
     }))
   }
 
-  function setCorrectOption(questionId: string, optionId: string) {
+  function setCorrectOption(questionId: string | number, optionId: string | number) {
     setDraft((prev) => ({
       ...prev,
       questions: prev.questions.map((question) => {
@@ -91,7 +91,7 @@ export function AdminQuizCreatePage() {
     }))
   }
 
-  function updateOptionText(questionId: string, optionId: string, text: string) {
+  function updateOptionText(questionId: string | number, optionId: string | number, text: string) {
     setDraft((prev) => ({
       ...prev,
       questions: prev.questions.map((question) => {
@@ -128,7 +128,7 @@ export function AdminQuizCreatePage() {
     })
   }
 
-  function removeQuestion(questionId: string) {
+  function removeQuestion(questionId: string | number) {
     setDraft((prev) => {
       if (prev.questions.length <= 10) {
         return prev
@@ -146,7 +146,7 @@ export function AdminQuizCreatePage() {
     })
   }
 
-  function toggleExpand(questionId: string) {
+  function toggleExpand(questionId: string | number) {
     setDraft((prev) => ({
       ...prev,
       questions: prev.questions.map((question) =>

@@ -3,7 +3,7 @@ import type { AdminQuizListRow } from '../utils/adminQuizTypes'
 
 type AdminQuizTableProps = {
   rows: AdminQuizListRow[]
-  deletingId: string | null
+  deletingId: number | null
   onDelete: (quiz: AdminQuizListRow) => void
 }
 

@@ -2,7 +2,7 @@ namespace Api.Features.Quizzes;
 
 // Responses — admin / full (may include IsCorrect)
 public sealed record QuizResponseDto(
-  Guid Id,
+  int Id,
   string Title,
   string? Description,
   int QuizCategoryId,
@@ -12,7 +12,7 @@ public sealed record QuizResponseDto(
   List<QuestionResponseDto> Questions);
 
 public sealed record QuestionResponseDto(
-  Guid Id,
+  int Id,
   string Text,
   string? Explanation,
   int Points,
@@ -20,13 +20,13 @@ public sealed record QuestionResponseDto(
   List<AnswerResponseDto> Answers);
 
 public sealed record AnswerResponseDto(
-  Guid Id,
+  int Id,
   string Text,
   bool IsCorrect);
 
 public sealed record UserQuizResultResponseDto(
-  Guid Id,
-  Guid QuizId,
+  int Id,
+  int QuizId,
   Guid UserId,
   int Score,
   int MaxScore,
@@ -34,11 +34,11 @@ public sealed record UserQuizResultResponseDto(
   DateTime CompletedAt);
 
 public sealed record CreatedQuizResponseDto(
-  Guid Id,
+  int Id,
   string Title);
 
 public sealed record QuizPreviewDto(
-  Guid Id,
+  int Id,
   string Title,
   string? Description,
   int QuizCategoryId,
@@ -47,7 +47,7 @@ public sealed record QuizPreviewDto(
   bool IsActive);
 
 public sealed record QuizAdminListItemDto(
-  Guid Id,
+  int Id,
   string Title,
   string? Description,
   int QuizCategoryId,
@@ -72,7 +72,7 @@ public static class QuizAdminSortOptions
 
 // Public list (no questions, no answers)
 public sealed record QuizListItemDto(
-  Guid Id,
+  int Id,
   string Title,
   string? Description,
   int QuizCategoryId,
@@ -85,7 +85,7 @@ public sealed record QuizListItemDto(
 
 // Take attempt (no IsCorrect, no Explanation)
 public sealed record QuizTakeDto(
-  Guid Id,
+  int Id,
   string Title,
   string? Description,
   int QuizCategoryId,
@@ -94,25 +94,25 @@ public sealed record QuizTakeDto(
   List<QuizTakeQuestionDto> Questions);
 
 public sealed record QuizTakeQuestionDto(
-  Guid Id,
+  int Id,
   string Text,
   int Points,
   int SortOrder,
   List<QuizTakeAnswerDto> Answers);
 
 public sealed record QuizTakeAnswerDto(
-  Guid Id,
+  int Id,
   string Text);
 
 // Per-question check
 public sealed record CheckQuizAnswerRequest(
-  Guid QuizId,
-  Guid QuestionId,
-  Guid? AnswerId);
+  int QuizId,
+  int QuestionId,
+  int? AnswerId);
 
 public sealed record CheckQuizAnswerResponse(
   bool IsCorrect,
-  Guid CorrectAnswerId,
+  int CorrectAnswerId,
   string? Explanation);
 
 // Platform / leaderboard / me stats
@@ -152,13 +152,13 @@ public sealed record CreateQuestionRequest(
 public sealed record CreateAnswerRequest(string Text, bool IsCorrect);
 
 public sealed record UpdateQuizRequest(
-  Guid Id,
+  int Id,
   string Title,
   string? Description,
   int QuizCategoryId,
   bool IsActive,
   List<CreateQuestionRequest>? Questions = null);
 
-public sealed record SubmitQuizRequest(Guid QuizId, TimeSpan CompletionTime, List<QuestionAnswerDto> Answers);
+public sealed record SubmitQuizRequest(int QuizId, TimeSpan CompletionTime, List<QuestionAnswerDto> Answers);
 
-public sealed record QuestionAnswerDto(Guid QuestionId, Guid AnswerId);
+public sealed record QuestionAnswerDto(int QuestionId, int AnswerId);

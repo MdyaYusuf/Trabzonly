@@ -31,7 +31,9 @@ export type QuizResultLocationState = {
 type QuestionPhase = 'answering' | 'checking' | 'revealed'
 
 export function TakeQuizPage() {
-  const { quizId } = useParams<{ quizId: string }>()
+  const { quizId: quizIdParam } = useParams<{ quizId: string }>()
+  const quizId = Number(quizIdParam)
+  const hasValidQuizId = Number.isFinite(quizId) && quizId > 0
   const navigate = useNavigate()
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
 
@@ -43,16 +45,16 @@ export function TakeQuizPage() {
   const [phase, setPhase] = useState<QuestionPhase>('answering')
   const [remainingSeconds, setRemainingSeconds] = useState(QUIZ_SECONDS_PER_QUESTION)
   const [feedbackByQuestion, setFeedbackByQuestion] = useState<
-    Record<string, TakeQuestionFeedback>
+    Record<number, TakeQuestionFeedback>
   >({})
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const startedAtRef = useRef(Date.now())
   const resolveLockRef = useRef(false)
   const finishedRef = useRef(false)
-  const selectedAnswersRef = useRef<Record<string, string>>({})
-  const feedbackByQuestionRef = useRef<Record<string, TakeQuestionFeedback>>({})
+  const selectedAnswersRef = useRef<Record<number, number>>({})
+  const feedbackByQuestionRef = useRef<Record<number, TakeQuestionFeedback>>({})
 
   selectedAnswersRef.current = selectedAnswers
   feedbackByQuestionRef.current = feedbackByQuestion
@@ -70,7 +72,7 @@ export function TakeQuizPage() {
   }, [isAuthenticated, navigate])
 
   useEffect(() => {
-    if (!isAuthenticated || !quizId) {
+    if (!isAuthenticated || !hasValidQuizId) {
       return
     }
 
@@ -81,7 +83,7 @@ export function TakeQuizPage() {
       setLoadError(false)
 
       try {
-        const result = await quizService.getTake(quizId!)
+        const result = await quizService.getTake(quizId)
 
         if (cancelled) {
           return
@@ -119,7 +121,7 @@ export function TakeQuizPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated, quizId])
+  }, [isAuthenticated, hasValidQuizId, quizId])
 
   const question = quiz?.questions[currentIndex] ?? null
 
@@ -155,7 +157,7 @@ export function TakeQuizPage() {
     }
   }, [phase, question?.id])
 
-  async function resolveAnswer(answerId: string | null) {
+  async function resolveAnswer(answerId: number | null) {
     if (!quiz || !question || resolveLockRef.current || finishedRef.current) {
       return
     }
@@ -176,7 +178,7 @@ export function TakeQuizPage() {
       return
     }
 
-    if (answerId) {
+    if (answerId != null) {
       setSelectedAnswers((prev) => ({
         ...prev,
         [question.id]: answerId,
@@ -205,7 +207,7 @@ export function TakeQuizPage() {
     void resolveAnswer(null)
   }, [phase, remainingSeconds])
 
-  async function submitAndFinish(finalAnswers: Record<string, string>) {
+  async function submitAndFinish(finalAnswers: Record<number, number>) {
     if (!quiz || finishedRef.current || isSubmitting) {
       return
     }
@@ -219,7 +221,7 @@ export function TakeQuizPage() {
     )
 
     const answers = Object.entries(finalAnswers).map(([questionId, answerId]) => ({
-      questionId,
+      questionId: Number(questionId),
       answerId,
     }))
 
@@ -267,7 +269,7 @@ export function TakeQuizPage() {
     return null
   }
 
-  if (!quizId) {
+  if (!hasValidQuizId) {
     return <Navigate to="/quizler" replace />
   }
 

@@ -3,7 +3,7 @@ using Api.Data;
 
 namespace Api.Features.Quizzes;
 
-public class EfQuestionRepository : EfBaseRepository<BaseDbContext, Question, Guid>, IQuestionRepository
+public class EfQuestionRepository : EfBaseRepository<BaseDbContext, Question, int>, IQuestionRepository
 {
   public EfQuestionRepository(BaseDbContext context) : base(context)
   {

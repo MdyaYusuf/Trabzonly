@@ -29,13 +29,13 @@ export interface UpdateQuizCategoryRequest {
 
 // Responses — admin / full (may include isCorrect)
 export interface AnswerResponseDto {
-  id: string
+  id: number
   text: string
   isCorrect: boolean
 }
 
 export interface QuestionResponseDto {
-  id: string
+  id: number
   text: string
   explanation?: string
   points: number
@@ -44,7 +44,7 @@ export interface QuestionResponseDto {
 }
 
 export interface QuizResponseDto {
-  id: string
+  id: number
   title: string
   description?: string
   quizCategoryId: number
@@ -55,8 +55,8 @@ export interface QuizResponseDto {
 }
 
 export interface UserQuizResultResponseDto {
-  id: string
-  quizId: string
+  id: number
+  quizId: number
   userId: string
   score: number
   maxScore: number
@@ -65,12 +65,12 @@ export interface UserQuizResultResponseDto {
 }
 
 export interface CreatedQuizResponseDto {
-  id: string
+  id: number
   title: string
 }
 
 export interface QuizAdminListItemDto {
-  id: string
+  id: number
   title: string
   description?: string | null
   quizCategoryId: number
@@ -92,7 +92,7 @@ export interface QuizAdminListQuery {
 
 /** Public list payload — never includes questions, answers, or isCorrect. */
 export interface QuizListItemDto {
-  id: string
+  id: number
   title: string
   description?: string
   quizCategoryId: number
@@ -106,12 +106,12 @@ export interface QuizListItemDto {
 
 /** Take attempt answer — text only; never includes isCorrect or explanation. */
 export interface QuizTakeAnswerDto {
-  id: string
+  id: number
   text: string
 }
 
 export interface QuizTakeQuestionDto {
-  id: string
+  id: number
   text: string
   points: number
   sortOrder: number
@@ -119,7 +119,7 @@ export interface QuizTakeQuestionDto {
 }
 
 export interface QuizTakeDto {
-  id: string
+  id: number
   title: string
   description?: string
   quizCategoryId: number
@@ -130,14 +130,14 @@ export interface QuizTakeDto {
 
 // Per-question check
 export interface CheckQuizAnswerRequest {
-  quizId: string
-  questionId: string
-  answerId?: string | null
+  quizId: number
+  questionId: number
+  answerId?: number | null
 }
 
 export interface CheckQuizAnswerResponse {
   isCorrect: boolean
-  correctAnswerId: string
+  correctAnswerId: number
   explanation?: string
 }
 
@@ -186,7 +186,7 @@ export interface CreateQuizRequest {
 }
 
 export interface UpdateQuizRequest {
-  id: string
+  id: number
   title: string
   description?: string
   quizCategoryId: number
@@ -196,12 +196,12 @@ export interface UpdateQuizRequest {
 }
 
 export interface QuestionAnswerDto {
-  questionId: string
-  answerId: string
+  questionId: number
+  answerId: number
 }
 
 export interface SubmitQuizRequest {
-  quizId: string
+  quizId: number
   completionTime: string
   answers: QuestionAnswerDto[]
 }

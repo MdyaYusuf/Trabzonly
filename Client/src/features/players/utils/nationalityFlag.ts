@@ -26,6 +26,11 @@ const NATIONALITY_FLAG_FILES: Record<string, string> = {
   'bosna-hersek': 'bosnia-and-herzegovina.svg',
   'fildişi sahili': 'cote-d-ivoire.svg',
   iskoçya: 'scotland.svg',
+  şili: 'chile.svg',
+  ispanya: 'spain.svg',
+  'güney kore': 'south-korea.svg',
+  danimarka: 'denmark.svg',
+  gana: 'ghana.svg',
 }
 
 function normalizeNationality(nationality: string): string {

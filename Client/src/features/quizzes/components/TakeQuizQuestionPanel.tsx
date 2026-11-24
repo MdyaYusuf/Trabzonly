@@ -3,9 +3,9 @@ import { OPTION_LETTERS, QUIZ_SECONDS_PER_QUESTION } from '../utils/quizFormat'
 
 export type TakeQuestionFeedback = {
   isCorrect: boolean
-  correctAnswerId: string
+  correctAnswerId: number
   explanation?: string
-  selectedAnswerId: string | null
+  selectedAnswerId: number | null
 }
 
 type TakeQuizQuestionPanelProps = {
@@ -17,7 +17,7 @@ type TakeQuizQuestionPanelProps = {
   phase: 'answering' | 'checking' | 'revealed'
   feedback: TakeQuestionFeedback | null
   remainingSeconds: number
-  onSelect: (optionId: string) => void
+  onSelect: (optionId: number) => void
   onNext: () => void
   isLast: boolean
   isSubmitting: boolean

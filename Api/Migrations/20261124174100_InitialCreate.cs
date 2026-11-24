@@ -29,6 +29,23 @@ namespace Trabzonly.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Clubs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ShortName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    IsTrabzonspor = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clubs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Metrics",
                 columns: table => new
                 {
@@ -71,7 +88,6 @@ namespace Trabzonly.Api.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    SeedKey = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -88,6 +104,7 @@ namespace Trabzonly.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsSystem = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -106,6 +123,7 @@ namespace Trabzonly.Api.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    DisplayedFixtureWeek = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -127,14 +145,15 @@ namespace Trabzonly.Api.Migrations
                     PreferredFoot = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     MarketValue = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Wage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CurrentTeam = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    CurrentTeam = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(400)", maxLength: 400, nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShirtNumber = table.Column<int>(type: "int", nullable: true),
                     AverageRating = table.Column<decimal>(type: "decimal(4,2)", precision: 4, scale: 2, nullable: false, defaultValue: 0m),
                     RatingCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsCaptain = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Category = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -178,11 +197,11 @@ namespace Trabzonly.Api.Migrations
                 name: "Quizzes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     QuizCategoryId = table.Column<int>(type: "int", nullable: false),
-                    SeedKey = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -231,6 +250,103 @@ namespace Trabzonly.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Fixtures",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SeasonId = table.Column<int>(type: "int", nullable: false),
+                    WeekNumber = table.Column<int>(type: "int", nullable: false),
+                    HomeClubId = table.Column<int>(type: "int", nullable: false),
+                    AwayClubId = table.Column<int>(type: "int", nullable: false),
+                    Kickoff = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    HomeScore = table.Column<int>(type: "int", nullable: true),
+                    AwayScore = table.Column<int>(type: "int", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fixtures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Fixtures_Clubs_AwayClubId",
+                        column: x => x.AwayClubId,
+                        principalTable: "Clubs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Fixtures_Clubs_HomeClubId",
+                        column: x => x.HomeClubId,
+                        principalTable: "Clubs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Fixtures_Seasons_SeasonId",
+                        column: x => x.SeasonId,
+                        principalTable: "Seasons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LeagueStandings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SeasonId = table.Column<int>(type: "int", nullable: false),
+                    ClubId = table.Column<int>(type: "int", nullable: false),
+                    Played = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Won = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Drawn = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Lost = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    GoalsFor = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    GoalsAgainst = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Points = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Rank = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeagueStandings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LeagueStandings_Clubs_ClubId",
+                        column: x => x.ClubId,
+                        principalTable: "Clubs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LeagueStandings_Seasons_SeasonId",
+                        column: x => x.SeasonId,
+                        principalTable: "Seasons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MatchWeeks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SeasonId = table.Column<int>(type: "int", nullable: false),
+                    Formation = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MatchWeeks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MatchWeeks_Seasons_SeasonId",
+                        column: x => x.SeasonId,
+                        principalTable: "Seasons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Injuries",
                 columns: table => new
                 {
@@ -269,13 +385,12 @@ namespace Trabzonly.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Team = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Appearances = table.Column<int>(type: "int", nullable: false),
-                    MinutesPlayed = table.Column<int>(type: "int", nullable: false),
                     Goals = table.Column<int>(type: "int", nullable: false),
-                    Assists = table.Column<int>(type: "int", nullable: false),
-                    YellowCards = table.Column<int>(type: "int", nullable: false),
-                    RedCards = table.Column<int>(type: "int", nullable: false),
-                    CleanSheets = table.Column<int>(type: "int", nullable: false),
-                    GoalsConceded = table.Column<int>(type: "int", nullable: false),
+                    Assists = table.Column<int>(type: "int", nullable: true),
+                    YellowCards = table.Column<int>(type: "int", nullable: true),
+                    RedCards = table.Column<int>(type: "int", nullable: true),
+                    CleanSheets = table.Column<int>(type: "int", nullable: true),
+                    GoalsConceded = table.Column<int>(type: "int", nullable: true),
                     PlayerId = table.Column<int>(type: "int", nullable: false),
                     SeasonId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -302,12 +417,13 @@ namespace Trabzonly.Api.Migrations
                 name: "Questions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Explanation = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     Points = table.Column<int>(type: "int", nullable: false),
                     SortOrder = table.Column<int>(type: "int", nullable: false),
-                    QuizId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuizId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -320,6 +436,30 @@ namespace Trabzonly.Api.Migrations
                         principalTable: "Quizzes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ContactMessages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Message = table.Column<string>(type: "nvarchar(400)", maxLength: 400, nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsResolved = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContactMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ContactMessages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -358,7 +498,6 @@ namespace Trabzonly.Api.Migrations
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     LikeCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     DislikeCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
@@ -467,12 +606,13 @@ namespace Trabzonly.Api.Migrations
                 name: "UserQuizResults",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Score = table.Column<int>(type: "int", nullable: false),
                     CompletionTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    QuizId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuizId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -494,13 +634,81 @@ namespace Trabzonly.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MatchWeekPlayerRatings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MatchWeekId = table.Column<int>(type: "int", nullable: false),
+                    PlayerId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Score = table.Column<decimal>(type: "decimal(3,1)", precision: 3, scale: 1, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MatchWeekPlayerRatings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MatchWeekPlayerRatings_MatchWeeks_MatchWeekId",
+                        column: x => x.MatchWeekId,
+                        principalTable: "MatchWeeks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MatchWeekPlayerRatings_Players_PlayerId",
+                        column: x => x.PlayerId,
+                        principalTable: "Players",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MatchWeekPlayerRatings_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MatchWeekSlots",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MatchWeekId = table.Column<int>(type: "int", nullable: false),
+                    PlayerId = table.Column<int>(type: "int", nullable: false),
+                    SlotKey = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    IsStarter = table.Column<bool>(type: "bit", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MatchWeekSlots", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MatchWeekSlots_MatchWeeks_MatchWeekId",
+                        column: x => x.MatchWeekId,
+                        principalTable: "MatchWeeks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MatchWeekSlots_Players_PlayerId",
+                        column: x => x.PlayerId,
+                        principalTable: "Players",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Answers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     IsCorrect = table.Column<bool>(type: "bit", nullable: false),
-                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -782,6 +990,17 @@ namespace Trabzonly.Api.Migrations
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Clubs_IsTrabzonspor",
+                table: "Clubs",
+                column: "IsTrabzonspor");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clubs_Name",
+                table: "Clubs",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CommentReactions_CommentId",
                 table: "CommentReactions",
                 column: "CommentId");
@@ -818,6 +1037,42 @@ namespace Trabzonly.Api.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ContactMessages_IsRead_CreatedDate",
+                table: "ContactMessages",
+                columns: new[] { "IsRead", "CreatedDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContactMessages_IsResolved_CreatedDate",
+                table: "ContactMessages",
+                columns: new[] { "IsResolved", "CreatedDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContactMessages_UserId_CreatedDate",
+                table: "ContactMessages",
+                columns: new[] { "UserId", "CreatedDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fixtures_AwayClubId",
+                table: "Fixtures",
+                column: "AwayClubId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fixtures_HomeClubId",
+                table: "Fixtures",
+                column: "HomeClubId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fixtures_SeasonId_HomeClubId_AwayClubId_WeekNumber",
+                table: "Fixtures",
+                columns: new[] { "SeasonId", "HomeClubId", "AwayClubId", "WeekNumber" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fixtures_SeasonId_WeekNumber",
+                table: "Fixtures",
+                columns: new[] { "SeasonId", "WeekNumber" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Injuries_PlayerId",
                 table: "Injuries",
                 column: "PlayerId");
@@ -826,6 +1081,70 @@ namespace Trabzonly.Api.Migrations
                 name: "IX_Injuries_SeasonId",
                 table: "Injuries",
                 column: "SeasonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeagueStandings_ClubId",
+                table: "LeagueStandings",
+                column: "ClubId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeagueStandings_SeasonId_ClubId",
+                table: "LeagueStandings",
+                columns: new[] { "SeasonId", "ClubId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeagueStandings_SeasonId_Rank",
+                table: "LeagueStandings",
+                columns: new[] { "SeasonId", "Rank" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekPlayerRatings_MatchWeekId_PlayerId",
+                table: "MatchWeekPlayerRatings",
+                columns: new[] { "MatchWeekId", "PlayerId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekPlayerRatings_MatchWeekId_PlayerId_UserId",
+                table: "MatchWeekPlayerRatings",
+                columns: new[] { "MatchWeekId", "PlayerId", "UserId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekPlayerRatings_PlayerId",
+                table: "MatchWeekPlayerRatings",
+                column: "PlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekPlayerRatings_UserId",
+                table: "MatchWeekPlayerRatings",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeeks_SeasonId",
+                table: "MatchWeeks",
+                column: "SeasonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekSlots_MatchWeekId_IsStarter_SortOrder",
+                table: "MatchWeekSlots",
+                columns: new[] { "MatchWeekId", "IsStarter", "SortOrder" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekSlots_MatchWeekId_PlayerId",
+                table: "MatchWeekSlots",
+                columns: new[] { "MatchWeekId", "PlayerId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekSlots_MatchWeekId_SlotKey",
+                table: "MatchWeekSlots",
+                columns: new[] { "MatchWeekId", "SlotKey" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchWeekSlots_PlayerId",
+                table: "MatchWeekSlots",
+                column: "PlayerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Metrics_Key",
@@ -843,6 +1162,11 @@ namespace Trabzonly.Api.Migrations
                 table: "PlayerRatings",
                 columns: new[] { "UserId", "PlayerId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Players_Category_IsActive",
+                table: "Players",
+                columns: new[] { "Category", "IsActive" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Players_PositionId",
@@ -950,23 +1274,9 @@ namespace Trabzonly.Api.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QuizCategories_SeedKey",
-                table: "QuizCategories",
-                column: "SeedKey",
-                unique: true,
-                filter: "[SeedKey] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Quizzes_QuizCategoryId",
                 table: "Quizzes",
                 column: "QuizCategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Quizzes_SeedKey",
-                table: "Quizzes",
-                column: "SeedKey",
-                unique: true,
-                filter: "[SeedKey] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_Name",
@@ -1076,7 +1386,22 @@ namespace Trabzonly.Api.Migrations
                 name: "CommentReactions");
 
             migrationBuilder.DropTable(
+                name: "ContactMessages");
+
+            migrationBuilder.DropTable(
+                name: "Fixtures");
+
+            migrationBuilder.DropTable(
                 name: "Injuries");
+
+            migrationBuilder.DropTable(
+                name: "LeagueStandings");
+
+            migrationBuilder.DropTable(
+                name: "MatchWeekPlayerRatings");
+
+            migrationBuilder.DropTable(
+                name: "MatchWeekSlots");
 
             migrationBuilder.DropTable(
                 name: "Metrics");
@@ -1112,7 +1437,10 @@ namespace Trabzonly.Api.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Seasons");
+                name: "Clubs");
+
+            migrationBuilder.DropTable(
+                name: "MatchWeeks");
 
             migrationBuilder.DropTable(
                 name: "PollOptions");
@@ -1125,6 +1453,9 @@ namespace Trabzonly.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Squads");
+
+            migrationBuilder.DropTable(
+                name: "Seasons");
 
             migrationBuilder.DropTable(
                 name: "Polls");

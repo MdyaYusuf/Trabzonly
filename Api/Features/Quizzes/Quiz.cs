@@ -3,7 +3,7 @@ using Api.Core.Entities;
 
 namespace Api.Features.Quizzes;
 
-public class Quiz : Entity<Guid>
+public class Quiz : Entity<int>
 {
   [SetsRequiredMembers]
   public Quiz()
