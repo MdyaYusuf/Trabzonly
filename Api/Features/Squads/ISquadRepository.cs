@@ -6,7 +6,7 @@ public interface ISquadRepository : IRepository<Squad, Guid>
 {
   Task<List<Squad>> GetRecentSquadsAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Squad>, IQueryable<Squad>>? include = null,
     bool enableTracking = false,

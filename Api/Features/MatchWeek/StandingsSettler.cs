@@ -82,7 +82,7 @@ public class StandingsSettler(
       _leagueStandingRepository.DeleteRange(existing);
     }
 
-    DateTime now = DateTime.Now;
+    DateTimeOffset now = DateTimeOffset.UtcNow;
 
     for (int index = 0; index < ranked.Count; index++)
     {

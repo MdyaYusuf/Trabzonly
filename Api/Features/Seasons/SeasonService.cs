@@ -237,7 +237,7 @@ public class SeasonService(
       cancellationToken: cancellationToken);
 
     season.DisplayedFixtureWeek = request.DisplayedFixtureWeek;
-    season.UpdatedDate = DateTime.Now;
+    season.UpdatedDate = DateTimeOffset.UtcNow;
 
     _seasonRepository.Update(season);
     await _unitOfWork.SaveChangesAsync(cancellationToken);

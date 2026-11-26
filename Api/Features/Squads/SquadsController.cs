@@ -23,7 +23,7 @@ public class SquadsController(ISquadService _squadService) : CustomBaseControlle
   [HttpGet("recent/{count:int}")]
   public async Task<IActionResult> GetRecentSquads(
     int count,
-    [FromQuery] DateTime? lastDate = null,
+    [FromQuery] DateTimeOffset? lastDate = null,
     [FromQuery] Guid? lastId = null,
     CancellationToken cancellationToken = default)
   {

@@ -19,7 +19,7 @@ public sealed record PlayerResponseDto(
   int Id,
   string Name,
   string Nationality,
-  DateTime DateOfBirth,
+  DateOnly DateOfBirth,
   int Age,
   int? Height,
   string PreferredFoot,
@@ -39,8 +39,8 @@ public sealed record PlayerResponseDto(
   string PositionAbbreviation = "",
   PositionZone PositionZone = PositionZone.Midfield,
   int CommentCount = 0,
-  DateTime CreatedDate = default,
-  DateTime? UpdatedDate = null,
+  DateTimeOffset CreatedDate = default,
+  DateTimeOffset? UpdatedDate = null,
   PlayerSeasonStatsDto? CurrentSeasonStats = null,
   decimal? CurrentUserScore = null);
 
@@ -74,14 +74,14 @@ public sealed record PlayerRatingResponseDto(
 public sealed record PlayerRosterOverviewDto(
   decimal TotalMarketValue,
   int ActivePlayerCount,
-  DateTime? LastUpdated,
+  DateTimeOffset? LastUpdated,
   string? CurrentSeasonName);
 
 // Requests
 public sealed record CreatePlayerRequest(
   string Name,
   string Nationality,
-  DateTime DateOfBirth,
+  DateOnly DateOfBirth,
   int? Height,
   string PreferredFoot,
   decimal? MarketValue,
@@ -98,7 +98,7 @@ public sealed record UpdatePlayerRequest(
   int Id,
   string Name,
   string Nationality,
-  DateTime DateOfBirth,
+  DateOnly DateOfBirth,
   int? Height,
   string PreferredFoot,
   decimal? MarketValue,

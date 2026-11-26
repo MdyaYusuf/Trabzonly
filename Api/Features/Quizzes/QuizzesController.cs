@@ -83,7 +83,7 @@ public class QuizzesController(IQuizService _quizService) : CustomBaseController
   [HttpGet("recent/{count:int}")]
   public async Task<IActionResult> GetRecentQuizzes(
     int count,
-    [FromQuery] DateTime? lastDate = null,
+    [FromQuery] DateTimeOffset? lastDate = null,
     [FromQuery] int? lastId = null,
     CancellationToken cancellationToken = default)
   {

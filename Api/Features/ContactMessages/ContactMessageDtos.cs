@@ -5,7 +5,7 @@ public sealed record ContactMessageAdminListItemDto(
   string Message,
   bool IsRead,
   bool IsResolved,
-  DateTime CreatedDate,
+  DateTimeOffset CreatedDate,
   Guid UserId,
   string Username,
   string Email);

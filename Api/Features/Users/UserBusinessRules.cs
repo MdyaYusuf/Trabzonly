@@ -161,7 +161,7 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
     if (user == null
         || string.IsNullOrWhiteSpace(user.PasswordResetToken)
         || !user.PasswordResetTokenExpiration.HasValue
-        || user.PasswordResetTokenExpiration.Value < DateTime.UtcNow)
+        || user.PasswordResetTokenExpiration.Value < DateTimeOffset.UtcNow)
     {
       throw new BusinessException("Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.");
     }

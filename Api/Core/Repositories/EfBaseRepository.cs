@@ -144,7 +144,7 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     TEntity entity,
     CancellationToken cancellationToken)
   {
-    entity.CreatedDate = DateTime.UtcNow;
+    entity.CreatedDate = DateTimeOffset.UtcNow;
     await _context.Set<TEntity>().AddAsync(entity, cancellationToken);
 
     return entity;
@@ -179,7 +179,7 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
 
   public void Update(TEntity entity)
   {
-    entity.UpdatedDate = DateTime.UtcNow;
+    entity.UpdatedDate = DateTimeOffset.UtcNow;
     _context.Set<TEntity>().Update(entity);
   }
 }

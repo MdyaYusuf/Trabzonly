@@ -135,7 +135,7 @@ public class SquadService(
 
   public async Task<ReturnModel<CursorPagedResponse<SquadPreviewDto>>> GetRecentSquadsAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Squad>, IQueryable<Squad>>? include = null,
     bool enableTracking = false,

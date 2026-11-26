@@ -96,13 +96,19 @@ export type FixtureDateGroup = {
   fixtures: FixtureResponseDto[]
 }
 
+function localDateKey(iso: string): string {
+  const date = new Date(iso)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function groupFixturesByDate(fixtures: FixtureResponseDto[]): FixtureDateGroup[] {
   const groups = new Map<string, FixtureDateGroup>()
 
   for (const fixture of fixtures) {
-    const key = fixture.kickoff
-      ? new Date(fixture.kickoff).toISOString().slice(0, 10)
-      : 'undated'
+    const key = fixture.kickoff ? localDateKey(fixture.kickoff) : 'undated'
     const label = fixture.kickoff ? formatFixtureDateLabel(fixture.kickoff) : 'Tarih belirsiz'
     const existing = groups.get(key)
 

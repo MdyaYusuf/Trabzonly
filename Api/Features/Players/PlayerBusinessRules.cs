@@ -30,7 +30,7 @@ public class PlayerBusinessRules(IPlayerRepository _playerRepository)
 
   public async Task PlayerCannotBeDuplicatedAsync(
     string name,
-    DateTime dateOfBirth,
+    DateOnly dateOfBirth,
     CancellationToken cancellationToken = default)
   {
     bool exists = await _playerRepository.AnyAsync(
@@ -43,7 +43,7 @@ public class PlayerBusinessRules(IPlayerRepository _playerRepository)
   }
 
   public async Task PlayerCannotBeDuplicatedWhenUpdatedAsync(
-    int id, string name, DateTime dateOfBirth, CancellationToken cancellationToken = default)
+    int id, string name, DateOnly dateOfBirth, CancellationToken cancellationToken = default)
   {
     bool exists = await _playerRepository.AnyAsync(
       p => p.Id != id && p.Name == name && p.DateOfBirth == dateOfBirth, cancellationToken);

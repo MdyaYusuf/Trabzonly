@@ -16,7 +16,7 @@ public class Fixture : Entity<int>
   public int AwayClubId { get; set; }
   public virtual Club AwayClub { get; set; } = default!;
 
-  public DateTime? Kickoff { get; set; }
+  public DateTimeOffset? Kickoff { get; set; }
   public int? HomeScore { get; set; }
   public int? AwayScore { get; set; }
 }

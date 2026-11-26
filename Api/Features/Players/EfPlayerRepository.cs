@@ -127,7 +127,7 @@ public class EfPlayerRepository : EfBaseRepository<BaseDbContext, Player, int>, 
       ? await query.CountAsync(cancellationToken)
       : 0;
 
-    DateTime? lastUpdated = hasPlayers
+    DateTimeOffset? lastUpdated = hasPlayers
       ? await query.MaxAsync(p => p.UpdatedDate ?? p.CreatedDate, cancellationToken)
       : null;
 

@@ -7,7 +7,7 @@ public class UserQuizResult : Entity<int>
 {
   public int Score { get; set; }
   public TimeSpan CompletionTime { get; set; }
-  public DateTime CompletedAt { get; set; }
+  public DateTimeOffset CompletedAt { get; set; }
 
   // Navigation properties
   public Guid UserId { get; set; }

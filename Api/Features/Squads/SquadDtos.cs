@@ -39,7 +39,7 @@ public sealed record SquadResponseDto(
   int RatingCount,
   int ViewCount,
   int CommentCount,
-  DateTime CreatedDate,
+  DateTimeOffset CreatedDate,
   List<SquadSlotResponseDto> Slots,
   decimal? CurrentUserScore = null,
   bool IsAuthorFollowedByCurrentUser = false);
@@ -68,7 +68,7 @@ public sealed record SquadPreviewDto(
   int RatingCount,
   int ViewCount,
   int CommentCount,
-  DateTime CreatedDate,
+  DateTimeOffset CreatedDate,
   List<SquadSlotResponseDto> Slots);
 
 public sealed record SquadRatingResponseDto(

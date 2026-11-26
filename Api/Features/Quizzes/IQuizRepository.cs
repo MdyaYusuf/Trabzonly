@@ -21,7 +21,7 @@ public interface IQuizRepository : IRepository<Quiz, int>
 
   Task<List<Quiz>> GetRecentQuizzesAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     int? lastIdCursor = null,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,

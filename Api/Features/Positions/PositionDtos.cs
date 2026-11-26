@@ -12,8 +12,8 @@ public sealed record PositionResponseDto(
   string Name,
   string Abbreviation,
   PositionZone Zone,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate,
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate,
   List<PositionRoleResponseDto> Roles);
 
 // Requests

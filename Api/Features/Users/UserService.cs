@@ -254,7 +254,7 @@ public class UserService(
 
   public async Task<ReturnModel<CursorPagedResponse<UserPreviewDto>>> GetNewestMembersAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     bool enableTracking = false,
@@ -266,7 +266,7 @@ public class UserService(
 
     if (lastDateCursor.HasValue && lastIdCursor.HasValue)
     {
-      DateTime cursorDate = lastDateCursor.Value;
+      DateTimeOffset cursorDate = lastDateCursor.Value;
       Guid cursorId = lastIdCursor.Value;
 
       query = query.Where(u =>

@@ -47,7 +47,7 @@ public interface IUserService
 
   Task<ReturnModel<CursorPagedResponse<UserPreviewDto>>> GetNewestMembersAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<User>, IQueryable<User>>? include = null,
     bool enableTracking = false,

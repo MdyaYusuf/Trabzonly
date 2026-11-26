@@ -36,6 +36,12 @@ function toDateInputValue(value: string | undefined | null): string {
     return ''
   }
 
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(value.trim())
+
+  if (dateOnlyMatch) {
+    return `${dateOnlyMatch[1]}-${dateOnlyMatch[2]}-${dateOnlyMatch[3]}`
+  }
+
   const date = new Date(value)
 
   if (Number.isNaN(date.getTime())) {

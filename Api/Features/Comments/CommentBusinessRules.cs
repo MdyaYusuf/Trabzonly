@@ -44,7 +44,7 @@ public class CommentBusinessRules(ICommentRepository _commentRepository)
   {
     if (userRole == "Admin") return;
 
-    var today = DateTime.Today;
+    DateTimeOffset today = new(DateTimeOffset.UtcNow.UtcDateTime.Date, TimeSpan.Zero);
     var count = await _commentRepository
       .Query(enableTracking: false, withDeleted: false)
       .CountAsync(c => c.UserId == userId && c.CreatedDate >= today, cancellationToken);
@@ -62,7 +62,7 @@ public class CommentBusinessRules(ICommentRepository _commentRepository)
   {
     if (userRole == "Admin") return;
 
-    var oneMinuteAgo = DateTime.Now.AddMinutes(-1);
+    var oneMinuteAgo = DateTimeOffset.UtcNow.AddMinutes(-1);
     bool postedRecently = await _commentRepository.AnyAsync(
       c => c.UserId == userId && c.CreatedDate >= oneMinuteAgo,
       cancellationToken);
@@ -78,7 +78,7 @@ public class CommentBusinessRules(ICommentRepository _commentRepository)
     string content,
     CancellationToken cancellationToken = default)
   {
-    var oneHourAgo = DateTime.Now.AddHours(-1);
+    var oneHourAgo = DateTimeOffset.UtcNow.AddHours(-1);
     bool isDuplicate = await _commentRepository.AnyAsync(
       c => c.UserId == userId && c.Content == content && c.CreatedDate >= oneHourAgo,
       cancellationToken);

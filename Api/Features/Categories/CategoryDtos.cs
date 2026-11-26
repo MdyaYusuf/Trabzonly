@@ -7,8 +7,8 @@ public sealed record CategoryResponseDto
   public string Name { get; init; } = default!;
   public string? Description { get; init; }
   public bool IsActive { get; init; }
-  public DateTime CreatedDate { get; init; }
-  public DateTime? UpdatedDate { get; init; }
+  public DateTimeOffset CreatedDate { get; init; }
+  public DateTimeOffset? UpdatedDate { get; init; }
 }
 
 public sealed record CategoryAdminListItemDto(
@@ -17,8 +17,8 @@ public sealed record CategoryAdminListItemDto(
   string? Description,
   bool IsActive,
   int PostCount,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate);
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate);
 
 // Requests
 public sealed record CreateCategoryRequest(

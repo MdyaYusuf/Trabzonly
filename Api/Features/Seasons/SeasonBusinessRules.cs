@@ -48,7 +48,7 @@ public class SeasonBusinessRules(ISeasonRepository _seasonRepository)
     }
   }
 
-  public async Task SeasonDatesCannotOverlapAsync(DateTime startDate, DateTime endDate, int? idToIgnore = null, CancellationToken cancellationToken = default)
+  public async Task SeasonDatesCannotOverlapAsync(DateOnly startDate, DateOnly endDate, int? idToIgnore = null, CancellationToken cancellationToken = default)
   {
     bool overlaps = await _seasonRepository.AnyAsync(
       s => (!idToIgnore.HasValue || s.Id != idToIgnore.Value) && startDate < s.EndDate && endDate > s.StartDate,

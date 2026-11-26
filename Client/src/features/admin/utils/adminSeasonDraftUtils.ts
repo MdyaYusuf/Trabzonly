@@ -5,7 +5,27 @@ import type {
 } from '@/features/seasons/seasonTypes'
 import type { AdminSeasonFormDraft, AdminSeasonListRow } from './adminSeasonTypes'
 
+function parseDateOnlyParts(value: string): { year: number; month: number; day: number } | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value.trim())
+
+  if (!match) {
+    return null
+  }
+
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  }
+}
+
 function formatDateLabel(value: string): string {
+  const parts = parseDateOnlyParts(value)
+
+  if (parts) {
+    return new Date(parts.year, parts.month - 1, parts.day).toLocaleDateString('tr-TR')
+  }
+
   const date = new Date(value)
 
   if (Number.isNaN(date.getTime())) {
@@ -18,6 +38,12 @@ function formatDateLabel(value: string): string {
 function toDateInputValue(value: string | undefined | null): string {
   if (!value) {
     return ''
+  }
+
+  const parts = parseDateOnlyParts(value)
+
+  if (parts) {
+    return `${String(parts.year).padStart(4, '0')}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}`
   }
 
   const date = new Date(value)

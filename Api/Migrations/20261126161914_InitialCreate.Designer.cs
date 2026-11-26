@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Trabzonly.Api.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20261124174100_InitialCreate")]
+    [Migration("20261126161914_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,8 +34,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Description")
@@ -50,8 +50,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -71,8 +71,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("DislikeCount")
@@ -100,8 +100,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<Guid?>("SquadId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -132,15 +132,15 @@ namespace Trabzonly.Api.Migrations
                     b.Property<Guid>("CommentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -165,8 +165,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<bool>("IsRead")
@@ -184,8 +184,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -211,8 +211,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("DaysInjured")
@@ -232,8 +232,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int?>("SeasonId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -254,8 +254,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<bool>("IsTrabzonspor")
@@ -272,8 +272,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -301,8 +301,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int?>("AwayScore")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("HomeClubId")
@@ -311,14 +311,14 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int?>("HomeScore")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Kickoff")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("Kickoff")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("SeasonId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<int>("WeekNumber")
@@ -350,8 +350,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("ClubId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("Drawn")
@@ -392,8 +392,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("SeasonId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<int>("Won")
@@ -422,8 +422,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Formation")
@@ -434,8 +434,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("SeasonId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -454,8 +454,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("MatchWeekId")
@@ -468,8 +468,8 @@ namespace Trabzonly.Api.Migrations
                         .HasPrecision(3, 1)
                         .HasColumnType("decimal(3,1)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -498,8 +498,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<bool>("IsStarter")
@@ -519,8 +519,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -545,8 +545,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Description")
@@ -563,8 +563,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<long>("Value")
@@ -598,16 +598,16 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("CurrentTeam")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
 
                     b.Property<string>("Description")
                         .HasMaxLength(400)
@@ -656,8 +656,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int?>("ShirtNumber")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<decimal?>("Wage")
@@ -679,8 +679,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("PlayerId")
@@ -690,8 +690,8 @@ namespace Trabzonly.Api.Migrations
                         .HasPrecision(3, 1)
                         .HasColumnType("decimal(3,1)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -716,8 +716,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<bool>("IsActive")
@@ -736,8 +736,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -758,8 +758,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Label")
@@ -773,8 +773,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<int>("VoteCount")
@@ -798,8 +798,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("PollId")
@@ -808,8 +808,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("PollOptionId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -841,8 +841,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Name")
@@ -850,8 +850,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<int>("Zone")
@@ -876,8 +876,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Description")
@@ -896,8 +896,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -929,8 +929,8 @@ namespace Trabzonly.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Description")
@@ -955,8 +955,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -980,8 +980,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<Guid>("PostId")
@@ -990,8 +990,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -1016,8 +1016,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<bool>("IsCorrect")
@@ -1031,8 +1031,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -1051,8 +1051,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Explanation")
@@ -1073,8 +1073,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -1093,8 +1093,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Description")
@@ -1112,8 +1112,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -1132,8 +1132,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("Description")
@@ -1152,8 +1152,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -1172,14 +1172,14 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CompletedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<TimeSpan>("CompletionTime")
                         .HasColumnType("time");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("QuizId")
@@ -1188,8 +1188,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -1213,8 +1213,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<bool>("IsSystem")
@@ -1227,8 +1227,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -1248,8 +1248,8 @@ namespace Trabzonly.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("DisplayedFixtureWeek")
@@ -1257,8 +1257,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -1270,11 +1270,11 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -1311,8 +1311,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int>("CornerTakerPlayerId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("DefenseLine")
@@ -1350,8 +1350,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -1382,8 +1382,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<decimal>("Score")
@@ -1393,8 +1393,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<Guid>("SquadId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<Guid>("UserId")
@@ -1417,8 +1417,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("PlayerId")
@@ -1438,8 +1438,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<Guid>("SquadId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");
@@ -1475,8 +1475,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<int?>("CleanSheets")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<int>("Goals")
@@ -1499,8 +1499,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<int?>("YellowCards")
@@ -1527,8 +1527,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<string>("DisplayTag")
@@ -1557,8 +1557,8 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTime?>("PasswordResetTokenExpiration")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("PasswordResetTokenExpiration")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ProfileImageUrl")
                         .HasMaxLength(500)
@@ -1568,14 +1568,14 @@ namespace Trabzonly.Api.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTime?>("RefreshTokenExpiration")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("RefreshTokenExpiration")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.Property<string>("Username")
@@ -1603,8 +1603,8 @@ namespace Trabzonly.Api.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
                     b.Property<Guid>("FollowerId")
@@ -1613,8 +1613,8 @@ namespace Trabzonly.Api.Migrations
                     b.Property<Guid>("FollowingId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
                         .HasColumnName("UpdatedDate");
 
                     b.HasKey("Id");

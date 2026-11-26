@@ -29,8 +29,8 @@ public sealed record PollAdminListItemDto(
   string? PostTitle,
   int OptionCount,
   int TotalVotes,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate);
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate);
 
 public sealed record PollAdminDetailDto(
   int Id,
@@ -43,8 +43,8 @@ public sealed record PollAdminDetailDto(
   string? PostTitle,
   int TotalVotes,
   bool OptionsLocked,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate,
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate,
   IReadOnlyList<PollOptionResponseDto> Options);
 
 public sealed record CreatedPollResponseDto(

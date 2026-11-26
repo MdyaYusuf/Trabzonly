@@ -20,7 +20,7 @@ public sealed record FixtureResponseDto(
   int WeekNumber,
   FixtureClubDto HomeClub,
   FixtureClubDto AwayClub,
-  DateTime? Kickoff,
+  DateTimeOffset? Kickoff,
   int? HomeScore,
   int? AwayScore);
 
@@ -31,13 +31,13 @@ public sealed record FixtureWeekResponseDto(
 
 public sealed record UpdateFixtureRequest(
   int Id,
-  DateTime? Kickoff,
+  DateTimeOffset? Kickoff,
   int? HomeScore,
   int? AwayScore);
 
 public sealed record UpdateFixtureWeekItemRequest(
   int Id,
-  DateTime? Kickoff,
+  DateTimeOffset? Kickoff,
   int? HomeScore,
   int? AwayScore);
 
@@ -89,7 +89,7 @@ public sealed record MatchWeekResponseDto(
   int SeasonId,
   string Formation,
   IReadOnlyList<MatchWeekSlotResponseDto> Slots,
-  DateTime? UpdatedDate);
+  DateTimeOffset? UpdatedDate);
 
 public sealed record MatchWeekSlotRequest(
   string SlotKey,

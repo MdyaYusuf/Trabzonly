@@ -46,7 +46,7 @@ public class ContactMessageBusinessRules(IContactMessageRepository _contactMessa
       return;
     }
 
-    DateTime cooldownStart = DateTime.Now.Subtract(SendCooldown);
+    DateTimeOffset cooldownStart = DateTimeOffset.UtcNow.Subtract(SendCooldown);
     bool sentRecently = await _contactMessageRepository.AnyAsync(
       m => m.UserId == userId && m.CreatedDate >= cooldownStart,
       cancellationToken);
@@ -68,7 +68,7 @@ public class ContactMessageBusinessRules(IContactMessageRepository _contactMessa
       return;
     }
 
-    DateTime today = DateTime.Today;
+    DateTimeOffset today = new(DateTimeOffset.UtcNow.UtcDateTime.Date, TimeSpan.Zero);
     int count = await _contactMessageRepository
       .Query(enableTracking: false)
       .CountAsync(m => m.UserId == userId && m.CreatedDate >= today, cancellationToken);

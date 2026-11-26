@@ -17,8 +17,8 @@ public class Season : Entity<int>
   }
 
   public required string Name { get; set; }
-  public DateTime StartDate { get; set; }
-  public DateTime EndDate { get; set; }
+  public DateOnly StartDate { get; set; }
+  public DateOnly EndDate { get; set; }
   public bool IsActive { get; set; }
   public int DisplayedFixtureWeek { get; set; } = 1;
 

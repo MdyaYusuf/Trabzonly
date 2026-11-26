@@ -153,7 +153,7 @@ public class MatchWeekService(
     else
     {
       existingRating.Score = request.Score;
-      existingRating.UpdatedDate = DateTime.Now;
+      existingRating.UpdatedDate = DateTimeOffset.UtcNow;
       _matchWeekPlayerRatingRepository.Update(existingRating);
     }
 

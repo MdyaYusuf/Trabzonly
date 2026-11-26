@@ -10,8 +10,8 @@ public class UserResponseDto
   public string? DisplayTag { get; set; }
   public string? ProfileImageUrl { get; set; }
   public bool IsActive { get; set; }
-  public DateTime CreatedDate { get; set; }
-  public DateTime? UpdatedDate { get; set; }
+  public DateTimeOffset CreatedDate { get; set; }
+  public DateTimeOffset? UpdatedDate { get; set; }
   public int RoleId { get; set; }
   public string RoleName { get; set; } = null!;
   public int FollowerCount { get; set; }
@@ -25,7 +25,7 @@ public sealed record UserAdminListItemDto(
   string Email,
   string? ProfileImageUrl,
   bool IsActive,
-  DateTime CreatedDate,
+  DateTimeOffset CreatedDate,
   int RoleId,
   string RoleName,
   int PostCount,
@@ -39,8 +39,8 @@ public sealed record UserAdminDetailDto(
   string? DisplayTag,
   string? ProfileImageUrl,
   bool IsActive,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate,
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate,
   int RoleId,
   string RoleName);
 
@@ -54,7 +54,7 @@ public sealed record UserPreviewDto
   public int TotalLikeCount { get; init; }
   public int FollowerCount { get; init; }
   public int FollowingCount { get; init; }
-  public DateTime CreatedDate { get; init; }
+  public DateTimeOffset CreatedDate { get; init; }
 }
 
 public sealed record PublicUserProfileDto
@@ -64,7 +64,7 @@ public sealed record PublicUserProfileDto
   public string? Bio { get; init; }
   public string? DisplayTag { get; init; }
   public string? ProfileImageUrl { get; init; }
-  public DateTime CreatedDate { get; init; }
+  public DateTimeOffset CreatedDate { get; init; }
   public int FollowerCount { get; init; }
   public int FollowingCount { get; init; }
   public bool? IsFollowedByCurrentUser { get; init; }

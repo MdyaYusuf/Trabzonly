@@ -466,10 +466,10 @@ public class PlayerService(
       return active.Id;
     }
 
-    DateTime now = DateTime.UtcNow;
+    DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 
     Season? current = await _seasonRepository.GetAsync(
-      predicate: s => s.StartDate <= now && s.EndDate >= now,
+      predicate: s => s.StartDate <= today && s.EndDate >= today,
       enableTracking: false,
       cancellationToken: cancellationToken);
 

@@ -5,7 +5,7 @@ namespace Api.Features.Authentication;
 // Responses
 public record TokenResponseDto(
   string AccessToken,
-  DateTime Expiration,
+  DateTimeOffset Expiration,
   string RefreshToken,
   UserResponseDto User);
 

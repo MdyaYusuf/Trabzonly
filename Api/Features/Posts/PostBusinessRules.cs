@@ -68,7 +68,7 @@ public class PostBusinessRules(IPostRepository _postRepository)
       return;
     }
 
-    var today = DateTime.Today;
+    DateTimeOffset today = new(DateTimeOffset.UtcNow.UtcDateTime.Date, TimeSpan.Zero);
     var userPostsTodayCount = await _postRepository
       .Query(enableTracking: false, withDeleted: false)
       .CountAsync(p => p.UserId == userId && p.CreatedDate >= today, cancellationToken);
@@ -89,7 +89,7 @@ public class PostBusinessRules(IPostRepository _postRepository)
       return;
     }
 
-    var fiveMinutesAgo = DateTime.Now.AddMinutes(-5);
+    var fiveMinutesAgo = DateTimeOffset.UtcNow.AddMinutes(-5);
     bool postedRecently = await _postRepository.AnyAsync(
       p => p.UserId == userId && p.CreatedDate >= fiveMinutesAgo,
       cancellationToken);

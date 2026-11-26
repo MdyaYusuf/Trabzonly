@@ -4,12 +4,12 @@ namespace Api.Features.Seasons;
 public sealed record SeasonResponseDto(
   int Id,
   string Name,
-  DateTime StartDate,
-  DateTime EndDate,
+  DateOnly StartDate,
+  DateOnly EndDate,
   bool IsActive,
   int DisplayedFixtureWeek,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate);
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate);
 
 public sealed record SeasonAdminSummaryDto(
   int TotalCount,
@@ -19,15 +19,15 @@ public sealed record SeasonAdminSummaryDto(
 // Requests
 public sealed record CreateSeasonRequest(
   string Name,
-  DateTime StartDate,
-  DateTime EndDate,
+  DateOnly StartDate,
+  DateOnly EndDate,
   bool IsActive);
 
 public sealed record UpdateSeasonRequest(
   int Id,
   string Name,
-  DateTime StartDate,
-  DateTime EndDate,
+  DateOnly StartDate,
+  DateOnly EndDate,
   bool IsActive);
 
 public sealed record UpdateDisplayedFixtureWeekRequest(

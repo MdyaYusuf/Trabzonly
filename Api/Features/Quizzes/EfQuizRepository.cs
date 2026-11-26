@@ -89,7 +89,7 @@ public class EfQuizRepository : EfBaseRepository<BaseDbContext, Quiz, int>, IQui
 
   public async Task<List<Quiz>> GetRecentQuizzesAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     int? lastIdCursor = null,
     Func<IQueryable<Quiz>, IQueryable<Quiz>>? include = null,
     bool enableTracking = false,

@@ -37,7 +37,7 @@ public sealed record PostResponseDto
   public int LikeCount { get; init; }
   public int DislikeCount { get; init; }
   public int CommentCount { get; init; }
-  public DateTime CreatedDate { get; init; }
+  public DateTimeOffset CreatedDate { get; init; }
   public Guid UserId { get; init; }
   public string AuthorUsername { get; init; } = default!;
   public string? AuthorDisplayTag { get; init; }
@@ -63,7 +63,7 @@ public sealed record PostPreviewDto
   public string? Description { get; init; }
   public string AuthorUsername { get; init; } = default!;
   public string CategoryName { get; init; } = default!;
-  public DateTime CreatedDate { get; init; }
+  public DateTimeOffset CreatedDate { get; init; }
   public int LikeCount { get; init; }
   public int DislikeCount { get; init; }
   public int CommentCount { get; init; }

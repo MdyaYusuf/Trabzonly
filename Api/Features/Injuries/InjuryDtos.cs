@@ -14,7 +14,7 @@ public sealed record InjuryResponseDto(
   string PositionAbbreviation,
   int? SeasonId,
   string? SeasonName,
-  DateTime CreatedDate);
+  DateTimeOffset CreatedDate);
 
 public sealed record CreatedInjuryResponseDto(
   int Id,

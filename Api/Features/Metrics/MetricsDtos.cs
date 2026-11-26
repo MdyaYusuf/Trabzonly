@@ -16,5 +16,5 @@ public sealed record MetricResponseDto(
   string DisplayName,
   long Value,
   string? Description,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate);
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate);

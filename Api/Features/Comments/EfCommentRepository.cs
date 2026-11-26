@@ -14,7 +14,7 @@ public class EfCommentRepository : EfBaseRepository<BaseDbContext, Comment, Guid
   public async Task<List<Comment>> GetRecentCommentsAsync(
     int count,
     Expression<Func<Comment, bool>>? filter = null,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Comment>, IQueryable<Comment>>? include = null,
     Func<IQueryable<Comment>, IOrderedQueryable<Comment>>? orderBy = null,

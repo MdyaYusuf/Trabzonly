@@ -4,7 +4,7 @@ public abstract class Entity<TId> where TId : notnull
 {
   protected Entity()
   {
-    CreatedDate = DateTime.Now;
+    CreatedDate = DateTimeOffset.UtcNow;
   }
 
   protected Entity(TId id) : this()
@@ -13,6 +13,6 @@ public abstract class Entity<TId> where TId : notnull
   }
 
   public TId Id { get; protected set; } = default!;
-  public DateTime CreatedDate { get; set; }
-  public DateTime? UpdatedDate { get; set; }
+  public DateTimeOffset CreatedDate { get; set; }
+  public DateTimeOffset? UpdatedDate { get; set; }
 }

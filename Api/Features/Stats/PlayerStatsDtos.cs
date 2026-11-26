@@ -19,7 +19,7 @@ public sealed record PlayerStatsResponseDto(
   string PositionAbbreviation,
   int SeasonId,
   string SeasonName,
-  DateTime CreatedDate);
+  DateTimeOffset CreatedDate);
 
 public sealed record CreatedPlayerStatsResponseDto(
   int Id,

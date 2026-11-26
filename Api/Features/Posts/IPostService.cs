@@ -50,7 +50,7 @@ public interface IPostService
 
   Task<ReturnModel<CursorPagedResponse<PostResponseDto>>> GetRecentPostsAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Post>, IQueryable<Post>>? include = null,
     bool enableTracking = false,

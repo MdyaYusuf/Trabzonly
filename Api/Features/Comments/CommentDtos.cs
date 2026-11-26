@@ -15,7 +15,7 @@ public sealed record CommentResponseDto(
   int? PlayerId,
   Guid? SquadId,
   Guid? ParentCommentId,
-  DateTime CreatedDate,
+  DateTimeOffset CreatedDate,
   CommentReactionType? CurrentUserReaction = null);
 
 public sealed record CreatedCommentResponseDto(
@@ -47,5 +47,5 @@ public sealed record CommentRecentQueryRequest(
   int? PlayerId = null,
   Guid? SquadId = null,
   string? Sort = null,
-  DateTime? LastDate = null,
+  DateTimeOffset? LastDate = null,
   Guid? LastId = null);

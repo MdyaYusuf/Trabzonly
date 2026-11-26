@@ -31,7 +31,7 @@ public sealed record UserQuizResultResponseDto(
   int Score,
   int MaxScore,
   TimeSpan CompletionTime,
-  DateTime CompletedAt);
+  DateTimeOffset CompletedAt);
 
 public sealed record CreatedQuizResponseDto(
   int Id,

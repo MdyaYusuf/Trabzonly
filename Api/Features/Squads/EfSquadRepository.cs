@@ -13,7 +13,7 @@ public class EfSquadRepository : EfBaseRepository<BaseDbContext, Squad, Guid>, I
 
   public async Task<List<Squad>> GetRecentSquadsAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     Guid? lastIdCursor = null,
     Func<IQueryable<Squad>, IQueryable<Squad>>? include = null,
     bool enableTracking = false,

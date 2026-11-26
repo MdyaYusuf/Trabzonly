@@ -74,7 +74,7 @@ public class FixtureService(
     fixture.Kickoff = request.Kickoff;
     fixture.HomeScore = request.HomeScore;
     fixture.AwayScore = request.AwayScore;
-    fixture.UpdatedDate = DateTime.Now;
+    fixture.UpdatedDate = DateTimeOffset.UtcNow;
 
     _fixtureRepository.Update(fixture);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -124,7 +124,7 @@ public class FixtureService(
 
     Dictionary<int, Fixture> fixturesById = fixtures.ToDictionary(f => f.Id);
     bool scoresChanged = false;
-    DateTime now = DateTime.Now;
+    DateTimeOffset now = DateTimeOffset.UtcNow;
 
     foreach (UpdateFixtureWeekItemRequest item in request.Fixtures)
     {

@@ -6,8 +6,8 @@ public sealed record RoleResponseDto
   public int Id { get; init; }
   public string Name { get; init; } = default!;
   public bool IsSystem { get; init; }
-  public DateTime CreatedDate { get; init; }
-  public DateTime? UpdatedDate { get; init; }
+  public DateTimeOffset CreatedDate { get; init; }
+  public DateTimeOffset? UpdatedDate { get; init; }
 }
 
 public sealed record RoleAdminListItemDto(
@@ -15,8 +15,8 @@ public sealed record RoleAdminListItemDto(
   string Name,
   int MemberCount,
   bool IsSystem,
-  DateTime CreatedDate,
-  DateTime? UpdatedDate);
+  DateTimeOffset CreatedDate,
+  DateTimeOffset? UpdatedDate);
 
 // Requests
 public sealed record CreateRoleRequest(string Name);

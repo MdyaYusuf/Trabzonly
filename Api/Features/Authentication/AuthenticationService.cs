@@ -51,7 +51,7 @@ public class AuthenticationService(
 
     string rawRefreshToken = GenerateSecureToken();
     user!.RefreshToken = HashingHelper.HashRefreshToken(rawRefreshToken);
-    user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(_options.RefreshTokenExpiration);
+    user.RefreshTokenExpiration = DateTimeOffset.UtcNow.AddDays(_options.RefreshTokenExpiration);
 
     _userRepository.Update(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -119,7 +119,7 @@ public class AuthenticationService(
 
     string currentRefreshToken = GenerateSecureToken();
     user!.RefreshToken = HashingHelper.HashRefreshToken(currentRefreshToken);
-    user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(_options.RefreshTokenExpiration);
+    user.RefreshTokenExpiration = DateTimeOffset.UtcNow.AddDays(_options.RefreshTokenExpiration);
 
     _userRepository.Update(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -177,7 +177,7 @@ public class AuthenticationService(
     {
       string rawToken = GenerateSecureToken();
       user.PasswordResetToken = HashingHelper.HashRefreshToken(rawToken);
-      user.PasswordResetTokenExpiration = DateTime.UtcNow.AddHours(1);
+      user.PasswordResetTokenExpiration = DateTimeOffset.UtcNow.AddHours(1);
 
       _userRepository.Update(user);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -268,13 +268,13 @@ public class AuthenticationService(
 
     SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_options.SecurityKey));
     SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha512Signature);
-    DateTime expiration = DateTime.UtcNow.AddMinutes(_options.AccessTokenExpiration);
+    DateTimeOffset expiration = DateTimeOffset.UtcNow.AddMinutes(_options.AccessTokenExpiration);
 
     JwtSecurityToken token = new(
       issuer: _options.Issuer,
       audience: _options.Audience,
       claims: claims,
-      expires: expiration,
+      expires: expiration.UtcDateTime,
       signingCredentials: creds
     );
 

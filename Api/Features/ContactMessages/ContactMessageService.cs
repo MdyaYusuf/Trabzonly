@@ -136,7 +136,7 @@ public class ContactMessageService(
     if (!message.IsRead)
     {
       message.IsRead = true;
-      message.UpdatedDate = DateTime.Now;
+      message.UpdatedDate = DateTimeOffset.UtcNow;
       _contactMessageRepository.Update(message);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
@@ -171,7 +171,7 @@ public class ContactMessageService(
         message.IsRead = true;
       }
 
-      message.UpdatedDate = DateTime.Now;
+      message.UpdatedDate = DateTimeOffset.UtcNow;
       _contactMessageRepository.Update(message);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
     }

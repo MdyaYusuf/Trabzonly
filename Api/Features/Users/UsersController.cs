@@ -141,7 +141,7 @@ public class UsersController(IUserService _userService) : CustomBaseController
   [HttpGet("newest-members/{count:int}")]
   public async Task<IActionResult> GetNewestMembers(
     int count,
-    [FromQuery] DateTime? lastDate = null,
+    [FromQuery] DateTimeOffset? lastDate = null,
     [FromQuery] Guid? lastId = null,
     CancellationToken cancellationToken = default)
   {

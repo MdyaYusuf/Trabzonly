@@ -28,9 +28,9 @@ public class User : Entity<Guid>
   public required string PasswordHash { get; set; }
   public required string PasswordKey { get; set; }
   public string? RefreshToken { get; set; }
-  public DateTime? RefreshTokenExpiration { get; set; }
+  public DateTimeOffset? RefreshTokenExpiration { get; set; }
   public string? PasswordResetToken { get; set; }
-  public DateTime? PasswordResetTokenExpiration { get; set; }
+  public DateTimeOffset? PasswordResetTokenExpiration { get; set; }
   public string? ProfileImageUrl { get; set; }
   public string? Bio { get; set; }
   public string? DisplayTag { get; set; }

@@ -69,7 +69,7 @@ public class PostsController(IPostService _postService) : CustomBaseController
   [HttpGet("recent/{count:int}")]
   public async Task<IActionResult> GetRecentPosts(
     int count,
-    [FromQuery] DateTime? lastDate = null,
+    [FromQuery] DateTimeOffset? lastDate = null,
     [FromQuery] Guid? lastId = null,
     CancellationToken cancellationToken = default)
   {

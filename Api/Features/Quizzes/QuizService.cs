@@ -297,7 +297,7 @@ public class QuizService(
 
   public async Task<ReturnModel<CursorPagedResponse<QuizListItemDto>>> GetRecentQuizzesAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     int? lastIdCursor = null,
     CancellationToken cancellationToken = default)
   {
@@ -564,7 +564,7 @@ public class QuizService(
       UserId = currentUserId,
       Score = totalScore,
       CompletionTime = completionTime,
-      CompletedAt = DateTime.Now
+      CompletedAt = DateTimeOffset.UtcNow
     };
 
     await _userQuizResultRepository.AddAsync(result, cancellationToken);

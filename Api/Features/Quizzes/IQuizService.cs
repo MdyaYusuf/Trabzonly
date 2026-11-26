@@ -49,7 +49,7 @@ public interface IQuizService
 
   Task<ReturnModel<CursorPagedResponse<QuizListItemDto>>> GetRecentQuizzesAsync(
     int count,
-    DateTime? lastDateCursor = null,
+    DateTimeOffset? lastDateCursor = null,
     int? lastIdCursor = null,
     CancellationToken cancellationToken = default);
 
