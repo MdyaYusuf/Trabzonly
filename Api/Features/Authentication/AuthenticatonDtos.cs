@@ -31,3 +31,10 @@ public sealed record ResetPasswordRequest(
   string Token,
   string NewPassword,
   string ConfirmNewPassword);
+
+public sealed record VerifyEmailRequest(
+  string Email,
+  string Token);
+
+public sealed record ResendEmailConfirmationRequest(
+  string Email);

@@ -14,6 +14,7 @@ public class SquadService(
   IUserFollowRepository _userFollowRepository,
   SquadMapper _mapper,
   SquadBusinessRules _businessRules,
+  UserBusinessRules _userBusinessRules,
   IUnitOfWork _unitOfWork,
   IValidator<CreateSquadRequest> _createValidator,
   IValidator<UpdateSquadRequest> _updateValidator,
@@ -259,6 +260,8 @@ public class SquadService(
     Guid currentUserId,
     CancellationToken cancellationToken = default)
   {
+    await _userBusinessRules.EmailMustBeConfirmedAsync(currentUserId, cancellationToken: cancellationToken);
+
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)
@@ -367,6 +370,8 @@ public class SquadService(
     Guid currentUserId,
     CancellationToken cancellationToken = default)
   {
+    await _userBusinessRules.EmailMustBeConfirmedAsync(currentUserId, cancellationToken: cancellationToken);
+
     var validationResult = await _rateValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)

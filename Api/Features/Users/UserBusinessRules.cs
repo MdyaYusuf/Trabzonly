@@ -198,4 +198,48 @@ public class UserBusinessRules(IUserRepository _userRepository, IRoleRepository 
       throw new NotFoundException($"{userId} numaralı kullanıcı bulunamadı.");
     }
   }
+
+  public async Task EmailMustBeConfirmedAsync(
+    Guid userId,
+    string? userRole = null,
+    CancellationToken cancellationToken = default)
+  {
+    if (userRole == "Admin")
+    {
+      return;
+    }
+
+    bool confirmed = await _userRepository.AnyAsync(
+      u => u.Id == userId && u.EmailConfirmed,
+      cancellationToken);
+
+    if (!confirmed)
+    {
+      throw new ForbiddenException(
+        "Bu işlem için e-posta adresinizi doğrulamanız gerekiyor. Gelen kutunuzu kontrol edin.");
+    }
+  }
+
+  public void EmailConfirmationTokenMustBeValid(User? user, string rawToken)
+  {
+    if (user == null
+        || string.IsNullOrWhiteSpace(user.EmailConfirmationToken)
+        || !user.EmailConfirmationTokenExpiration.HasValue
+        || user.EmailConfirmationTokenExpiration.Value < DateTimeOffset.UtcNow)
+    {
+      throw new BusinessException("E-posta doğrulama bağlantısı geçersiz veya süresi dolmuş.");
+    }
+
+    string hashedToken = HashingHelper.HashRefreshToken(rawToken);
+
+    if (user.EmailConfirmationToken != hashedToken)
+    {
+      throw new BusinessException("E-posta doğrulama bağlantısı geçersiz veya süresi dolmuş.");
+    }
+
+    if (!user.IsActive)
+    {
+      throw new BusinessException("Hesabınız pasif durumdadır. Lütfen yönetici ile iletişime geçin.");
+    }
+  }
 }

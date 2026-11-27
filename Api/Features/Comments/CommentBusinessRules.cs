@@ -1,9 +1,12 @@
 using Api.Core.Exceptions;
+using Api.Features.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Comments;
 
-public class CommentBusinessRules(ICommentRepository _commentRepository)
+public class CommentBusinessRules(
+  ICommentRepository _commentRepository,
+  UserBusinessRules _userBusinessRules)
 {
   public async Task<Comment> GetCommentIfExistAsync(
     Guid id,
@@ -42,7 +45,12 @@ public class CommentBusinessRules(ICommentRepository _commentRepository)
     string userRole,
     CancellationToken cancellationToken = default)
   {
-    if (userRole == "Admin") return;
+    await _userBusinessRules.EmailMustBeConfirmedAsync(userId, userRole, cancellationToken);
+
+    if (userRole == "Admin")
+    {
+      return;
+    }
 
     DateTimeOffset today = new(DateTimeOffset.UtcNow.UtcDateTime.Date, TimeSpan.Zero);
     var count = await _commentRepository

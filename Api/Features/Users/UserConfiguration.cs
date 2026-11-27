@@ -51,6 +51,17 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     builder.Property(u => u.PasswordResetTokenExpiration)
       .IsRequired(false);
 
+    builder.Property(u => u.EmailConfirmed)
+      .HasDefaultValue(false)
+      .IsRequired();
+
+    builder.Property(u => u.EmailConfirmationToken)
+      .HasMaxLength(500)
+      .IsRequired(false);
+
+    builder.Property(u => u.EmailConfirmationTokenExpiration)
+      .IsRequired(false);
+
     builder.Property(u => u.ProfileImageUrl)
       .HasMaxLength(500)
       .IsRequired(false);

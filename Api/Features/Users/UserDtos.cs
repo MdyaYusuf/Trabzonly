@@ -10,6 +10,7 @@ public class UserResponseDto
   public string? DisplayTag { get; set; }
   public string? ProfileImageUrl { get; set; }
   public bool IsActive { get; set; }
+  public bool EmailConfirmed { get; set; }
   public DateTimeOffset CreatedDate { get; set; }
   public DateTimeOffset? UpdatedDate { get; set; }
   public int RoleId { get; set; }

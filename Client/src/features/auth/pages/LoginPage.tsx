@@ -9,6 +9,7 @@ import { useAppDispatch } from '@/core/store/hooks'
 type LoginLocationState = {
   from?: string
   notice?: string
+  registeredEmail?: string
 }
 
 function resolvePostLoginPath(from: string | undefined): string {
@@ -24,10 +25,11 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const locationState = (location.state as LoginLocationState | null) ?? null
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(locationState?.registeredEmail ?? '')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isResending, setIsResending] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
 
   useEffect(() => {
@@ -37,6 +39,31 @@ export function LoginPage() {
 
     toast.info(locationState.notice)
   }, [locationState?.notice])
+
+  async function handleResendConfirmation() {
+    const trimmedEmail = email.trim()
+
+    if (!trimmedEmail || isResending) {
+      return
+    }
+
+    setIsResending(true)
+
+    try {
+      const response = await authService.resendEmailConfirmation({ email: trimmedEmail })
+
+      if (response.success) {
+        toast.success(
+          response.message ||
+            'Eğer doğrulanmamış bir hesabınız varsa yeni bağlantı gönderildi.',
+        )
+      }
+    } catch {
+      // Global toast handles API errors.
+    } finally {
+      setIsResending(false)
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -134,7 +161,15 @@ export function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end py-1">
+          <div className="flex flex-wrap items-center justify-between gap-2 py-1">
+            <button
+              type="button"
+              className="font-label text-label-md font-bold text-on-surface-variant transition-colors hover:text-primary disabled:opacity-60"
+              onClick={() => void handleResendConfirmation()}
+              disabled={isResending || !email.trim()}
+            >
+              {isResending ? 'Gönderiliyor...' : 'Doğrulama e-postasını yeniden gönder'}
+            </button>
             <Link
               to="/sifremi-unuttum"
               className="font-label text-label-md font-bold text-secondary transition-colors hover:text-primary"

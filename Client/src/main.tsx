@@ -37,6 +37,7 @@ import { AdminMatchWeekLineupPage } from '@/features/admin/pages/AdminMatchWeekL
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { VerifyEmailPage } from '@/features/auth/pages/VerifyEmailPage'
 import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
 import { PlayerDirectoryPage } from '@/features/players/pages/PlayerDirectoryPage'
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
           {
             path: 'sifre-sifirla',
             element: <ResetPasswordPage />,
+          },
+          {
+            path: 'eposta-dogrula',
+            element: <VerifyEmailPage />,
           },
           {
             path: 'topluluk-kurallari',

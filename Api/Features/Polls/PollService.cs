@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
+using Api.Features.Users;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ public class PollService(
   IPollOptionRepository _pollOptionRepository,
   IPollVoteRepository _pollVoteRepository,
   PollBusinessRules _businessRules,
+  UserBusinessRules _userBusinessRules,
   IUnitOfWork _unitOfWork,
   IValidator<CreatePollRequest> _createValidator,
   IValidator<UpdatePollRequest> _updateValidator,
@@ -294,6 +296,8 @@ public class PollService(
     Guid currentUserId,
     CancellationToken cancellationToken = default)
   {
+    await _userBusinessRules.EmailMustBeConfirmedAsync(currentUserId, cancellationToken: cancellationToken);
+
     var validationResult = await _voteValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)

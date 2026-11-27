@@ -73,3 +73,26 @@ public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequ
       .Equal(r => r.NewPassword).WithMessage("Şifreler eşleşmiyor.");
   }
 }
+
+public class VerifyEmailRequestValidator : AbstractValidator<VerifyEmailRequest>
+{
+  public VerifyEmailRequestValidator()
+  {
+    RuleFor(r => r.Email)
+      .NotEmpty().WithMessage("E-posta adresi gereklidir.")
+      .EmailAddress().WithMessage("Geçerli bir e-posta formatı giriniz.");
+
+    RuleFor(r => r.Token)
+      .NotEmpty().WithMessage("Doğrulama tokeni gereklidir.");
+  }
+}
+
+public class ResendEmailConfirmationRequestValidator : AbstractValidator<ResendEmailConfirmationRequest>
+{
+  public ResendEmailConfirmationRequestValidator()
+  {
+    RuleFor(r => r.Email)
+      .NotEmpty().WithMessage("E-posta adresi gereklidir.")
+      .EmailAddress().WithMessage("Geçerli bir e-posta formatı giriniz.");
+  }
+}

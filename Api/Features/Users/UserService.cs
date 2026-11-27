@@ -568,6 +568,7 @@ public class UserService(
     Guid currentUserId,
     CancellationToken cancellationToken = default)
   {
+    await _businessRules.EmailMustBeConfirmedAsync(currentUserId, cancellationToken: cancellationToken);
     _businessRules.CannotFollowSelf(currentUserId, targetUserId);
     await _businessRules.UserMustBeActiveAsync(targetUserId, cancellationToken);
 

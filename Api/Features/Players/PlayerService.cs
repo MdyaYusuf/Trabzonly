@@ -5,6 +5,7 @@ using Api.Core.Responses;
 using Api.Features.Positions;
 using Api.Features.Seasons;
 using Api.Features.Stats;
+using Api.Features.Users;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,7 @@ public class PlayerService(
   ISeasonRepository _seasonRepository,
   PlayerMapper _mapper,
   PlayerBusinessRules _businessRules,
+  UserBusinessRules _userBusinessRules,
   IUnitOfWork _unitOfWork,
   IValidator<CreatePlayerRequest> _createValidator,
   IValidator<UpdatePlayerRequest> _updateValidator,
@@ -383,6 +385,8 @@ public class PlayerService(
     Guid currentUserId,
     CancellationToken cancellationToken = default)
   {
+    await _userBusinessRules.EmailMustBeConfirmedAsync(currentUserId, cancellationToken: cancellationToken);
+
     var validationResult = await _rateValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)

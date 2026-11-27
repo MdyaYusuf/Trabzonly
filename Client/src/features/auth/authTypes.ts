@@ -21,3 +21,12 @@ export interface ResetPasswordRequest {
   newPassword: string
   confirmNewPassword: string
 }
+
+export interface VerifyEmailRequest {
+  email: string
+  token: string
+}
+
+export interface ResendEmailConfirmationRequest {
+  email: string
+}

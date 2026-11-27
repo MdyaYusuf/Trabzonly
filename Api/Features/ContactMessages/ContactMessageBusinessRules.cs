@@ -1,9 +1,12 @@
 using Api.Core.Exceptions;
+using Api.Features.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.ContactMessages;
 
-public class ContactMessageBusinessRules(IContactMessageRepository _contactMessageRepository)
+public class ContactMessageBusinessRules(
+  IContactMessageRepository _contactMessageRepository,
+  UserBusinessRules _userBusinessRules)
 {
   public const int DailyLimit = 3;
   public static readonly TimeSpan SendCooldown = TimeSpan.FromHours(1);
@@ -63,6 +66,8 @@ public class ContactMessageBusinessRules(IContactMessageRepository _contactMessa
     string userRole,
     CancellationToken cancellationToken = default)
   {
+    await _userBusinessRules.EmailMustBeConfirmedAsync(userId, userRole, cancellationToken);
+
     if (userRole == "Admin")
     {
       return;

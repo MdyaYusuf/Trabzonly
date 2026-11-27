@@ -47,8 +47,17 @@ export function RegisterPage() {
       })
 
       if (response.success) {
-        setStatusMessage('Kayıt tamamlandı. Giriş sayfasına yönlendiriliyorsunuz...')
-        navigate('/login')
+        setStatusMessage(
+          response.message ||
+            'Kayıt oluşturuldu. E-posta adresinize gönderilen doğrulama bağlantısını kullanın.',
+        )
+        navigate('/login', {
+          state: {
+            registeredEmail: email,
+            notice:
+              'Kayıt başarılı. Giriş yapmadan önce e-posta kutunuzdaki doğrulama bağlantısını kullanın.',
+          },
+        })
         return
       }
 

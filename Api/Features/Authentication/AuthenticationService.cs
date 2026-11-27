@@ -25,6 +25,8 @@ public class AuthenticationService(
   IValidator<LoginRequest> _loginValidator,
   IValidator<ForgotPasswordRequest> _forgotPasswordValidator,
   IValidator<ResetPasswordRequest> _resetPasswordValidator,
+  IValidator<VerifyEmailRequest> _verifyEmailValidator,
+  IValidator<ResendEmailConfirmationRequest> _resendEmailConfirmationValidator,
   IOptions<TokenOptions> _tokenOptions,
   IOptions<EmailOptions> _emailOptions) : IAuthenticationService
 {
@@ -88,20 +90,27 @@ public class AuthenticationService(
     createdUser.Email = email;
     createdUser.RoleId = 2;
     createdUser.DisplayTag = UserDisplayTags.Default;
+    createdUser.EmailConfirmed = false;
 
     HashingHelper.CreatePasswordHash(request.Password, out string hash, out string key);
     createdUser.PasswordHash = hash;
     createdUser.PasswordKey = key;
 
+    string rawConfirmationToken = GenerateSecureToken();
+    createdUser.EmailConfirmationToken = HashingHelper.HashRefreshToken(rawConfirmationToken);
+    createdUser.EmailConfirmationTokenExpiration = DateTimeOffset.UtcNow.AddHours(24);
+
     await _userRepository.AddAsync(createdUser, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    await SendEmailConfirmationAsync(createdUser, rawConfirmationToken, cancellationToken);
 
     CreatedUserResponseDto response = _mapper.EntityToCreatedResponseDto(createdUser);
 
     return new ReturnModel<CreatedUserResponseDto>()
     {
       Success = true,
-      Message = "Kaydınız başarıyla tamamlandı.",
+      Message = "Kaydınız oluşturuldu. Devam etmek için e-posta adresinize gönderilen doğrulama bağlantısını kullanın.",
       Data = response,
       StatusCode = 201
     };
@@ -245,6 +254,112 @@ public class AuthenticationService(
       StatusCode = 200,
       Message = "Şifreniz başarıyla güncellendi. Yeni şifrenizle giriş yapabilirsiniz."
     };
+  }
+
+  public async Task<ReturnModel<NoData>> VerifyEmailAsync(
+    VerifyEmailRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    var validationResult = await _verifyEmailValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    string email = NormalizeEmail(request.Email);
+
+    User? user = await _userRepository.GetAsync(
+      predicate: u => u.Email == email,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    if (user != null && user.EmailConfirmed)
+    {
+      return new ReturnModel<NoData>()
+      {
+        Success = true,
+        StatusCode = 200,
+        Message = "E-posta adresiniz zaten doğrulanmış. Giriş yapabilirsiniz."
+      };
+    }
+
+    _userBusinessRules.EmailConfirmationTokenMustBeValid(user, request.Token);
+
+    user!.EmailConfirmed = true;
+    user.EmailConfirmationToken = null;
+    user.EmailConfirmationTokenExpiration = null;
+
+    _userRepository.Update(user);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      StatusCode = 200,
+      Message = "E-posta adresiniz doğrulandı. Artık giriş yapabilirsiniz."
+    };
+  }
+
+  public async Task<ReturnModel<NoData>> ResendEmailConfirmationAsync(
+    ResendEmailConfirmationRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    var validationResult = await _resendEmailConfirmationValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    string email = NormalizeEmail(request.Email);
+
+    User? user = await _userRepository.GetAsync(
+      predicate: u => u.Email == email,
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    if (user != null && user.IsActive && !user.EmailConfirmed)
+    {
+      string rawToken = GenerateSecureToken();
+      user.EmailConfirmationToken = HashingHelper.HashRefreshToken(rawToken);
+      user.EmailConfirmationTokenExpiration = DateTimeOffset.UtcNow.AddHours(24);
+
+      _userRepository.Update(user);
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+      await SendEmailConfirmationAsync(user, rawToken, cancellationToken);
+    }
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      StatusCode = 200,
+      Message = "Eğer bu e-posta ile doğrulanmamış bir hesap varsa, yeni bir doğrulama bağlantısı gönderildi."
+    };
+  }
+
+  private async Task SendEmailConfirmationAsync(
+    User user,
+    string rawToken,
+    CancellationToken cancellationToken)
+  {
+    string confirmUrl =
+      $"{_emailSettings.FrontendBaseUrl.TrimEnd('/')}/eposta-dogrula?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(rawToken)}";
+
+    string htmlBody =
+      $"""
+       <p>Merhaba {user.Username},</p>
+       <p>Trabzonly hesabını etkinleştirmek için e-posta adresini doğrulaman gerekiyor.</p>
+       <p><a href="{confirmUrl}">E-postanı doğrulamak için buraya tıkla</a></p>
+       <p>Bu bağlantı 24 saat geçerlidir. Bu kaydı sen oluşturmadıysan bu e-postayı yok sayabilirsin.</p>
+       """;
+
+    await _emailSender.SendAsync(
+      user.Email,
+      "Trabzonly — E-posta Doğrulama",
+      htmlBody,
+      cancellationToken);
   }
 
   private static string NormalizeEmail(string email)

@@ -10,6 +10,9 @@ public partial class UserMapper
   [MapperIgnoreSource(nameof(RegisterUserRequest.ConfirmPassword))]
   [MapperIgnoreTarget(nameof(User.PasswordHash))]
   [MapperIgnoreTarget(nameof(User.PasswordKey))]
+  [MapperIgnoreTarget(nameof(User.EmailConfirmed))]
+  [MapperIgnoreTarget(nameof(User.EmailConfirmationToken))]
+  [MapperIgnoreTarget(nameof(User.EmailConfirmationTokenExpiration))]
   public partial User CreateToEntity(RegisterUserRequest request);
   [MapperIgnoreSource(nameof(UpdateUserRequest.ImageFile))]
   [MapperIgnoreTarget(nameof(User.Username))]

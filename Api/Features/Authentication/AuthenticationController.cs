@@ -4,6 +4,7 @@ using Api.Core.Security;
 using Api.Features.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 
 namespace Api.Features.Authentication;
@@ -26,6 +27,7 @@ public class AuthenticationController(
   }
 
   [HttpPost("register")]
+  [EnableRateLimiting("auth-register")]
   public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
   {
     var result = await _authService.RegisterAsync(request, cancellationToken);
@@ -82,6 +84,7 @@ public class AuthenticationController(
   }
 
   [HttpPost("forgot-password")]
+  [EnableRateLimiting("auth-sensitive")]
   public async Task<IActionResult> ForgotPassword(
     [FromBody] ForgotPasswordRequest request,
     CancellationToken cancellationToken)
@@ -92,11 +95,34 @@ public class AuthenticationController(
   }
 
   [HttpPost("reset-password")]
+  [EnableRateLimiting("auth-sensitive")]
   public async Task<IActionResult> ResetPassword(
     [FromBody] ResetPasswordRequest request,
     CancellationToken cancellationToken)
   {
     var result = await _authService.ResetPasswordAsync(request, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpPost("verify-email")]
+  [EnableRateLimiting("auth-sensitive")]
+  public async Task<IActionResult> VerifyEmail(
+    [FromBody] VerifyEmailRequest request,
+    CancellationToken cancellationToken)
+  {
+    var result = await _authService.VerifyEmailAsync(request, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpPost("resend-email-confirmation")]
+  [EnableRateLimiting("auth-sensitive")]
+  public async Task<IActionResult> ResendEmailConfirmation(
+    [FromBody] ResendEmailConfirmationRequest request,
+    CancellationToken cancellationToken)
+  {
+    var result = await _authService.ResendEmailConfirmationAsync(request, cancellationToken);
 
     return CreateActionResult(result);
   }

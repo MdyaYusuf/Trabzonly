@@ -31,6 +31,9 @@ public class User : Entity<Guid>
   public DateTimeOffset? RefreshTokenExpiration { get; set; }
   public string? PasswordResetToken { get; set; }
   public DateTimeOffset? PasswordResetTokenExpiration { get; set; }
+  public bool EmailConfirmed { get; set; }
+  public string? EmailConfirmationToken { get; set; }
+  public DateTimeOffset? EmailConfirmationTokenExpiration { get; set; }
   public string? ProfileImageUrl { get; set; }
   public string? Bio { get; set; }
   public string? DisplayTag { get; set; }

@@ -13,7 +13,8 @@ function isPublicAuthPath(pathname: string = window.location.pathname): boolean 
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/sifremi-unuttum" ||
-    pathname === "/sifre-sifirla"
+    pathname === "/sifre-sifirla" ||
+    pathname === "/eposta-dogrula"
   );
 }
 

@@ -14,8 +14,8 @@ public class EmailOptions
   public bool EnableSsl { get; set; } = true;
 }
 
-public class LoggingEmailSender(
-  ILogger<LoggingEmailSender> _logger,
+public class EmailSender(
+  ILogger<EmailSender> _logger,
   IOptions<EmailOptions> _options) : IEmailSender
 {
   public Task SendAsync(

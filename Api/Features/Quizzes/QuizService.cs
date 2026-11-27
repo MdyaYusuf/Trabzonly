@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Api.Core.Exceptions;
 using Api.Core.Repositories;
 using Api.Core.Responses;
+using Api.Features.Users;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ public class QuizService(
   QuizMapper _mapper,
   QuizBusinessRules _businessRules,
   QuizCategoryBusinessRules _categoryBusinessRules,
+  UserBusinessRules _userBusinessRules,
   IUnitOfWork _unitOfWork,
   IValidator<CreateQuizRequest> _createValidator,
   IValidator<UpdateQuizRequest> _updateValidator,
@@ -518,6 +520,8 @@ public class QuizService(
     Guid currentUserId,
     CancellationToken cancellationToken = default)
   {
+    await _userBusinessRules.EmailMustBeConfirmedAsync(currentUserId, cancellationToken: cancellationToken);
+
     var validationResult = await _submitValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)

@@ -4,7 +4,9 @@ import type {
   ForgotPasswordRequest,
   LoginRequest,
   RegisterUserRequest,
+  ResendEmailConfirmationRequest,
   ResetPasswordRequest,
+  VerifyEmailRequest,
 } from './authTypes'
 import type { UserResponseDto, CreatedUserResponseDto } from '../users/userTypes'
 import userService from '../users/userService'
@@ -73,6 +75,20 @@ export const authService = {
 
   resetPassword: async (request: ResetPasswordRequest) => {
     return await apiClient<null>('/Authentication/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    })
+  },
+
+  verifyEmail: async (request: VerifyEmailRequest) => {
+    return await apiClient<null>('/Authentication/verify-email', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    })
+  },
+
+  resendEmailConfirmation: async (request: ResendEmailConfirmationRequest) => {
+    return await apiClient<null>('/Authentication/resend-email-confirmation', {
       method: 'POST',
       body: JSON.stringify(request),
     })

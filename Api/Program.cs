@@ -1,7 +1,9 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Api.Core.Email;
 using Api.Core.Middlewares;
+using Api.Core.Responses;
 using Api.Core.Security;
 using Api.Data;
 using Api.Features.Authentication;
@@ -21,6 +23,7 @@ using Api.Features.ContactMessages;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Api.Features.Categories;
 using Api.Features.Posts;
@@ -64,7 +67,44 @@ builder.Services.AddContactMessageDependencies();
 
 builder.Services.Configure<TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
-builder.Services.AddScoped<IEmailSender, LoggingEmailSender>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+builder.Services.AddRateLimiter(options =>
+{
+  options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+  options.OnRejected = async (context, cancellationToken) =>
+  {
+    context.HttpContext.Response.ContentType = "application/json";
+    await context.HttpContext.Response.WriteAsJsonAsync(
+      new ReturnModel<NoData>
+      {
+        Success = false,
+        StatusCode = StatusCodes.Status429TooManyRequests,
+        Message = "Çok fazla istek gönderildi. Lütfen bir süre sonra tekrar deneyin."
+      },
+      cancellationToken);
+  };
+
+  options.AddPolicy("auth-register", httpContext =>
+    RateLimitPartition.GetFixedWindowLimiter(
+      partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+      factory: _ => new FixedWindowRateLimiterOptions
+      {
+        PermitLimit = 5,
+        Window = TimeSpan.FromMinutes(15),
+        QueueLimit = 0
+      }));
+
+  options.AddPolicy("auth-sensitive", httpContext =>
+    RateLimitPartition.GetFixedWindowLimiter(
+      partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+      factory: _ => new FixedWindowRateLimiterOptions
+      {
+        PermitLimit = 5,
+        Window = TimeSpan.FromMinutes(15),
+        QueueLimit = 0
+      }));
+});
 
 var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() ?? throw new InvalidOperationException("TokenOptions bölümü yapılandırma dosyasında appsettings bulunamadı.");
 
@@ -129,6 +169,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseCors("AllowFrontend");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

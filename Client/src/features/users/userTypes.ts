@@ -7,6 +7,7 @@ export interface UserResponseDto {
   displayTag?: string | null
   profileImageUrl?: string | null
   isActive: boolean
+  emailConfirmed: boolean
   createdDate: string
   updatedDate?: string | null
   roleId: number

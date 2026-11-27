@@ -24,4 +24,12 @@ public interface IAuthenticationService
   Task<ReturnModel<NoData>> ResetPasswordAsync(
     ResetPasswordRequest request,
     CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> VerifyEmailAsync(
+    VerifyEmailRequest request,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> ResendEmailConfirmationAsync(
+    ResendEmailConfirmationRequest request,
+    CancellationToken cancellationToken = default);
 }

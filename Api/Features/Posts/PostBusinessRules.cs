@@ -1,10 +1,13 @@
 using Api.Core.Exceptions;
 using Api.Features.Polls;
+using Api.Features.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Features.Posts;
 
-public class PostBusinessRules(IPostRepository _postRepository)
+public class PostBusinessRules(
+  IPostRepository _postRepository,
+  UserBusinessRules _userBusinessRules)
 {
   public async Task<Post> GetPostIfExistAsync(
     Guid id,
@@ -63,6 +66,8 @@ public class PostBusinessRules(IPostRepository _postRepository)
     string userRole,
     CancellationToken cancellationToken = default)
   {
+    await _userBusinessRules.EmailMustBeConfirmedAsync(userId, userRole, cancellationToken);
+
     if (userRole == "Admin")
     {
       return;
