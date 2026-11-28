@@ -28,153 +28,204 @@ using Microsoft.IdentityModel.Tokens;
 using Api.Features.Categories;
 using Api.Features.Posts;
 using Api.Features.Squads;
+using Serilog;
+using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+  .MinimumLevel.Information()
+  .WriteTo.Console()
+  .CreateBootstrapLogger();
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+try
 {
-  options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-});
+  var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddOpenApi();
-builder.Services.AddProblemDetails();
-builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-  options.SuppressModelStateInvalidFilter = true;
-});
-
-builder.Services.AddDataDependencies(builder.Configuration);
-builder.Services.AddUserDependencies();
-builder.Services.AddRoleDependencies();
-builder.Services.AddAuthenticationDependencies();
-builder.Services.AddPlayerDependencies();
-builder.Services.AddInjuryDependencies();
-builder.Services.AddQuizDependencies();
-builder.Services.AddPostDependencies();
-builder.Services.AddSquadDependencies();
-builder.Services.AddCategoryDependencies();
-builder.Services.AddCommentDependencies();
-builder.Services.AddPositionDependencies();
-builder.Services.AddSeasonDependencies();
-builder.Services.AddPlayerStatsDependencies();
-builder.Services.AddMetricsDependencies();
-builder.Services.AddPollDependencies();
-builder.Services.AddMatchWeekDependencies();
-builder.Services.AddContactMessageDependencies();
-
-builder.Services.Configure<TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
-builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
-builder.Services.AddScoped<IEmailSender, EmailSender>();
-
-builder.Services.AddRateLimiter(options =>
-{
-  options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-  options.OnRejected = async (context, cancellationToken) =>
+  builder.Host.UseSerilog((context, services, configuration) =>
   {
-    context.HttpContext.Response.ContentType = "application/json";
-    await context.HttpContext.Response.WriteAsJsonAsync(
-      new ReturnModel<NoData>
-      {
-        Success = false,
-        StatusCode = StatusCodes.Status429TooManyRequests,
-        Message = "Çok fazla istek gönderildi. Lütfen bir süre sonra tekrar deneyin."
-      },
-      cancellationToken);
-  };
+    string logsDirectory = Path.Combine(context.HostingEnvironment.ContentRootPath, "Logs");
+    Directory.CreateDirectory(logsDirectory);
 
-  options.AddPolicy("auth-register", httpContext =>
-    RateLimitPartition.GetFixedWindowLimiter(
-      partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-      factory: _ => new FixedWindowRateLimiterOptions
-      {
-        PermitLimit = 5,
-        Window = TimeSpan.FromMinutes(15),
-        QueueLimit = 0
-      }));
+    configuration
+      .ReadFrom.Configuration(context.Configuration)
+      .ReadFrom.Services(services)
+      .Enrich.FromLogContext()
+      .WriteTo.Console()
+      .WriteTo.File(
+        path: Path.Combine(logsDirectory, "trabzonly-.log"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 7,
+        shared: true,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+  });
 
-  options.AddPolicy("auth-sensitive", httpContext =>
-    RateLimitPartition.GetFixedWindowLimiter(
-      partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-      factory: _ => new FixedWindowRateLimiterOptions
-      {
-        PermitLimit = 5,
-        Window = TimeSpan.FromMinutes(15),
-        QueueLimit = 0
-      }));
-});
-
-var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() ?? throw new InvalidOperationException("TokenOptions bölümü yapılandırma dosyasında appsettings bulunamadı.");
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-  .AddJwtBearer(options =>
+  builder.Services.AddControllers().AddJsonOptions(options =>
   {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-      ValidateIssuer = true,
-      ValidateAudience = true,
-      ValidateLifetime = true,
-      ValidIssuer = tokenOptions.Issuer,
-      ValidAudience = tokenOptions.Audience,
-      ValidateIssuerSigningKey = true,
-      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey)),
-      ClockSkew = TimeSpan.Zero
-    };
-    options.Events = new JwtBearerEvents
-    {
-      OnMessageReceived = context =>
-      {
-        string? authorization = context.Request.Headers.Authorization;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+  });
 
-        if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+  builder.Services.AddHttpContextAccessor();
+  builder.Services.AddOpenApi();
+  builder.Services.AddProblemDetails();
+  builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+
+  builder.Services.Configure<ApiBehaviorOptions>(options =>
+  {
+    options.SuppressModelStateInvalidFilter = true;
+  });
+
+  builder.Services.AddDataDependencies(builder.Configuration);
+  builder.Services.AddUserDependencies();
+  builder.Services.AddRoleDependencies();
+  builder.Services.AddAuthenticationDependencies();
+  builder.Services.AddPlayerDependencies();
+  builder.Services.AddInjuryDependencies();
+  builder.Services.AddQuizDependencies();
+  builder.Services.AddPostDependencies();
+  builder.Services.AddSquadDependencies();
+  builder.Services.AddCategoryDependencies();
+  builder.Services.AddCommentDependencies();
+  builder.Services.AddPositionDependencies();
+  builder.Services.AddSeasonDependencies();
+  builder.Services.AddPlayerStatsDependencies();
+  builder.Services.AddMetricsDependencies();
+  builder.Services.AddPollDependencies();
+  builder.Services.AddMatchWeekDependencies();
+  builder.Services.AddContactMessageDependencies();
+
+  builder.Services.Configure<TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
+  builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
+  builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+  builder.Services.AddRateLimiter(options =>
+  {
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+      context.HttpContext.Response.ContentType = "application/json";
+      await context.HttpContext.Response.WriteAsJsonAsync(
+        new ReturnModel<NoData>
         {
+          Success = false,
+          StatusCode = StatusCodes.Status429TooManyRequests,
+          Message = "Çok fazla istek gönderildi. Lütfen bir süre sonra tekrar deneyin."
+        },
+        cancellationToken);
+    };
+
+    options.AddPolicy("auth-register", httpContext =>
+      RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+          PermitLimit = 5,
+          Window = TimeSpan.FromMinutes(15),
+          QueueLimit = 0
+        }));
+
+    options.AddPolicy("auth-sensitive", httpContext =>
+      RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+          PermitLimit = 5,
+          Window = TimeSpan.FromMinutes(15),
+          QueueLimit = 0
+        }));
+  });
+
+  var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() ?? throw new InvalidOperationException("TokenOptions bölümü yapılandırma dosyasında appsettings bulunamadı.");
+
+  builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidIssuer = tokenOptions.Issuer,
+        ValidAudience = tokenOptions.Audience,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey)),
+        ClockSkew = TimeSpan.Zero
+      };
+      options.Events = new JwtBearerEvents
+      {
+        OnMessageReceived = context =>
+        {
+          string? authorization = context.Request.Headers.Authorization;
+
+          if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+          {
+            return Task.CompletedTask;
+          }
+
+          if (context.Request.Cookies.TryGetValue("accessToken", out string? accessToken))
+          {
+            context.Token = accessToken;
+          }
+
           return Task.CompletedTask;
         }
+      };
+    });
 
-        if (context.Request.Cookies.TryGetValue("accessToken", out string? accessToken))
-        {
-          context.Token = accessToken;
-        }
+  builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-        return Task.CompletedTask;
+  builder.Services.AddCors(options =>
+  {
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+      policy.WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+  });
+
+  var app = builder.Build();
+
+  app.UseExceptionHandler();
+
+  if (app.Environment.IsDevelopment())
+  {
+    app.MapOpenApi();
+  }
+
+  app.UseHttpsRedirection();
+  app.UseStaticFiles();
+
+  app.UseSerilogRequestLogging(options =>
+  {
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0} ms";
+    options.GetLevel = (httpContext, _, exception) =>
+    {
+      if (exception != null || httpContext.Response.StatusCode >= StatusCodes.Status500InternalServerError)
+      {
+        return LogEventLevel.Error;
       }
+
+      return LogEventLevel.Information;
     };
   });
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+  app.UseCors("AllowFrontend");
 
-builder.Services.AddCors(options =>
-{
-  options.AddPolicy("AllowFrontend", policy =>
-  {
-    policy.WithOrigins("http://localhost:5173")
-      .AllowAnyHeader()
-      .AllowAnyMethod()
-      .AllowCredentials();
-  });
-});
+  app.UseRateLimiter();
 
-var app = builder.Build();
+  app.UseAuthentication();
+  app.UseAuthorization();
 
-app.UseExceptionHandler();
+  app.MapControllers();
 
-if (app.Environment.IsDevelopment())
-{
-  app.MapOpenApi();
+  app.Run();
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseCors("AllowFrontend");
-
-app.UseRateLimiter();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+  Log.Fatal(ex, "Uygulama başlatılamadı.");
+  throw;
+}
+finally
+{
+  Log.CloseAndFlush();
+}

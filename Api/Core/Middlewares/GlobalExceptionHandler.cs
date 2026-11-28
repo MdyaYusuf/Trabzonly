@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace Api.Core.Middlewares;
 
-public class GlobalExceptionHandler : IExceptionHandler
+public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : IExceptionHandler
 {
   private static readonly JsonSerializerOptions _jsonOptions = new()
   {
@@ -24,6 +24,19 @@ public class GlobalExceptionHandler : IExceptionHandler
       ValidationException => StatusCodes.Status400BadRequest,
       _ => StatusCodes.Status500InternalServerError
     };
+
+    if (statusCode >= StatusCodes.Status500InternalServerError)
+    {
+      _logger.LogError(exception, "İşlenmeyen hata. Path: {Path}", httpContext.Request.Path);
+    }
+    else if (exception is not ValidationException)
+    {
+      _logger.LogWarning(
+        exception,
+        "İstek başarısız. StatusCode: {StatusCode}. Path: {Path}",
+        statusCode,
+        httpContext.Request.Path);
+    }
 
     var response = new ReturnModel<NoData>
     {

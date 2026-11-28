@@ -28,7 +28,9 @@ public class AuthenticationService(
   IValidator<VerifyEmailRequest> _verifyEmailValidator,
   IValidator<ResendEmailConfirmationRequest> _resendEmailConfirmationValidator,
   IOptions<TokenOptions> _tokenOptions,
-  IOptions<EmailOptions> _emailOptions) : IAuthenticationService
+  IOptions<EmailOptions> _emailOptions,
+  ILogger<AuthenticationService> _logger,
+  IHostEnvironment _environment) : IAuthenticationService
 {
   private readonly TokenOptions _options = _tokenOptions.Value;
   private readonly EmailOptions _emailSettings = _emailOptions.Value;
@@ -102,6 +104,11 @@ public class AuthenticationService(
 
     await _userRepository.AddAsync(createdUser, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    _logger.LogInformation(
+      "Yeni kullanıcı kaydı oluşturuldu. UserId: {UserId}. Email: {Email}",
+      createdUser.Id,
+      createdUser.Email);
 
     await SendEmailConfirmationAsync(createdUser, rawConfirmationToken, cancellationToken);
 
@@ -202,6 +209,13 @@ public class AuthenticationService(
          <p>Bu bağlantı 1 saat geçerlidir. Talebi sen oluşturmadıysan bu e-postayı yok sayabilirsin.</p>
          """;
 
+      _logger.LogInformation(
+        "Şifre sıfırlama e-postası istendi. UserId: {UserId}. Email: {Email}",
+        user.Id,
+        email);
+
+      LogDevelopmentLink("Şifre sıfırlama", resetUrl);
+
       await _emailSender.SendAsync(
         email,
         "Trabzonly — Şifre Sıfırlama",
@@ -248,6 +262,11 @@ public class AuthenticationService(
     _userRepository.Update(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+    _logger.LogInformation(
+      "Şifre sıfırlama tamamlandı. UserId: {UserId}. Email: {Email}",
+      user.Id,
+      email);
+
     return new ReturnModel<NoData>()
     {
       Success = true,
@@ -292,6 +311,11 @@ public class AuthenticationService(
 
     _userRepository.Update(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    _logger.LogInformation(
+      "E-posta doğrulandı. UserId: {UserId}. Email: {Email}",
+      user.Id,
+      email);
 
     return new ReturnModel<NoData>()
     {
@@ -355,11 +379,31 @@ public class AuthenticationService(
        <p>Bu bağlantı 24 saat geçerlidir. Bu kaydı sen oluşturmadıysan bu e-postayı yok sayabilirsin.</p>
        """;
 
+    _logger.LogInformation(
+      "E-posta doğrulama bağlantısı gönderiliyor. UserId: {UserId}. Email: {Email}",
+      user.Id,
+      user.Email);
+
+    LogDevelopmentLink("E-posta doğrulama", confirmUrl);
+
     await _emailSender.SendAsync(
       user.Email,
       "Trabzonly — E-posta Doğrulama",
       htmlBody,
       cancellationToken);
+  }
+
+  private void LogDevelopmentLink(string purpose, string url)
+  {
+    if (!_environment.IsDevelopment())
+    {
+      return;
+    }
+
+    _logger.LogInformation(
+      "Geliştirme bağlantısı ({Purpose}): {Url}",
+      purpose,
+      url);
   }
 
   private static string NormalizeEmail(string email)

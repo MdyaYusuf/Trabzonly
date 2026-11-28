@@ -1,5 +1,9 @@
+using MailKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
 
 namespace Api.Core.Email;
 
@@ -16,9 +20,10 @@ public class EmailOptions
 
 public class EmailSender(
   ILogger<EmailSender> _logger,
-  IOptions<EmailOptions> _options) : IEmailSender
+  IOptions<EmailOptions> _options,
+  IHostEnvironment _environment) : IEmailSender
 {
-  public Task SendAsync(
+  public async Task SendAsync(
     string toEmail,
     string subject,
     string htmlBody,
@@ -28,32 +33,83 @@ public class EmailSender(
 
     if (!string.IsNullOrWhiteSpace(options.SmtpHost) && !string.IsNullOrWhiteSpace(options.FromAddress))
     {
-      using var client = new System.Net.Mail.SmtpClient(options.SmtpHost, options.SmtpPort)
+      try
       {
-        EnableSsl = options.EnableSsl,
-        DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network
-      };
+        var message = new MimeMessage();
+        message.From.Add(MailboxAddress.Parse(options.FromAddress));
+        message.To.Add(MailboxAddress.Parse(toEmail));
+        message.Subject = subject;
+        message.Body = new TextPart("html")
+        {
+          Text = htmlBody
+        };
 
-      if (!string.IsNullOrWhiteSpace(options.SmtpUsername))
-      {
-        client.Credentials = new System.Net.NetworkCredential(options.SmtpUsername, options.SmtpPassword);
+        using var client = new SmtpClient();
+
+        await client.ConnectAsync(
+          options.SmtpHost,
+          options.SmtpPort,
+          ResolveSecureSocketOptions(options),
+          cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(options.SmtpUsername))
+        {
+          await client.AuthenticateAsync(
+            options.SmtpUsername,
+            options.SmtpPassword ?? string.Empty,
+            cancellationToken);
+        }
+
+        await client.SendAsync(new SendRequest(message), cancellationToken);
+        await client.DisconnectAsync(true, cancellationToken);
+
+        _logger.LogInformation(
+          "E-posta gönderildi. Alıcı: {To}. Konu: {Subject}",
+          toEmail,
+          subject);
+
+        return;
       }
-
-      using var message = new System.Net.Mail.MailMessage(options.FromAddress, toEmail, subject, htmlBody)
+      catch (Exception ex)
       {
-        IsBodyHtml = true
-      };
+        _logger.LogError(
+          ex,
+          "E-posta gönderimi başarısız. Alıcı: {To}. Konu: {Subject}",
+          toEmail,
+          subject);
 
-      client.Send(message);
-      return Task.CompletedTask;
+        throw;
+      }
     }
 
-    _logger.LogInformation(
-      "E-posta gönderimi (SMTP yapılandırılmadı). Alıcı: {To}. Konu: {Subject}. Gövde: {Body}",
-      toEmail,
-      subject,
-      htmlBody);
+    if (_environment.IsProduction())
+    {
+      _logger.LogWarning(
+        "E-posta gönderilmedi: SMTP yapılandırılmadı. Alıcı: {To}. Konu: {Subject}",
+        toEmail,
+        subject);
+    }
+    else
+    {
+      _logger.LogInformation(
+        "E-posta gönderilmedi: SMTP yapılandırılmadı. Alıcı: {To}. Konu: {Subject}",
+        toEmail,
+        subject);
+    }
+  }
 
-    return Task.CompletedTask;
+  private static SecureSocketOptions ResolveSecureSocketOptions(EmailOptions options)
+  {
+    if (!options.EnableSsl)
+    {
+      return SecureSocketOptions.None;
+    }
+
+    if (options.SmtpPort == 465)
+    {
+      return SecureSocketOptions.SslOnConnect;
+    }
+
+    return SecureSocketOptions.StartTls;
   }
 }
